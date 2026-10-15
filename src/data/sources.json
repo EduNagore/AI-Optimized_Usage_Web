@@ -1,0 +1,370 @@
+[
+  {
+    "id": "anthropic-modelos",
+    "title": "Modelos",
+    "url": "https://platform.claude.com/docs/en/about-claude/models/overview.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "anthropic-precios",
+    "title": "Precios",
+    "url": "https://platform.claude.com/docs/en/about-claude/pricing.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas",
+    "title": "Optimizar coste e inteligencia (mediciones publicadas)",
+    "url": "https://platform.claude.com/docs/en/about-claude/models/optimizing-for-cost-and-intelligence.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "anthropic-guia-de-migracion",
+    "title": "Guía de migración",
+    "url": "https://platform.claude.com/docs/en/about-claude/models/migration-guide.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "anthropic-buenas-practicas-de-prompting",
+    "title": "Buenas prácticas de prompting",
+    "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "anthropic-esfuerzo",
+    "title": "Esfuerzo",
+    "url": "https://platform.claude.com/docs/en/build-with-claude/effort.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "anthropic-razonamiento-adaptativo",
+    "title": "Razonamiento adaptativo",
+    "url": "https://platform.claude.com/docs/en/build-with-claude/adaptive-thinking.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "anthropic-prompt-caching",
+    "title": "Prompt caching",
+    "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "anthropic-batch",
+    "title": "Batch",
+    "url": "https://platform.claude.com/docs/en/build-with-claude/batch-processing.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "anthropic-conteo-de-tokens",
+    "title": "Conteo de tokens",
+    "url": "https://platform.claude.com/docs/en/build-with-claude/token-counting.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "anthropic-compactacion",
+    "title": "Compactación",
+    "url": "https://platform.claude.com/docs/en/build-with-claude/compaction.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "anthropic-context-editing",
+    "title": "Context editing",
+    "url": "https://platform.claude.com/docs/en/build-with-claude/context-editing.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "anthropic-preserved-thinking",
+    "title": "Preserved thinking",
+    "url": "https://platform.claude.com/docs/en/build-with-claude/preserved-thinking.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "anthropic-tool-search",
+    "title": "Tool search",
+    "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-search-tool.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "anthropic-programmatic-tool-calling",
+    "title": "Programmatic tool calling",
+    "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "anthropic-memory-tool",
+    "title": "Memory tool",
+    "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "anthropic-skills",
+    "title": "Skills",
+    "url": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "anthropic-structured-outputs",
+    "title": "Structured outputs",
+    "url": "https://platform.claude.com/docs/en/build-with-claude/structured-outputs.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "anthropic-vision",
+    "title": "Visión",
+    "url": "https://platform.claude.com/docs/en/build-with-claude/vision.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "anthropic-managed-agents",
+    "title": "Managed Agents",
+    "url": "https://platform.claude.com/docs/en/managed-agents/overview.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "anthropic-admin-api-de-uso-y-coste",
+    "title": "Admin API de uso y coste",
+    "url": "https://platform.claude.com/docs/en/manage-claude/usage-cost-api.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "anthropic-cookbook-de-optimizacion-de-coste",
+    "title": "Cookbook de optimización de coste",
+    "url": "https://platform.claude.com/cookbook/cost-optimization-cost-optimization",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "claude-code-indice-completo",
+    "title": "Índice completo",
+    "url": "https://code.claude.com/docs/llms.txt",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "claude-code-comandos",
+    "title": "Comandos",
+    "url": "https://code.claude.com/docs/en/commands.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "claude-code-modelo-y-esfuerzo",
+    "title": "Modelo y esfuerzo",
+    "url": "https://code.claude.com/docs/en/model-config.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "claude-code-costes",
+    "title": "Costes",
+    "url": "https://code.claude.com/docs/en/costs.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "claude-code-buenas-practicas",
+    "title": "Buenas prácticas",
+    "url": "https://code.claude.com/docs/en/best-practices.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "claude-code-agentes-en-paralelo",
+    "title": "Agentes en paralelo",
+    "url": "https://code.claude.com/docs/en/agents.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "claude-code-subagentes",
+    "title": "Subagentes",
+    "url": "https://code.claude.com/docs/en/sub-agents.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "claude-code-flujos-dinamicos",
+    "title": "Flujos dinámicos",
+    "url": "https://code.claude.com/docs/en/workflows.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "claude-code-agent-teams",
+    "title": "Agent teams",
+    "url": "https://code.claude.com/docs/en/agent-teams.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "claude-code-skills",
+    "title": "Skills",
+    "url": "https://code.claude.com/docs/en/skills.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "claude-code-hooks",
+    "title": "Hooks",
+    "url": "https://code.claude.com/docs/en/hooks-guide.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "claude-code-memoria-y-claude-md",
+    "title": "Memoria y CLAUDE.md",
+    "url": "https://code.claude.com/docs/en/memory.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "claude-code-modos-de-permiso",
+    "title": "Modos de permiso",
+    "url": "https://code.claude.com/docs/en/permission-modes.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "claude-code-prompt-caching-en-claude-code",
+    "title": "Prompt caching en Claude Code",
+    "url": "https://code.claude.com/docs/en/prompt-caching.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "claude-code-rutinas",
+    "title": "Rutinas",
+    "url": "https://code.claude.com/docs/en/routines.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "claude-code-changelog",
+    "title": "Changelog",
+    "url": "https://code.claude.com/docs/en/changelog.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "openai-ultimo-modelo-y-migracion",
+    "title": "Último modelo y migración",
+    "url": "https://developers.openai.com/api/docs/guides/latest-model",
+    "publisher": "OpenAI",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "openai-precios",
+    "title": "Precios",
+    "url": "https://developers.openai.com/api/docs/pricing",
+    "publisher": "OpenAI",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "openai-codex-y-chatgpt-work",
+    "title": "Codex y ChatGPT Work",
+    "url": "https://learn.chatgpt.com/docs",
+    "publisher": "OpenAI",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "openai-notas-de-version-de-chatgpt",
+    "title": "Notas de versión de ChatGPT",
+    "url": "https://help.openai.com/en/articles/6825453-chatgpt-release-notes",
+    "publisher": "OpenAI",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "google-ultimo-modelo",
+    "title": "Último modelo",
+    "url": "https://ai.google.dev/gemini-api/docs/latest-model",
+    "publisher": "Google",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "google-changelog-de-la-api",
+    "title": "Changelog de la API",
+    "url": "https://ai.google.dev/gemini-api/docs/changelog",
+    "publisher": "Google",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "google-guia-de-gemini-3-thinking-level",
+    "title": "Guía de Gemini 3 (`thinking_level`)",
+    "url": "https://ai.google.dev/gemini-api/docs/gemini-3",
+    "publisher": "Google",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  },
+  {
+    "id": "google-precios",
+    "title": "Precios",
+    "url": "https://ai.google.dev/gemini-api/docs/pricing",
+    "publisher": "Google",
+    "official": true,
+    "lastChecked": "2026-10-15"
+  }
+]

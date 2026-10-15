@@ -1,0 +1,11 @@
+dist/
+.astro/
+node_modules/
+package-lock.json
+plan/
+.claude/
+CLAUDE.md
+src/data/*.json
+research/
+playwright-report/
+test-results/

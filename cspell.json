@@ -1,0 +1,8 @@
+{
+  "version": "0.2",
+  "language": "es,en",
+  "import": ["@cspell/dict-es-es/cspell-ext.json"],
+  "dictionaries": ["es-es", "softwareTerms", "typescript", "npm", "project"],
+  "dictionaryDefinitions": [{ "name": "project", "path": "./cspell-project.txt", "addWords": true }],
+  "ignorePaths": ["node_modules", "dist", ".astro", "package-lock.json", "src/data/sources.json"]
+}
