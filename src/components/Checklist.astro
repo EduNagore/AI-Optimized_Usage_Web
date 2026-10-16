@@ -1,0 +1,135 @@
+---
+/**
+ * Lista de comprobación marcable. El estado se guarda en el navegador (localStorage, dentro de un
+ * try/catch): si el almacenamiento falla, la lista funciona igual pero no recuerda.
+ */
+interface Props {
+  /** Identificador estable dentro de la página, para guardar el estado. */
+  id: string;
+  items: string[];
+  titulo?: string;
+}
+
+const { id, items, titulo = 'Lista de comprobación' } = Astro.props;
+---
+
+<div class="checklist" data-checklist={id}>
+  <p class="title">{titulo}</p>
+  <ul>
+    {items.map((item, i) => (
+      <li>
+        <label>
+          <input type="checkbox" data-index={i} />
+          <span>{item}</span>
+        </label>
+      </li>
+    ))}
+  </ul>
+  <p class="progress" data-progress>
+    0 de {items.length} marcados
+  </p>
+</div>
+
+<style>
+  .checklist {
+    margin-block: var(--space-6);
+    padding: var(--space-4) var(--space-5);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+  .title {
+    font-weight: 600;
+    margin: 0 0 var(--space-3);
+    color: var(--color-heading);
+    font-size: var(--text-base);
+    line-height: 1.3;
+  }
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  li {
+    margin: 0;
+  }
+  li + li {
+    margin-top: var(--space-1);
+  }
+  label {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding-block: var(--space-1);
+    cursor: pointer;
+  }
+  input {
+    flex: none;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin: 0.2rem 0 0;
+    accent-color: var(--color-accent);
+    cursor: pointer;
+  }
+  input:checked + span {
+    color: var(--color-text-muted);
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+  }
+  .progress {
+    margin: var(--space-3) 0 0;
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    font-variant-numeric: tabular-nums;
+  }
+  @media print {
+    input {
+      accent-color: #000;
+    }
+  }
+</style>
+
+<script>
+  // Mejora progresiva: sin JS, las casillas se marcan pero no se recuerdan.
+  const storageKey = (id: string) => `checklist:${location.pathname}:${id}`;
+
+  function load(id: string): number[] {
+    try {
+      const raw = localStorage.getItem(storageKey(id));
+      const parsed: unknown = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed.filter((n): n is number => typeof n === 'number') : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function save(id: string, checked: number[]) {
+    try {
+      localStorage.setItem(storageKey(id), JSON.stringify(checked));
+    } catch {
+      // Almacenamiento no disponible: la lista sigue funcionando sin memoria.
+    }
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-checklist]').forEach((root) => {
+    const id = root.dataset['checklist'] ?? '';
+    const boxes = [...root.querySelectorAll<HTMLInputElement>('input[type="checkbox"]')];
+    const progress = root.querySelector<HTMLElement>('[data-progress]');
+    const update = () => {
+      const n = boxes.filter((b) => b.checked).length;
+      if (progress) progress.textContent = `${n} de ${boxes.length} marcados`;
+    };
+    const saved = new Set(load(id));
+    boxes.forEach((b, i) => {
+      b.checked = saved.has(i);
+      b.addEventListener('change', () => {
+        save(
+          id,
+          boxes.flatMap((x, j) => (x.checked ? [j] : [])),
+        );
+        update();
+      });
+    });
+    update();
+  });
+</script>

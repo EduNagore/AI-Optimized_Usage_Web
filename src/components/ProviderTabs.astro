@@ -1,0 +1,27 @@
+---
+import { TabItem, Tabs } from '@astrojs/starlight/components';
+
+/**
+ * Pestañas Claude / OpenAI / Google sincronizadas en toda la página (y recordadas en el navegador).
+ * Cada proveedor es un slot con nombre; los que no se pasen no aparecen.
+ *
+ *   <ProviderTabs>
+ *     <div slot="claude">…</div>
+ *     <div slot="openai">…</div>
+ *   </ProviderTabs>
+ */
+const providers = [
+  { slot: 'claude', label: 'Claude' },
+  { slot: 'openai', label: 'OpenAI' },
+  { slot: 'google', label: 'Google' },
+] as const;
+const present = providers.filter((p) => Astro.slots.has(p.slot));
+---
+
+<Tabs syncKey="proveedor">
+  {present.map((p) => (
+    <TabItem label={p.label}>
+      <slot name={p.slot} />
+    </TabItem>
+  ))}
+</Tabs>

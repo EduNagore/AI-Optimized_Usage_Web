@@ -1,0 +1,116 @@
+---
+import { getEntry } from 'astro:content';
+import { url } from '@lib/paths';
+import Icon, { type IconName } from '../Icon.astro';
+
+/** Accesos directos a las herramientas de uso diario. Marca las que aún están en preparación. */
+const items: Array<{ id: string; icon: IconName; title: string; text: string }> = [
+  {
+    id: 'm12-recursos/chuleta',
+    icon: 'chuleta',
+    title: 'Chuleta',
+    text: 'Reglas, comandos y equivalencias en una página imprimible.',
+  },
+  {
+    id: 'm5-tokens-y-contexto/calculadora-de-coste',
+    icon: 'calculadora',
+    title: 'Calculadora de coste',
+    text: 'Cuánto cuesta una tarea y qué palanca ahorra más.',
+  },
+  {
+    id: 'm4-modelo-y-esfuerzo/selector-interactivo',
+    icon: 'selector',
+    title: 'Selector de modelo',
+    text: 'Una recomendación razonada de modelo y esfuerzo.',
+  },
+  {
+    id: 'm7-claude-code/comandos',
+    icon: 'comando',
+    title: 'Explorador de comandos',
+    text: 'Todos los comandos de Claude Code, con su impacto en tokens.',
+  },
+];
+const resolved = await Promise.all(
+  items.map(async (i) => {
+    const entry = await getEntry('docs', i.id);
+    if (!entry) throw new Error(`Accesos directos: no existe la página «${i.id}»`);
+    return { ...i, soon: entry.data.status === 'en-preparacion' };
+  }),
+);
+---
+
+<section class="shortcuts" aria-labelledby="accesos">
+  <h2 id="accesos">Herramientas de uso diario</h2>
+  <ul>
+    {resolved.map((s) => (
+      <li>
+        <a href={url(s.id)}>
+          <span class="icon">
+            <Icon name={s.icon} size={22} />
+          </span>
+          <span class="body">
+            <span class="title">{s.title}</span>
+            <span class="text">{s.text}</span>
+            {s.soon && <span class="soon">En preparación</span>}
+          </span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  ul {
+    display: grid;
+    gap: var(--space-3);
+    margin: var(--space-4) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 40rem) {
+    ul {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 64rem) {
+    ul {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+  a {
+    display: flex;
+    gap: var(--space-3);
+    height: 100%;
+    padding: var(--space-4);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-bg);
+    color: var(--color-text);
+    text-decoration: none;
+  }
+  a:hover {
+    border-color: var(--color-accent);
+    background: var(--color-surface);
+  }
+  .icon {
+    flex: none;
+    color: var(--color-accent);
+  }
+  .body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+  .title {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+  .text {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+  .soon {
+    color: var(--sem-neutro-fg);
+    font-size: var(--text-xs);
+  }
+</style>

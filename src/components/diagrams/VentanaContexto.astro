@@ -1,0 +1,182 @@
+---
+import Diagram from '../Diagram.astro';
+
+/**
+ * Diagrama 2 (plan/03_DISENO.md §7): anatomía de la ventana de contexto. Una columna con la parte
+ * estable (la que la caché reutiliza) arriba y la que crece en cada turno debajo. Las alturas son
+ * ilustrativas: el diagrama lo dice, porque no representa una medición.
+ */
+interface Props {
+  id?: string;
+}
+const { id = 'ventana-contexto' } = Astro.props;
+
+const barX = 14;
+const barW = 112;
+const labelX = 142;
+
+const stable = [
+  { name: 'Instrucciones del sistema', note: 'Las fija la app o la API', h: 44, tone: 1 },
+  { name: 'Herramientas', note: 'Qué herramientas puede usar', h: 52, tone: 2 },
+  { name: 'Ficheros de instrucciones', note: 'CLAUDE.md, AGENTS.md, memoria', h: 44, tone: 3 },
+] as const;
+const growing = [
+  { name: 'Conversación', note: 'Tus mensajes y sus respuestas', h: 100, tone: 1 },
+  { name: 'Ficheros leídos', note: 'Lo que abre o adjuntas', h: 76, tone: 2 },
+  { name: 'Resultados de herramientas', note: 'Salida de comandos y búsquedas', h: 72, tone: 3 },
+] as const;
+const free = { name: 'Espacio libre', note: 'Lo que queda para seguir', h: 64 };
+
+let y = 10;
+const place = <T extends { h: number }>(items: readonly T[]) =>
+  items.map((it) => {
+    const row = { ...it, y };
+    y += it.h;
+    return row;
+  });
+
+const headStable = y + 14;
+y += 26;
+const stableRows = place(stable);
+const stableEnd = y;
+y += 22;
+const headGrowing = y + 14;
+y += 26;
+const growingRows = place(growing);
+const freeRow = { ...free, y };
+y += free.h;
+const noteY = y + 26;
+const H = noteY + 10;
+---
+
+<Diagram
+  id={id}
+  titulo="Anatomía de la ventana de contexto"
+  descripcion="Una columna con lo que ocupa la ventana. Arriba, la parte estable que se repite igual en cada turno: instrucciones del sistema, herramientas y ficheros de instrucciones. Debajo, la parte que crece: la conversación, los ficheros leídos y los resultados de herramientas. Al final, el espacio libre."
+>
+  <svg
+    class="window"
+    viewBox={`0 0 360 ${H}`}
+    role="group"
+    aria-label="Columna con las partes que ocupan la ventana de contexto"
+  >
+    <text x={barX} y={headStable} class="group">
+      Parte estable
+    </text>
+    <text x={barX + 100} y={headStable} class="group-note">
+      · igual en cada turno
+    </text>
+    {stableRows.map((r) => (
+      <>
+        <rect x={barX} y={r.y} width={barW} height={r.h} class={`seg stable-${r.tone}`} />
+        <text x={labelX} y={r.y + r.h / 2 - 3} class="name">
+          {r.name}
+        </text>
+        <text x={labelX} y={r.y + r.h / 2 + 14} class="note">
+          {r.note}
+        </text>
+      </>
+    ))}
+    <line x1={barX} x2="346" y1={stableEnd + 11} y2={stableEnd + 11} class="rule" />
+    <text x={barX} y={headGrowing} class="group">
+      Parte que crece
+    </text>
+    <text x={barX + 120} y={headGrowing} class="group-note">
+      · se reenvía entera en cada turno
+    </text>
+    {growingRows.map((r) => (
+      <>
+        <rect x={barX} y={r.y} width={barW} height={r.h} class={`seg grow-${r.tone}`} />
+        <text x={labelX} y={r.y + r.h / 2 - 3} class="name">
+          {r.name}
+        </text>
+        <text x={labelX} y={r.y + r.h / 2 + 14} class="note">
+          {r.note}
+        </text>
+      </>
+    ))}
+    <rect x={barX} y={freeRow.y} width={barW} height={freeRow.h} class="seg free" />
+    <text x={labelX} y={freeRow.y + freeRow.h / 2 - 3} class="name">
+      {freeRow.name}
+    </text>
+    <text x={labelX} y={freeRow.y + freeRow.h / 2 + 14} class="note">
+      {freeRow.note}
+    </text>
+    <text x={barX} y={noteY} class="note">
+      Alturas ilustrativas: no representan una medición.
+    </text>
+  </svg>
+
+  <Fragment slot="texto">
+    <p>De arriba abajo, la ventana contiene:</p>
+    <ol>
+      {[...stable, ...growing].map((s) => (
+        <li>
+          <strong>{s.name}</strong>: {s.note.toLowerCase()}.
+        </li>
+      ))}
+      <li>
+        <strong>{free.name}</strong>: {free.note.toLowerCase()}.
+      </li>
+    </ol>
+    <p>
+      Los tres primeros bloques forman la parte estable, igual en cada turno, que la caché de prompt puede
+      reutilizar. Los tres siguientes crecen con la conversación y se reenvían completos en cada turno.
+    </p>
+  </Fragment>
+</Diagram>
+
+<style>
+  .window {
+    max-width: 30rem;
+    margin-inline: auto;
+  }
+  .seg {
+    stroke: var(--color-border-strong);
+    stroke-width: 1;
+  }
+  .stable-1 {
+    fill: color-mix(in srgb, var(--color-accent) 14%, var(--color-bg));
+  }
+  .stable-2 {
+    fill: color-mix(in srgb, var(--color-accent) 26%, var(--color-bg));
+  }
+  .stable-3 {
+    fill: color-mix(in srgb, var(--color-accent) 38%, var(--color-bg));
+  }
+  .grow-1 {
+    fill: color-mix(in srgb, var(--color-text) 10%, var(--color-bg));
+  }
+  .grow-2 {
+    fill: color-mix(in srgb, var(--color-text) 18%, var(--color-bg));
+  }
+  .grow-3 {
+    fill: color-mix(in srgb, var(--color-text) 26%, var(--color-bg));
+  }
+  .free {
+    fill: none;
+    stroke-dasharray: 5 4;
+  }
+  .rule {
+    stroke: var(--color-border);
+    stroke-width: 1;
+  }
+  .group {
+    fill: var(--color-heading);
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .group-note {
+    fill: var(--color-text-muted);
+    font-size: 13.5px;
+  }
+  .name {
+    fill: var(--color-heading);
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .note {
+    fill: var(--color-text-muted);
+    font-size: 13px;
+  }
+</style>

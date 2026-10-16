@@ -1,0 +1,77 @@
+---
+/**
+ * Contenedor accesible para un diagrama SVG en línea: título y descripción visibles como pie de
+ * figura, y un texto alternativo largo (slot «texto») plegado para quien no pueda ver el dibujo.
+ * El SVG usa currentColor y los tokens del tema, así que sirve en claro y en oscuro.
+ */
+interface Props {
+  /** Identificador único en la página (enlaza título y descripción con la figura). */
+  id: string;
+  titulo: string;
+  descripcion: string;
+}
+
+const { id, titulo, descripcion } = Astro.props;
+const hasLong = Astro.slots.has('texto');
+---
+
+<figure class="diagram not-content" aria-labelledby={`${id}-titulo`} aria-describedby={`${id}-desc`}>
+  <div class="art">
+    <slot />
+  </div>
+  <figcaption>
+    <strong id={`${id}-titulo`}>{titulo}.</strong>
+    <span id={`${id}-desc`}> {descripcion}</span>
+  </figcaption>
+  {hasLong && (
+    <details class="long">
+      <summary>Descripción detallada del diagrama</summary>
+      <div class="long-body">
+        <slot name="texto" />
+      </div>
+    </details>
+  )}
+</figure>
+
+<style>
+  .diagram {
+    margin: var(--space-8) 0;
+    padding: var(--space-4);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+  .art {
+    container-type: inline-size;
+    color: var(--color-text);
+  }
+  /* :where() deja la especificidad en cero para que cada diagrama pueda ocultar su variante */
+  :where(.art) :global(svg) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  figcaption {
+    margin-top: var(--space-3);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+  figcaption strong {
+    color: var(--color-heading);
+  }
+  .long {
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
+  }
+  .long summary {
+    color: var(--color-accent);
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .long-body {
+    margin-top: var(--space-2);
+  }
+  .long-body > :global(:first-child) {
+    margin-top: 0;
+  }
+</style>

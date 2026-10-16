@@ -1,0 +1,54 @@
+---
+import Callout from '../Callout.astro';
+import LessonMeta from '../LessonMeta.astro';
+
+/**
+ * Cabecera de lección: título, entradilla (la descripción de la página), metadatos y, mientras la
+ * página es un esqueleto, el aviso de «en preparación». La portada tiene su propio h1.
+ */
+const route = Astro.locals.starlightRoute;
+const entry = route.entry;
+const data = entry.data;
+// La portada (slug vacío) tiene su propia cabecera y no lleva pie de fuentes.
+const isHome = route.id === '';
+---
+
+{!isHome && (
+  <header class="lesson-head">
+    <h1 id="_top">{data.title}</h1>
+    {data.description && <p class="lead">{data.description}</p>}
+    <LessonMeta
+      level={data.level}
+      tracks={data.tracks}
+      readingTime={data.readingTime}
+      lastReviewed={data.lastReviewed}
+    />
+    {data.status === 'en-preparacion' && (
+      <Callout tipo="preparacion">
+        <p>
+          Esta página está en preparación: el título y la entradilla anuncian lo que cubrirá. El resto de la
+          guía ya se puede recorrer desde la barra lateral.
+        </p>
+      </Callout>
+    )}
+  </header>
+)}
+
+<style>
+  .lesson-head {
+    margin-bottom: var(--space-2);
+  }
+  h1 {
+    margin: var(--space-4) 0 0;
+    color: var(--color-heading);
+    font-size: var(--sl-text-h1);
+    line-height: var(--leading-heading);
+  }
+  .lead {
+    max-width: var(--measure);
+    margin: var(--space-3) 0 0;
+    color: var(--color-text-muted);
+    font-size: var(--text-lg);
+    line-height: 1.5;
+  }
+</style>

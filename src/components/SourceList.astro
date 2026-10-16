@@ -1,0 +1,84 @@
+---
+import { getEntry } from 'astro:content';
+import { formatDate } from '@lib/format';
+import Icon from './Icon.astro';
+
+/** Pie de fuentes de una lección: título, editor y fecha de la última comprobación. */
+interface Props {
+  ids: string[];
+}
+
+const { ids } = Astro.props;
+const entries = await Promise.all(
+  ids.map(async (id) => {
+    const entry = await getEntry('sources', id);
+    if (!entry) throw new Error(`<SourceList>: la fuente «${id}» no existe en sources.json`);
+    return entry.data;
+  }),
+);
+---
+
+{entries.length > 0 && (
+  <section class="sources" aria-labelledby="fuentes-titulo">
+    <h2 id="fuentes-titulo" class="sources-title">
+      <Icon name="fuentes" size={18} /> Fuentes
+    </h2>
+    <ul>
+      {entries.map((s) => (
+        <li>
+          <a href={s.url} rel="noopener">
+            {s.title}
+          </a>
+          <span class="meta">
+            {s.publisher} · comprobada el {formatDate(s.lastChecked)}
+          </span>
+        </li>
+      ))}
+    </ul>
+  </section>
+)}
+
+<style>
+  .sources {
+    margin-top: var(--space-10);
+    padding-top: var(--space-4);
+    border-top: var(--border-width) solid var(--color-border);
+  }
+  .sources .sources-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0 0 var(--space-3);
+    color: var(--color-heading);
+    font-size: var(--text-base);
+  }
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--text-sm);
+  }
+  li {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-block: var(--space-2);
+  }
+  li + li {
+    border-top: var(--border-width) solid var(--color-border);
+  }
+  a {
+    color: var(--color-accent);
+  }
+  .meta {
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  @media (min-width: 40rem) {
+    li {
+      flex-direction: row;
+      justify-content: space-between;
+      gap: var(--space-4);
+    }
+  }
+</style>

@@ -1,0 +1,74 @@
+---
+import { getCollection } from 'astro:content';
+import { levels } from '@lib/modules';
+import { formatMinutes } from '@lib/format';
+import { url } from '@lib/paths';
+
+/** Índice de un módulo: lista de sus páginas en el orden de la barra lateral. */
+interface Props {
+  dir: string;
+}
+
+const { dir } = Astro.props;
+const pages = (
+  await getCollection('docs', ({ id }) => id.startsWith(`${dir}/`) && id !== `${dir}/index`)
+).sort((a, b) => (a.data.sidebar.order ?? 999) - (b.data.sidebar.order ?? 999));
+---
+
+<ol class="pages">
+  {pages.map((p) => (
+    <li>
+      <a class="title" href={url(p.id)}>
+        {p.data.title}
+      </a>
+      <p class="desc">{p.data.description}</p>
+      <p class="meta">
+        {p.data.level && <span>{levels[p.data.level]}</span>}
+        {p.data.readingTime && <span>{formatMinutes(p.data.readingTime)}</span>}
+        {p.data.status === 'en-preparacion' && <span class="soon">En preparación</span>}
+      </p>
+    </li>
+  ))}
+</ol>
+
+<style>
+  .pages {
+    margin: var(--space-6) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: var(--border-width) solid var(--color-border);
+  }
+  li {
+    margin: 0;
+    padding: var(--space-4) 0;
+    border-bottom: var(--border-width) solid var(--color-border);
+  }
+  .title {
+    color: var(--color-heading);
+    font-size: var(--text-lg);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .title:hover {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+  .desc {
+    margin: var(--space-1) 0 0;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-4);
+    margin: var(--space-2) 0 0;
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    font-variant-numeric: tabular-nums;
+  }
+  .soon {
+    color: var(--sem-neutro-fg);
+    font-style: normal;
+  }
+</style>

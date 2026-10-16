@@ -1,0 +1,131 @@
+---
+import { getCollection } from 'astro:content';
+import { formatDate, latestDate } from '@lib/format';
+import { url } from '@lib/paths';
+import Icon from '../Icon.astro';
+
+/**
+ * Cómo se mantiene la guía: fecha de la última verificación global (la más reciente de todos los
+ * ficheros de datos) y los tres tipos de afirmación que distingue el texto.
+ */
+const collections = await Promise.all([
+  getCollection('models'),
+  getCollection('effort'),
+  getCollection('pricing-rules'),
+  getCollection('claude-code-commands'),
+  getCollection('features'),
+  getCollection('changelog'),
+]);
+const verified = latestDate(collections.flat().map((e) => e.data.verifiedAt))!;
+const kinds = [
+  {
+    cls: 'verificado',
+    icon: 'verificado',
+    title: 'Dato verificado',
+    text: 'Sale de la documentación oficial del proveedor, con su fuente y la fecha en que se comprobó.',
+  },
+  {
+    cls: 'medicion',
+    icon: 'medicion',
+    title: 'Medición publicada',
+    text: 'Una cifra que el proveedor publica sobre sus propios modelos. Se cita con su fuente y no se presenta como garantía.',
+  },
+  {
+    cls: 'recomendacion',
+    icon: 'recomendacion',
+    title: 'Recomendación de la guía',
+    text: 'Criterio de esta guía, siempre con su porqué. No es un dato oficial.',
+  },
+] as const;
+---
+
+<section class="maintenance" aria-labelledby="mantenimiento">
+  <h2 id="mantenimiento">Cómo se mantiene esta guía</h2>
+  <p class="intro">
+    Los precios, modelos, límites y comandos no están escritos a mano en las páginas: viven en ficheros de
+    datos con su fuente oficial y su fecha. Actualizar la guía es editar datos. Última verificación global de
+    los datos:{' '}
+    <strong>
+      <time datetime={verified}>{formatDate(verified)}</time>
+    </strong>
+    .
+  </p>
+  <ul>
+    {kinds.map((k) => (
+      <li class={`kind kind-${k.cls}`}>
+        <p class="kind-title">
+          <Icon name={k.icon} size={18} /> {k.title}
+        </p>
+        <p>{k.text}</p>
+      </li>
+    ))}
+  </ul>
+  <p class="links">
+    <a href={url('m12-recursos/metodologia')}>Metodología de verificación</a>
+    <a href={url('m12-recursos/fuentes')}>Fuentes oficiales</a>
+  </p>
+</section>
+
+<style>
+  .intro {
+    max-width: var(--measure);
+    margin: var(--space-2) 0 0;
+    color: var(--color-text-muted);
+  }
+  .intro strong {
+    color: var(--color-heading);
+    font-variant-numeric: tabular-nums;
+  }
+  ul {
+    display: grid;
+    gap: var(--space-3);
+    margin: var(--space-5) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 48rem) {
+    ul {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .kind {
+    padding: var(--space-3) var(--space-4);
+    border: var(--border-width) solid var(--bd);
+    border-radius: var(--radius-md);
+    background: var(--bg);
+    font-size: var(--text-sm);
+  }
+  .kind-verificado {
+    --fg: var(--sem-verificado-fg);
+    --bg: var(--sem-verificado-bg);
+    --bd: var(--sem-verificado-bd);
+  }
+  .kind-medicion {
+    --fg: var(--sem-medicion-fg);
+    --bg: var(--sem-medicion-bg);
+    --bd: var(--sem-medicion-bd);
+  }
+  .kind-recomendacion {
+    --fg: var(--sem-recomendacion-fg);
+    --bg: var(--sem-recomendacion-bg);
+    --bd: var(--sem-recomendacion-bd);
+  }
+  .kind p {
+    margin: 0;
+  }
+  .kind-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-1) !important;
+    color: var(--fg);
+    font-weight: 600;
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-6);
+    margin: var(--space-5) 0 0;
+    font-weight: 600;
+  }
+</style>

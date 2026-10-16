@@ -1,0 +1,264 @@
+/* Tema sobre Starlight: traduce los tokens de tokens.css a las variables --sl-* y fija la
+   tipografía, la maquetación y los estilos compartidos. Este CSS no está en capas, así que gana
+   a las capas de Starlight sin necesidad de !important. */
+
+:root {
+  /* Tipografía (plan/03_DISENO.md §4) */
+  --sl-font: var(--font-sans);
+  --sl-font-mono: var(--font-mono);
+  --sl-text-body: var(--text-base);
+  --sl-text-body-sm: var(--text-sm);
+  --sl-text-code: 0.9rem;
+  --sl-text-code-sm: 0.8125rem;
+  --sl-text-h1: var(--text-3xl);
+  --sl-text-h2: var(--text-2xl);
+  --sl-text-h3: var(--text-xl);
+  --sl-text-h4: var(--text-lg);
+  --sl-text-h5: var(--text-base);
+  --sl-line-height: var(--leading-body);
+  --sl-line-height-headings: var(--leading-heading);
+
+  /* Maquetación: líneas de 65–75 caracteres, margen lateral de 16 px en móvil */
+  --sl-content-width: 42rem;
+  --sl-content-pad-x: 1rem;
+  --sl-nav-pad-x: 1rem;
+
+  /* Colores: Starlight lee estas variables, que a su vez salen de nuestros tokens */
+  --sl-color-white: var(--color-heading);
+  --sl-color-gray-1: var(--color-text);
+  --sl-color-gray-2: var(--color-text);
+  --sl-color-gray-3: var(--color-text-muted);
+  --sl-color-gray-4: var(--color-border-strong);
+  --sl-color-gray-5: var(--color-border);
+  --sl-color-gray-6: var(--color-surface-2);
+  --sl-color-gray-7: var(--color-surface);
+  --sl-color-black: var(--color-bg);
+
+  --sl-color-accent-low: var(--color-accent-tint);
+  --sl-color-accent: var(--color-accent);
+  --sl-color-accent-high: var(--color-accent-strong);
+
+  --sl-color-text: var(--color-text);
+  --sl-color-text-accent: var(--color-accent);
+  --sl-color-text-invert: var(--color-on-accent);
+  --sl-color-bg: var(--color-bg);
+  --sl-color-bg-nav: var(--color-bg);
+  --sl-color-bg-sidebar: var(--color-bg);
+  --sl-color-bg-inline-code: var(--color-surface-2);
+  --sl-color-bg-accent: var(--color-accent);
+  --sl-color-hairline-light: var(--color-border);
+  --sl-color-hairline: var(--color-border);
+  --sl-color-hairline-shade: var(--color-border);
+
+  /* Los avisos de Starlight (:::note, :::tip…) no se usan: <Callout> los sustituye. Por si se cuela
+     alguno, que no salga morado. */
+  --sl-color-orange: var(--sem-novedad-fg);
+  --sl-color-orange-low: var(--sem-novedad-bg);
+  --sl-color-orange-high: var(--sem-novedad-fg);
+  --sl-color-green: var(--sem-verificado-fg);
+  --sl-color-green-low: var(--sem-verificado-bg);
+  --sl-color-green-high: var(--sem-verificado-fg);
+  --sl-color-blue: var(--sem-medicion-fg);
+  --sl-color-blue-low: var(--sem-medicion-bg);
+  --sl-color-blue-high: var(--sem-medicion-fg);
+  --sl-color-purple: var(--color-accent);
+  --sl-color-purple-low: var(--color-accent-tint);
+  --sl-color-purple-high: var(--color-accent-strong);
+  --sl-color-red: var(--sem-cuidado-fg);
+  --sl-color-red-low: var(--sem-cuidado-bg);
+  --sl-color-red-high: var(--sem-cuidado-fg);
+
+  --sl-shadow-sm: none;
+  --sl-shadow-md: none;
+  --sl-shadow-lg: none;
+}
+
+@media (min-width: 50em) {
+  :root {
+    --sl-text-h1: var(--text-4xl);
+    --sl-text-h2: var(--text-3xl);
+    --sl-text-h3: var(--text-xl);
+    --sl-text-h4: var(--text-lg);
+    --sl-nav-pad-x: 1.5rem;
+  }
+}
+
+@media (min-width: 72rem) {
+  :root {
+    --sl-content-pad-x: 1.5rem;
+  }
+}
+
+body {
+  font-feature-settings: 'kern', 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
+/* El nombre del sitio es largo: en móvil se reduce para que quepa junto al menú y la búsqueda */
+@media (max-width: 49.99em) {
+  .site-title {
+    font-size: 0.875rem;
+  }
+}
+
+/* Botón del menú móvil: cuadrado con borde, sin el círculo relleno de Starlight */
+button.sl-menu-button,
+:root[data-theme='light'] button.sl-menu-button {
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  color: var(--color-heading);
+  box-shadow: none;
+}
+
+button.sl-menu-button:has(~ :popover-open),
+:root[data-theme='light'] button.sl-menu-button:has(~ :popover-open) {
+  background: var(--color-surface-2);
+}
+
+/* Titulares: semibold, sin mayúsculas forzadas */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: -0.005em;
+}
+
+.sl-markdown-content :is(h2, h3, h4):not(:where(.not-content *)) {
+  margin-top: 2em;
+}
+
+/* Cifras tabulares donde se comparan números */
+table,
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.sl-markdown-content table:not(:where(.not-content *)) {
+  font-size: var(--text-sm);
+}
+
+.sl-markdown-content :is(th, td):not(:where(.not-content *)) {
+  padding: 0.5rem 0.75rem;
+}
+
+.sl-markdown-content th:not(:where(.not-content *)) {
+  background: var(--color-surface-2);
+  color: var(--color-heading);
+  font-weight: 600;
+  text-align: start;
+}
+
+/* Los componentes con not-content conservan el color de enlace de la guía */
+.sl-markdown-content .not-content :where(a:not(.btn)) {
+  color: var(--color-accent);
+}
+
+/* Foco visible en todo el sitio */
+:focus-visible {
+  outline: 2px solid var(--color-accent-strong);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Barra lateral: la página actual se marca con un fondo tenue y un filo, no con un bloque sólido */
+.sidebar-content a[aria-current='page'],
+.sidebar-content a[aria-current='page']:hover,
+.sidebar-content a[aria-current='page']:focus {
+  background: var(--color-accent-tint);
+  color: var(--color-accent-strong);
+  font-weight: 600;
+  box-shadow: inset 3px 0 0 var(--color-accent);
+}
+
+/* Botones: rectangulares, nunca en forma de píldora */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0.5rem 1rem;
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  color: var(--color-heading);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: 1.3;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: var(--color-surface-2);
+}
+
+.btn-primary {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.btn-primary:hover {
+  border-color: var(--color-accent-strong);
+  background: var(--color-accent-strong);
+  color: var(--color-on-accent);
+}
+
+/* Texto solo para lectores de pantalla */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Impresión (chuleta y plantillas): sin navegación y con la URL de los enlaces visible */
+@media print {
+  :root {
+    --sl-content-width: 100%;
+  }
+
+  header.header,
+  nav.sidebar,
+  .mobile-preferences,
+  starlight-toc,
+  mobile-starlight-toc,
+  .pagination-links,
+  .page-actions,
+  .btn,
+  [data-print='hide'] {
+    display: none !important;
+  }
+
+  .sl-markdown-content a[href^='http']::after {
+    content: ' (' attr(href) ')';
+    font-size: 0.85em;
+    word-break: break-all;
+  }
+
+  body {
+    background: #fff;
+    color: #000;
+  }
+}

@@ -1,0 +1,82 @@
+---
+import CicloMetodo from '../diagrams/CicloMetodo.astro';
+import { url } from '@lib/paths';
+import Icon from '../Icon.astro';
+import Hero from './Hero.astro';
+import Maintenance from './Maintenance.astro';
+import ModuleMap from './ModuleMap.astro';
+import Novedades from './Novedades.astro';
+import Routes from './Routes.astro';
+import Shortcuts from './Shortcuts.astro';
+---
+
+<div class="home not-content">
+  <Hero />
+  <Routes />
+  <section class="method" aria-labelledby="metodo">
+    <h2 id="metodo">El método en siete pasos</h2>
+    <p class="intro">
+      Todo el contenido de la guía cuelga de un ciclo: clasificar la tarea, elegir superficie, modelo y
+      esfuerzo, preparar el contexto, formular el encargo, verificar y sistematizar. Cada paso del diagrama
+      enlaza a su lección.
+    </p>
+    <CicloMetodo />
+    <p class="more">
+      <a href={url('m2-metodo/ciclo-de-7-pasos')}>
+        Leer el método completo <Icon name="flecha" size={16} />
+      </a>
+    </p>
+  </section>
+  <Shortcuts />
+  <Novedades />
+  <ModuleMap />
+  <Maintenance />
+</div>
+
+<style is:global>
+  /* La portada usa más ancho que una lección */
+  :root:has(.home) {
+    --sl-content-width: 72rem;
+  }
+  /* Starlight deja un panel vacío donde iría el título: la portada trae el suyo */
+  .content-panel:has(> .sl-container:empty) {
+    display: none;
+  }
+  :root:has(.home) .content-panel {
+    border-top: 0;
+  }
+  .home > section {
+    margin-top: var(--space-16);
+  }
+  .home > section:first-child {
+    margin-top: 0;
+  }
+  .home h2 {
+    margin: 0;
+    color: var(--color-heading);
+    font-size: var(--text-2xl);
+    line-height: 1.2;
+  }
+  @media (min-width: 50em) {
+    .home h2 {
+      font-size: var(--text-3xl);
+    }
+  }
+</style>
+
+<style>
+  .intro {
+    max-width: var(--measure);
+    margin: var(--space-2) 0 0;
+    color: var(--color-text-muted);
+  }
+  .more {
+    margin: var(--space-4) 0 0;
+    font-weight: 600;
+  }
+  .more a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+</style>

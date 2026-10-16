@@ -1,0 +1,22 @@
+---
+import Default from '@astrojs/starlight/components/Footer.astro';
+import LastVerified from '../LastVerified.astro';
+import SourceList from '../SourceList.astro';
+
+/** Pie de lección: fuentes con fecha y última revisión, antes de la paginación de Starlight. */
+const route = Astro.locals.starlightRoute;
+const entry = route.entry;
+const data = entry.data;
+// La portada (slug vacío) tiene su propia cabecera y no lleva pie de fuentes.
+const isHome = route.id === '';
+---
+
+{!isHome && (
+  <div class="lesson-foot">
+    <SourceList ids={data.sources ?? []} />
+    {data.lastReviewed && <LastVerified fecha={data.lastReviewed} />}
+  </div>
+)}
+<Default {...Astro.props}>
+  <slot />
+</Default>

@@ -1,0 +1,145 @@
+/* Tokens de diseño. Ver plan/03_DISENO.md §3 y §4.
+   Los colores viven aquí y en ningún otro sitio: claro en :root, oscuro con prefers-color-scheme
+   y con el selector de tema de Starlight (data-theme). Los dos bloques oscuros son idénticos
+   (lo comprueba tests/tokens.test.ts, que además valida los contrastes WCAG AA). */
+
+:root {
+  /* Base neutra: grises fríos */
+  --color-bg: #ffffff;
+  --color-surface: #f6f8fa;
+  --color-surface-2: #edf0f4;
+  --color-border: #d3dae2;
+  --color-border-strong: #7b8998;
+  --color-text: #1c2530;
+  --color-text-muted: #485467;
+  --color-heading: #0d1620;
+
+  /* Un solo acento: verde azulado profundo */
+  --color-accent: #0b6767;
+  --color-accent-strong: #074b4b;
+  --color-accent-tint: #e2f1f0;
+  --color-on-accent: #ffffff;
+
+  /* Distintivos (siempre con icono y texto, nunca solo color) */
+  --sem-verificado-fg: #1b6a3a;
+  --sem-verificado-bg: #e7f4ec;
+  --sem-verificado-bd: #a1d0b1;
+  --sem-recomendacion-fg: #0b6060;
+  --sem-recomendacion-bg: #e2f1f0;
+  --sem-recomendacion-bd: #96c9c7;
+  --sem-medicion-fg: #1d56a0;
+  --sem-medicion-bg: #e7eff9;
+  --sem-medicion-bd: #a3c0e4;
+  --sem-novedad-fg: #7d4a00;
+  --sem-novedad-bg: #fcf0d9;
+  --sem-novedad-bd: #e2bd78;
+  --sem-cuidado-fg: #a02222;
+  --sem-cuidado-bg: #fae8e8;
+  --sem-cuidado-bd: #e1a6a6;
+  --sem-neutro-fg: #3f4c5d;
+  --sem-neutro-bg: #edf0f4;
+  --sem-neutro-bd: #bcc6d2;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --color-bg: #0d1217;
+    --color-surface: #141b22;
+    --color-surface-2: #1b242d;
+    --color-border: #2a3540;
+    --color-border-strong: #66768a;
+    --color-text: #d3dae2;
+    --color-text-muted: #98a6b5;
+    --color-heading: #f0f3f6;
+    --color-accent: #52bfb9;
+    --color-accent-strong: #86d9d4;
+    --color-accent-tint: #11302f;
+    --color-on-accent: #06201f;
+    --sem-verificado-fg: #7ed39b;
+    --sem-verificado-bg: #12261a;
+    --sem-verificado-bd: #2d5a3d;
+    --sem-recomendacion-fg: #86d9d4;
+    --sem-recomendacion-bg: #11302f;
+    --sem-recomendacion-bd: #2a6462;
+    --sem-medicion-fg: #8ebcf2;
+    --sem-medicion-bg: #13233a;
+    --sem-medicion-bd: #2f568a;
+    --sem-novedad-fg: #f0bf6a;
+    --sem-novedad-bg: #2e2210;
+    --sem-novedad-bd: #6b4d1a;
+    --sem-cuidado-fg: #f2a0a0;
+    --sem-cuidado-bg: #331616;
+    --sem-cuidado-bd: #7a3030;
+    --sem-neutro-fg: #b5c1ce;
+    --sem-neutro-bg: #1c252f;
+    --sem-neutro-bd: #3a4857;
+  }
+}
+
+:root[data-theme='dark'] {
+  --color-bg: #0d1217;
+  --color-surface: #141b22;
+  --color-surface-2: #1b242d;
+  --color-border: #2a3540;
+  --color-border-strong: #66768a;
+  --color-text: #d3dae2;
+  --color-text-muted: #98a6b5;
+  --color-heading: #f0f3f6;
+  --color-accent: #52bfb9;
+  --color-accent-strong: #86d9d4;
+  --color-accent-tint: #11302f;
+  --color-on-accent: #06201f;
+  --sem-verificado-fg: #7ed39b;
+  --sem-verificado-bg: #12261a;
+  --sem-verificado-bd: #2d5a3d;
+  --sem-recomendacion-fg: #86d9d4;
+  --sem-recomendacion-bg: #11302f;
+  --sem-recomendacion-bd: #2a6462;
+  --sem-medicion-fg: #8ebcf2;
+  --sem-medicion-bg: #13233a;
+  --sem-medicion-bd: #2f568a;
+  --sem-novedad-fg: #f0bf6a;
+  --sem-novedad-bg: #2e2210;
+  --sem-novedad-bd: #6b4d1a;
+  --sem-cuidado-fg: #f2a0a0;
+  --sem-cuidado-bg: #331616;
+  --sem-cuidado-bd: #7a3030;
+  --sem-neutro-fg: #b5c1ce;
+  --sem-neutro-bg: #1c252f;
+  --sem-neutro-bd: #3a4857;
+}
+
+/* Tipografía, espacios y formas (iguales en ambos temas) */
+:root {
+  --font-sans: 'IBM Plex Sans Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Escala modular (≈1,2) sobre cuerpo de 17 px */
+  --text-xs: 0.8125rem;
+  --text-sm: 0.9375rem;
+  --text-base: 1.0625rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 1.8125rem;
+  --text-3xl: 2.25rem;
+  --text-4xl: 2.75rem;
+  --leading-body: 1.6;
+  --leading-heading: 1.2;
+
+  /* Ritmo vertical: múltiplos de 4 px */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --border-width: 1px;
+  --measure: 68ch;
+}

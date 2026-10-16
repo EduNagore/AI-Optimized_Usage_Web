@@ -1,0 +1,23 @@
+---
+import { formatDate } from '@lib/format';
+
+/** Fecha de la última revisión de la página o del dato. */
+interface Props {
+  fecha: string;
+  etiqueta?: string;
+}
+const { fecha, etiqueta = 'Última revisión' } = Astro.props;
+---
+
+<p class="last-verified">
+  {etiqueta}: <time datetime={fecha}>{formatDate(fecha)}</time>
+</p>
+
+<style>
+  .last-verified {
+    margin: var(--space-3) 0 0;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+  }
+</style>

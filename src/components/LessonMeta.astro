@@ -1,0 +1,76 @@
+---
+import { levels, tracks as trackInfo, type Level, type Track } from '@lib/modules';
+import { formatDate, formatMinutes } from '@lib/format';
+
+/** Línea de metadatos de una lección: nivel, rutas, tiempo de lectura y última revisión. */
+interface Props {
+  level?: Level | undefined;
+  tracks?: Track[] | undefined;
+  readingTime?: number | undefined;
+  lastReviewed?: string | undefined;
+}
+
+const { level, tracks = [], readingTime, lastReviewed } = Astro.props;
+const filled = level === 'basico' ? 1 : level === 'intermedio' ? 2 : 3;
+const hasAny = level || tracks.length > 0 || readingTime || lastReviewed;
+---
+
+{hasAny && (
+  <ul class="meta" aria-label="Datos de la lección">
+    {level && (
+      <li>
+        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+          {[0, 1, 2].map((i) => (
+            <rect
+              x={1 + i * 5}
+              y={10 - i * 4}
+              width="3.5"
+              height={5 + i * 4}
+              rx="0.5"
+              fill={i < filled ? 'currentColor' : 'none'}
+              stroke="currentColor"
+              stroke-width="1"
+            />
+          ))}
+        </svg>
+        <span>
+          <span class="sr-only">Nivel: </span>
+          {levels[level]}
+        </span>
+      </li>
+    )}
+    {tracks.length > 0 && (
+      <li>
+        <span class="sr-only">Rutas: </span>
+        {tracks.map((t) => trackInfo[t].label).join(' · ')}
+      </li>
+    )}
+    {readingTime && (
+      <li>
+        <span class="sr-only">Tiempo de lectura: </span>
+        {formatMinutes(readingTime)}
+      </li>
+    )}
+    {lastReviewed && <li>Revisada el {formatDate(lastReviewed)}</li>}
+  </ul>
+)}
+
+<style>
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-4);
+    margin: var(--space-3) 0 0;
+    padding: 0;
+    list-style: none;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+  }
+  li {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+  }
+</style>

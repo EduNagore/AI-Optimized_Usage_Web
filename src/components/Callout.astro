@@ -1,0 +1,110 @@
+---
+import { formatDate } from '@lib/format';
+import Icon, { type IconName } from './Icon.astro';
+
+/**
+ * Distintivo de la guía (plan/03_DISENO.md §3 y §6). Siempre lleva icono y texto: el color nunca
+ * es el único portador del significado.
+ */
+const kinds = {
+  verificado: { label: 'Dato verificado', icon: 'verificado' },
+  recomendacion: { label: 'Recomendación de la guía', icon: 'recomendacion' },
+  medicion: { label: 'Medición publicada', icon: 'medicion' },
+  novedad: { label: 'Novedad 2026', icon: 'novedad' },
+  varia: { label: 'Varía según el proveedor', icon: 'varia' },
+  cuidado: { label: 'Cuidado', icon: 'cuidado' },
+  preparacion: { label: 'En preparación', icon: 'preparacion' },
+} as const satisfies Record<string, { label: string; icon: IconName }>;
+
+interface Props {
+  tipo: keyof typeof kinds;
+  /** Sustituye al rótulo por defecto (útil para «Medición publicada por Anthropic»). */
+  titulo?: string;
+  /** AAAA-MM-DD: se muestra como «verificado el 15 de octubre de 2026». */
+  fecha?: string;
+}
+
+const { tipo, titulo, fecha } = Astro.props;
+const kind = kinds[tipo];
+const label = titulo ?? kind.label;
+---
+
+<aside class={`callout callout-${tipo}`} aria-label={label}>
+  <p class="callout-head">
+    <Icon name={kind.icon} size={18} />
+    <strong>{label}</strong>
+    {fecha && <span class="callout-date">· verificado el {formatDate(fecha)}</span>}
+  </p>
+  <div class="callout-body">
+    <slot />
+  </div>
+</aside>
+
+<style>
+  .callout {
+    --fg: var(--sem-neutro-fg);
+    --bg: var(--sem-neutro-bg);
+    --bd: var(--sem-neutro-bd);
+    margin-block: var(--space-6);
+    padding: var(--space-3) var(--space-4);
+    border: var(--border-width) solid var(--bd);
+    border-radius: var(--radius-md);
+    background: var(--bg);
+    color: var(--color-text);
+  }
+  .callout-verificado {
+    --fg: var(--sem-verificado-fg);
+    --bg: var(--sem-verificado-bg);
+    --bd: var(--sem-verificado-bd);
+  }
+  .callout-recomendacion {
+    --fg: var(--sem-recomendacion-fg);
+    --bg: var(--sem-recomendacion-bg);
+    --bd: var(--sem-recomendacion-bd);
+  }
+  .callout-medicion {
+    --fg: var(--sem-medicion-fg);
+    --bg: var(--sem-medicion-bg);
+    --bd: var(--sem-medicion-bd);
+  }
+  .callout-novedad {
+    --fg: var(--sem-novedad-fg);
+    --bg: var(--sem-novedad-bg);
+    --bd: var(--sem-novedad-bd);
+  }
+  .callout-cuidado {
+    --fg: var(--sem-cuidado-fg);
+    --bg: var(--sem-cuidado-bg);
+    --bd: var(--sem-cuidado-bd);
+  }
+  .callout-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+    color: var(--fg);
+    font-size: var(--text-sm);
+    line-height: 1.3;
+  }
+  .callout-head :global(svg) {
+    flex: none;
+  }
+  .callout-date {
+    font-weight: 400;
+    font-variant-numeric: tabular-nums;
+  }
+  .callout-body {
+    margin-top: var(--space-2);
+    font-size: var(--text-sm);
+  }
+  .callout-body > :global(:first-child) {
+    margin-top: 0;
+  }
+  .callout-body > :global(:last-child) {
+    margin-bottom: 0;
+  }
+  .callout-body :global(p) {
+    margin-block: var(--space-2);
+  }
+</style>

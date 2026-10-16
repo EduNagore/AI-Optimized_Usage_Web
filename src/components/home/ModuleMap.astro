@@ -1,0 +1,54 @@
+---
+import { modules } from '@lib/modules';
+import { url } from '@lib/paths';
+
+/** Mapa de la guía: los trece módulos y qué cubre cada uno. */
+---
+
+<section class="map" aria-labelledby="mapa">
+  <h2 id="mapa">Mapa de la guía</h2>
+  <ul>
+    {modules.map((m) => (
+      <li>
+        <a class="name" href={url(`${m.dir}/`)}>
+          {m.label}
+        </a>
+        <p>{m.summary}</p>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  ul {
+    display: grid;
+    gap: 0 var(--space-8);
+    margin: var(--space-4) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: var(--border-width) solid var(--color-border);
+  }
+  @media (min-width: 48rem) {
+    ul {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 72rem) {
+    ul {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  li {
+    padding: var(--space-3) 0;
+    border-bottom: var(--border-width) solid var(--color-border);
+  }
+  .name {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+  p {
+    margin: var(--space-1) 0 0;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+</style>

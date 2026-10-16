@@ -1,0 +1,176 @@
+---
+import { getCollection } from 'astro:content';
+import { formatDate, latestDate } from '@lib/format';
+import { url } from '@lib/paths';
+import Fact from '../Fact.astro';
+
+/**
+ * Cabecera de la portada: la tesis del sitio y, en lugar de una ilustración, un dato real: los
+ * precios vigentes, cada cifra con su fuente. Los precios salen de models.json vía <Fact>.
+ */
+const models = (await getCollection('models')).map((e) => e.data);
+const rowIds = ['haiku-5-5', 'sonnet-5-5', 'opus-5-5', 'gpt-6-1-sol', 'gemini-4-argon'];
+const providerNames = { anthropic: 'Anthropic', openai: 'OpenAI', google: 'Google' } as const;
+const rows = rowIds.map((id) => {
+  const m = models.find((x) => x.id === id);
+  if (!m) throw new Error(`Portada: no existe el modelo «${id}» en models.json`);
+  return m;
+});
+const verified = latestDate(rows.map((r) => r.verifiedAt))!;
+---
+
+<section class="hero" aria-labelledby="_top">
+  <div class="text">
+    <h1 id="_top">Mejores resultados con menos tokens</h1>
+    <p class="lead">
+      Una guía en español para trabajar con Claude, ChatGPT y Gemini: qué modelo elegir, cuánto esfuerzo
+      pedirle, cómo escribir el encargo y cómo medir lo que cuesta. Un método, plantillas y datos con su
+      fuente oficial y su fecha.
+    </p>
+    <p class="actions">
+      <a class="btn btn-primary" href={url('m2-metodo/ciclo-de-7-pasos')}>
+        Empieza por el método
+      </a>
+      <a class="btn" href={url('m12-recursos/chuleta')}>
+        Ver la chuleta
+      </a>
+    </p>
+  </div>
+
+  <aside class="panel" aria-labelledby="panel-precios">
+    <p id="panel-precios" class="panel-title">
+      Precios por millón de tokens
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Modelo</th>
+          <th scope="col" class="num">
+            Entrada
+          </th>
+          <th scope="col" class="num">
+            Salida
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((m) => (
+          <tr>
+            <th scope="row">
+              {m.name}
+              <span class="provider">{providerNames[m.provider]}</span>
+            </th>
+            <td class="num">
+              <Fact id={`${m.id}.pricing.input`} />
+            </td>
+            <td class="num">
+              <Fact id={`${m.id}.pricing.output`} />
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+    <p class="panel-foot">
+      Verificado el {formatDate(verified)}. Pasa el ratón o el foco por una cifra para ver su fuente. Algunos
+      precios son introductorios:{' '}
+      <a href={url('m4-modelo-y-esfuerzo/mapa-de-modelos')}>consulta el mapa de modelos</a>.
+    </p>
+  </aside>
+</section>
+
+<style>
+  .hero {
+    display: grid;
+    gap: var(--space-8);
+    padding-block: var(--space-8) var(--space-12);
+  }
+  @media (min-width: 60rem) {
+    .hero {
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+      align-items: center;
+      gap: var(--space-12);
+      padding-block: var(--space-12) var(--space-16);
+    }
+  }
+  h1 {
+    margin: 0;
+    max-width: 18ch;
+    color: var(--color-heading);
+    font-size: var(--text-3xl);
+    line-height: 1.1;
+  }
+  @media (min-width: 40rem) {
+    h1 {
+      font-size: 3.25rem;
+    }
+  }
+  .lead {
+    max-width: var(--measure);
+    margin: var(--space-5) 0 0;
+    color: var(--color-text-muted);
+    font-size: var(--text-lg);
+    line-height: 1.55;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin: var(--space-6) 0 0;
+  }
+  .actions .btn {
+    flex: 1 1 13rem;
+    justify-content: center;
+    max-width: 18rem;
+    padding: 0.7rem 1.25rem;
+    font-size: var(--text-base);
+  }
+  .panel {
+    padding: var(--space-4) var(--space-5);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+  .panel-title {
+    margin: 0 0 var(--space-3);
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+  table {
+    display: table;
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+  }
+  th,
+  td {
+    padding: var(--space-2) 0;
+    border-bottom: var(--border-width) solid var(--color-border);
+    text-align: start;
+    vertical-align: baseline;
+  }
+  thead th {
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    font-weight: 400;
+  }
+  tbody th {
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+  .provider {
+    display: block;
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    font-weight: 400;
+  }
+  .num {
+    text-align: end;
+  }
+  .panel-foot {
+    margin: var(--space-3) 0 0;
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    line-height: 1.5;
+  }
+</style>

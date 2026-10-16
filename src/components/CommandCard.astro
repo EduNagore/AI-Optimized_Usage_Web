@@ -1,0 +1,122 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+import { formatDate } from '@lib/format';
+import Icon from './Icon.astro';
+
+/**
+ * Ficha de un comando `/` de Claude Code, leída de claude-code-commands.json.
+ *   <CommandCard comando="/compact" />
+ */
+interface Props {
+  comando: string;
+}
+
+const { comando } = Astro.props;
+const all = await getCollection('claude-code-commands');
+const entry = all.find((c) => c.data.command === comando);
+if (!entry) throw new Error(`<CommandCard>: el comando «${comando}» no está en claude-code-commands.json`);
+const cmd = entry.data;
+const source = await getEntry('sources', cmd.source);
+const statusLabel = { activo: 'Activo', alias: 'Alias', eliminado: 'Retirado' } as const;
+---
+
+<article class="command-card not-content">
+  <header class="head">
+    <p class="name">
+      <code>{cmd.command}</code>
+      {cmd.args && <code class="args">{cmd.args}</code>}
+    </p>
+    <p class="chips">
+      <span class="chip">{cmd.category}</span>
+      <span class="chip">Fase: {cmd.phase}</span>
+      <span class={`chip chip-${cmd.status}`}>{statusLabel[cmd.status]}</span>
+    </p>
+  </header>
+  <p class="summary">{cmd.summary}</p>
+  {cmd.example && (
+    <p class="example">
+      <span class="label">Ejemplo</span> <code>{cmd.example}</code>
+    </p>
+  )}
+  <p class="foot">
+    <Icon name="fuentes" size={14} />
+    {source ? (
+      <a href={source.data.url} rel="noopener">
+        {source.data.title}
+      </a>
+    ) : (
+      cmd.source
+    )}
+    · verificado el {formatDate(cmd.verifiedAt)}
+  </p>
+</article>
+
+<style>
+  .command-card {
+    margin-block: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-2) var(--space-4);
+  }
+  .name {
+    margin: 0;
+    font-size: var(--text-lg);
+  }
+  .name code {
+    padding: 0;
+    background: none;
+    color: var(--color-heading);
+    font-weight: 500;
+  }
+  .name .args {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-2);
+    margin: 0;
+  }
+  .chip {
+    padding: 1px var(--space-2);
+    border: var(--border-width) solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    line-height: 1.5;
+  }
+  .chip-eliminado {
+    border-color: var(--sem-cuidado-bd);
+    background: var(--sem-cuidado-bg);
+    color: var(--sem-cuidado-fg);
+  }
+  .summary {
+    margin: var(--space-2) 0 0;
+    font-size: var(--text-sm);
+  }
+  .example {
+    margin: var(--space-2) 0 0;
+    font-size: var(--text-sm);
+  }
+  .label {
+    color: var(--color-text-muted);
+  }
+  .foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1) var(--space-2);
+    margin: var(--space-3) 0 0;
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+  }
+</style>

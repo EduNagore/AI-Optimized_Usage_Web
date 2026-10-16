@@ -1,0 +1,139 @@
+---
+import { wordDiff } from '@lib/diff';
+import Icon from './Icon.astro';
+
+/**
+ * Comparación de dos versiones de un prompt con las diferencias resaltadas por palabras. Lo
+ * eliminado va tachado y lo añadido, subrayado y en negrita: el color refuerza, no es la señal.
+ * El contenido por defecto (slot) son las anotaciones de qué cambió y por qué.
+ */
+interface Props {
+  antes: string;
+  despues: string;
+  etiquetaAntes?: string;
+  etiquetaDespues?: string;
+}
+
+const { antes, despues, etiquetaAntes = 'Antes', etiquetaDespues = 'Después' } = Astro.props;
+const diff = wordDiff(antes.trim(), despues.trim());
+const hasNotes = Astro.slots.has('default');
+---
+
+<div class="before-after">
+  <div class="panels">
+    <section class="panel panel-before" aria-label={etiquetaAntes}>
+      <p class="panel-title">
+        <Icon name="cerrar" size={16} /> {etiquetaAntes}
+      </p>
+      <p class="text">
+        {diff.before.map((p) =>
+          p.kind === 'del' ? (
+            <del>
+              <span class="sr-only">[eliminado: </span>
+              {p.text}
+              <span class="sr-only">]</span>
+            </del>
+          ) : (
+            <Fragment>{p.text}</Fragment>
+          ),
+        )}
+      </p>
+    </section>
+    <section class="panel panel-after" aria-label={etiquetaDespues}>
+      <p class="panel-title">
+        <Icon name="ok" size={16} /> {etiquetaDespues}
+      </p>
+      <p class="text">
+        {diff.after.map((p) =>
+          p.kind === 'add' ? (
+            <ins>
+              <span class="sr-only">[añadido: </span>
+              {p.text}
+              <span class="sr-only">]</span>
+            </ins>
+          ) : (
+            <Fragment>{p.text}</Fragment>
+          ),
+        )}
+      </p>
+    </section>
+  </div>
+  <p class="legend">
+    <del>Tachado</del>: se elimina · <ins>Subrayado</ins>: se añade
+  </p>
+  {hasNotes && (
+    <div class="notes">
+      <slot />
+    </div>
+  )}
+</div>
+
+<style>
+  .before-after {
+    container-type: inline-size;
+    margin-block: var(--space-6);
+  }
+  .panels {
+    display: grid;
+    gap: var(--space-3);
+  }
+  @container (min-width: 40rem) {
+    .panels {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .panel {
+    padding: var(--space-3) var(--space-4);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+  .panel-title {
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0 0 var(--space-2);
+    font-size: var(--text-sm);
+    line-height: 1.3;
+  }
+  .panel-before .panel-title {
+    color: var(--sem-cuidado-fg);
+  }
+  .panel-after .panel-title {
+    color: var(--sem-verificado-fg);
+  }
+  .text {
+    margin: 0;
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  del {
+    background: var(--sem-cuidado-bg);
+    color: var(--sem-cuidado-fg);
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+  }
+  ins {
+    background: var(--sem-verificado-bg);
+    color: var(--sem-verificado-fg);
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+  .legend {
+    margin: var(--space-2) 0 0;
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+  }
+  .notes {
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
+  }
+  .notes > :global(:first-child) {
+    margin-top: 0;
+  }
+</style>

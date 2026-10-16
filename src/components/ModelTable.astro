@@ -1,0 +1,195 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+import { formatDate, formatTokensShort, formatUsd, latestDate } from '@lib/format';
+
+/**
+ * Tabla de modelos generada desde models.json. Filtra por proveedor, nivel o lista de ids.
+ * En pantallas estrechas se desplaza dentro de su contenedor, con pista visual en los bordes.
+ */
+interface Props {
+  provider?: 'anthropic' | 'openai' | 'google';
+  tier?: string;
+  ids?: string[];
+  /** Nombre accesible de la región desplazable. */
+  etiqueta?: string;
+}
+
+const { provider, tier, ids, etiqueta = 'Tabla de modelos' } = Astro.props;
+const providerNames = { anthropic: 'Anthropic', openai: 'OpenAI', google: 'Google' } as const;
+
+const all = (await getCollection('models')).map((e) => e.data);
+const rows = ids
+  ? ids.map((id) => {
+      const row = all.find((r) => r.id === id);
+      if (!row) throw new Error(`<ModelTable>: no existe el modelo «${id}»`);
+      return row;
+    })
+  : all.filter((r) => (!provider || r.provider === provider) && (!tier || r.tier === tier));
+if (rows.length === 0) throw new Error('<ModelTable>: ningún modelo cumple el filtro');
+
+const showProvider = !provider && new Set(rows.map((r) => r.provider)).size > 1;
+const verified = latestDate(rows.map((r) => r.verifiedAt))!;
+const sourceIds = [...new Set(rows.map((r) => r.source))];
+const sources = (await Promise.all(sourceIds.map((id) => getEntry('sources', id)))).flatMap((s) =>
+  s ? [s.data] : [],
+);
+const price = (n: number | null) => (n === null ? '—' : formatUsd(n));
+const statusLabel = {
+  ga: 'Disponible',
+  beta: 'Beta',
+  'acceso-limitado': 'Acceso limitado',
+} as const;
+const withNotes = rows.filter((r) => r.pricing.notes);
+---
+
+<div class="table-wrap not-content">
+  <div class="scroller" role="region" aria-label={etiqueta} tabindex="0">
+    <table>
+      <caption class="sr-only">{etiqueta}. Precios en dólares por millón de tokens.</caption>
+      <thead>
+        <tr>
+          <th scope="col">Modelo</th>
+          {showProvider && <th scope="col">Proveedor</th>}
+          <th scope="col">Nivel</th>
+          <th scope="col" class="num">
+            Contexto
+          </th>
+          <th scope="col" class="num">
+            Entrada
+          </th>
+          <th scope="col" class="num">
+            Salida
+          </th>
+          <th scope="col" class="num">
+            Lectura de caché
+          </th>
+          <th scope="col">Esfuerzo por defecto (API)</th>
+          <th scope="col">Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((r) => (
+          <tr>
+            <th scope="row">
+              {r.name}
+              <span class="api-id">{r.apiId}</span>
+            </th>
+            {showProvider && <td>{providerNames[r.provider]}</td>}
+            <td>{r.tier}</td>
+            <td class="num">{formatTokensShort(r.contextWindow)}</td>
+            <td class="num">{price(r.pricing.input)}</td>
+            <td class="num">{price(r.pricing.output)}</td>
+            <td class="num">{price(r.pricing.cacheRead)}</td>
+            <td>{r.effort.default['api'] ?? '—'}</td>
+            <td>{statusLabel[r.status]}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  <p class="scroll-hint" aria-hidden="true">
+    Desliza la tabla para ver todas las columnas →
+  </p>
+  {withNotes.length > 0 && (
+    <ul class="notes">
+      {withNotes.map((r) => (
+        <li>
+          <strong>{r.name}:</strong> {r.pricing.notes}
+        </li>
+      ))}
+    </ul>
+  )}
+  <p class="provenance">
+    Precios en dólares por millón de tokens (MTok). Fuente:{' '}
+    {sources.map((s, i) => (
+      <>
+        {i > 0 && ', '}
+        <a href={s.url} rel="noopener">
+          {s.publisher}, {s.title}
+        </a>
+      </>
+    ))}
+    . Verificado el {formatDate(verified)}.
+  </p>
+</div>
+
+<style>
+  .table-wrap {
+    margin-block: var(--space-6);
+  }
+  .scroller {
+    overflow-x: auto;
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-md);
+    /* Sombras de desplazamiento: solo aparecen en el borde con más contenido por ver */
+    background:
+      linear-gradient(to right, var(--color-bg) 30%, transparent) left center / 24px 100% no-repeat local,
+      linear-gradient(to left, var(--color-bg) 30%, transparent) right center / 24px 100% no-repeat local,
+      linear-gradient(to right, var(--color-border-strong), transparent) left center / 10px 100% no-repeat
+        scroll,
+      linear-gradient(to left, var(--color-border-strong), transparent) right center / 10px 100% no-repeat
+        scroll;
+  }
+  table {
+    display: table;
+    width: 100%;
+    margin: 0;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+  }
+  th,
+  td {
+    padding: var(--space-2) var(--space-3);
+    border-bottom: var(--border-width) solid var(--color-border);
+    text-align: start;
+    vertical-align: top;
+    white-space: nowrap;
+  }
+  thead th {
+    background: var(--color-surface-2);
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+  tbody tr:last-child > * {
+    border-bottom: 0;
+  }
+  tbody th {
+    position: sticky;
+    inset-inline-start: 0;
+    background: var(--color-bg);
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+  .num {
+    text-align: end;
+  }
+  .api-id {
+    display: block;
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: 400;
+  }
+  .scroll-hint {
+    margin: var(--space-2) 0 0;
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+  }
+  @media (min-width: 64rem) {
+    .scroll-hint {
+      display: none;
+    }
+  }
+  .notes {
+    margin: var(--space-3) 0 0;
+    padding-inline-start: 1.25rem;
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+  }
+  .provenance {
+    margin: var(--space-2) 0 0;
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+  }
+</style>

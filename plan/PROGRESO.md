@@ -3,14 +3,14 @@
 > Memoria entre sesiones. Actualízalo al cerrar cada tarea: qué se hizo, qué falta, decisiones con su motivo y coste de la fase.
 
 ## Estado actual
-- **Fase en curso:** 1 (hecha, a la espera del punto de control 1). La Fase 0 está cerrada.
+- **Fase en curso:** 2 (hecha, a la espera del punto de control 2). Las Fases 0 y 1 están cerradas.
 - **Rama:** `feat/web`
-- **Última actualización:** 2026-10-16 (Fase 1 completada, pendiente de confirmación del usuario)
+- **Última actualización:** 2026-10-16 (Fase 2 completada, pendiente de confirmación del usuario: capturas, nombre del sitio y decisiones de diseño)
 
 ## Fases
 - [x] 0. Preparación (2026-10-15: `npm run build`, `npm run check` y `npm run test:e2e` pasan)
 - [x] 1. Investigación y verificación (2026-10-16; punto de control 1 pendiente de confirmación del usuario)
-- [ ] 2. Diseño y arquitectura (punto de control 2)
+- [x] 2. Diseño y arquitectura (2026-10-16; punto de control 2 pendiente de confirmación del usuario)
 - [ ] 3. Contenido núcleo: M2, M3, M4, M5, M0
 - [ ] 4. Contenido avanzado: M7, M8, M6, M9, M10, M1, M12
 - [ ] 5. Interactivos
@@ -32,6 +32,20 @@
 | 2026-10-16 | Fuera de `models.json`: Opus 4.5 y Mythos 5 | Opus 4.5 es heredado (retirada no antes de 2026-11-24) y Mythos 5 es de acceso limitado. Decisión editorial; reversible |
 | 2026-10-16 | `changelog.json`: `impact` provisional («Pendiente de redactar en la Fase 3») | Los investigadores aportan hechos, no valoración de impacto; se redacta al escribir las páginas |
 | 2026-10-16 | Ids de fuentes nuevas autogenerados desde la URL | Las 46 sembradas conservan su id; las demás (≈85) cubren los enlaces de las novedades |
+| 2026-10-16 | IBM Plex Sans (variable) + IBM Plex Mono, solo subconjunto latino, @font-face propio en `src/styles/fonts.css`; se retira Inter | Es la primera opción de `03_DISENO.md`, con cifras tabulares y buena cobertura del español. Fontsource solo publica CSS con todos los alfabetos; el propio evita descargas innecesarias |
+| 2026-10-16 | Tokens en `src/styles/tokens.css`, mapeo a `--sl-*` en `theme.css`; `tests/tokens.test.ts` valida contrastes AA en ambos temas y que los dos bloques oscuros sean idénticos | El diseño exige AA «comprobado en ambos temas»: queda como puerta automática |
+| 2026-10-16 | Acento único: verde azulado (#0b6767 claro, #52bfb9 oscuro); semánticos verde/acento/azul/ámbar/rojo/gris con icono y texto | `03_DISENO.md` §3 |
+| 2026-10-16 | La barra lateral no numera los módulos (sin «M2»); los módulos se llaman por su nombre. El orden y los nombres viven en `src/lib/modules.ts` | Evita las etiquetas numeradas de la lista de «evitar». Se puede revertir |
+| 2026-10-16 | Esqueleto: 89 páginas + 13 índices de módulo («Visión general»), todas con `status: en-preparacion`, `level`, `tracks`, `readingTime` provisionales | Fija la barra lateral. El aviso «En preparación» sale del layout (override de `PageTitle`), no del cuerpo: al terminar una página basta quitar `status` |
+| 2026-10-16 | Rutas: Esencial = 7 páginas (≈ 45 min); Profesional 67; Técnica 82. Asignación provisional | La ruta Profesional casi coincide con todo el sitio: recalibrar en la Fase 3 al redactar |
+| 2026-10-16 | Overrides de Starlight: `PageTitle` (título, entradilla, metadatos, aviso) y `Footer` (fuentes y última revisión). El pie sale del frontmatter `sources` / `lastReviewed` | Una sola plantilla para todas las lecciones |
+| 2026-10-16 | Los componentes que no deben heredar el estilo Markdown de Starlight llevan la clase `not-content` | Convención oficial de Starlight; evita márgenes y tablas con `display:block` heredados |
+| 2026-10-16 | `<Fact>` usa `<modelo>.<ruta>` (p. ej. `sonnet-5-5.pricing.input`), no el prefijo `claude-` del plan; falla el build si el dato no existe. Tooltip fijo abajo en pantalla (no anclado) | Los ids de `models.json` no llevan el prefijo; un tooltip anclado desbordaba la página en móvil |
+| 2026-10-16 | Diagramas con dos dibujos del mismo contenido (anillo ≥ 520 px, columna en móvil), conmutados con una consulta de contenedor | Un único SVG a 360 px dejaba el texto en ≈ 8 px |
+| 2026-10-16 | `src/content.config.ts`: las colecciones de datos se declaran una a una | Con `Object.fromEntries` se perdía el tipo de cada registro en `getCollection()` (`astro check` fallaba) |
+| 2026-10-16 | `rollupOptions.onwarn` ignora `MODULE_LEVEL_DIRECTIVE` | Astro inserta `use astro:head-inject` en cada módulo de contenido: 105 avisos de ruido interno |
+| 2026-10-16 | `src/content/docs/m12-recursos/catalogo-de-componentes.mdx` es una lección de ejemplo con todos los componentes | Referencia para los redactores. Hay que ocultarla (`sidebar.hidden`) o retirarla antes de publicar |
+| 2026-10-16 | `e2e/smoke.spec.ts` reescrito: axe en claro y oscuro sobre cinco páginas, sin desbordamiento horizontal a 360 px, tooltip de `<Fact>`, lista de comprobación y quiz | La página de prueba `prueba/hola` ya no existe |
 
 ## Conflictos entre fuentes y datos pendientes
 | Dato | Fuentes | Estado |
@@ -57,14 +71,22 @@
 **Pendientes menores del verificador (no aplicados):** `/privacy-settings` solo Pro y Max; alias `/reset` y `/new` de `/clear`; matices de memoria en Team/Enterprise (desactivada por miembro, no con HIPAA ni CMEK). `features.json` fila `codex-surfaces`: fuente genérica.
 | Avisos benignos de Astro en el build: «Entry docs → 404 was not found» y `No items found` en los JSON vacíos | — | Desaparecen al añadir datos (Fase 1) y al personalizar la 404 (Fase 2) |
 
+## Datos que corregir antes de publicar (detectados en la Fase 2)
+- `changelog.json`: varios `summary` arrastran notas del proceso de investigación («Dato tomado de un resultado de búsqueda…; no leído directamente»). La portada solo muestra la primera frase, pero hay que limpiarlos en la Fase 3 al redactar `impact`.
+- `task-matrix.json` y `glossary.json` siguen vacíos (aviso benigno del build). Se rellenan en las Fases 3 y 4 (matriz de M4, glosario de M0).
+- Avisos del build que quedan: «No items found» (los dos JSON anteriores) y «Could not render /404 … conflicts with higher priority route» (por `404.mdx` propio; la página sale bien).
+- Faltan `FeatureMatrix`, `TaskMatrix` y `CommandExplorer` (Fases 3–5). `Quiz` es solo la carcasa (sin progreso guardado).
+- En móvil el nombre actual del sitio solo cabe en la cabecera reduciéndolo a 14 px; un nombre más corto lo resolvería (ver propuestas del punto de control 2).
+
 ## Coste por fase (según `/usage`)
 | Fase | Tokens / coste | Notas |
 |---|---|---|
 | 0 | _pendiente de anotar por el usuario con `/usage`_ | |
+| 2 | _pendiente de anotar por el usuario con `/usage`_ | Sin subagentes: sesión principal (Sonnet 5.5, esfuerzo high) |
 | 1 | _pendiente de anotar por el usuario con `/usage`_ | 5 investigadores (Haiku, ≈1,0 M tokens de subagente en total: 152K + 100K + 123K + 297K + 306K) y 3 verificadores (Opus, ≈0,45 M: 222K + 84K + 140K) |
 
 ## Pendientes y siguientes pasos
-- Fase 2 (tras confirmar el punto de control 1): diseño y arquitectura.
+- Tras el punto de control 2: elegir el nombre del sitio (cambiar `title` en `astro.config.mjs` y en `index.mdx`), confirmar o ajustar la dirección visual y empezar la Fase 3 (M2 → M3 → M4 → M5 → M0).
 - Verificar al redactar: valores del resumen de `claude-code.json` que no entran en `src/data/` (hooks, skills, límites de flujos, rutinas). Están en `research/claude-code.json` con cita.
 - Si no existe el repo remoto o hay que subir la rama, pedir confirmación (no se ha hecho push).
 - `npm audit` marca 10 vulnerabilidades moderadas en dependencias de desarrollo/transitivas; revisar antes de publicar (Fase 6).

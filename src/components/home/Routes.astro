@@ -1,0 +1,123 @@
+---
+import { getCollection } from 'astro:content';
+import { buildRoute, type RoutePage } from '@lib/home';
+import { formatMinutes } from '@lib/format';
+import { tracks as trackInfo, type Track } from '@lib/modules';
+import { url } from '@lib/paths';
+import Icon from '../Icon.astro';
+
+/** Las tres rutas de lectura, calculadas desde los metadatos `tracks` y `readingTime` de las páginas. */
+const docs = await getCollection('docs');
+const pages: RoutePage[] = docs.flatMap((d) =>
+  d.data.tracks && d.data.readingTime
+    ? [
+        {
+          id: d.id,
+          title: d.data.title,
+          tracks: d.data.tracks,
+          readingTime: d.data.readingTime,
+          order: d.data.sidebar.order ?? 999,
+        },
+      ]
+    : [],
+);
+const order: Track[] = ['esencial', 'profesional', 'tecnica'];
+const routes = order.map((t) => ({ track: t, ...trackInfo[t], ...buildRoute(pages, t) }));
+const SHOWN = 5;
+---
+
+<section class="routes" aria-labelledby="rutas">
+  <h2 id="rutas">Tres rutas, según lo que necesites</h2>
+  <p class="intro">
+    El mismo contenido se recorre de tres formas. Cada página indica a qué rutas pertenece y su nivel.
+  </p>
+  <div class="grid">
+    {routes.map((r) => (
+      <article class="route">
+        <h3>{r.label}</h3>
+        <p class="stats">
+          {formatMinutes(r.totalMinutes)} de lectura · {r.pages.length} páginas
+        </p>
+        <p class="audience">{r.audience}</p>
+        <ol>
+          {r.pages.slice(0, SHOWN).map((p) => (
+            <li>
+              <a href={url(p.id)}>{p.title}</a>
+            </li>
+          ))}
+        </ol>
+        {r.pages.length > SHOWN && <p class="more">y {r.pages.length - SHOWN} páginas más</p>}
+        {r.pages[0] && (
+          <a class="start" href={url(r.pages[0].id)}>
+            Empezar la ruta {r.label.toLowerCase()} <Icon name="flecha" size={16} />
+          </a>
+        )}
+      </article>
+    ))}
+  </div>
+</section>
+
+<style>
+  .intro {
+    max-width: var(--measure);
+    margin: var(--space-2) 0 0;
+    color: var(--color-text-muted);
+  }
+  .grid {
+    display: grid;
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+  }
+  @media (min-width: 56rem) {
+    .grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .route {
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-5);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+  h3 {
+    margin: 0;
+    color: var(--color-heading);
+    font-size: var(--text-xl);
+  }
+  .stats {
+    margin: var(--space-1) 0 0;
+    color: var(--color-accent);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .audience {
+    margin: var(--space-3) 0;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+  ol {
+    margin: 0;
+    padding-inline-start: 1.25rem;
+    font-size: var(--text-sm);
+  }
+  li + li {
+    margin-top: var(--space-1);
+  }
+  .more {
+    margin: var(--space-2) 0 0;
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+  }
+  .start {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: auto;
+    padding-top: var(--space-4);
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
+</style>

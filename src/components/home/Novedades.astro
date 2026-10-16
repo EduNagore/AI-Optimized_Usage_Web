@@ -1,0 +1,107 @@
+---
+import { getCollection } from 'astro:content';
+import { formatDate } from '@lib/format';
+import { firstSentence, selectHighlights } from '@lib/home';
+import { url } from '@lib/paths';
+import Icon from '../Icon.astro';
+
+/** Últimas novedades del sector, desde changelog.json (sin las notas de versión de las herramientas). */
+const entries = (await getCollection('changelog')).map((e) => e.data);
+const items = selectHighlights(entries, 5);
+---
+
+<section class="news" aria-labelledby="novedades">
+  <h2 id="novedades">Novedades recientes</h2>
+  <ul>
+    {items.map((n) => (
+      <li>
+        <p class="meta">
+          <time datetime={n.date}>{formatDate(n.date)}</time>
+          <span class="provider">{n.provider}</span>
+        </p>
+        <p class="title">
+          {n.link ? (
+            <a href={n.link} rel="noopener">
+              {n.title}
+            </a>
+          ) : (
+            n.title
+          )}
+        </p>
+        <p class="summary">{firstSentence(n.summary)}</p>
+      </li>
+    ))}
+  </ul>
+  <p class="all">
+    <a href={url('m12-recursos/novedades')}>
+      Ver todas las novedades <Icon name="flecha" size={16} />
+    </a>
+  </p>
+</section>
+
+<style>
+  ul {
+    margin: var(--space-4) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: var(--border-width) solid var(--color-border);
+  }
+  li {
+    padding: var(--space-4) 0;
+    border-bottom: var(--border-width) solid var(--color-border);
+  }
+  @media (min-width: 48rem) {
+    li {
+      display: grid;
+      grid-template-columns: 14rem minmax(0, 1fr);
+      column-gap: var(--space-6);
+    }
+    .summary {
+      grid-column: 2;
+    }
+    .meta {
+      grid-row: 1 / span 2;
+    }
+  }
+  p {
+    margin: 0;
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-3);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+  }
+  .provider {
+    padding: 0 var(--space-2);
+    border: var(--border-width) solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-xs);
+    line-height: 1.6;
+  }
+  .title {
+    margin-top: var(--space-1);
+    font-weight: 600;
+  }
+  @media (min-width: 48rem) {
+    .title {
+      margin-top: 0;
+    }
+  }
+  .summary {
+    margin-top: var(--space-1);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+  .all {
+    margin-top: var(--space-4);
+    font-weight: 600;
+  }
+  .all a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+</style>

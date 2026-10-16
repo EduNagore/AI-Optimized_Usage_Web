@@ -1,0 +1,210 @@
+---
+title: Catálogo de componentes
+description: Cada componente de la guía en uso, dentro de una lección de ejemplo sobre resumir un informe. Es la referencia para quien redacta.
+sidebar:
+  order: 6
+level: intermedio
+tracks: [tecnica]
+readingTime: 6
+lastReviewed: 2026-10-16
+sources: [anthropic-buenas-practicas-de-prompting, anthropic-precios]
+---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Fact from '@components/Fact.astro';
+import ModelTable from '@components/ModelTable.astro';
+import Steps from '@components/Steps.astro';
+import BeforeAfter from '@components/BeforeAfter.astro';
+import PromptTemplate from '@components/PromptTemplate.astro';
+import ProviderTabs from '@components/ProviderTabs.astro';
+import Checklist from '@components/Checklist.astro';
+import CommandCard from '@components/CommandCard.astro';
+import CicloMetodo from '@components/diagrams/CicloMetodo.astro';
+import VentanaContexto from '@components/diagrams/VentanaContexto.astro';
+import Quiz from '@components/interactive/Quiz.tsx';
+
+<KeyTakeaways>
+
+- Pega el documento primero y la pregunta al final: el modelo trabaja mejor así.
+- Di para quién es el resumen y qué decisión debe apoyar, no solo cuántas líneas quieres.
+- Pide citas con página para poder comprobar cada afirmación.
+- Un modelo capaz a esfuerzo bajo suele bastar para resumir; sube solo si falla.
+
+</KeyTakeaways>
+
+Esta página no enseña un tema: enseña **cómo se ve cada pieza** de la guía. Usa como hilo un caso de oficina, resumir un informe trimestral, y sigue la plantilla de página: ideas clave, teoría mínima, práctica, ejemplo, errores, lista de comprobación y fuentes.
+
+## La idea
+
+Un informe de ochenta páginas no cabe en la cabeza de nadie, pero sí en la ventana de contexto de un modelo actual. Cabe, y aun así conviene no llenarla sin criterio: cada turno de la conversación reenvía todo lo que ya hay dentro, y el rendimiento baja a medida que se llena.
+
+<VentanaContexto />
+
+Por eso el resumen de un informe se prepara como cualquier otro encargo: primero el material, luego la pregunta, y un criterio claro de qué es un buen resultado.
+
+### Datos que cambian
+
+Los datos volátiles no se escriben a mano. Se referencian: <Fact id="sonnet-5-5.pricing.input" /> por millón de tokens de entrada y <Fact id="sonnet-5-5.pricing.output" /> de salida en Sonnet 5.5, con una ventana de <Fact id="sonnet-5-5.contextWindow" />. Pasa el ratón o el foco por una cifra para ver de dónde sale.
+
+<Callout tipo="verificado" fecha="2026-10-16">
+
+Los tres modelos de Claude más usados en el trabajo diario, con los precios vigentes de la tabla oficial.
+
+</Callout>
+
+<ModelTable ids={['haiku-5-5', 'sonnet-5-5', 'opus-5-5']} etiqueta="Modelos de Claude de uso diario" />
+
+## Los distintivos
+
+Cada afirmación del sitio es de uno de estos tipos, y el texto lo dice.
+
+<Callout tipo="recomendacion">
+
+Empieza con el modelo capaz a esfuerzo bajo y sube solo si el resultado falla. Es una recomendación de la guía: un solo modelo comparte una sola caché, y mides antes de gastar más.
+
+</Callout>
+
+<Callout tipo="medicion" titulo="Medición publicada por Anthropic">
+
+Anthropic publica comparativas de coste e inteligencia por nivel de esfuerzo. Son cifras del proveedor sobre sus propios modelos: léelas en la fuente antes de decidir.
+
+</Callout>
+
+<Callout tipo="novedad">
+
+Los modelos recientes siguen las instrucciones de forma más literal que los anteriores. Si reutilizas un prompt antiguo, revísalo.
+
+</Callout>
+
+<Callout tipo="varia">
+
+Cada proveedor llama de forma distinta al mando que controla cuánto razona el modelo: `effort`, `reasoning.effort` o `thinking_level`.
+
+</Callout>
+
+<Callout tipo="cuidado">
+
+No pegues datos personales ni confidenciales en una herramienta que tu organización no haya aprobado.
+
+</Callout>
+
+## En la práctica
+
+<Steps>
+
+1. Adjunta el informe y escribe la petición **después** del documento.
+2. Indica el público y la decisión que debe apoyar el resumen.
+3. Pide que cada afirmación lleve la página donde aparece.
+4. Comprueba tres citas al azar contra el original antes de reenviar el resumen.
+
+</Steps>
+
+Los pasos concretos cambian según la herramienta:
+
+<ProviderTabs>
+  <div slot="claude">
+
+En Claude, crea un proyecto con el informe como conocimiento y haz la petición en una conversación nueva dentro del proyecto.
+
+  </div>
+  <div slot="openai">
+
+En ChatGPT, adjunta el informe a la conversación y escribe la petición a continuación.
+
+  </div>
+  <div slot="google">
+
+En Gemini, sube el informe como archivo y escribe la petición en el mismo mensaje.
+
+  </div>
+</ProviderTabs>
+
+Si trabajas en Claude Code, este es el comando que libera contexto entre un informe y el siguiente:
+
+<CommandCard comando="/compact" />
+
+## Ejemplo: antes y después
+
+La diferencia entre un encargo flojo y uno bueno casi nunca es la longitud, sino el contexto.
+
+<BeforeAfter
+  antes="Resume este informe en cinco puntos."
+  despues="Resume este informe para el comité de dirección, que decidirá si renovamos el contrato. Dame cinco puntos con la página de cada uno y señala las cifras que contradicen el resumen ejecutivo."
+>
+
+Qué cambió y por qué: se añade **quién lo lee** y **qué decide**, que orientan lo que importa; se pide la **página**, que permite verificar; y se pide **buscar contradicciones**, algo que un resumen genérico no hace.
+
+</BeforeAfter>
+
+Y la plantilla que lo generaliza, lista para copiar:
+
+<PromptTemplate
+  titulo="Resumen de un informe para una decisión"
+  archivo="resumen-informe-decision"
+  texto={`<documento>
+{{pega aquí el informe}}
+</documento>
+
+Resume este informe para {{público: por ejemplo, el comité de dirección}}, que debe decidir {{decisión}}.
+
+Dame {{número}} puntos. Cada uno debe llevar la página donde aparece la afirmación. Al final, señala las cifras del cuerpo del informe que contradigan el resumen ejecutivo.
+
+Si falta información para sostener un punto, dilo en lugar de suponerla.`}
+
+>
+
+Úsala cuando necesites resumir un documento largo para apoyar una decisión concreta.
+
+</PromptTemplate>
+
+## Errores frecuentes
+
+- **Resumir sin decir para qué.** El modelo elige qué es importante por ti, y no siempre acierta.
+- **Aceptar el resumen sin comprobar las citas.** Una cita sin página no se puede verificar.
+- **Seguir la misma conversación con otro informe.** El primero sigue ocupando la ventana y reenviándose en cada turno.
+
+<Checklist
+  id="resumen-informe"
+  titulo="Antes de enviar el resumen"
+  items={[
+    'Dice para quién es y qué decisión apoya.',
+    'Cada afirmación lleva la página de origen.',
+    'He comprobado tres citas contra el original.',
+    'Las cifras clave coinciden con las del documento.',
+  ]}
+/>
+
+<Quiz
+  client:visible
+  titulo="Comprueba lo aprendido"
+  preguntas={[
+    {
+      pregunta: '¿Dónde conviene poner la pregunta cuando se adjunta un documento largo?',
+      opciones: ['Antes del documento', 'Después del documento', 'Da igual'],
+      correcta: 1,
+      explicacion:
+        'La guía de prompting de Anthropic recomienda poner los documentos primero y la pregunta al final.',
+    },
+    {
+      pregunta: '¿Para qué sirve pedir la página de cada afirmación?',
+      opciones: [
+        'Para que el resumen sea más largo',
+        'Para poder comprobarla contra el original',
+        'Para ahorrar tokens de salida',
+      ],
+      correcta: 1,
+      explicacion: 'Una afirmación con su página se verifica en segundos; sin ella, hay que releerlo todo.',
+    },
+  ]}
+/>
+
+## El método completo
+
+Este caso es un ejemplo del ciclo que organiza toda la guía:
+
+<CicloMetodo />
+
+## Para profundizar
+
+La guía oficial de prompting de Anthropic (abajo, en Fuentes) desarrolla el orden de documentos y pregunta, el uso de ejemplos y la estructura del encargo.
