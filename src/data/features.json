@@ -1,1 +1,229 @@
-[]
+[
+  {
+    "id": "claude-apps-projects-plans",
+    "feature": "Proyectos",
+    "provider": "anthropic",
+    "surface": "Apps de Claude",
+    "status": "Disponible en Free, Pro, Max, Team y Enterprise; RAG en Pro, Max, Team y Enterprise; compartir en Team y Enterprise",
+    "source": "support-claude-com-en-articles-9517075-what-are-projects",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "claude-apps-projects-freeLimit",
+    "feature": "Proyectos: límite en Free",
+    "provider": "anthropic",
+    "surface": "Apps de Claude",
+    "status": "5 proyectos",
+    "source": "support-claude-com-en-articles-9517075-what-are-projects",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "claude-apps-files-limits",
+    "feature": "Subida de ficheros",
+    "provider": "anthropic",
+    "surface": "Apps de Claude",
+    "status": "Chats: 500 MB por fichero, hasta 20 ficheros por chat. Proyectos: 30 MB por fichero; número ilimitado, pero el contenido total debe caber en la ventana de contexto.",
+    "source": "support-claude-com-en-articles-8241126-upload-files-to-claude",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "claude-apps-memory-availability",
+    "feature": "Memoria",
+    "provider": "anthropic",
+    "surface": "Apps de Claude",
+    "status": "Activa por defecto en Free, Pro, Max; Team/Enterprise: la controla el propietario",
+    "howTo": "Ajustes > Memoria",
+    "source": "support-claude-com-en-articles-11817273-use-claude-s-chat-search-and-memory-to-b",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "claude-apps-memory-chatSearch",
+    "feature": "Búsqueda en chats anteriores",
+    "provider": "anthropic",
+    "surface": "Apps de Claude",
+    "status": "Pro, Max, Team, Enterprise (búsqueda); incógnito en todos los planes",
+    "source": "support-claude-com-en-articles-11817273-use-claude-s-chat-search-and-memory-to-b",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "claude-apps-connectors-customRemoteMcp",
+    "feature": "Conectores personalizados (MCP remoto)",
+    "provider": "anthropic",
+    "surface": "Apps de Claude",
+    "status": "Free, Pro, Max, Team, Enterprise; Free: 1 conector personalizado",
+    "source": "support-claude-com-en-articles-11175166-get-started-with-custom-connectors-using",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "claude-apps-skills-plans",
+    "feature": "Skills",
+    "provider": "anthropic",
+    "surface": "Apps de Claude",
+    "status": "Free, Pro, Max, Team, Enterprise",
+    "source": "support-claude-com-en-articles-12512180-use-skills-in-claude",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "claude-apps-artifacts-plans",
+    "feature": "Artifacts y plantillas",
+    "provider": "anthropic",
+    "surface": "Apps de Claude",
+    "status": "Crear artifacts y plantillas Docs/Slides/Design: Free, Pro, Max, Team, Enterprise. Plantilla Dashboards (beta): Pro y superiores. Conectar apps y almacenar datos: Pro y superiores. Plantilla Motion (beta): Team y Enterprise.",
+    "source": "support-claude-com-en-articles-17153992-what-are-artifacts-and-how-do-i-use-them",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "claude-apps-research-plans",
+    "feature": "Research (investigación)",
+    "provider": "anthropic",
+    "surface": "Apps de Claude",
+    "status": "Pro, Max, Team, Enterprise; no Free",
+    "source": "support-claude-com-en-articles-11088861-use-research-on-claude",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "claude-apps-excel-plans",
+    "feature": "Claude en Excel",
+    "provider": "anthropic",
+    "surface": "Microsoft Excel",
+    "status": "Pro, Max, Team, Enterprise (GA); no Free",
+    "source": "claude-com-docs-office-agents-excel",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "claude-apps-cowork-plans",
+    "feature": "Cowork",
+    "provider": "anthropic",
+    "surface": "Apps de Claude (escritorio, web y móvil)",
+    "status": "Pro, Max, Team, Enterprise (no Free)",
+    "source": "support-claude-com-en-articles-13455879-use-claude-cowork-on-team-and-enterprise",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "claude-apps-cowork-cloud",
+    "feature": "Cowork: sesiones en la nube",
+    "provider": "anthropic",
+    "surface": "Apps de Claude",
+    "status": "Team: activado por defecto; Enterprise: desactivado por defecto",
+    "source": "support-claude-com-en-articles-13455879-use-claude-cowork-on-team-and-enterprise",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "claude-apps-chrome-plans",
+    "feature": "Claude en Chrome",
+    "provider": "anthropic",
+    "surface": "Google Chrome",
+    "status": "Pro, Max, Team, Enterprise; no Free; solo Google Chrome; no en móvil",
+    "source": "support-claude-com-en-articles-12012173-get-started-with-claude-in-chrome",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "claude-code-subagents",
+    "feature": "Subagentes",
+    "provider": "anthropic",
+    "surface": "Claude Code",
+    "status": "Disponible",
+    "howTo": ".claude/agents/*.md",
+    "source": "claude-code-subagentes",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "claude-code-agent-teams",
+    "feature": "Agent teams",
+    "provider": "anthropic",
+    "surface": "Claude Code",
+    "status": "Experimental (CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1)",
+    "source": "claude-code-agent-teams",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "claude-code-workflows",
+    "feature": "Flujos dinámicos",
+    "provider": "anthropic",
+    "surface": "Claude Code",
+    "status": "Disponible",
+    "source": "claude-code-flujos-dinamicos",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "claude-code-routines",
+    "feature": "Rutinas",
+    "provider": "anthropic",
+    "surface": "Claude Code",
+    "status": "Research preview",
+    "source": "claude-code-rutinas",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "claude-code-goal",
+    "feature": "/goal",
+    "provider": "anthropic",
+    "surface": "Claude Code",
+    "status": "Disponible",
+    "source": "code-claude-com-docs-en-goal",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "claude-code-hooks",
+    "feature": "Hooks",
+    "provider": "anthropic",
+    "surface": "Claude Code",
+    "status": "33 eventos; tipos command, http, mcp_tool, prompt y agent",
+    "source": "code-claude-com-docs-en-hooks",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "claude-api-managed-agents",
+    "feature": "Managed Agents",
+    "provider": "anthropic",
+    "surface": "API de Claude",
+    "status": "Beta (cabecera managed-agents-2026-04-01)",
+    "source": "anthropic-managed-agents",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "claude-api-compaction",
+    "feature": "Compactación en servidor",
+    "provider": "anthropic",
+    "surface": "API de Claude",
+    "status": "Beta (bajo demanda: cabecera compact-2026-09-04; por umbral: compact-2026-01-12)",
+    "source": "anthropic-compactacion",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "claude-api-fast-mode-opus55",
+    "feature": "Fast mode de Opus 5.5",
+    "provider": "anthropic",
+    "surface": "API de Claude",
+    "status": "Fuera de vista previa desde 2026-10-15 (Opus 5 y Opus 4.8 siguen en vista previa)",
+    "source": "anthropic-precios",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "codex-surfaces",
+    "feature": "Codex",
+    "provider": "openai",
+    "surface": "App de ChatGPT, móvil, web, CLI, extensión de IDE y Codex Cloud",
+    "status": "Disponible",
+    "source": "openai-codex-y-chatgpt-work",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "chatgpt-gpt6-rollout",
+    "feature": "GPT-6 en ChatGPT",
+    "provider": "openai",
+    "surface": "ChatGPT",
+    "status": "Sin confirmar en fuente oficial: reparto por plan y fecha (help.openai.com no accesible)",
+    "source": "openai-notas-de-version-de-chatgpt",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "gemini-cli-estado",
+    "feature": "Gemini CLI",
+    "provider": "google",
+    "surface": "Terminal",
+    "status": "Desde 2026-06-18 deja de dar servicio a Google AI Pro, Ultra y Code Assist for individuals (los sustituye Antigravity CLI, agy); sigue con licencias Code Assist Standard y Enterprise y claves de pago de la API",
+    "source": "developers-googleblog-com-an-important-update-transitioning-gemini-cli-to-antigr",
+    "verifiedAt": "2026-10-16"
+  }
+]

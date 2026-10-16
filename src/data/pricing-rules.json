@@ -1,1 +1,236 @@
-[]
+[
+  {
+    "id": "anthropic-batch-discount",
+    "provider": "anthropic",
+    "rule": "Descuento de Batch sobre todos los tokens (también caché)",
+    "value": 0.5,
+    "appliesTo": "Message Batches API; resultados en menos de 24 h, hasta 100.000 peticiones o 256 MB por lote",
+    "source": "anthropic-batch",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "anthropic-cache-write-5m",
+    "provider": "anthropic",
+    "rule": "Multiplicador de escritura de caché (5 min) sobre la entrada",
+    "value": 1.25,
+    "appliesTo": "Todos los modelos",
+    "source": "anthropic-prompt-caching",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "anthropic-cache-write-1h",
+    "provider": "anthropic",
+    "rule": "Multiplicador de escritura de caché (1 h) sobre la entrada",
+    "value": 2,
+    "appliesTo": "Todos los modelos",
+    "source": "anthropic-prompt-caching",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "anthropic-cache-read-default",
+    "provider": "anthropic",
+    "rule": "Multiplicador de lectura de caché sobre la entrada",
+    "value": 0.1,
+    "appliesTo": "Generalidad de modelos",
+    "source": "anthropic-prompt-caching",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "anthropic-cache-read-low",
+    "provider": "anthropic",
+    "rule": "Multiplicador de lectura de caché reducido",
+    "value": "0,05× (Opus 5.5 y Sonnet 5.5); 0,025× (Fable 5.1 y Mythos 5.1)",
+    "appliesTo": "Modelos indicados",
+    "source": "anthropic-prompt-caching",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "anthropic-cache-min-tokens",
+    "provider": "anthropic",
+    "rule": "Mínimo cacheable",
+    "value": "512 tokens (Fable, Mythos, Opus 5.5, Opus 5, Sonnet 5.5, Haiku 5.5); 1.024 (Opus 4.8, Sonnet 5, Sonnet 4.6); 2.048 (Opus 4.7); 4.096 (Opus 4.6, Haiku 4.5)",
+    "appliesTo": "Por modelo",
+    "source": "anthropic-prompt-caching",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "anthropic-cache-breakpoints",
+    "provider": "anthropic",
+    "rule": "Puntos de corte máximos por petición",
+    "value": 4,
+    "appliesTo": "Caché explícita; existe además caché automática con un cache_control en la raíz",
+    "source": "anthropic-prompt-caching",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "anthropic-cache-ttl",
+    "provider": "anthropic",
+    "rule": "TTL de la caché",
+    "value": "5 min por defecto; 1 h con ttl \"1h\"",
+    "appliesTo": "API",
+    "source": "anthropic-prompt-caching",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "anthropic-opus55-fast",
+    "provider": "anthropic",
+    "rule": "Precio de fast mode en Opus 5.5 (entrada / salida por MTok)",
+    "value": "8 / 40",
+    "appliesTo": "Claude API; sale de vista previa el 2026-10-15",
+    "source": "anthropic-precios",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "anthropic-tokenizer",
+    "provider": "anthropic",
+    "rule": "Tokens adicionales del tokenizador de Opus 4.7 y posteriores",
+    "value": "aprox. +30 %",
+    "appliesTo": "Mismo texto, modelos desde Opus 4.7",
+    "source": "anthropic-precios",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "anthropic-us-residency",
+    "provider": "anthropic",
+    "rule": "Recargo de residencia de datos en EE. UU.",
+    "value": 1.1,
+    "appliesTo": "Multiplicador sobre el precio estándar, modelos elegibles",
+    "source": "anthropic-precios",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "anthropic-max-output",
+    "provider": "anthropic",
+    "rule": "Salida máxima",
+    "value": 128000,
+    "appliesTo": "Modelos actuales (streaming para valores altos)",
+    "source": "anthropic-modelos",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "anthropic-managed-agents",
+    "provider": "anthropic",
+    "rule": "Coste de sesión de Managed Agents",
+    "value": "0,08 $ por hora de sesión (más tokens)",
+    "appliesTo": "Beta; solo cuenta el tiempo en estado running; no elegible para ZDR/HIPAA",
+    "source": "anthropic-managed-agents",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "anthropic-ptc-saving",
+    "provider": "anthropic",
+    "rule": "Ahorro de tokens de entrada con programmatic tool calling (medición publicada)",
+    "value": "38 % menos de tokens de entrada facturados en un benchmark con 75 herramientas; 20–40 % en peticiones con 10 a 49 definiciones de herramientas",
+    "appliesTo": "Documentación de programmatic tool calling",
+    "source": "anthropic-programmatic-tool-calling",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "anthropic-tool-search-threshold",
+    "provider": "anthropic",
+    "rule": "Umbral orientativo para tool search con defer_loading",
+    "value": "10 o más herramientas, o definiciones de más de 10.000 tokens (basta uno de los criterios)",
+    "appliesTo": "API",
+    "source": "anthropic-tool-search",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "openai-batch-flex",
+    "provider": "openai",
+    "rule": "Batch y Flex",
+    "value": 0.5,
+    "appliesTo": "Multiplicador sobre el precio estándar",
+    "source": "openai-precios",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "openai-fast",
+    "provider": "openai",
+    "rule": "Fast mode (antes Priority)",
+    "value": 2,
+    "appliesTo": "Multiplicador sobre el precio estándar; Ultrafast en Astra (global y residencia en EE. UU.) y 6.1 Sol (global y residencia en EE. UU. y UE)",
+    "source": "openai-precios",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "openai-long-context",
+    "provider": "openai",
+    "rule": "Umbral de contexto largo",
+    "value": 272000,
+    "appliesTo": "Tokens de entrada; por encima, se cobra toda la petición a 2× entrada y caché y 1,5× salida",
+    "source": "openai-precios",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "openai-regional",
+    "provider": "openai",
+    "rule": "Recargo de endpoints regionales (residencia de datos) y FedRAMP",
+    "value": 0.1,
+    "appliesTo": "Residencia: modelos lanzados desde 2026-03-05; FedRAMP también +10 %",
+    "source": "openai-precios",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "openai-cache-ttl",
+    "provider": "openai",
+    "rule": "prompt_cache_options.ttl",
+    "value": "30m (único valor admitido y por defecto)",
+    "appliesTo": "GPT-5.6 y posteriores; sustituye a prompt_cache_retention",
+    "source": "openai-ultimo-modelo-y-migracion",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "openai-cache-min",
+    "provider": "openai",
+    "rule": "Mínimo cacheable",
+    "value": 1024,
+    "appliesTo": "tokens; lectura 0,1× la entrada (0,05× en 6.1 Sol), escritura 1,25×",
+    "source": "openai-precios",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "openai-gpt56-terra",
+    "provider": "openai",
+    "rule": "GPT-5.6 Terra (entrada / cacheada / escritura / salida por MTok)",
+    "value": "2 / 0,20 / 2,50 / 12",
+    "appliesTo": "Hasta 272K",
+    "source": "openai-precios",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "openai-gpt56-luna",
+    "provider": "openai",
+    "rule": "GPT-5.6 Luna (entrada / cacheada / escritura / salida por MTok)",
+    "value": "0,20 / 0,02 / 0,25 / 1,20",
+    "appliesTo": "Hasta 272K",
+    "source": "openai-precios",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "google-argon-intro",
+    "provider": "google",
+    "rule": "Gemini 4 Argon: precio introductorio hasta 2026-11-30 (entrada / salida)",
+    "value": "2 / 10",
+    "appliesTo": "USD por MTok, razonamiento incluido",
+    "source": "google-precios",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "google-argon-post",
+    "provider": "google",
+    "rule": "Gemini 4 Argon: precio desde 2026-12-01 (entrada / salida / caché)",
+    "value": "4 / 20 / 0,20",
+    "appliesTo": "USD por MTok",
+    "source": "google-precios",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "google-implicit-cache",
+    "provider": "google",
+    "rule": "Caché implícita",
+    "value": "activa por defecto; mínimo 4.096 tokens (Argon y 3.8 Flash); descuento del 95 % en aciertos en Gemini 4 Argon",
+    "appliesTo": "Gemini 4 Argon no admite caché explícita; Gemini 3.8 Flash tiene además precio de almacenamiento de caché",
+    "source": "google-precios",
+    "verifiedAt": "2026-10-16"
+  }
+]

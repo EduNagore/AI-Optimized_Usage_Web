@@ -1,1 +1,104 @@
-[]
+[
+  {
+    "id": "anthropic-effort",
+    "provider": "anthropic",
+    "parameter": "output_config.effort",
+    "source": "anthropic-esfuerzo",
+    "levels": [
+      {
+        "name": "low",
+        "effect": "Menos razonamiento: más rápido y barato."
+      },
+      {
+        "name": "medium",
+        "effect": "Por defecto en Opus 5.5 y Haiku 5.5; la documentación recomienda empezar en medium con Haiku 5.5."
+      },
+      {
+        "name": "high",
+        "effect": "Razonamiento profundo; por defecto en todos los modelos con esfuerzo salvo Opus 5.5 y Haiku 5.5."
+      },
+      {
+        "name": "xhigh",
+        "effect": "Más razonamiento aún; no existe en Opus 4.6 ni Sonnet 4.6."
+      },
+      {
+        "name": "max",
+        "effect": "Máximo razonamiento; en Claude Code se aplica solo a la sesión actual, salvo que se fije con CLAUDE_CODE_EFFORT_LEVEL."
+      }
+    ],
+    "defaults": {
+      "opus-5-5": "medium",
+      "haiku-5-5": "medium",
+      "fable-5-1": "high",
+      "sonnet-5-5 (API)": "high",
+      "sonnet-5-5 (Claude Code)": "medium"
+    },
+    "notes": "thinking {type: \"adaptive\"} sustituye a budget_tokens (error 400 en los modelos recientes). Opus 5.5: el razonamiento no se puede desactivar.",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "openai-reasoning-effort",
+    "provider": "openai",
+    "parameter": "reasoning.effort",
+    "source": "openai-ultimo-modelo-y-migracion",
+    "levels": [
+      {
+        "name": "none",
+        "effect": "Sin razonamiento (no existe en Astra ni en 6.1 Sol)."
+      },
+      {
+        "name": "low",
+        "effect": "Razonamiento ligero."
+      },
+      {
+        "name": "medium",
+        "effect": "Por defecto en la familia GPT-6, salvo Astra."
+      },
+      {
+        "name": "high",
+        "effect": "Razonamiento profundo."
+      },
+      {
+        "name": "xhigh",
+        "effect": "Más razonamiento."
+      },
+      {
+        "name": "max",
+        "effect": "Máximo razonamiento."
+      }
+    ],
+    "defaults": {
+      "gpt-6-1-sol": "medium",
+      "gpt-6-sol": "medium",
+      "gpt-6-luna": "medium"
+    },
+    "notes": "Con esfuerzo distinto de none, eliminar temperature, top_p y top_logprobs (en Chat Completions, también logprobs). minimal existe en el parámetro, pero no lo admite ningún modelo GPT-6; el esfuerzo por defecto de Astra no está publicado. configuration_update cambia el esfuerzo a mitad de conversación sin romper el prefijo cacheado.",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "google-thinking-level",
+    "provider": "google",
+    "parameter": "thinking_level",
+    "source": "google-ultimo-modelo",
+    "levels": [
+      {
+        "name": "low",
+        "effect": "Menos razonamiento."
+      },
+      {
+        "name": "medium",
+        "effect": "Por defecto en Gemini 4 Argon."
+      },
+      {
+        "name": "high",
+        "effect": "Más razonamiento."
+      }
+    ],
+    "defaults": {
+      "gemini-4-argon": "medium",
+      "gemini-3-8-flash": "medium"
+    },
+    "notes": "Google recomienda probar los tres niveles y quedarse con el más bajo que cumpla. La guía de Gemini 3 está deprecada: no se usa como fuente del valor por defecto.",
+    "verifiedAt": "2026-10-16"
+  }
+]
