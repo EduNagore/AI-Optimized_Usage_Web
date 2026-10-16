@@ -385,7 +385,7 @@
   },
   {
     "id": "support-claude-com-en-articles-9517075-what-are-projects",
-    "title": "9517075-what-are-projects",
+    "title": "What are projects",
     "url": "https://support.claude.com/en/articles/9517075-what-are-projects",
     "publisher": "Anthropic",
     "official": true,
@@ -393,7 +393,7 @@
   },
   {
     "id": "support-claude-com-en-articles-8241126-upload-files-to-claude",
-    "title": "8241126-upload-files-to-claude",
+    "title": "Upload files to claude",
     "url": "https://support.claude.com/en/articles/8241126-upload-files-to-claude",
     "publisher": "Anthropic",
     "official": true,
@@ -401,7 +401,7 @@
   },
   {
     "id": "support-claude-com-en-articles-11817273-use-claude-s-chat-search-and-memory-to-b",
-    "title": "11817273-use-claude-s-chat-search-and-memory-to-build-on-previous-context",
+    "title": "Use claude s chat search and memory to build on previous context",
     "url": "https://support.claude.com/en/articles/11817273-use-claude-s-chat-search-and-memory-to-build-on-previous-context",
     "publisher": "Anthropic",
     "official": true,
@@ -409,7 +409,7 @@
   },
   {
     "id": "support-claude-com-en-articles-11175166-get-started-with-custom-connectors-using",
-    "title": "11175166-get-started-with-custom-connectors-using-remote-mcp",
+    "title": "Get started with custom connectors using remote mcp",
     "url": "https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp",
     "publisher": "Anthropic",
     "official": true,
@@ -417,7 +417,7 @@
   },
   {
     "id": "support-claude-com-en-articles-12512180-use-skills-in-claude",
-    "title": "12512180-use-skills-in-claude",
+    "title": "Use skills in claude",
     "url": "https://support.claude.com/en/articles/12512180-use-skills-in-claude",
     "publisher": "Anthropic",
     "official": true,
@@ -425,7 +425,7 @@
   },
   {
     "id": "support-claude-com-en-articles-17153992-what-are-artifacts-and-how-do-i-use-them",
-    "title": "17153992-what-are-artifacts-and-how-do-i-use-them",
+    "title": "What are artifacts and how do i use them",
     "url": "https://support.claude.com/en/articles/17153992-what-are-artifacts-and-how-do-i-use-them",
     "publisher": "Anthropic",
     "official": true,
@@ -433,7 +433,7 @@
   },
   {
     "id": "support-claude-com-en-articles-11088861-use-research-on-claude",
-    "title": "11088861-use-research-on-claude",
+    "title": "Use research on claude",
     "url": "https://support.claude.com/en/articles/11088861-use-research-on-claude",
     "publisher": "Anthropic",
     "official": true,
@@ -441,7 +441,7 @@
   },
   {
     "id": "claude-com-docs-office-agents-excel",
-    "title": "excel",
+    "title": "Excel",
     "url": "https://claude.com/docs/office-agents/excel",
     "publisher": "Anthropic",
     "official": true,
@@ -449,7 +449,7 @@
   },
   {
     "id": "support-claude-com-en-articles-13455879-use-claude-cowork-on-team-and-enterprise",
-    "title": "13455879-use-claude-cowork-on-team-and-enterprise-plans",
+    "title": "Use claude cowork on team and enterprise plans",
     "url": "https://support.claude.com/en/articles/13455879-use-claude-cowork-on-team-and-enterprise-plans",
     "publisher": "Anthropic",
     "official": true,
@@ -457,7 +457,7 @@
   },
   {
     "id": "support-claude-com-en-articles-12012173-get-started-with-claude-in-chrome",
-    "title": "12012173-get-started-with-claude-in-chrome",
+    "title": "Get started with claude in chrome",
     "url": "https://support.claude.com/en/articles/12012173-get-started-with-claude-in-chrome",
     "publisher": "Anthropic",
     "official": true,
@@ -473,7 +473,7 @@
   },
   {
     "id": "developers-googleblog-com-an-important-update-transitioning-gemini-cli-to-antigr",
-    "title": "an-important-update-transitioning-gemini-cli-to-antigravity-cli",
+    "title": "An important update transitioning gemini cli to antigravity cli",
     "url": "https://developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli/",
     "publisher": "Google",
     "official": true,
@@ -481,7 +481,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-build-with-claude-fast-mode",
-    "title": "fast-mode",
+    "title": "Build with claude: fast mode",
     "url": "https://platform.claude.com/docs/en/build-with-claude/fast-mode",
     "publisher": "Anthropic",
     "official": true,
@@ -489,7 +489,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-manage-claude-opentelemetry",
-    "title": "opentelemetry",
+    "title": "Opentelemetry",
     "url": "https://platform.claude.com/docs/en/manage-claude/opentelemetry",
     "publisher": "Anthropic",
     "official": true,
@@ -497,7 +497,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-managed-agents-multiagent-orchestration",
-    "title": "multiagent-orchestration",
+    "title": "Multiagent orchestration",
     "url": "https://platform.claude.com/docs/en/managed-agents/multiagent-orchestration#dynamic-workflows",
     "publisher": "Anthropic",
     "official": true,
@@ -505,7 +505,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-manage-claude-compliance-api",
-    "title": "compliance-api",
+    "title": "Compliance api",
     "url": "https://platform.claude.com/docs/en/manage-claude/compliance-api",
     "publisher": "Anthropic",
     "official": true,
@@ -513,7 +513,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-models-haiku-5-5-whats-new-haiku-5-5",
-    "title": "whats-new-haiku-5-5",
+    "title": "Novedades de Haiku 5.5",
     "url": "https://platform.claude.com/docs/en/models/haiku-5-5/whats-new-haiku-5-5",
     "publisher": "Anthropic",
     "official": true,
@@ -521,7 +521,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-api-models-list",
-    "title": "list",
+    "title": "Models: list",
     "url": "https://platform.claude.com/docs/en/api/models/list",
     "publisher": "Anthropic",
     "official": true,
@@ -537,7 +537,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-models-sonnet-5-5-overview",
-    "title": "overview",
+    "title": "Sonnet 5.5: visión general",
     "url": "https://platform.claude.com/docs/en/models/sonnet-5-5/overview",
     "publisher": "Anthropic",
     "official": true,
@@ -545,7 +545,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-build-with-claude-refusals-and-fallback",
-    "title": "refusals-and-fallback",
+    "title": "Refusals and fallback",
     "url": "https://platform.claude.com/docs/en/build-with-claude/refusals-and-fallback#how-refusals-are-billed",
     "publisher": "Anthropic",
     "official": true,
@@ -553,7 +553,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-build-with-claude-cache-diagnostics",
-    "title": "cache-diagnostics",
+    "title": "Cache diagnostics",
     "url": "https://platform.claude.com/docs/en/build-with-claude/cache-diagnostics",
     "publisher": "Anthropic",
     "official": true,
@@ -561,7 +561,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-models-opus-5-5-whats-new-opus-5-5",
-    "title": "whats-new-opus-5-5",
+    "title": "Novedades de Opus 5.5",
     "url": "https://platform.claude.com/docs/en/models/opus-5-5/whats-new-opus-5-5",
     "publisher": "Anthropic",
     "official": true,
@@ -569,7 +569,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-manage-claude-compliance-sessions",
-    "title": "compliance-sessions",
+    "title": "Compliance sessions",
     "url": "https://platform.claude.com/docs/en/manage-claude/compliance-sessions#retrieve-local-sessions",
     "publisher": "Anthropic",
     "official": true,
@@ -577,7 +577,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-build-with-claude-compaction-on-demand",
-    "title": "compaction-on-demand",
+    "title": "Compaction on demand",
     "url": "https://platform.claude.com/docs/en/build-with-claude/compaction-on-demand",
     "publisher": "Anthropic",
     "official": true,
@@ -585,7 +585,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-managed-agents-permission-policies",
-    "title": "permission-policies",
+    "title": "Permission policies",
     "url": "https://platform.claude.com/docs/en/managed-agents/permission-policies#let-the-server-evaluate-each-call-with-auto",
     "publisher": "Anthropic",
     "official": true,
@@ -593,7 +593,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-cli-sdks-libraries-cli-apply",
-    "title": "apply",
+    "title": "Cli: apply",
     "url": "https://platform.claude.com/docs/en/cli-sdks-libraries/cli/apply",
     "publisher": "Anthropic",
     "official": true,
@@ -601,7 +601,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-models-fable-5-1-whats-new-fable-5-1",
-    "title": "whats-new-fable-5-1",
+    "title": "Novedades de Fable 5.1",
     "url": "https://platform.claude.com/docs/en/models/fable-5-1/whats-new-fable-5-1",
     "publisher": "Anthropic",
     "official": true,
@@ -609,7 +609,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-build-with-claude-files",
-    "title": "files",
+    "title": "Build with claude: files",
     "url": "https://platform.claude.com/docs/en/build-with-claude/files#migrate-from-files-api-2025-04-14",
     "publisher": "Anthropic",
     "official": true,
@@ -617,7 +617,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-manage-claude-compliance-sessions-2",
-    "title": "compliance-sessions",
+    "title": "Compliance sessions",
     "url": "https://platform.claude.com/docs/en/manage-claude/compliance-sessions",
     "publisher": "Anthropic",
     "official": true,
@@ -625,7 +625,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-cli-sdks-libraries-sdks-python",
-    "title": "python",
+    "title": "Sdks: python",
     "url": "https://platform.claude.com/docs/en/cli-sdks-libraries/sdks/python",
     "publisher": "Anthropic",
     "official": true,
@@ -633,7 +633,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-agents-and-tools-tool-use-browser-use-tool",
-    "title": "browser-use-tool",
+    "title": "Browser use tool",
     "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/browser-use-tool",
     "publisher": "Anthropic",
     "official": true,
@@ -641,7 +641,7 @@
   },
   {
     "id": "platform-claude-com-playground",
-    "title": "playground",
+    "title": "Playground",
     "url": "https://platform.claude.com/playground",
     "publisher": "Anthropic",
     "official": true,
@@ -649,7 +649,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-managed-agents-budgets",
-    "title": "budgets",
+    "title": "Managed agents: budgets",
     "url": "https://platform.claude.com/docs/en/managed-agents/budgets",
     "publisher": "Anthropic",
     "official": true,
@@ -657,7 +657,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-manage-claude-inference-hooks",
-    "title": "inference-hooks",
+    "title": "Inference hooks",
     "url": "https://platform.claude.com/docs/en/manage-claude/inference-hooks",
     "publisher": "Anthropic",
     "official": true,
@@ -665,7 +665,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-manage-claude-compliance-sessions-3",
-    "title": "compliance-sessions",
+    "title": "Compliance sessions",
     "url": "https://platform.claude.com/docs/en/manage-claude/compliance-sessions#retrieve-remote-sessions",
     "publisher": "Anthropic",
     "official": true,
@@ -673,7 +673,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-managed-agents-dreams",
-    "title": "dreams",
+    "title": "Dreams",
     "url": "https://platform.claude.com/docs/en/managed-agents/dreams#limits",
     "publisher": "Anthropic",
     "official": true,
@@ -681,7 +681,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-models-opus-5-overview",
-    "title": "overview",
+    "title": "Opus 5: visión general",
     "url": "https://platform.claude.com/docs/en/models/opus-5/overview",
     "publisher": "Anthropic",
     "official": true,
@@ -689,7 +689,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-managed-agents-agent-setup",
-    "title": "agent-setup",
+    "title": "Agent setup",
     "url": "https://platform.claude.com/docs/en/managed-agents/agent-setup#create-an-agent",
     "publisher": "Anthropic",
     "official": true,
@@ -697,7 +697,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-build-with-claude-mid-conversation-system-messages",
-    "title": "mid-conversation-system-messages",
+    "title": "Mid conversation system messages",
     "url": "https://platform.claude.com/docs/en/build-with-claude/mid-conversation-system-messages",
     "publisher": "Anthropic",
     "official": true,
@@ -705,7 +705,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-manage-claude-user-management",
-    "title": "user-management",
+    "title": "User management",
     "url": "https://platform.claude.com/docs/en/manage-claude/user-management",
     "publisher": "Anthropic",
     "official": true,
@@ -713,7 +713,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-manage-claude-authentication",
-    "title": "authentication",
+    "title": "Authentication",
     "url": "https://platform.claude.com/docs/en/manage-claude/authentication#key-expiration",
     "publisher": "Anthropic",
     "official": true,
@@ -721,7 +721,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-managed-agents-memory",
-    "title": "memory",
+    "title": "Managed agents: memory",
     "url": "https://platform.claude.com/docs/en/managed-agents/memory#list-memories",
     "publisher": "Anthropic",
     "official": true,
@@ -729,7 +729,7 @@
   },
   {
     "id": "anthropic-com-news-redeploying-fable-5",
-    "title": "redeploying-fable-5",
+    "title": "Redeploying fable 5",
     "url": "https://www.anthropic.com/news/redeploying-fable-5",
     "publisher": "Anthropic",
     "official": true,
@@ -737,7 +737,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-models-sonnet-5-overview",
-    "title": "overview",
+    "title": "Sonnet 5: visión general",
     "url": "https://platform.claude.com/docs/en/models/sonnet-5/overview",
     "publisher": "Anthropic",
     "official": true,
@@ -745,7 +745,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-build-with-claude-fast-mode-2",
-    "title": "fast-mode",
+    "title": "Build with claude: fast mode",
     "url": "https://platform.claude.com/docs/en/build-with-claude/fast-mode#supported-models",
     "publisher": "Anthropic",
     "official": true,
@@ -753,7 +753,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-api-rate-limits",
-    "title": "rate-limits",
+    "title": "Rate limits",
     "url": "https://platform.claude.com/docs/en/api/rate-limits",
     "publisher": "Anthropic",
     "official": true,
@@ -761,7 +761,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-api-beta-tunnels",
-    "title": "tunnels",
+    "title": "Beta: tunnels",
     "url": "https://platform.claude.com/docs/en/api/beta/tunnels",
     "publisher": "Anthropic",
     "official": true,
@@ -769,7 +769,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-agents-and-tools-tool-use-code-execution-tool",
-    "title": "code-execution-tool",
+    "title": "Code execution tool",
     "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/code-execution-tool",
     "publisher": "Anthropic",
     "official": true,
@@ -777,7 +777,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-models-overview",
-    "title": "overview",
+    "title": "Models: visión general",
     "url": "https://platform.claude.com/docs/en/models/overview#latest-models-comparison",
     "publisher": "Anthropic",
     "official": true,
@@ -785,7 +785,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-api-claude-platform-on-aws-iam-actions",
-    "title": "claude-platform-on-aws-iam-actions",
+    "title": "Claude platform on aws iam actions",
     "url": "https://platform.claude.com/docs/en/api/claude-platform-on-aws-iam-actions",
     "publisher": "Anthropic",
     "official": true,
@@ -793,7 +793,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-models-fable-5-overview",
-    "title": "overview",
+    "title": "Fable 5: visión general",
     "url": "https://platform.claude.com/docs/en/models/fable-5/overview",
     "publisher": "Anthropic",
     "official": true,
@@ -801,7 +801,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-agents-and-tools-tool-use-advisor-tool",
-    "title": "advisor-tool",
+    "title": "Advisor tool",
     "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/advisor-tool",
     "publisher": "Anthropic",
     "official": true,
@@ -809,7 +809,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-build-with-claude-extended-thinking",
-    "title": "extended-thinking",
+    "title": "Extended thinking",
     "url": "https://platform.claude.com/docs/en/build-with-claude/extended-thinking#budget-rules-and-tuning",
     "publisher": "Anthropic",
     "official": true,
@@ -817,7 +817,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-agents-and-tools-mcp-tunnels-overview",
-    "title": "overview",
+    "title": "Mcp tunnels: visión general",
     "url": "https://platform.claude.com/docs/en/agents-and-tools/mcp-tunnels/overview",
     "publisher": "Anthropic",
     "official": true,
@@ -825,7 +825,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-agents-and-tools-tool-use-web-search-tool",
-    "title": "web-search-tool",
+    "title": "Web search tool",
     "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/web-search-tool",
     "publisher": "Anthropic",
     "official": true,
@@ -833,7 +833,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-build-with-claude-claude-platform-on-aws",
-    "title": "claude-platform-on-aws",
+    "title": "Claude platform on aws",
     "url": "https://platform.claude.com/docs/en/build-with-claude/claude-platform-on-aws",
     "publisher": "Anthropic",
     "official": true,
@@ -841,7 +841,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-managed-agents-multiagent-orchestration-2",
-    "title": "multiagent-orchestration",
+    "title": "Multiagent orchestration",
     "url": "https://platform.claude.com/docs/en/managed-agents/multiagent-orchestration",
     "publisher": "Anthropic",
     "official": true,
@@ -849,7 +849,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-manage-claude-workload-identity-federation",
-    "title": "workload-identity-federation",
+    "title": "Workload identity federation",
     "url": "https://platform.claude.com/docs/en/manage-claude/workload-identity-federation",
     "publisher": "Anthropic",
     "official": true,
@@ -857,7 +857,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-build-with-claude-context-windows",
-    "title": "context-windows",
+    "title": "Context windows",
     "url": "https://platform.claude.com/docs/en/build-with-claude/context-windows",
     "publisher": "Anthropic",
     "official": true,
@@ -865,7 +865,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-agents-and-tools-agent-skills-claude-api-skill",
-    "title": "claude-api-skill",
+    "title": "Claude api skill",
     "url": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/claude-api-skill",
     "publisher": "Anthropic",
     "official": true,
@@ -873,7 +873,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-manage-claude-rate-limits-api",
-    "title": "rate-limits-api",
+    "title": "Rate limits api",
     "url": "https://platform.claude.com/docs/en/manage-claude/rate-limits-api",
     "publisher": "Anthropic",
     "official": true,
@@ -881,7 +881,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-managed-agents-memory-2",
-    "title": "memory",
+    "title": "Managed agents: memory",
     "url": "https://platform.claude.com/docs/en/managed-agents/memory",
     "publisher": "Anthropic",
     "official": true,
@@ -889,7 +889,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-about-claude-models-whats-new-claude-4-7",
-    "title": "whats-new-claude-4-7",
+    "title": "Novedades de Claude 4.7",
     "url": "https://platform.claude.com/docs/en/about-claude/models/whats-new-claude-4-7",
     "publisher": "Anthropic",
     "official": true,
@@ -897,7 +897,7 @@
   },
   {
     "id": "anthropic-com-glasswing",
-    "title": "glasswing",
+    "title": "Glasswing",
     "url": "https://anthropic.com/glasswing",
     "publisher": "Anthropic",
     "official": true,
@@ -905,7 +905,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-build-with-claude-batch-processing",
-    "title": "batch-processing",
+    "title": "Batch processing",
     "url": "https://platform.claude.com/docs/en/build-with-claude/batch-processing#extended-output-beta",
     "publisher": "Anthropic",
     "official": true,
@@ -913,7 +913,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-build-with-claude-thinking",
-    "title": "thinking",
+    "title": "Build with claude: thinking",
     "url": "https://platform.claude.com/docs/en/build-with-claude/thinking#controlling-thinking-display",
     "publisher": "Anthropic",
     "official": true,
@@ -921,7 +921,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-build-with-claude-prompt-caching",
-    "title": "prompt-caching",
+    "title": "Prompt caching",
     "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching#automatic-caching",
     "publisher": "Anthropic",
     "official": true,
@@ -929,7 +929,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-models-overview-2",
-    "title": "overview",
+    "title": "Models: visión general",
     "url": "https://platform.claude.com/docs/en/models/overview",
     "publisher": "Anthropic",
     "official": true,
@@ -937,7 +937,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-about-claude-models-whats-new-claude-4-6",
-    "title": "whats-new-claude-4-6",
+    "title": "Novedades de Claude 4.6",
     "url": "https://platform.claude.com/docs/en/about-claude/models/whats-new-claude-4-6",
     "publisher": "Anthropic",
     "official": true,
@@ -945,7 +945,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-release-notes-overview",
-    "title": "overview",
+    "title": "Release notes: visión general",
     "url": "https://platform.claude.com/docs/en/release-notes/overview",
     "publisher": "Anthropic",
     "official": true,
@@ -985,7 +985,7 @@
   },
   {
     "id": "developers-openai-com-api-docs-changelog",
-    "title": "changelog",
+    "title": "Docs: changelog",
     "url": "https://developers.openai.com/api/docs/changelog",
     "publisher": "OpenAI",
     "official": true,
@@ -993,7 +993,7 @@
   },
   {
     "id": "learn-chatgpt-com-docs-whats-new",
-    "title": "whats-new",
+    "title": "Docs: whats new",
     "url": "https://learn.chatgpt.com/docs/whats-new",
     "publisher": "OpenAI",
     "official": true,
@@ -1001,7 +1001,7 @@
   },
   {
     "id": "gemini-google-release-notes",
-    "title": "release-notes",
+    "title": "Release notes",
     "url": "https://gemini.google/release-notes/",
     "publisher": "Google",
     "official": true,
@@ -1017,7 +1017,7 @@
   },
   {
     "id": "support-claude-com-en-articles-12138966-release-notes",
-    "title": "12138966-release-notes",
+    "title": "Release notes",
     "url": "https://support.claude.com/en/articles/12138966-release-notes",
     "publisher": "Anthropic",
     "official": true,
@@ -1025,7 +1025,7 @@
   },
   {
     "id": "ai-google-dev-gemini-api-docs-prompting-strategies",
-    "title": "prompting-strategies",
+    "title": "Prompting strategies",
     "url": "https://ai.google.dev/gemini-api/docs/prompting-strategies",
     "publisher": "Google",
     "official": true,
@@ -1033,9 +1033,49 @@
   },
   {
     "id": "anthropic-com-engineering-effective-context-engineering-for-ai-agents",
-    "title": "effective-context-engineering-for-ai-agents",
+    "title": "Effective context engineering for ai agents",
     "url": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
     "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-16"
+  },
+  {
+    "id": "anthropic-prompting-opus-5-5",
+    "title": "Guía de prompting de Claude Opus 5.5",
+    "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5-5.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-16"
+  },
+  {
+    "id": "anthropic-prompting-sonnet-5-5",
+    "title": "Guía de prompting de Claude Sonnet 5.5",
+    "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-sonnet-5-5.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-16"
+  },
+  {
+    "id": "anthropic-prompting-haiku-5-5",
+    "title": "Guía de prompting de Claude Haiku 5.5",
+    "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-haiku-5-5.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-16"
+  },
+  {
+    "id": "anthropic-prompting-fable-5-1",
+    "title": "Guía de prompting de Claude Fable 5.1",
+    "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5-1.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-16"
+  },
+  {
+    "id": "openai-guia-de-prompts",
+    "title": "Guía de prompts (prompt guidance)",
+    "url": "https://developers.openai.com/api/docs/guides/prompt-guidance",
+    "publisher": "OpenAI",
     "official": true,
     "lastChecked": "2026-10-16"
   }

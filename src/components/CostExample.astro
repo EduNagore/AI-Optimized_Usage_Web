@@ -1,0 +1,125 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+import { formatDate } from '@lib/format';
+
+/**
+ * Coste de un intento y de un volumen, calculado desde models.json y el descuento de Batch de
+ * pricing-rules.json. Así los resultados se actualizan solos cuando cambian los precios.
+ * Los tokens de razonamiento se facturan como salida y no están incluidos: se suman a `salida`.
+ */
+interface Props {
+  ids: string[];
+  /** Tokens de entrada de un intento. */
+  entrada: number;
+  /** Tokens de salida de un intento (incluido el razonamiento, si lo hay). */
+  salida: number;
+  /** Número de documentos o ejecuciones del caso de volumen. */
+  volumen: number;
+  etiqueta?: string;
+}
+
+const { ids, entrada, salida, volumen, etiqueta = 'Coste de un intento y de un volumen' } = Astro.props;
+const models = (await getCollection('models')).map((e) => e.data);
+const rule = await getEntry('pricing-rules', 'anthropic-batch-discount');
+if (!rule) throw new Error('<CostExample>: falta anthropic-batch-discount en pricing-rules.json');
+const batch = rule.data.value;
+if (typeof batch !== 'number') throw new Error('<CostExample>: el descuento de Batch no es numérico');
+
+const rows = ids.map((id) => {
+  const m = models.find((r) => r.id === id);
+  if (!m) throw new Error(`<CostExample>: no existe el modelo «${id}»`);
+  const perAttempt = (entrada * (m.pricing.input ?? 0) + salida * (m.pricing.output ?? 0)) / 1_000_000;
+  return { m, perAttempt, total: perAttempt * volumen };
+});
+const fmt = (n: number) =>
+  `${new Intl.NumberFormat('es-ES', {
+    maximumFractionDigits: n < 0.01 ? 4 : n < 10 ? 3 : 0,
+  }).format(n)} $`;
+const num = (n: number) => new Intl.NumberFormat('es-ES').format(n);
+const verified = rows
+  .map((r) => r.m.verifiedAt)
+  .sort()
+  .at(-1)!;
+const hasTiers = rows.filter((r) => r.m.pricing.notes?.includes('Precios hasta'));
+---
+
+<div class="table-wrap not-content">
+  <div class="scroller" role="region" aria-label={etiqueta} tabindex="0">
+    <table>
+      <caption class="sr-only">
+        {etiqueta}:{num(entrada)}tokens de entrada y{num(salida)}de salida por intento.
+      </caption>
+      <thead>
+        <tr>
+          <th scope="col">Modelo</th>
+          <th scope="col" class="num">
+            Un intento
+          </th>
+          <th scope="col" class="num">
+            {num(volumen)} documentos
+          </th>
+          <th scope="col" class="num">
+            Con Batch
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((r) => (
+          <tr>
+            <th scope="row">{r.m.name}</th>
+            <td class="num">{fmt(r.perAttempt)}</td>
+            <td class="num">{fmt(r.total)}</td>
+            <td class="num">{fmt(r.total * batch)}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  <p class="note">
+    Cálculo con los precios de <code>models.json</code> verificados el {formatDate(verified)}. Batch aplica el
+    factor {batch} de <code>pricing-rules.json</code>
+    {hasTiers.length > 0 && ' y los precios de Haiku 5.5 valen hasta 100.000 tokens de entrada'}.
+  </p>
+</div>
+
+<style>
+  .table-wrap {
+    margin-block: var(--space-5);
+  }
+  .scroller {
+    overflow-x: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md, 8px);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm, 0.9rem);
+  }
+  th,
+  td {
+    padding: var(--space-2) var(--space-3);
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+    white-space: nowrap;
+  }
+  .num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  tbody tr:last-child > * {
+    border-bottom: 0;
+  }
+  .note {
+    margin-block: var(--space-2) 0;
+    font-size: var(--text-sm, 0.9rem);
+    color: var(--color-text-muted);
+  }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+</style>

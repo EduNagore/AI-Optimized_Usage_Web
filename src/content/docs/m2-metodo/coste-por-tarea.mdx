@@ -6,6 +6,109 @@ sidebar:
 level: intermedio
 tracks: [profesional, tecnica]
 readingTime: 8
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-16
+sources: [anthropic-precios, anthropic-batch, anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Fact from '@components/Fact.astro';
+import ModelTable from '@components/ModelTable.astro';
+import CostExample from '@components/CostExample.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Lo que importa es el coste de terminar la tarea bien, no el precio de un millón de tokens.
+- Un intento fallido cuesta los tokens y, sobre todo, tu tiempo de revisión.
+- En tareas sueltas manda el tiempo de las personas; en volumen mandan los tokens.
+- La salida cuesta varias veces más que la entrada, y las mejoras gratuitas van antes que cambiar de modelo.
+
+</KeyTakeaways>
+
+## La idea
+
+Comparar modelos por su precio por millón de tokens es como comparar coches por el precio del litro de gasolina. El dato es real, pero no responde a la pregunta que importa: cuánto cuesta llegar. En IA, **llegar** significa tener la tarea terminada y verificada.
+
+El coste por tarea completada suma cuatro cosas:
+
+- los tokens de cada intento (entrada más salida),
+- el número de intentos hasta que sale bien,
+- el tiempo de una persona para revisar y corregir cada intento,
+- y el coste de los errores que se escapan.
+
+Los precios cambian, así que se leen siempre de los datos. Estos son los tres modelos de Claude de uso diario:
+
+<ModelTable
+  ids={['haiku-5-5', 'sonnet-5-5', 'opus-5-5']}
+  etiqueta="Precios por millón de tokens de entrada y salida"
+/>
+
+Dos hechos de la tabla importan para razonar. Primero, la salida cuesta varias veces más que la entrada por token: en Sonnet 5.5, <Fact id="sonnet-5-5.pricing.output" /> frente a <Fact id="sonnet-5-5.pricing.input" />. Eso no significa que recortar la salida ahorre siempre más: si pides respuestas largas o repetidas, rinde mucho; si cargas mucho material cada vez, pesa más la entrada, y ahí actúa la caché. Segundo, entre el modelo más barato y el más caro hay una distancia enorme (Haiku 5.5 cobra <Fact id="haiku-5-5.pricing.input" /> de entrada; Opus 5.5, <Fact id="opus-5-5.pricing.input" />), pero esa distancia solo duele de verdad cuando multiplicas por miles de ejecuciones. Los precios de Haiku 5.5 valen hasta 100.000 tokens de entrada por petición; por encima suben (consulta la nota de la tabla).
+
+## Ejemplo numérico
+
+Una tarea de oficina típica: analizar un documento de 20.000 tokens de entrada y obtener un informe de 2.000 tokens de salida. La tabla calcula, desde los datos, lo que cuesta un intento, 5.000 documentos iguales y esos mismos 5.000 por [lotes](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/batch/), que la documentación de Anthropic ofrece con descuento para trabajos que pueden esperar hasta 24 horas:
+
+<CostExample ids={['haiku-5-5', 'sonnet-5-5', 'opus-5-5']} entrada={20000} salida={2000} volumen={5000} />
+
+Una advertencia sobre las cifras: los 2.000 tokens de salida **no incluyen el razonamiento**, que se factura como salida. Cuánto razona un modelo depende de su nivel de `effort` y varía entre modelos (en Opus 5.5 no se puede desactivar), así que el coste real puede ser mayor y no por igual en todos. Es la razón por la que conviene medir con tus propios documentos; el efecto del esfuerzo está en [Esfuerzo y razonamiento](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/esfuerzo-y-razonamiento/).
+
+Lo primero que se ve es que, **para una tarea suelta, los tokens son céntimos con cualquier modelo**. Lo que decide el coste es otra cosa: suponte que cada intento fallido te obliga a diez minutos de revisión y reescritura. Si el modelo barato necesita tres intentos y el capaz acierta a la primera, el modelo barato te cuesta veinte minutos más de tu tiempo para ahorrar unos céntimos. Es un supuesto ilustrativo, no una medición: cambia los minutos por los tuyos. Y si reintentas dentro de la misma conversación, cada intento reenvía el contexto anterior, así que los reintentos salen algo más caros que el primero.
+
+El razonamiento se invierte con el volumen: con 5.000 documentos la elección de modelo importa de verdad, y es donde tiene sentido medir en una muestra qué modelo barato sigue acertando.
+
+### El precio de la cola
+
+Supón, como hipótesis, que un modelo barato resuelve bien el 95 % de los documentos y falla en el 5 % difícil, y que esos fallos no los detecta nadie hasta que llegan al cliente. El ahorro en tokens se ve en la factura; el coste de esos 250 documentos mal resueltos (de 5.000) no se ve en ninguna parte y puede superar con mucho lo ahorrado. Dos salidas habituales: detectar los casos dudosos (una verificación automática o una segunda pasada solo sobre ellos) y reservar el modelo capaz para esa cola. Es una hipótesis para razonar, no una cifra medida.
+
+<Callout tipo="medicion" titulo="Medición publicada por Anthropic">
+
+Anthropic publica en su guía de optimización de coste e inteligencia comparativas por nivel de esfuerzo y por modelo. Una de ellas, recogida en la sección de optimización de [Esfuerzo y razonamiento](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/esfuerzo-y-razonamiento/): en un subconjunto de SWE-bench Pro (tareas de programación), Sonnet 5.5 en `medium` quedó unos 7 puntos por debajo de `high` con aproximadamente el 59 % del coste por tarea. Son cifras del proveedor sobre sus propias tareas: úsalas como orientación y confirma con tus documentos.
+
+</Callout>
+
+<Callout tipo="recomendacion">
+
+Antes de cambiar a un modelo menor, aplica las mejoras que no cuestan calidad: pide menos salida, ordena el contexto, reutiliza caché y usa lotes cuando puedas esperar. Es una recomendación de la guía: bajar de modelo o de esfuerzo sí puede costar calidad, y eso se mide en una muestra antes de generalizarlo. El orden detallado está en [el orden de las palancas](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/orden-de-las-palancas/).
+
+</Callout>
+
+## En la práctica
+
+<Steps>
+
+1. Elige una tarea que repites y calcula el tamaño aproximado: tokens de entrada y de salida de un intento.
+2. Haz diez ejecuciones con el modelo que usas hoy y apunta cuántas salen bien a la primera y cuánto tiempo te lleva corregir las que no.
+3. Repite con otro modelo o esfuerzo sobre los mismos diez casos.
+4. Compara el coste total: tokens más tiempo de revisión, no solo tokens.
+5. Si el volumen es alto, usa la [calculadora de coste](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/calculadora-de-coste/) con tus cifras.
+
+</Steps>
+
+## Ejemplo de oficina: clasificar correos de soporte
+
+Un equipo clasifica 2.000 correos al mes por urgencia. Supón, como hipótesis, que con un modelo pequeño hay que repasar la mitad y con uno intermedio solo una de cada veinte: el coste en tokens sube con el intermedio, pero las horas de repaso de una persona bajan mucho más de lo que sube la factura. Para saber si esa hipótesis es cierta en tu caso hace falta una muestra de cien correos etiquetados a mano, no una opinión.
+
+## Errores frecuentes
+
+- **Elegir por la tarifa más baja.** No cuentas los reintentos ni tu tiempo.
+- **Elegir siempre el modelo más caro por si acaso.** Pagas razonamiento que una tarea sencilla no usa.
+- **No medir.** Sin una muestra, ambas decisiones son una intuición.
+- **Ignorar la salida.** Pedir «explícalo con detalle» cuando solo querías la cifra encarece cada respuesta.
+
+<Checklist
+  id="coste-por-tarea"
+  titulo="Antes de decidir por precio"
+  items={[
+    'He estimado tokens de entrada y salida de un intento.',
+    'Sé cuántos intentos necesita cada opción en una muestra real.',
+    'He contado el tiempo de revisión, no solo los tokens.',
+    'He aplicado antes las mejoras que no cuestan calidad.',
+  ]}
+/>
+
+## Para profundizar
+
+La mecánica de tokens y precios está en el módulo de [fundamentos](/AI-Optimized_Usage_Web/m1-fundamentos/economia-de-un-llm/) y las palancas de ahorro en el módulo 5.

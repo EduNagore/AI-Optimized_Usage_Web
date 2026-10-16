@@ -6,6 +6,122 @@ sidebar:
 level: intermedio
 tracks: [profesional, tecnica]
 readingTime: 6
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-16
+sources:
+  [
+    anthropic-buenas-practicas-de-prompting,
+    anthropic-com-engineering-effective-context-engineering-for-ai-agents,
+    anthropic-prompting-opus-5-5,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import BeforeAfter from '@components/BeforeAfter.astro';
+import PromptTemplate from '@components/PromptTemplate.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Pon los documentos largos arriba y la pregunta al final.
+- Etiqueta cada documento con su nombre, fecha y origen.
+- Pide primero los pasajes relevantes, copiados literalmente, y analiza después.
+- Si el material es enorme, pregunta por partes en lugar de pedirlo todo a la vez.
+- Más contexto no siempre es mejor: lo irrelevante diluye lo importante.
+
+</KeyTakeaways>
+
+## La idea
+
+Puedes pegar en una conversación un contrato de cincuenta páginas, el acta de tres reuniones y un Excel exportado. Cabe. Pero que quepa no significa que el modelo lo use bien: lo que importa es dónde pones cada cosa y cómo lo etiquetas. La guía oficial de Anthropic recomienda, para entradas largas, colocar los documentos cerca del principio del prompt, por encima de la pregunta, las instrucciones y los ejemplos.
+
+Lo que sigue son tres hábitos que ayudan en cualquier modelo y cualquier proveedor.
+
+**Documentos primero, pregunta al final.** Es la recomendación de la guía de Anthropic para entradas largas (la fuente la sitúa a partir de unos 20.000 tokens). La guía no detalla el mecanismo; trátalo como una recomendación y compruébalo con tus propios documentos.
+
+**Cada documento con su etiqueta.** Envolver cada documento con un nombre, una fecha y su origen permite que el modelo distinga fuentes y que tú le pidas citarlas. También separa el material de tus instrucciones.
+
+**Extractos antes que análisis.** Pedirle que primero copie los fragmentos relevantes, y después responda a partir de ellos, ancla la respuesta en el texto y deja un rastro que puedes verificar.
+
+<Callout tipo="recomendacion">
+
+Pide siempre las citas con su ubicación (página, apartado o cláusula). Es una recomendación de la guía: una afirmación con su apartado se comprueba en segundos; sin él, hay que releer todo el documento para saber si es verdad.
+
+</Callout>
+
+## En la práctica
+
+<Steps>
+
+1. Pega o adjunta los documentos al principio del mensaje, cada uno con nombre, fecha y origen.
+2. Escribe tu pregunta o tarea al final, tras los documentos.
+3. Pide que primero extraiga los pasajes relevantes, literales y con su ubicación.
+4. Pide que responda solo a partir de esos pasajes y que indique si el material no basta.
+5. Comprueba tres citas al azar contra el original antes de dar nada por bueno.
+
+</Steps>
+
+Si el material es muy grande, divide: una pregunta por bloque de documentos y una última conversación que junte las respuestas parciales. Así cada paso se puede revisar por separado y no se arrastra todo el material en cada turno.
+
+<Callout tipo="cuidado">
+
+El texto pegado puede contener instrucciones que tú no escribiste (un correo que dice «ignora lo anterior», una web con órdenes ocultas). Etiqueta el material como tal y dile al modelo que lo trate como datos, no como órdenes. La guía de Opus 5.5 propone una técnica para quien integra el modelo en una aplicación: envolver cada bloque pegado en etiquetas `<pasted_content>` con un identificador aleatorio y avisarlo en el prompt de sistema. Si usas un chat normal, basta con etiquetar tú el material. Es una barrera más, no una garantía: las etiquetas se pueden imitar.
+
+</Callout>
+
+## Ejemplo: tres informes trimestrales y una decisión
+
+Una responsable de compras tiene los informes de tres trimestres de un proveedor y debe decidir si renueva.
+
+<BeforeAfter
+  antes="Aquí tienes tres informes. ¿Qué tal ha ido el proveedor? [pega los tres informes a continuación]"
+  despues="<informe nombre='Q1' fecha='2026-04-15'>…</informe> <informe nombre='Q2' fecha='2026-07-14'>…</informe> <informe nombre='Q3' fecha='2026-10-13'>…</informe> Con estos tres informes, primero copia literalmente las cifras de plazos de entrega e incidencias de cada trimestre, indicando de qué informe sale cada una. Después dime si la tendencia justifica renovar el contrato, que se decide el 30 de octubre. Si algún informe no recoge un dato, dilo."
+>
+
+Qué cambió y por qué: los documentos van primero y etiquetados, así se puede citar cuál es cuál; la pregunta va al final y menciona la decisión; se pide copiar las cifras antes de interpretar y se permite decir «no consta», que evita inventar un dato que falta.
+
+</BeforeAfter>
+
+<PromptTemplate
+  titulo="Preguntar sobre varios documentos con citas"
+  archivo="preguntar-varios-documentos"
+  texto={`<documento nombre="{{nombre 1}}" fecha="{{fecha}}" origen="{{origen}}">{{contenido}}</documento>
+
+<documento nombre="{{nombre 2}}" fecha="{{fecha}}" origen="{{origen}}">
+  {{ contenido }}
+</documento>
+
+Pregunta: {{pregunta, y qué decisión apoya}}
+
+Paso 1: copia literalmente los pasajes relevantes, indicando de qué documento y apartado salen.
+Paso 2: responde solo con esos pasajes. Si no bastan, dilo y señala qué falta.`}
+
+>
+
+Para analizar a la vez varios documentos con citas comprobables. Hay una variante más corta, para un documento, en la [Biblioteca de plantillas](/AI-Optimized_Usage_Web/m3-prompting/biblioteca-de-plantillas/).
+
+</PromptTemplate>
+
+## Errores frecuentes
+
+- **Pegar todo «por si acaso».** Cada turno reenvía todo el historial, y el rendimiento baja según se llena la ventana. Aporta lo relevante.
+- **La pregunta al principio y el documento después.** Funciona peor en entradas largas, según la guía.
+- **Aceptar un resumen sin citas.** No se puede distinguir lo que dice el documento de lo que el modelo supone.
+- **Continuar en la misma conversación con otro informe.** El anterior sigue ocupando la ventana. Abre una conversación nueva (ver [Tokens y contexto](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/)).
+
+<Checklist
+  id="contexto-largo"
+  titulo="Con un documento largo"
+  items={[
+    'Los documentos van antes que la pregunta.',
+    'Cada documento tiene nombre, fecha y origen.',
+    'Pido pasajes literales con su ubicación antes del análisis.',
+    'Permito responder «no consta».',
+    'He comprobado tres citas contra el original.',
+  ]}
+/>
+
+## Para profundizar
+
+La guía de Anthropic sobre ingeniería de contexto para agentes explica por qué conviene el contexto mínimo suficiente. En esta guía, [Encargos para tareas largas](/AI-Optimized_Usage_Web/m3-prompting/tareas-largas-y-agentes/) lleva la idea más allá de una sola conversación.

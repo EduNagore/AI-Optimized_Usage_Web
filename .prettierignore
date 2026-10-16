@@ -9,3 +9,4 @@ src/data/*.json
 research/
 playwright-report/
 test-results/
+src/content/plantillas/

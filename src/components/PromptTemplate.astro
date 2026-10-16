@@ -171,7 +171,8 @@ const hasUsage = Astro.slots.has('default');
     });
 
     root.querySelector('[data-download]')?.addEventListener('click', () => {
-      const blob = new Blob([`# ${title}\n\n${text}\n`], { type: 'text/markdown;charset=utf-8' });
+      const body = text.startsWith('---') ? `${text}\n` : `# ${title}\n\n${text}\n`;
+      const blob = new Blob([body], { type: 'text/markdown;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;

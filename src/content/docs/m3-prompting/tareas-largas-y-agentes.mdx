@@ -4,8 +4,144 @@ description: 'Especificación completa, criterios de verificación, estado en fi
 sidebar:
   order: 5
 level: avanzado
-tracks: [tecnica]
+tracks: [profesional, tecnica]
 readingTime: 8
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-16
+sources:
+  [
+    anthropic-buenas-practicas-de-prompting,
+    anthropic-prompting-opus-5-5,
+    anthropic-prompting-sonnet-5-5,
+    anthropic-prompting-haiku-5-5,
+    anthropic-prompting-fable-5-1,
+    openai-guia-de-prompts,
+    anthropic-com-engineering-effective-context-engineering-for-ai-agents,
+    claude-code-buenas-practicas,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import BeforeAfter from '@components/BeforeAfter.astro';
+import PromptTemplate from '@components/PromptTemplate.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Un agente trabaja solo durante minutos u horas: el encargo debe estar completo desde el principio.
+- Define cómo se comprueba que ha terminado; sin eso, el agente decide por su cuenta cuándo parar.
+- Si la tarea supera una ventana de contexto, guarda el estado en ficheros (progreso, lista de pendientes).
+- Marca qué acciones requieren confirmación: las irreversibles o las que salen de tu entorno.
+- Que no toque los tests para que pasen, y que no especule sobre lo que no ha abierto.
+
+</KeyTakeaways>
+
+## La idea
+
+Un chat es una conversación: puedes corregir sobre la marcha. Un agente es otra cosa: recibe un encargo, usa herramientas (leer ficheros, ejecutar código, buscar en la web, operar en tu hoja de cálculo) y trabaja muchos pasos sin que lo veas. Si el encargo es ambiguo, puede no preguntarte a mitad: decide y sigue. Por eso el encargo para un agente se parece más a una especificación que a una pregunta.
+
+Esto no es solo para programadores. Cualquier tarea larga delegada (preparar una investigación, ordenar un archivo de contratos, consolidar diez hojas de cálculo) tiene la misma forma.
+
+Cinco elementos hacen la diferencia.
+
+**1. Especificación completa al inicio.** Objetivo, contexto, qué no tocar y qué entregar. Lo que no digas, el agente lo supondrá.
+
+**2. Criterios de verificación.** Qué significa «terminado»: tests que pasan, cifras que cuadran con la fuente, un documento que cumple una lista. La guía de Opus 5.5 recomienda tratar un final de turno solo con texto como un informe, no como prueba de que la tarea esté hecha. Y la de Haiku 5.5 advierte de que una comprobación solo de sintaxis no cuenta: hay que ejercitar el cambio de verdad.
+
+**3. Estado en ficheros.** Cuando el trabajo sobrepasa una ventana de contexto, la memoria de la conversación se pierde o se resume. Un fichero `PROGRESO.md` y una lista de pendientes permiten retomar con contexto limpio. La guía de Fable 5.1 advierte además de que los resúmenes de compactación pueden perder restricciones y decisiones, y aconseja indicar qué debe conservarse.
+
+**4. Autonomía con límites.** Deja claro qué puede hacer sin preguntar y qué requiere confirmación (borrar, enviar, pagar, publicar, tocar sistemas externos).
+
+**5. Honestidad sobre lo que no sabe.** «No especules sobre código (o datos) que no hayas abierto; léelo primero.» Es la defensa más barata contra la invención.
+
+<Callout tipo="medicion" titulo="Medición publicada por Anthropic">
+
+La guía de Sonnet 5.5 propone, para el esfuerzo `max`, una instrucción del estilo «cuando el trabajo esté hecho y las comprobaciones pasen, detente e informa; no lances subagentes revisores salvo que se pidan». En sus pruebas con tareas de programación, eso evitó que el modelo lanzara subagentes revisores y redujo el coste de la sesión en torno a un tercio, sin cambio de calidad. Es una medición del proveedor en un caso concreto; úsala como pista, no como promesa.
+
+</Callout>
+
+<Callout tipo="recomendacion">
+
+Pide al agente que no «arregle» los tests o los comprobantes para que salga el resultado esperado; que corrija el código o los datos. El porqué: un agente que busca pasar la comprobación puede modificarla en lugar de resolver el problema, y tú creerás que está bien.
+
+</Callout>
+
+## En la práctica
+
+Estructura del encargo, en orden:
+
+1. Objetivo en términos de resultado, no de pasos.
+2. Contexto: por qué se necesita y qué restricciones reales hay (con su motivo).
+3. Alcance: qué sí y qué no tocar.
+4. Cómo comprobar que está hecho, y qué hacer si no se puede comprobar.
+5. Dónde guardar el progreso si la tarea es larga.
+6. Qué acciones requieren confirmación.
+7. Qué debe entregar al final (resumen de lo hecho, lo probado y lo dudoso).
+
+<PromptTemplate
+  titulo="Encargo a un agente para una tarea larga"
+  archivo="encargo-tarea-larga"
+  texto={`Objetivo: {{resultado final, en términos de lo que debe existir o cumplirse}}.
+
+Contexto: {{por qué se necesita, quién lo usará}}.
+
+Alcance: puedes {{lo permitido}}. No toques {{lo prohibido}}, porque {{motivo}}.
+
+Cómo saber que está terminado: {{criterios verificables}}. Comprueba cada uno antes de dar la tarea por cerrada; si alguno no se puede comprobar, dilo.
+
+Si la tarea no cabe en una sola sesión: mantén un fichero PROGRESO.md con lo hecho, lo pendiente y las decisiones tomadas con su motivo. Léelo al empezar y actualízalo al terminar cada bloque.
+
+Pide confirmación antes de {{acciones irreversibles o externas: borrar, enviar, publicar}}.
+
+No supongas el contenido de ficheros o datos que no hayas abierto. No modifiques las comprobaciones para que pasen.
+
+Al terminar, entrega: qué has hecho, qué has probado y qué dudas te quedan.`}
+
+>
+
+Para delegar tareas de más de unos minutos. En el caso del código, hay una versión específica en la [Biblioteca de plantillas](/AI-Optimized_Usage_Web/m3-prompting/biblioteca-de-plantillas/).
+
+</PromptTemplate>
+
+<Callout tipo="varia">
+
+Las guías de otros proveedores aportan matices propios. Según un resumen de la guía de prompts de OpenAI (sin confirmar en el texto literal), GPT-6 Astra es más sensible a las instrucciones de `AGENTS.md` y de los skills, y delega menos en subagentes de lo que muchos flujos necesitan: si quieres delegación, pídela de forma explícita.
+
+</Callout>
+
+## Ejemplo: consolidar hojas de cálculo
+
+Un caso fuera del código. Una analista debe consolidar doce hojas mensuales de gastos en una sola y detectar anomalías.
+
+<BeforeAfter
+  antes="Junta estas doce hojas de gastos en una y dime si hay algo raro."
+  despues="Objetivo: una hoja única con todos los gastos del año y una lista de anomalías. Contexto: la lista la revisa finanzas el viernes. Alcance: lee las doce hojas de la carpeta /gastos; no modifiques los originales (son los de referencia). Comprobación: el total consolidado por mes debe coincidir con el total de cada hoja original; si no coincide, explica la diferencia. Guarda en PROGRESO.md qué meses llevas. Pregunta antes de borrar o renombrar nada. Al final, di qué has hecho y qué no has podido comprobar."
+>
+
+Qué cambió y por qué: se define un criterio de verificación comprobable (los totales mensuales deben cuadrar), se protegen los originales, se deja un estado en fichero por si la tarea se corta, y se pide un cierre honesto con lo no comprobado.
+
+</BeforeAfter>
+
+## Errores frecuentes
+
+- **Lanzar al agente con una frase y esperar que acierte.** Cada hueco se rellena con una suposición, y no verás cuál.
+- **Aceptar «hecho» sin comprobación.** El texto final de un agente es un informe, no una prueba.
+- **Instrucciones largas y repetidas en cada turno.** En bucles de agente, las instrucciones largas pesan: ponlas una vez al principio y en el fichero de instrucciones.
+- **Dar permisos amplios por comodidad.** Limita qué acciones puede ejecutar sin preguntar.
+
+<Checklist
+  id="tareas-largas"
+  titulo="Antes de delegar"
+  items={[
+    'El objetivo está en términos de resultado.',
+    'He dicho qué no se puede tocar y por qué.',
+    'Hay un criterio de verificación que se puede ejecutar.',
+    'Hay un fichero de progreso si la tarea es larga.',
+    'Las acciones irreversibles requieren confirmación.',
+    'He pedido un cierre con lo hecho, lo probado y lo dudoso.',
+  ]}
+/>
+
+## Para profundizar
+
+Si no tienes claro el alcance, empieza por [Que la IA te entreviste](/AI-Optimized_Usage_Web/m3-prompting/que-la-ia-te-entreviste/) y escribe la especificación antes de delegar. Los agentes se tratan a fondo en el [módulo de agentes](/AI-Optimized_Usage_Web/m8-agentes/).

@@ -1,11 +1,131 @@
 ---
 title: 'Principios de un buen encargo'
-description: 'Claridad, contexto y motivo, ejemplos, estructura y objetivo en lugar de método.'
+description: 'Claridad, contexto y motivo, ejemplos, estructura y objetivo en lugar de método: los principios que siguen valiendo.'
 sidebar:
   order: 2
 level: basico
-tracks: [profesional, tecnica]
+tracks: [esencial, profesional, tecnica]
 readingTime: 8
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-16
+sources:
+  [
+    anthropic-buenas-practicas-de-prompting,
+    ai-google-dev-gemini-api-docs-prompting-strategies,
+    anthropic-com-engineering-effective-context-engineering-for-ai-agents,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import BeforeAfter from '@components/BeforeAfter.astro';
+import PromptTemplate from '@components/PromptTemplate.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Sé claro y directo: di qué quieres, para quién y para qué.
+- Explica el porqué de cada restricción; el modelo generaliza a partir de la razón.
+- Los ejemplos se imitan: si das uno, el modelo copiará su longitud, tono y estructura.
+- Separa las partes del encargo con secciones o etiquetas.
+- Pide el objetivo, no el método, salvo que la operación sea frágil.
+
+</KeyTakeaways>
+
+## La idea
+
+Casi todo lo que sabes sobre redactar un buen briefing para una persona vale para un modelo. Estos son los ocho principios de esta guía. Se apoyan en la guía de buenas prácticas de Anthropic y coinciden, con matices, con la de Google; el orden y la formulación son nuestros. Cada uno lleva su porqué.
+
+**1. Claro y directo.** Di lo que quieres sin rodeos. Un encargo ambiguo obliga al modelo a adivinar, y adivinará razonable, pero no necesariamente lo que tú necesitas.
+
+**2. Contexto y motivación.** Decir para qué sirve el resultado mejora la precisión, porque el modelo puede decidir mejor los casos que no previste. «No uses puntos suspensivos» se cumple; «no uses puntos suspensivos porque esto lo lee un programa de voz» se generaliza a otros símbolos que el programa tampoco lee.
+
+**3. Ejemplos variados, marcados como ilustrativos.** El modelo imita lo que ve: longitud, tono y estructura. Dos o tres ejemplos distintos entre sí enseñan el patrón; uno solo lo convierte en plantilla rígida. Etiquétalos como «ejemplo» para que no los trate como datos reales.
+
+**4. Estructura.** Secciones o etiquetas XML (`<instrucciones>`, `<contexto>`, `<entrada>`) evitan que el modelo confunda lo que son instrucciones con lo que es material. La guía de Anthropic lo resume así: envolver cada tipo de contenido en su propia etiqueta reduce los malentendidos.
+
+**5. Rol en una línea, más contexto real.** «Eres analista financiero» orienta el registro, sobre todo en el prompt de sistema de un asistente, donde una línea de rol fija el enfoque. Pero el rol solo no basta: lo que más pesa es el contexto que lo acompaña (para quién trabajas, qué se decide con ello). Esto último es criterio de esta guía.
+
+**6. Objetivo, no método.** Describe el resultado y cómo se comprobará. Los pasos se prescriben solo cuando la operación es frágil (una migración, un cálculo con orden obligatorio).
+
+**7. Una restricción con su razón vale más que diez prohibiciones.** Una lista larga de «no» compite por atención y deja huecos; una razón cubre casos que no escribiste.
+
+**8. Más contexto del que parece necesario, pero relevante.** Lo que a ti te parece obvio no lo es para quien no estaba en la reunión. Eso sí, contexto relevante: añadir material por añadir diluye lo importante (ver [Documentos y contexto largo](/AI-Optimized_Usage_Web/m3-prompting/contexto-largo/)).
+
+<Callout tipo="recomendacion">
+
+Antes de enviar un encargo, imagina que se lo das a una persona competente que no conoce tu empresa. Si con ese texto no podría empezar sin preguntarte nada, falta contexto. Es el criterio de la guía; el porqué es que el modelo está en la misma situación que esa persona.
+
+</Callout>
+
+<Callout tipo="varia" titulo="Lo que dicen otras guías oficiales">
+
+La guía de estrategias de prompting de Google para Gemini dice que sus modelos responden mejor a prompts directos, bien estructurados y con la tarea claramente definida, y recomienda incluir siempre ejemplos. Dos proveedores, mismos principios de base. Sin confirmar en el texto literal de la fuente: la cita procede de un resumen automatizado de la página.
+
+</Callout>
+
+## En la práctica
+
+Usa esta estructura como esqueleto para cualquier encargo que merezca más de una línea. Es la misma que la plantilla de encargo del módulo de método: objetivo, contexto, material, restricciones con motivo, formato y criterio de éxito (ver [Plantilla de encargo](/AI-Optimized_Usage_Web/m2-metodo/plantilla-de-encargo/)).
+
+<PromptTemplate
+  titulo="Esqueleto de un buen encargo"
+  archivo="esqueleto-de-encargo"
+  texto={`<contexto>
+{{quién eres tú, para quién es el resultado y qué se decide con él}}
+</contexto>
+
+<material>
+{{documentos o datos, cada uno con nombre y fecha}}
+</material>
+
+<tarea>
+{{qué quieres, en una o dos frases}}
+</tarea>
+
+Restricciones: {{restricción}} (porque {{motivo}}).
+
+Formato: {{descripción breve}}. Ejemplo ilustrativo, no para copiar literalmente:
+{{ejemplo de la forma que buscas}}
+
+Sabré que está bien si {{criterio comprobable}}.`}
+
+>
+
+Úsalo cuando no sepas por dónde empezar. Se puede acortar: lo importante es que cada parte que quites sea una que el modelo pueda deducir sin riesgo.
+
+</PromptTemplate>
+
+## Ejemplo: de la petición suelta al encargo
+
+<BeforeAfter
+  antes="Escríbeme un correo para pedir presupuesto a un proveedor de catering."
+  despues="Soy responsable de eventos de una empresa de 120 personas y organizo la comida de Navidad del 18 de diciembre. Escribe un correo para pedir presupuesto a un proveedor de catering. Datos: 90 asistentes, menú de cóctel de pie, tres opciones sin gluten y dos veganas, en nuestra sede de Valencia. Quiero que el proveedor me envíe precio por persona, condiciones de cancelación y fecha límite para confirmar. Tono cordial y breve: es un primer contacto con varios proveedores."
+>
+
+Qué cambió y por qué: se añade quién escribe y para qué, los datos que el proveedor necesita para presupuestar (sin ellos, la respuesta será «¿puede darme más detalles?») y lo que se espera recibir. El tono se justifica: es un primer contacto con varios proveedores.
+
+</BeforeAfter>
+
+## Errores frecuentes
+
+- **Rol vacío.** «Actúa como experto mundial en marketing» no sustituye al contexto. Aporta lo que sabes de tu caso.
+- **Un único ejemplo.** El modelo lo copiará casi literal. Da dos o tres distintos, o describe la forma sin ejemplo.
+- **Mezclar material e instrucciones sin separar.** Si pegas un correo de un cliente dentro de tu petición sin etiquetarlo, el modelo puede tomar frases del correo por órdenes.
+- **Dictar el método cuando conoces el objetivo.** Si no sabes cuál es el mejor camino, deja que el modelo lo elija y pídele que lo explique.
+
+<Checklist
+  id="principios"
+  titulo="Antes de enviar el encargo"
+  items={[
+    'Dice qué quiero, para quién y para qué.',
+    'Cada restricción lleva su motivo.',
+    'El material está separado de las instrucciones.',
+    'Si hay ejemplos, son varios y están marcados como ilustrativos.',
+    'Describe cómo sabré que el resultado es correcto.',
+    'Un colega competente podría empezar sin preguntarme nada.',
+  ]}
+/>
+
+## Para profundizar
+
+Sigue con [Documentos y contexto largo](/AI-Optimized_Usage_Web/m3-prompting/contexto-largo/) si trabajas con material extenso, o con [Formato y longitud](/AI-Optimized_Usage_Web/m3-prompting/formato-y-longitud/) para controlar la forma de la respuesta.

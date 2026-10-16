@@ -6,6 +6,120 @@ sidebar:
 level: basico
 tracks: [esencial, profesional, tecnica]
 readingTime: 6
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-16
+sources: [anthropic-buenas-practicas-de-prompting]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Steps from '@components/Steps.astro';
+import BeforeAfter from '@components/BeforeAfter.astro';
+import PromptTemplate from '@components/PromptTemplate.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Un buen encargo se parece al que darías a un compañero competente que no conoce tu situación.
+- Siete piezas: objetivo, contexto y porqué, material, restricciones, formato, criterio de éxito y qué hacer si falta información.
+- Cada restricción lleva su motivo: así el modelo generaliza en lugar de aplicar la regla a ciegas.
+- Pega el material primero y pon la petición al final.
+
+</KeyTakeaways>
+
+## La idea
+
+Observación de la guía, no una medición: los modelos actuales tienden a hacer lo que se les pide y poco más. Eso es una ventaja si dices lo que quieres, y un problema si das por hecho lo que «se sobreentiende»: lo que no escribes, el modelo lo adivina. Un encargo completo evita las adivinanzas más costosas.
+
+La guía oficial de prompting de Anthropic recomienda ser claro y directo, explicar el motivo de las instrucciones, dar ejemplos del resultado esperado y colocar los documentos largos antes de la pregunta. La plantilla de abajo reúne esos consejos en un encargo de trabajo.
+
+Las siete piezas:
+
+1. **Objetivo**: qué quieres obtener, en una frase.
+2. **Contexto y porqué**: para quién es y qué decisión apoya. Cambia lo que el modelo considera importante.
+3. **Material**: los documentos o datos, identificados con etiquetas claras.
+4. **Restricciones, con su motivo**: «no más de una página, porque se lee en la reunión».
+5. **Formato de salida**: tabla, lista, correo; mejor con un ejemplo breve.
+6. **Criterio de éxito y cómo verificarlo**: qué haría bueno el resultado y cómo lo comprobarás.
+7. **Si falta información**: qué hacer, normalmente «dilo en lugar de suponerlo».
+
+<Callout tipo="recomendacion">
+
+Añade siempre la pieza 7. Es una recomendación de la guía: sin ella, ante un dato que falta el modelo tiende a rellenar el hueco con algo plausible, y un hueco rellenado es más difícil de detectar que un hueco declarado.
+
+</Callout>
+
+## En la práctica
+
+<Steps>
+
+1. Copia la plantilla de abajo y pégala en un documento tuyo.
+2. Rellena primero objetivo, contexto y criterio de éxito: si no puedes, la tarea aún no está clara.
+3. Añade el material entre etiquetas y la petición al final.
+4. Escribe cada restricción con su porqué en la misma frase.
+5. Lanza el encargo y verifica según el criterio de éxito que escribiste.
+6. Si funciona y se repite, guárdalo (paso 7 del [ciclo](/AI-Optimized_Usage_Web/m2-metodo/ciclo-de-7-pasos/)).
+
+</Steps>
+
+<PromptTemplate
+  titulo="Encargo universal de trabajo"
+  archivo="encargo-universal"
+  texto={`<material>
+{{pega aquí los documentos o datos; si son varios, uno por etiqueta con su nombre}}
+</material>
+
+Objetivo: {{qué quieres obtener, en una frase}}.
+
+Contexto: esto es para {{quién lo va a leer o usar}}, que debe {{decisión o uso}}. Lo digo para que priorices {{qué importa más}}.
+
+Restricciones:
+
+- {{restricción 1}}, porque {{motivo}}.
+- {{restricción 2}}, porque {{motivo}}.
+
+Formato de salida: {{tabla / lista / correo / otro}}. Por ejemplo: {{ejemplo breve de una línea del resultado}}.
+
+Criterio de éxito: el resultado es bueno si {{criterio}}. Lo comprobaré {{cómo}}, así que indica de dónde sale cada dato.
+
+Si te falta información para hacerlo bien, dímelo en lugar de suponerla.`}
+
+>
+
+Úsala para cualquier tarea de más de una frase. Con tareas muy cortas, puedes quedarte solo con objetivo y criterio de éxito.
+
+</PromptTemplate>
+
+## Ejemplo de oficina: respuesta a una reclamación
+
+<BeforeAfter
+  antes="Escribe una respuesta a esta reclamación de un cliente."
+  despues="Escribe una respuesta a la reclamación del cliente que pego abajo. Va firmada por el responsable de atención al cliente y debe reconocer el retraso sin admitir responsabilidad legal, porque el caso lo está revisando el departamento jurídico. Máximo 150 palabras, tono cordial y formal, de usted. Cierra proponiendo una llamada. Si el texto no dice la fecha del pedido, dímelo en lugar de inventarla."
+>
+
+Qué cambió y por qué: se indica **quién firma** y **qué no se puede decir** (con el motivo, que permite al modelo decidir los casos intermedios); se limita la **longitud** y el **tono**; y se prevé el **dato que falta**.
+
+</BeforeAfter>
+
+## Errores frecuentes
+
+- **Restricciones sin motivo.** «Nunca uses viñetas» obedece peor y se aplica a ciegas; «no uses viñetas porque esto se pega en un correo de texto plano» se aplica con criterio.
+- **Describir solo lo que no quieres.** Dile qué hacer: «responde en un párrafo» funciona mejor que «no hagas listas».
+- **Mezclar varias tareas en un encargo.** Un objetivo por encargo; si hay dos, haz dos.
+- **Olvidar el criterio de éxito.** Sin él no sabes cuándo has terminado ni qué comprobar.
+
+<Checklist
+  id="plantilla-encargo"
+  titulo="Revisa tu encargo antes de enviarlo"
+  items={[
+    'El objetivo cabe en una frase.',
+    'Digo para quién es y qué decisión apoya.',
+    'El material va primero y la petición al final.',
+    'Cada restricción tiene su motivo.',
+    'Hay un criterio de éxito que puedo comprobar.',
+    'He dicho qué hacer si falta información.',
+  ]}
+/>
+
+## Para profundizar
+
+Los principios de prompting actuales, con las diferencias entre modelos, están en el [módulo 3](/AI-Optimized_Usage_Web/m3-prompting/principios/).

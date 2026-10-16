@@ -6,6 +6,104 @@ sidebar:
 level: intermedio
 tracks: [profesional, tecnica]
 readingTime: 5
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-16
+sources: [anthropic-buenas-practicas-de-prompting, claude-code-buenas-practicas]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Steps from '@components/Steps.astro';
+import PromptTemplate from '@components/PromptTemplate.astro';
+import BeforeAfter from '@components/BeforeAfter.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Dividir una tarea en pasos encadenados te deja inspeccionar cada resultado intermedio.
+- El patrón básico: borrador, revisión contra criterios explícitos, versión final.
+- Revisar en una conversación o agente nuevo da una segunda opinión más independiente.
+- Si hay una fórmula o una cifra que comprobar, compruébala con código o con la fuente, no preguntando al mismo modelo.
+- Con una sola petición bien escrita suele bastar; encadena cuando necesites controlar el proceso.
+
+</KeyTakeaways>
+
+## La idea
+
+Hay dos formas de pedir un informe revisado. En una sola petición: «escribe el informe, revísalo y entrégame la versión final». O encadenando: primero el borrador; luego, por separado, una revisión contra criterios; por último, la versión final. La primera es más rápida. La segunda te permite ver y corregir lo que sale de cada paso, y esa es la razón para usarla.
+
+La regla práctica es que encadenar compensa cuando quieres inspeccionar un resultado intermedio, cuando una fase tiene criterios muy distintos de la anterior (redactar frente a verificar), o cuando necesitas intervenir en el medio.
+
+Autocorregir funciona mejor si la revisión tiene **criterios explícitos**. «Mejóralo» produce cambios cosméticos; «comprueba que cada cifra aparece en las fuentes y que no hay ninguna frase sin respaldo» produce una auditoría.
+
+<Callout tipo="recomendacion">
+
+Para revisar algo importante, usa una conversación o un subagente nuevo y dale el texto y los criterios, no el historial de cómo se escribió. El porqué: quien revisa con el mismo contexto que quien escribió tiende a dar por buenas las mismas suposiciones. Es una recomendación de la guía, coherente con la práctica de revisión con contexto limpio.
+
+</Callout>
+
+## En la práctica
+
+<Steps>
+
+1. **Borrador.** Pide una primera versión con el encargo completo. No te preocupes por la perfección.
+2. **Criterios.** Escribe (o pide que redacte) cinco o seis criterios comprobables: «toda cifra tiene fuente», «el resumen cabe en una pantalla», «el tono es neutro».
+3. **Revisión.** En una conversación nueva, entrega borrador y criterios. Pide una lista de incumplimientos con la frase concreta, sin reescribir.
+4. **Corrección.** Con la lista de incumplimientos, pide la versión final.
+5. **Tu comprobación.** Contrasta las cifras clave con la fuente. El modelo que se revisa a sí mismo puede equivocarse igual.
+
+</Steps>
+
+<PromptTemplate
+  titulo="Revisión contra criterios"
+  archivo="revision-contra-criterios"
+  texto={`<texto>
+{{borrador}}
+</texto>
+
+<criterios>
+1. {{criterio comprobable 1}}
+2. {{criterio comprobable 2}}
+3. {{criterio comprobable 3}}
+</criterios>
+
+Revisa el texto contra los criterios, uno a uno. Para cada criterio, responde «cumple» o «no cumple» y, si no cumple, cita la frase concreta y explica por qué. No reescribas el texto: solo informa. Si no puedes juzgar un criterio con lo que ves, dilo.`}
+
+>
+
+Para el paso 3. Después, entrega al modelo el texto y su lista de incumplimientos para la versión final.
+
+</PromptTemplate>
+
+## Ejemplo: una propuesta comercial
+
+<BeforeAfter
+  antes="Escribe una propuesta para este cliente, revísala y mejórala tú mismo."
+  despues="Paso 1: escribe la propuesta con la información adjunta. [Se obtiene el borrador.] Paso 2, en una conversación nueva: revisa este borrador contra estos criterios: (1) cada precio coincide con la tarifa adjunta; (2) los plazos son los acordados; (3) no promete nada que no esté en el alcance; (4) cabe en dos páginas. Indica los incumplimientos con la frase. Paso 3: corrige solo esos incumplimientos."
+>
+
+Qué cambió y por qué: el «mejórala tú mismo» sin criterios produce retoques de estilo; con criterios comprobables, la revisión detecta de verdad precios mal copiados o promesas fuera de alcance, y el cambio en el paso 3 queda acotado a lo señalado.
+
+</BeforeAfter>
+
+## Errores frecuentes
+
+- **Pedir «revísalo» sin criterios.** Obtendrás cambios de estilo y la falsa tranquilidad de que alguien lo ha mirado.
+- **Que el modelo se revise a sí mismo en la misma conversación y dar el visto bueno.** Mejor con contexto limpio y, para cifras, con la fuente.
+- **Encadenar por costumbre.** Cada paso añade tiempo y tokens; si el resultado de un paso no lo vas a mirar, no lo separes.
+- **Revisar sin tocar el material original.** Las cifras se verifican contra la fuente, no contra otro resumen.
+
+<Checklist
+  id="encadenar"
+  titulo="Antes de dar algo por revisado"
+  items={[
+    'La revisión tenía criterios explícitos y comprobables.',
+    'La hizo una conversación o un agente nuevo.',
+    'Las cifras clave se contrastaron con la fuente.',
+    'La corrección se limitó a lo señalado.',
+    'Solo encadené los pasos cuyo resultado iba a inspeccionar.',
+  ]}
+/>
+
+## Para profundizar
+
+El patrón de revisar con contexto limpio se desarrolla en el [módulo de calidad y seguridad](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/). Para pasar de revisar a delegar, ve a [Encargos para tareas largas](/AI-Optimized_Usage_Web/m3-prompting/tareas-largas-y-agentes/).

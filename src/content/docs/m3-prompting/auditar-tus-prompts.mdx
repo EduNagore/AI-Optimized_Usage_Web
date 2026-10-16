@@ -6,6 +6,120 @@ sidebar:
 level: intermedio
 tracks: [profesional, tecnica]
 readingTime: 6
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-16
+sources:
+  [
+    anthropic-buenas-practicas-de-prompting,
+    anthropic-guia-de-migracion,
+    claude-code-comandos,
+    anthropic-prompting-opus-5-5,
+    anthropic-prompting-sonnet-5-5,
+    anthropic-prompting-haiku-5-5,
+    anthropic-prompting-fable-5-1,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+import CommandCard from '@components/CommandCard.astro';
+
+<KeyTakeaways>
+
+- Los prompts acumulan restos: parches de modelos anteriores que hoy estorban.
+- Audítalos cuando cambies de modelo o cuando un resultado se haya vuelto raro.
+- Quita el lenguaje de presión, los andamios que ya tienen función propia y las prohibiciones sin motivo.
+- No toques el contexto, el detalle de las herramientas ni los pasos exactos de una operación frágil.
+- Cambia por grupos y compara con casos reales.
+
+</KeyTakeaways>
+
+## La idea
+
+Un prompt que lleva un año en uso es como una hoja de cálculo heredada: cada parche tuvo su razón, y casi nadie recuerda cuál. Con un modelo nuevo, algunos de esos parches dejan de hacer falta, y unos pocos empiezan a perjudicar. Las guías de Anthropic para modelos recientes insisten en una idea: lo que antes compensaba una debilidad, ahora puede provocar un exceso (reglas aplicadas donde no tocaban, búsquedas innecesarias, formatos rígidos).
+
+Auditar no es reescribir. Es repasar el prompt con una lista de restos conocidos, decidir qué sale, qué se queda y qué se prueba. Seis familias de restos.
+
+**Lenguaje de presión.** Mayúsculas, «CRÍTICO», «NUNCA», «SIEMPRE». Provoca sobreaplicación. Sustitúyelo por la situación en que la regla importa.
+
+**Andamios que ya tienen función propia.** «Piensa paso a paso» se sustituye por el esfuerzo; «responde solo en JSON» y el prellenado, por structured outputs; las etiquetas de razonamiento, por el razonamiento del propio modelo.
+
+**Sobreespecificación.** Pasos que dictan el método en una tarea donde el modelo tiene mejor criterio que tú. Cambia a objetivo y comprobación.
+
+**Fósiles de modelos antiguos.** Frases que corregían un fallo concreto de una versión anterior («no te saltes ninguna fila», «no te detengas a medias»). Quítalas y mira si el fallo reaparece. La guía de Haiku 5.5 documenta un caso medido: las instrucciones de «busca siempre» hicieron que se buscara en la mitad de los prompts que no lo necesitaban.
+
+**Prohibiciones sin motivo.** Una lista de «no» sin razón. Conserva las que protegen algo real y añade su porqué; elimina las demás.
+
+**Coreografía de salida.** Plantillas de respuesta detalladas hasta el último campo cuando una descripción y un ejemplo bastarían.
+
+<Callout tipo="recomendacion">
+
+Cambia un grupo de restos cada vez y prueba con diez casos reales, incluidos los difíciles, antes de pasar al siguiente. El porqué: si cambias todo a la vez y el resultado empeora, no sabrás qué lo causó; y los casos fáciles funcionan con cualquier versión, así que no te dicen nada.
+
+</Callout>
+
+## Lo que no se toca
+
+- **El contexto.** Quién eres, para quién es, qué se decide. Es lo que más aporta.
+- **El detalle de las herramientas.** Qué hace cada una, cuándo usarla y qué devuelve.
+- **Los pasos exactos de una operación frágil.** Una migración, un cálculo con orden obligatorio, un procedimiento regulado.
+- **Las restricciones reales con su razón.** Seguridad, confidencialidad, cumplimiento.
+
+## En la práctica
+
+<Steps>
+
+1. Copia el prompt a un documento y numera sus frases.
+2. Marca cada frase con una letra: P (presión), A (andamio sustituible), E (sobreespecificación), F (fósil), N (prohibición sin motivo), C (coreografía), o nada si es contexto o una restricción justificada.
+3. Reescribe un grupo de marcas y guarda la versión anterior.
+4. Prueba ambas versiones con los mismos casos y compara.
+5. Quédate con la que mejor resuelva los casos difíciles, no solo los fáciles.
+
+</Steps>
+
+Si trabajas con Claude Code, existe una ayuda: el subcomando `prompt-audit` de `/doctor` revisa los prompts de tu configuración. El skill `/claude-api` incluye también un subcomando `prompt-audit`.
+
+<CommandCard comando="/doctor" />
+
+<Callout tipo="cuidado">
+
+Las herramientas automáticas proponen cambios, no los validan. Lee cada propuesta y pruébala con tus casos antes de adoptarla. La documentación del comando no detalla lo que revisa y no hemos comprobado su salida real.
+
+</Callout>
+
+## Ejemplo: auditoría de un prompt de resúmenes
+
+Un equipo usa este prompt desde hace un año:
+
+> ERES UN EXPERTO ANALISTA. IMPORTANTE: NUNCA te saltes ningún punto del documento. Piensa paso a paso antes de responder. Responde SIEMPRE en el siguiente formato exacto: TÍTULO, RESUMEN (máximo 120 palabras), PUNTOS (exactamente 5), CONCLUSIÓN. NO uses lenguaje técnico. NO inventes datos.
+
+La auditoría marca: mayúsculas y «IMPORTANTE» (P); «nunca te saltes» (F, un fósil); «piensa paso a paso» (A); el formato rígido (C); «no uses lenguaje técnico» (N, sin motivo). Versión revisada:
+
+> Resumes documentos de trabajo para directivos de distintas áreas que no son especialistas: evita la jerga porque no la entenderían y tendrían que preguntar. Prioriza lo que afecta a decisiones y plazos. Si algo del documento no se sostiene con datos, dilo en lugar de completarlo. Estructura: un titular, un párrafo de resumen y los puntos que merezcan destacarse, con la página de cada uno.
+
+Qué cambió y por qué: el contexto (quién lee) reemplaza a la orden de evitar jerga; el límite rígido de palabras y el número exacto de puntos se sustituyen por un criterio de relevancia; «no inventes datos» pasa a una acción concreta (decir cuándo algo no se sostiene).
+
+## Errores frecuentes
+
+- **Auditar sin casos de prueba.** Sin ellos, cualquier cambio parece una mejora.
+- **Quitar la restricción que protegía algo.** Si no sabes por qué estaba, averígualo antes.
+- **Tratar la auditoría como cosa de una vez.** Repítela cuando cambies de modelo.
+- **Confiar en la herramienta automática sin leer.** Propone; tú decides.
+
+<Checklist
+  id="auditar-prompts"
+  titulo="Auditoría de un prompt"
+  items={[
+    'He eliminado mayúsculas y lenguaje de presión.',
+    'He sustituido los andamios por la función que los reemplaza (esfuerzo, structured outputs).',
+    'He revisado si los parches de modelos antiguos siguen haciendo falta.',
+    'Cada prohibición que queda tiene su motivo.',
+    'He conservado el contexto, las herramientas y los pasos frágiles.',
+    'He probado antes y después con casos reales, incluidos los difíciles.',
+  ]}
+/>
+
+## Para profundizar
+
+Las particularidades de cada modelo están en [Notas por modelo](/AI-Optimized_Usage_Web/m3-prompting/notas-por-modelo/). Para el catálogo de comandos de Claude Code, consulta el [módulo de Claude Code](/AI-Optimized_Usage_Web/m7-claude-code/).

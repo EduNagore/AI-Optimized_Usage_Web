@@ -6,6 +6,106 @@ sidebar:
 level: intermedio
 tracks: [profesional, tecnica]
 readingTime: 6
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-16
+sources: [claude-code-buenas-practicas, anthropic-buenas-practicas-de-prompting]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Steps from '@components/Steps.astro';
+import PromptTemplate from '@components/PromptTemplate.astro';
+import BeforeAfter from '@components/BeforeAfter.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Cuando no sabes del todo qué quieres, no escribas el encargo: pide que te entrevisten.
+- Que pregunte solo por lo difícil de decidir, no por lo que podría deducir.
+- Haz que el resultado sea un documento (una especificación), no una conversación.
+- Ejecuta ese documento en una sesión nueva, con contexto limpio.
+- Sirve igual para un plan de proyecto, un informe o una política que para una aplicación.
+
+</KeyTakeaways>
+
+## La idea
+
+El problema más común al delegar no es escribir mal, sino no saber aún todo lo que quieres. Los huecos aparecen cuando el trabajo ya está hecho: «ah, pero esto debía excluir a los autónomos». Invertir el sentido ayuda: en lugar de que tú redactes un encargo perfecto, pides que el modelo te haga las preguntas que un buen profesional haría antes de empezar.
+
+El método tiene tres pasos: entrevista, especificación y ejecución en limpio. La entrevista saca a la luz lo que no habías decidido. La especificación es el producto de esa conversación, escrita en un fichero que puedes leer, corregir y reutilizar. La ejecución en sesión nueva evita arrastrar todo el vaivén de la entrevista: el agente empieza solo con el documento, que contiene lo importante. Es el mismo principio que aplican las buenas prácticas de Claude Code: planificar primero, ejecutar después, y no llenar el contexto de ensayo y error.
+
+<Callout tipo="recomendacion">
+
+Si una tarea te lleva más de una hora o tiene consecuencias, dedica diez minutos a la entrevista. El porqué: un hueco descubierto antes de empezar cuesta una pregunta; descubierto al final, cuesta rehacer.
+
+</Callout>
+
+## En la práctica
+
+<Steps>
+
+1. Describe la idea en pocas frases, sin intentar ser completo.
+2. Pide que te entreviste, solo sobre lo difícil de decidir y en bloques pequeños.
+3. Responde con honestidad, incluido «no lo sé»: es información útil.
+4. Pide que escriba la especificación en un fichero (`SPEC.md` en el código; un documento en cualquier otro caso).
+5. Léela y corrígela tú. Es el momento más barato de cambiar de opinión.
+6. Abre una conversación nueva, adjunta solo la especificación y pide que la ejecute.
+
+</Steps>
+
+<PromptTemplate
+  titulo="Entrevista y especificación"
+  archivo="entrevista-y-especificacion"
+  texto={`Quiero {{idea o encargo, en pocas frases}}.
+Contexto: {{quién lo usará o lo leerá, y para qué}}.
+
+Antes de hacer nada, entrevístame. Pregunta solo por lo que sea difícil de decidir o pueda cambiar el resultado de forma importante: casos límite, quién decide, qué queda fuera, plazos, riesgos. No preguntes lo que puedas deducir del contexto. Hazme entre {{3 y 5}} preguntas cada vez.
+
+Cuando te diga que hemos terminado, escribe una especificación con: objetivo, alcance y exclusiones, requisitos, criterios para dar el trabajo por bueno, supuestos y preguntas abiertas. Sin relleno.`}
+
+>
+
+Úsala cuando el encargo sea grande o vago. La especificación resultante es lo que pegas, solo, en la sesión de ejecución.
+
+</PromptTemplate>
+
+## Ejemplo: un plan de formación
+
+Un responsable de RR. HH. quiere montar un plan de formación en IA para su departamento, pero no sabe por dónde empezar.
+
+<BeforeAfter
+  antes="Hazme un plan de formación en IA para mi departamento."
+  despues="Quiero un plan de formación en IA para un departamento de 25 personas de RR. HH., que lo usará la dirección para aprobar presupuesto. Antes de escribir nada, entrevístame con las preguntas que cambien el plan: nivel de partida, tiempo disponible, herramientas aprobadas, qué tareas se quieren mejorar, cómo se medirá el éxito. Cuando terminemos, escribe una especificación del plan."
+>
+
+Qué cambió y por qué: el modelo deja de rellenar con un plan genérico y pregunta por lo que de verdad cambia el plan (por ejemplo, qué herramientas aprobó la organización). La especificación final es un documento que la dirección puede revisar antes de gastar un euro.
+
+</BeforeAfter>
+
+<Callout tipo="cuidado">
+
+La entrevista funciona si respondes con datos reales. Si contestas lo que crees que quiere oír el modelo, tendrás una especificación elegante sobre una realidad inventada. No incluyas datos personales o confidenciales en herramientas que tu organización no haya aprobado.
+
+</Callout>
+
+## Errores frecuentes
+
+- **Entrevistas interminables.** Fija un tope («cinco preguntas cada vez, y paramos cuando digas»).
+- **Saltarse la lectura de la especificación.** Si no la lees, no has ganado nada: el error sale en la ejecución.
+- **Ejecutar en la misma conversación.** Arrastras la entrevista entera y el modelo da peso a ideas ya descartadas.
+- **Especificar la solución en lugar del resultado.** Describe qué debe lograrse y cómo se comprobará.
+
+<Checklist
+  id="entrevista"
+  titulo="Cierre de la entrevista"
+  items={[
+    'Las preguntas fueron sobre decisiones difíciles, no obvias.',
+    'La especificación está en un fichero que puedo editar.',
+    'La he leído y corregido yo.',
+    'Tiene criterios para dar el trabajo por bueno.',
+    'La ejecuto en una conversación nueva.',
+  ]}
+/>
+
+## Para profundizar
+
+Una plantilla específica para funcionalidades de software está en la [Biblioteca de plantillas](/AI-Optimized_Usage_Web/m3-prompting/biblioteca-de-plantillas/). Para delegar la ejecución, sigue con [Encargos para tareas largas](/AI-Optimized_Usage_Web/m3-prompting/tareas-largas-y-agentes/).

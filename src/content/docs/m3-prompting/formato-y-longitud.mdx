@@ -6,6 +6,119 @@ sidebar:
 level: intermedio
 tracks: [profesional, tecnica]
 readingTime: 6
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-16
+sources:
+  [
+    anthropic-buenas-practicas-de-prompting,
+    anthropic-structured-outputs,
+    anthropic-prompting-fable-5-1,
+    openai-guia-de-prompts,
+    ai-google-dev-gemini-api-docs-prompting-strategies,
+    google-ultimo-modelo,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import BeforeAfter from '@components/BeforeAfter.astro';
+import ProviderTabs from '@components/ProviderTabs.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Enseña la forma con un ejemplo breve: describirla con palabras funciona peor.
+- Para una persona, pide el formato según el uso («tabla solo para comparar»); para un programa, usa structured outputs.
+- En vez de un límite de palabras, di quién lo lee y para qué.
+- Si el modelo formatea de más, pide prosa; si formatea de menos, muestra la estructura que quieres.
+
+</KeyTakeaways>
+
+## La idea
+
+El formato de la respuesta cuenta tanto como el contenido: un resumen en una pared de texto no se lee, y una tabla de una sola fila sobra. Hay dos situaciones distintas, y se resuelven de forma distinta.
+
+**Cuando el lector es una persona**, la forma se pide con una descripción corta y, mejor, con un ejemplo de lo que quieres. El modelo imita lo que ve, así que un ejemplo transmite longitud, tono y estructura de una vez.
+
+**Cuando el lector es un programa**, no basta con pedir «responde solo en JSON». Para eso están los structured outputs: se entrega a la API un esquema y la respuesta lo cumple. En la API de Anthropic, el esquema va en `output_config.format` con `type: "json_schema"`.
+
+<Callout tipo="verificado" fecha="2026-10-16">
+
+Los structured outputs están disponibles de forma general (salieron de beta) y se configuran con `output_config.format`, con `type: "json_schema"`. Sustituyen al antiguo parámetro `output_format`.
+
+</Callout>
+
+<Callout tipo="cuidado">
+
+También se usaba prellenar la respuesta del asistente para forzar un formato. No hemos podido confirmar en la fuente oficial qué ocurre con esa técnica en los modelos recientes de Anthropic: si dependes de ella, pruébala en tu modelo y, para una forma exacta, pasa a un esquema.
+
+</Callout>
+
+<Callout tipo="recomendacion">
+
+Para cualquier salida que consuma un programa (una tabla de datos, una clasificación), usa un esquema y no una petición en texto. El porqué: el esquema garantiza la forma, y así dedicas tu atención a comprobar el contenido, no a reparar JSON roto.
+
+</Callout>
+
+## En la práctica
+
+Tres técnicas para personas.
+
+**Un ejemplo de forma.** «Responde así: _Decisión: …; Motivo: …; Riesgo: …_» consigue más que «sé conciso y estructurado».
+
+**Formato condicional.** Dile cuándo usar cada formato: «usa una tabla solo para comparar opciones; en el resto, párrafos cortos». Evita las listas con viñetas para explicar razonamientos: la prosa conecta las ideas con su porqué.
+
+**Público y propósito, no palabras.** «Máximo 150 palabras» se cumple a costa del contenido. «Para un directivo que lo lee en el móvil entre dos reuniones y tiene que decidir sí o no» da el mismo control con mejor resultado.
+
+Si no obtienes lo que buscas, ajusta según el modelo:
+
+<ProviderTabs>
+  <div slot="claude">
+
+En Claude, el modelo suele seguir la forma que le muestras. Si formatea de más, pídelo en positivo («escribe en prosa, sin viñetas, en párrafos de tres o cuatro líneas»). Para programas, usa `output_config.format`. La guía de Fable 5.1 señala que este modelo usa menos negritas, cabeceras y listas que los anteriores: si tu prompt trae reglas contra el exceso de formato, quítalas o sustitúyelas por una regla que diga cuándo sí usarlo.
+
+  </div>
+  <div slot="openai">
+
+Para los modelos GPT-6, la guía de prompts de OpenAI es la referencia; no hemos verificado todavía en su texto literal ninguna indicación de formato, así que no damos aquí cifras ni tendencias. Pide la forma que quieres con un ejemplo, como en el resto de proveedores.
+
+  </div>
+  <div slot="google">
+
+En Gemini, la guía de estrategias de prompting de Google recomienda incluir ejemplos de la salida deseada. Si usas la API de Gemini 4 Argon, la documentación oficial recomienda dejar `max_output_tokens` en su valor por defecto o sin fijar, y como mínimo 32.768 si tu aplicación tenía un límite menor.
+
+  </div>
+</ProviderTabs>
+
+## Ejemplo: un resumen de reunión que se lee
+
+<BeforeAfter
+  antes="Resume la reunión en menos de 100 palabras."
+  despues="Resume la reunión para la directora, que no asistió y lo leerá en el móvil antes de otra reunión. Necesita saber qué se decidió y qué se espera de ella. Formato: «Decidido:» con una frase por decisión; «Te toca:» con lo que se le pide y para cuándo. Si no se pide nada, escribe «Nada por tu parte»."
+>
+
+Qué cambió y por qué: el límite de palabras se cambia por quién lee, dónde y para qué; y el ejemplo de formato («Decidido» y «Te toca») fija la estructura sin describirla. La frase final cubre el caso en que no hay nada que pedir, para que el modelo no invente una tarea.
+
+</BeforeAfter>
+
+## Errores frecuentes
+
+- **«Responde solo con JSON» y analizarlo con un script frágil.** Se rompe el día que el modelo añade una frase. Usa structured outputs.
+- **Depender del prellenado de la respuesta.** No está confirmado que siga funcionando en los modelos recientes: usa un esquema.
+- **Pedir tablas para todo.** Una tabla ayuda a comparar; para razonar, la prosa es más clara.
+- **Corregir el formato en cada turno.** Dilo una vez en el encargo, con un ejemplo.
+
+<Checklist
+  id="formato-y-longitud"
+  titulo="Antes de pedir el formato"
+  items={[
+    'Sé quién lee la respuesta y dónde.',
+    'He dado un ejemplo breve de la forma que quiero.',
+    'Si lo lee un programa, uso un esquema.',
+    'No uso un límite de palabras como única guía.',
+    'Contemplo el caso «no hay nada que decir».',
+  ]}
+/>
+
+## Para profundizar
+
+La documentación de structured outputs de Anthropic detalla los esquemas admitidos. Para encadenar varias respuestas, sigue con [Encadenar y autocorregir](/AI-Optimized_Usage_Web/m3-prompting/encadenar-y-autocorregir/).

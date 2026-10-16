@@ -1,11 +1,671 @@
 ---
 title: 'Biblioteca de plantillas de trabajo'
-description: 'Más de dieciocho plantillas copiables y descargables: correos, informes, contratos, datos y agentes.'
+description: 'Veinte plantillas copiables y descargables: correos, informes, contratos, datos y agentes.'
 sidebar:
   order: 9
 level: basico
-tracks: [profesional, tecnica]
+tracks: [esencial, profesional, tecnica]
 readingTime: 10
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-16
+sources: [anthropic-buenas-practicas-de-prompting, anthropic-structured-outputs, anthropic-skills]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import PromptTemplate from '@components/PromptTemplate.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Veinte plantillas para empezar hoy: cada una se copia o se descarga como `.md`.
+- Las partes resaltadas son las variables: sustitúyelas por tus datos antes de enviar.
+- Todas aplican los mismos principios: contexto con su motivo, material separado, formato claro y una forma de comprobar el resultado.
+- Cada plantilla indica una configuración recomendada de superficie, modelo y esfuerzo en términos generales, sin nombres que caduquen.
+
+</KeyTakeaways>
+
+## La idea
+
+Una plantilla no es un hechizo: es un encargo bien hecho que ya has pensado una vez. Lo que ahorra no es escribir, sino acordarte de lo que suele faltar: para quién es, qué se decide, qué hacer si faltan datos y cómo comprobar el resultado. Adáptala a tu caso antes de usarla; borrar un apartado que no necesitas es mejor que rellenarlo con relleno.
+
+<Callout tipo="recomendacion">
+
+Guarda las plantillas que uses con frecuencia en un proyecto o en un fichero de instrucciones de tu herramienta, y ajústalas con lo que aprendas. El porqué: un encargo que ya funcionó es la mejor base para el siguiente, y mantenerlo en un único sitio evita que cada persona del equipo lo reinvente.
+
+</Callout>
+
+<Callout tipo="cuidado">
+
+No pegues datos personales, contratos u otra información confidencial en una herramienta que tu organización no haya aprobado. Las plantillas de revisión de contratos son una ayuda para preparar la revisión profesional, no la sustituyen.
+
+</Callout>
+
+## En la práctica
+
+Usa las plantillas así: elige la que más se parezca a tu tarea, copia el texto, sustituye las variables resaltadas, borra lo que no aplique y envíalo. Si el resultado no es lo que esperabas, corrige la plantilla, no solo la respuesta. Para el modelo y el esfuerzo concretos, consulta el [módulo de modelo y esfuerzo](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/). La configuración que se da en cada plantilla es una recomendación general de la guía. Ten en cuenta que en algunas aplicaciones de chat no puedes elegir el esfuerzo: depende de la aplicación y del plan (ver [Esfuerzo y razonamiento](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/esfuerzo-y-razonamiento/)); en ese caso, ajusta el modelo y la claridad del encargo.
+
+## Oficina
+
+Para el trabajo diario con documentos, correos, reuniones y decisiones.
+
+<PromptTemplate
+  titulo="Correo delicado"
+  archivo="correo-delicado"
+  texto={`<situacion>
+{{qué ha pasado, con fechas y cifras reales}}
+</situacion>
+
+<destinatario>
+{{quién es, qué relación tienes con esa persona y qué sabe ya}}
+</destinatario>
+
+Redacta un correo para {{nombre o cargo}}. El objetivo es {{qué quieres conseguir: por ejemplo, acordar una nueva fecha}}. Tono: {{por ejemplo, cercano y profesional, sin disculpas excesivas}}.
+
+Incluye: lo ocurrido en una o dos frases, lo que ofrecemos como solución y lo que necesitamos de la otra persona, con una fecha concreta.
+
+No inventes datos ni compromisos que no aparezcan en la situación. Si falta algo para redactarlo bien, hazme las preguntas antes de escribir el correo.`}
+
+>
+
+**Cuándo usarla.** Cuando tienes que decir algo incómodo (un retraso, una negativa, una queja) y no quieres que suene ni frío ni servil.
+
+**Configuración recomendada.** Chat, modelo equilibrado, esfuerzo bajo. Lee el resultado entero antes de enviarlo.
+
+**Ejemplo con los huecos rellenados.**
+
+- Situación: entregamos el módulo de facturación con dos semanas de retraso (previsto 15 de septiembre, ahora 29) por un fallo de nuestro proveedor de pagos.
+- Destinatario: Marta Ruiz, responsable de compras; cuatro años de relación, sabe del retraso por teléfono pero no del motivo.
+- Objetivo: conservar su confianza y acordar una fecha de pruebas antes del viernes. Tono: cercano y profesional.
+
+</PromptTemplate>
+
+<PromptTemplate
+  titulo="Informe ejecutivo"
+  archivo="informe-ejecutivo"
+  texto={`<material>
+{{pega aquí los documentos, notas o cifras, cada uno dentro de su etiqueta con nombre y fecha}}
+</material>
+
+Escribe un informe ejecutivo para {{público}}, que debe decidir {{decisión}}.
+
+Estructura: conclusión y recomendación en las dos primeras frases; después, los tres hechos que más pesan; después, los riesgos y lo que no sabemos; por último, los siguientes pasos con responsable y fecha.
+
+Usa solo cifras que aparezcan en el material y cita de cuál procede cada una. Si dos fuentes se contradicen, señálalo en lugar de elegir una. Extensión: lo que haga falta para que se pueda leer en {{minutos}} minutos.`}
+
+>
+
+**Cuándo usarla.** Cuando tienes notas, cifras o documentos dispersos y necesitas un informe de una o dos páginas para quien decide.
+
+**Configuración recomendada.** Chat con el material adjunto, modelo equilibrado, esfuerzo medio. Pide las cifras con su origen.
+
+**Ejemplo con los huecos rellenados.**
+
+- Material: tres informes trimestrales del proveedor de logística y un correo suyo proponiendo subir tarifas un 6 %.
+- Público: comité de dirección. Decisión: renovar o no el contrato en octubre.
+- Lectura en: 4 minutos.
+
+</PromptTemplate>
+
+<PromptTemplate
+  titulo="Acta de reunión a tareas"
+  archivo="acta-a-tareas"
+  texto={`<transcripcion>
+{{pega aquí la transcripción o tus notas}}
+</transcripcion>
+
+Participantes: {{nombres y cargos}}. Fecha de la reunión: {{fecha}}.
+
+A partir de la transcripción, prepara:
+
+1. Decisiones tomadas, una frase cada una.
+2. Tareas, en una tabla con tarea, responsable, fecha límite y la frase de la transcripción que la respalda.
+3. Temas abiertos que quedaron sin decidir.
+
+Si una tarea no tiene responsable o fecha dicha en voz alta, escribe «sin asignar» y no la deduzcas. No añadas nada que no se haya dicho.`}
+
+>
+
+**Cuándo usarla.** Cuando tienes la transcripción o las notas de una reunión y necesitas saber qué se decidió y quién hace qué.
+
+**Configuración recomendada.** Chat, modelo equilibrado, esfuerzo bajo. Contrasta las tareas con tus notas antes de enviarlas.
+
+**Ejemplo con los huecos rellenados.**
+
+- Transcripción de 50 minutos del comité de proyecto del 14 de octubre.
+- Participantes: Ana (dirección), Luis (TI), Marta (compras), Pablo (finanzas), Sara (RR. HH.) y Elena (proyecto).
+- Fecha de la reunión: 2026-10-14.
+
+</PromptTemplate>
+
+<PromptTemplate
+  titulo="Análisis de documento con citas"
+  archivo="analisis-documento-citas"
+  texto={`<documento nombre="{{nombre}}" fecha="{{fecha}}">
+{{pega aquí el documento}}
+</documento>
+
+Primero, extrae del documento los pasajes que sean relevantes para esta pregunta y cópialos literalmente con su página o apartado: {{pregunta}}
+
+Después, responde usando solo esos pasajes. Cada afirmación debe llevar entre paréntesis el apartado de donde sale. Si el documento no responde a la pregunta, dilo y no lo completes con conocimiento general.`}
+
+>
+
+**Cuándo usarla.** Cuando necesitas respuestas sobre un documento largo y quieres poder comprobar cada una.
+
+**Configuración recomendada.** Chat con el documento adjunto o en un proyecto, modelo equilibrado, esfuerzo medio.
+
+**Ejemplo con los huecos rellenados.**
+
+- Documento: «Política de viajes y gastos» (v3, 2026-01-10), 40 páginas.
+- Pregunta: ¿qué gastos requieren aprobación previa y de quién?
+- Resultado esperado: lista de gastos con el apartado de la política de donde sale cada uno.
+
+</PromptTemplate>
+
+<PromptTemplate
+  titulo="Comparar propuestas"
+  archivo="comparar-propuestas"
+  texto={`<propuesta id="A" origen="{{proveedor}}">
+{{texto o resumen de la propuesta A}}
+</propuesta>
+
+<propuesta id="B" origen="{{proveedor}}">
+{{texto o resumen de la propuesta B}}
+</propuesta>
+
+Criterios, por orden de importancia: {{criterio 1}}, {{criterio 2}}, {{criterio 3}}.
+
+Compáralas en una tabla con una fila por criterio. Debajo, di cuál recomiendas y por qué, y qué haría cambiar tu recomendación. Señala qué datos faltan en cada propuesta para comparar en igualdad de condiciones; no los estimes.`}
+
+>
+
+**Cuándo usarla.** Cuando tienes dos o más ofertas, presupuestos o candidaturas y necesitas compararlas con un criterio común.
+
+**Configuración recomendada.** Chat, modelo de gama alta si la decisión es importante, esfuerzo alto. Revisa tú las cifras de la tabla.
+
+**Ejemplo con los huecos rellenados.**
+
+- Propuestas: A (Formaprof, 12.400 EUR, 3 meses), B (Aula Norte, 9.800 EUR, 5 meses), C (CursoYa, 7.500 EUR, plataforma propia).
+- Criterios, por orden: calidad del temario, plazo de entrega, coste total.
+- Decisión: contratar la formación en IA del segundo semestre.
+
+</PromptTemplate>
+
+<PromptTemplate
+  titulo="Revisión de contrato (primera lectura)"
+  archivo="revision-contrato"
+  texto={`<contrato>
+{{pega aquí el contrato}}
+</contrato>
+
+Soy {{parte: por ejemplo, el cliente}} y mi prioridad es {{prioridad: por ejemplo, poder salir del contrato con poco coste}}.
+
+Haz una primera lectura crítica. Para cada cláusula que me perjudique o sea inusual, indica: número de cláusula, qué dice en lenguaje llano, por qué me afecta y qué cambio pediría. Después, lista las cláusulas habituales que echas en falta.
+
+Cita la cláusula literalmente cuando la comentes. Si algo depende de la legislación aplicable, dilo en lugar de afirmarlo. Esto es una ayuda para preparar la revisión, no un dictamen jurídico: cierra con las tres preguntas que debería hacer a un abogado.`}
+
+>
+
+**Cuándo usarla.** Cuando quieres una primera lectura crítica de un contrato antes de enviarlo a quien lo revisa de forma profesional.
+
+**Configuración recomendada.** Chat con el contrato adjunto, modelo de gama alta, esfuerzo alto. No sustituye la revisión jurídica.
+
+**Ejemplo con los huecos rellenados.**
+
+- Contrato: prestación de servicios de mantenimiento informático, 18 páginas, 24 meses.
+- Parte: somos el cliente. Prioridad: poder salir del contrato con poco coste y con un nivel de servicio exigible.
+- Resultado esperado: cláusulas problemáticas con el cambio que pediríamos y tres preguntas para el abogado.
+
+</PromptTemplate>
+
+<PromptTemplate
+  titulo="Plan de proyecto"
+  archivo="plan-de-proyecto"
+  texto={`Objetivo: {{qué hay que conseguir y para cuándo}}.
+Equipo y recursos: {{personas, horas disponibles, presupuesto}}.
+Restricciones reales: {{fechas fijas, dependencias, normas}}.
+
+Antes de escribir el plan, hazme las preguntas que necesites para no suponer nada importante. Cuando te responda, entrega:
+
+1. Fases con hitos y fechas.
+2. Tareas por fase, con responsable y dependencias.
+3. Los cinco riesgos principales, con probabilidad, impacto y una medida preventiva cada uno.
+4. Cómo sabremos que cada fase está terminada.
+
+Marca como supuesto cualquier dato que hayas tenido que asumir.`}
+
+>
+
+**Cuándo usarla.** Cuando tienes un objetivo claro pero no el calendario ni los riesgos.
+
+**Configuración recomendada.** Chat, modelo de gama alta, esfuerzo medio o alto. Mejor tras una entrevista (ver «Que la IA te entreviste»).
+
+**Ejemplo con los huecos rellenados.**
+
+- Objetivo: implantar una herramienta de facturación electrónica en el departamento de administración (12 personas) antes del 31 de diciembre.
+- Recursos: 2 personas al 30 %, 15.000 EUR, apoyo puntual de TI.
+- Restricciones: cierre contable en noviembre, sin parar la facturación semanal.
+
+</PromptTemplate>
+
+<PromptTemplate
+  titulo="Investigación con fuentes"
+  archivo="investigacion-con-fuentes"
+  texto={`Tema: {{tema acotado}}.
+Para qué lo necesito: {{decisión o documento que alimentará}}.
+Fuentes que prefiero: {{por ejemplo, organismos oficiales, normativa, publicaciones del proveedor}}. Descarta blogs y agregadores salvo como pista para llegar a la fuente original.
+
+Busca, lee y contrasta. Entrega:
+
+1. Respuesta breve.
+2. Datos clave, cada uno con su fuente (enlace) y la fecha de la fuente.
+3. Puntos en los que las fuentes discrepan.
+4. Lo que no has podido confirmar.
+
+Separa con claridad lo que dice la fuente de lo que es tu interpretación.`}
+
+>
+
+**Cuándo usarla.** Cuando necesitas un estado de la cuestión que puedas defender, con fuentes que se puedan abrir.
+
+**Configuración recomendada.** Modo de investigación o chat con búsqueda web, modelo de gama alta, esfuerzo alto. Abre tú las fuentes clave.
+
+**Ejemplo con los huecos rellenados.**
+
+- Tema: qué exige la normativa europea de accesibilidad a la web de una empresa de servicios y desde cuándo.
+- Para qué: decidir si incluimos la adaptación en el presupuesto del año.
+- Fuentes preferidas: organismos oficiales y texto de la norma.
+
+</PromptTemplate>
+
+<PromptTemplate
+  titulo="Feedback a un texto"
+  archivo="feedback-a-un-texto"
+  texto={`<texto>
+{{pega aquí tu texto}}
+</texto>
+
+Es {{tipo de texto}} para {{público}} y debe conseguir {{objetivo}}.
+
+Léelo como lo haría ese público y dame feedback con este orden: lo que ya funciona, los tres problemas que más restan al objetivo (con la frase concreta donde ocurren) y una sugerencia concreta para cada uno.
+
+No reescribas el texto entero; solo propón nuevas frases donde sea imprescindible. Si algo es cuestión de gusto y no de eficacia, indícalo como tal.`}
+
+>
+
+**Cuándo usarla.** Cuando quieres una lectura crítica de un texto tuyo (propuesta, artículo, presentación) sin que te lo reescriban.
+
+**Configuración recomendada.** Chat, modelo equilibrado, esfuerzo medio.
+
+**Ejemplo con los huecos rellenados.**
+
+- Texto: propuesta comercial de tres páginas para un cliente nuevo del sector hotelero.
+- Tipo y público: propuesta, dirigida a la directora de operaciones de una cadena.
+- Objetivo: conseguir una reunión de seguimiento en dos semanas.
+
+</PromptTemplate>
+
+<PromptTemplate
+  titulo="Traducción con glosario"
+  archivo="traduccion-con-glosario"
+  texto={`<glosario>
+{{término original}} = {{traducción obligatoria}}
+{{término original}} = {{traducción obligatoria}}
+</glosario>
+
+<texto idioma="{{idioma de origen}}">
+{{pega aquí el texto}}
+</texto>
+
+Traduce el texto a {{idioma y variante, por ejemplo español de España}}. Registro: {{formal o cercano}}. Respeta el glosario sin excepciones, mantén el formato (títulos, listas, tablas) y no traduzcas nombres de producto ni de personas.
+
+Al final, lista los pasajes ambiguos en los que hayas tenido que elegir una interpretación, con la alternativa descartada.`}
+
+>
+
+**Cuándo usarla.** Cuando traduces documentos de empresa y los términos deben ser siempre los mismos.
+
+**Configuración recomendada.** Chat, modelo equilibrado, esfuerzo bajo. Pide a una persona del idioma que revise lo importante.
+
+**Ejemplo con los huecos rellenados.**
+
+- Glosario: «ticket» = «incidencia»; «dashboard» = «panel de control»; «onboarding» = «incorporación».
+- Texto: manual de usuario de 12 páginas, del inglés.
+- Destino: español de España, registro formal; no traducir nombres de producto.
+
+</PromptTemplate>
+
+## Datos
+
+Para sacar información ordenada de textos y tablas.
+
+<PromptTemplate
+  titulo="Extraer datos a tabla o JSON"
+  archivo="extraer-a-tabla-json"
+  texto={`<documentos>
+{{pega aquí los textos, cada uno en su etiqueta con un identificador}}
+</documentos>
+
+Extrae de cada documento estos campos: {{campo 1}}, {{campo 2}}, {{campo 3}}.
+
+Devuelve una tabla con una fila por documento y una columna por campo (o, si prefiero JSON, un objeto por documento con esos nombres de campo). Si un campo no aparece en el documento, escribe «no consta»: no lo supongas. Mantén las fechas en formato AAAA-MM-DD y los importes con la moneda.`}
+
+>
+
+**Cuándo usarla.** Cuando tienes texto libre (facturas, correos, fichas) y necesitas campos ordenados.
+
+**Configuración recomendada.** Chat para pocos documentos; API con structured outputs si son muchos. Modelo rápido y barato, esfuerzo bajo. Valida una muestra a mano.
+
+**Ejemplo con los huecos rellenados.**
+
+- Documentos: 50 correos de clientes pidiendo cambios de pedido, cada uno con su identificador (C-001 a C-050).
+- Campos: cliente, número de pedido, importe, fecha de entrega solicitada.
+- Salida: tabla; fechas en AAAA-MM-DD; «no consta» si falta un campo.
+
+</PromptTemplate>
+
+<PromptTemplate
+  titulo="Análisis de un CSV o un Excel"
+  archivo="analisis-csv-excel"
+  texto={`Adjunto {{nombre del fichero}}. Cada fila es {{qué representa una fila}}. Las columnas son: {{lista de columnas y qué significan}}.
+
+Pregunta de negocio: {{qué quiero saber y para qué decisión}}.
+
+Antes de analizar, revisa la calidad de los datos (vacíos, duplicados, valores raros) y cuéntame qué has encontrado. Después responde a la pregunta calculando con código, no de cabeza, y enséñame el método en una frase.
+
+Entrega: la respuesta en dos frases, una tabla con las cifras que la sostienen y las limitaciones del análisis. Si la pregunta no se puede responder con estos datos, dilo.`}
+
+>
+
+**Cuándo usarla.** Cuando tienes una tabla y quieres respuestas, no solo gráficos bonitos.
+
+**Configuración recomendada.** Chat con ejecución de código o herramienta de hojas de cálculo, esfuerzo medio. Recalcula las cifras clave por tu cuenta.
+
+**Ejemplo con los huecos rellenados.**
+
+- Fichero: ventas-2026.xlsx. Cada fila es una venta; columnas: fecha, producto, región, importe en euros.
+- Pregunta: ¿en qué región y producto cayeron las ventas de septiembre respecto a agosto?
+- Decisión: dónde reforzar al equipo comercial en el último trimestre.
+
+</PromptTemplate>
+
+## Técnico
+
+Para quien programa, revisa código o monta asistentes y agentes.
+
+<PromptTemplate
+  titulo="Prompt de sistema para un asistente interno"
+  archivo="prompt-de-sistema-asistente"
+  texto={`Eres el asistente de {{equipo o área}} de {{empresa}}. Ayudas a {{quién lo usa}} con {{tareas que sí cubre}}.
+
+Contexto: {{qué es la empresa, qué documentos tienes y cuáles son la fuente de verdad}}. Los usuarios suelen preguntar por {{casos más habituales}}.
+
+Cómo responder: {{tono y longitud, con el motivo; por ejemplo, breve y con el apartado de la política, porque la gente quiere comprobarlo}}.
+
+Qué no haces y por qué: {{límite 1 y su motivo}}; {{límite 2 y su motivo}}. En esos casos, indica a quién dirigirse: {{contacto}}.
+
+Si la respuesta no está en los documentos, dilo y no la inventes. Si la pregunta es ambigua, haz una pregunta antes de responder. Cuando cites una norma, indica el apartado.`}
+
+>
+
+**Cuándo usarla.** Cuando montas un asistente para tu equipo (por ejemplo, de dudas de RR. HH. o de soporte) y necesitas sus instrucciones de base.
+
+**Configuración recomendada.** Proyecto o API, modelo rápido o equilibrado, esfuerzo bajo. Pruébalo con 20 preguntas reales, incluidas las difíciles.
+
+**Ejemplo con los huecos rellenados.**
+
+- Asistente: del equipo de RR. HH. de una empresa de 300 personas, para dudas de vacaciones, permisos y gastos.
+- Fuente de verdad: la política interna de 2026. Límite: no informa de salarios individuales, porque son confidenciales; remite a rrhh@ejemplo.com.
+- Respuestas: breves y con el apartado de la política citado.
+
+</PromptTemplate>
+
+<PromptTemplate
+  titulo="Encargo a un agente de código"
+  archivo="encargo-agente-codigo"
+  texto={`Objetivo: {{qué debe poder hacerse al terminar, en términos de comportamiento}}.
+
+Contexto: {{por qué se necesita, qué módulos intervienen y cuáles no se deben tocar}}.
+
+Restricciones: {{por ejemplo, no cambiar la API pública; motivo: hay clientes que dependen de ella}}.
+
+Cómo comprobar que está hecho: {{comando de tests o de comprobación}}. No des la tarea por terminada hasta que pase. Si un test falla, arregla el código y no el test, salvo que el test esté mal; en ese caso, explícalo.
+
+Antes de editar, lee los ficheros afectados; no supongas cómo funciona algo que no hayas abierto. Si una acción es irreversible o afecta a algo fuera del repositorio, pregunta antes.
+
+Al terminar, resume qué cambiaste, qué probaste y qué dudas te quedan.`}
+
+>
+
+**Cuándo usarla.** Cuando delegas una tarea de programación a Claude Code, Codex u otro agente y quieres que termine sin tener que vigilarlo.
+
+**Configuración recomendada.** Agente en el repositorio, modelo equilibrado, esfuerzo medio. Tests como criterio de éxito.
+
+**Ejemplo con los huecos rellenados.**
+
+- Objetivo: el listado de pedidos de la API debe poder paginarse (parámetros page y size, tamaño máximo 100).
+- Restricción: no cambiar el formato de respuesta actual porque hay clientes que dependen de él.
+- Comprobación: npm test; añadir tests de paginación que fallen antes del cambio.
+
+</PromptTemplate>
+
+<PromptTemplate
+  titulo="Revisión de código"
+  archivo="revision-de-codigo"
+  texto={`Revisa este cambio: {{rama, diff o pull request}}.
+
+Qué pretende: {{descripción del cambio}}. Qué importa más: {{por ejemplo, corrección y seguridad antes que estilo}}.
+
+Busca errores de lógica, casos límite sin cubrir, problemas de seguridad y pruebas que no prueban lo que dicen. Para cada hallazgo indica fichero y línea, por qué es un problema, cómo reproducirlo y una corrección sugerida.
+
+Ordena por gravedad. Informa solo de lo que puedas justificar con el código; si no estás seguro, márcalo como duda. No comentes estilo salvo que cause errores. Si no encuentras problemas, dilo.`}
+
+>
+
+**Cuándo usarla.** Cuando quieres una segunda lectura de un cambio antes de integrarlo, con contexto limpio.
+
+**Configuración recomendada.** Sesión nueva o subagente revisor, modelo de gama alta, esfuerzo alto. Reproduce cada hallazgo antes de aceptarlo.
+
+**Ejemplo con los huecos rellenados.**
+
+- Cambio: rama feature/descuentos, que modifica el cálculo de descuentos por volumen.
+- Pretende: aplicar el tramo correcto cuando el pedido cruza dos escalones.
+- Prioridad: corrección y seguridad antes que estilo.
+
+</PromptTemplate>
+
+<PromptTemplate
+  titulo="Especificación de una funcionalidad"
+  archivo="especificacion-funcionalidad"
+  texto={`Idea: {{descripción en pocas frases}}.
+Usuarios y problema que resuelve: {{quién la usa y qué no puede hacer hoy}}.
+
+Entrevístame con preguntas concretas sobre lo que sea difícil de decidir (casos límite, permisos, errores, rendimiento, qué queda fuera). Hazlas de una en una o en bloques pequeños.
+
+Cuando hayamos terminado, escribe una especificación con: objetivo, alcance y exclusiones, comportamiento esperado con ejemplos, casos límite, criterios de aceptación comprobables y preguntas abiertas. Guárdala como SPEC.md.`}
+
+>
+
+**Cuándo usarla.** Cuando quieres convertir una idea en una especificación que una persona o un agente pueda implementar.
+
+**Configuración recomendada.** Chat o agente en modo plan, modelo de gama alta, esfuerzo medio o alto. Ver «Que la IA te entreviste».
+
+**Ejemplo con los huecos rellenados.**
+
+- Idea: exportar los informes de la aplicación de gestión a PDF.
+- Usuarios y problema: responsables de área que hoy copian tablas a mano a un documento.
+- Después de la entrevista, la especificación se guarda como SPEC.md.
+
+</PromptTemplate>
+
+<PromptTemplate
+  titulo="Fichero SKILL.md"
+  archivo="fichero-skill"
+  texto={`---
+name: {{nombre-en-minusculas-con-guiones}}
+description: {{qué hace y cuándo debe usarse, en una o dos frases con las palabras que diría el usuario}}
+---
+
+# {{Título}}
+
+## Cuándo usarlo
+
+{{situaciones concretas}}
+
+## Procedimiento
+
+1. {{paso 1}}
+2. {{paso 2}}
+3. {{paso 3}}
+
+## Qué hace falta saber
+
+{{reglas del dominio y por qué existen}}
+
+## Cómo comprobar que está bien
+
+{{criterios verificables}}
+
+## Qué no hacer
+
+{{límite y su motivo}}
+
+<!-- Pautas oficiales para escribir skills: descripción en tercera persona (qué hace y cuándo usarla, máximo 1.024 caracteres), nombre de hasta 64 caracteres, SKILL.md de menos de 500 líneas y prueba con todos los modelos que vayas a usar. Borra este comentario al terminar. -->`}
+
+>
+
+**Cuándo usarla.** Cuando repites un procedimiento muchas veces y quieres que el agente lo siga siempre igual.
+
+**Configuración recomendada.** Se escribe una vez con un modelo de gama alta y se prueba con el modelo que lo usará.
+
+**Ejemplo con los huecos rellenados.**
+
+- name: informe-semanal
+- description: Prepara el informe semanal de ventas con las secciones fijas del equipo. Úsalo cuando pidan «el informe de la semana».
+- Procedimiento: leer el export del CRM, calcular tres indicadores, redactar resumen de una página.
+
+</PromptTemplate>
+
+<PromptTemplate
+  titulo="Encargo a un subagente"
+  archivo="encargo-subagente"
+  texto={`Tarea: {{qué debe hacer, en una frase}}.
+
+Por qué se necesita: {{qué decisión depende del resultado}}.
+
+Lo que ya sabes y no hace falta repetir: {{contexto mínimo imprescindible, porque no has visto la conversación}}.
+
+Alcance: {{dónde buscar o qué tocar}}. Fuera de alcance: {{qué no tocar}}.
+
+Devuelve solo: {{formato exacto del resultado, por ejemplo una lista de ficheros con una línea cada uno}}. No incluyas el proceso. Si no puedes completar la tarea, dime qué falta en lugar de devolver algo parcial como si fuera completo.`}
+
+>
+
+**Cuándo usarla.** Cuando delegas una parte acotada de una tarea mayor a otro agente que no ha visto tu conversación.
+
+**Configuración recomendada.** Subagente con herramientas mínimas; modelo rápido para explorar, equilibrado o superior para revisar.
+
+**Ejemplo con los huecos rellenados.**
+
+- Tarea: listar todos los sitios del repositorio donde se calcula el IVA.
+- Por qué: vamos a cambiar el tipo reducido y hay que saber qué módulos tocan.
+- Devuelve solo: lista de ficheros con una línea cada uno; sin explicar el proceso.
+
+</PromptTemplate>
+
+<PromptTemplate
+  titulo="Prompt de evaluación con rúbrica"
+  archivo="prompt-de-evaluacion"
+  texto={`Vas a evaluar una respuesta según una rúbrica.
+
+<consulta>
+{{consulta original}}
+</consulta>
+
+<respuesta>
+{{respuesta a evaluar}}
+</respuesta>
+
+<referencia>
+{{respuesta ideal o hechos que debe contener, si los hay}}
+</referencia>
+
+Rúbrica (puntúa cada criterio de 0 a 2):
+
+- {{criterio 1: por ejemplo, exactitud respecto a la referencia}}
+- {{criterio 2: por ejemplo, tono adecuado}}
+- {{criterio 3: por ejemplo, no inventa datos}}
+
+Para cada criterio, escribe primero la evidencia (cita breve de la respuesta) y después la puntuación. Termina con la suma y una frase sobre el fallo principal. Puntúa solo con lo que ves; no premies la longitud.`}
+
+>
+
+**Cuándo usarla.** Cuando necesitas que un modelo puntúe respuestas de otro (o tuyas) con criterios fijos, para comparar versiones de un prompt.
+
+**Configuración recomendada.** API o chat, modelo de gama alta distinto del evaluado si es posible, esfuerzo medio. Contrástalo con la valoración de una persona en una muestra.
+
+**Ejemplo con los huecos rellenados.**
+
+- Consulta: «¿Cuántos días de vacaciones me quedan si empecé en marzo?».
+- Referencia: 17 días, según el apartado 4.2 de la política.
+- Rúbrica: exactitud respecto a la referencia, cita del apartado, no inventa datos.
+
+</PromptTemplate>
+
+## Método
+
+La plantilla general, para cuando ninguna otra encaja.
+
+<PromptTemplate
+  titulo="Encargo universal"
+  archivo="encargo-universal"
+  texto={`Objetivo: {{qué quiero conseguir, en una frase}}.
+
+Contexto y porqué: {{para qué se usará el resultado y quién lo leerá}}.
+
+Material: {{documentos, datos o enlaces, cada uno con su nombre}}.
+
+Restricciones: {{lo que debe cumplirse, con el motivo de cada una}}.
+
+Formato de salida: {{cómo quiero el resultado; un ejemplo breve vale más que una descripción}}.
+
+Criterio de éxito: {{cómo sabré que está bien y cómo se comprobará}}.
+
+Si falta información para hacerlo bien, pregúntame antes de empezar y no la supongas.`}
+
+>
+
+**Cuándo usarla.** Cuando no hay una plantilla específica para tu tarea. Es la versión corta de la plantilla de encargo del módulo de método.
+
+**Configuración recomendada.** Cualquier superficie; el modelo y el esfuerzo dependen de la tarea (ver el módulo de modelo y esfuerzo).
+
+**Ejemplo con los huecos rellenados.**
+
+- Objetivo: preparar el guion de una presentación de 10 minutos sobre los resultados del trimestre.
+- Contexto: la verá el comité de dirección; deben decidir si ampliamos el equipo comercial.
+- Criterio de éxito: cinco diapositivas, una cifra por diapositiva, con la fuente de cada cifra.
+
+</PromptTemplate>
+
+## Errores frecuentes
+
+- **Enviar la plantilla sin rellenar las variables.** Si quedan llaves dobles, el modelo trabajará con los huecos.
+- **Rellenar con relleno.** Una variable que no sabes responder es mejor dejarla fuera o pedir que te pregunten.
+- **No comprobar el resultado.** Cada plantilla trae una vía de verificación (citas, «no consta», supuestos marcados); úsala.
+- **Un único encargo gigante.** Si la tarea tiene fases con criterios distintos, encadénalas (ver [Encadenar y autocorregir](/AI-Optimized_Usage_Web/m3-prompting/encadenar-y-autocorregir/)).
+
+<Checklist
+  id="biblioteca"
+  titulo="Antes de enviar una plantilla"
+  items={[
+    'He sustituido todas las variables resaltadas.',
+    'He borrado los apartados que no aplican.',
+    'El material está dentro de sus etiquetas.',
+    'Sé cómo voy a comprobar el resultado.',
+    'No incluyo datos confidenciales en una herramienta no aprobada.',
+  ]}
+/>
+
+## Para profundizar
+
+Para ver el efecto de mejorar un prompt, pasa al [Laboratorio antes y después](/AI-Optimized_Usage_Web/m3-prompting/laboratorio-antes-despues/).

@@ -6,6 +6,131 @@ sidebar:
 level: avanzado
 tracks: [profesional, tecnica]
 readingTime: 8
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-16
+sources:
+  [
+    anthropic-prompting-opus-5-5,
+    anthropic-prompting-sonnet-5-5,
+    anthropic-prompting-haiku-5-5,
+    anthropic-prompting-fable-5-1,
+    openai-guia-de-prompts,
+    ai-google-dev-gemini-api-docs-prompting-strategies,
+    google-ultimo-modelo,
+    anthropic-esfuerzo,
+    anthropic-buenas-practicas-de-prompting,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Fact from '@components/Fact.astro';
+import ModelTable from '@components/ModelTable.astro';
+import ProviderTabs from '@components/ProviderTabs.astro';
+import BeforeAfter from '@components/BeforeAfter.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Los principios de prompting valen para todos los modelos; lo que cambia son las particularidades.
+- El esfuerzo por defecto depende del modelo y de la superficie: compruébalo antes de culpar al prompt.
+- Cada guía oficial insiste en algo distinto: Sonnet 5.5, en decir cuándo buscar datos que pueden haber cambiado; Haiku 5.5, en que `low` salta búsquedas en prompts largos de agente; Gemini 4, en retirar los parámetros de muestreo.
+- Esta página es la que más cambia: léela con su fecha de revisión.
+
+</KeyTakeaways>
+
+## La idea
+
+Los principios de las páginas anteriores no cambian de un modelo a otro. Lo que cambia es la calibración: cuánto razona por defecto cada modelo, qué parámetros admite, a qué es sensible. Esta página reúne esas particularidades. Es la parte más volátil del módulo: cada vez que sale un modelo o un proveedor actualiza su guía, algo de esto puede quedarse atrás.
+
+<Callout tipo="verificado" fecha="2026-10-16">
+
+Lo que sigue procede de las guías oficiales de prompting de cada modelo de Claude, que se han leído en su texto. Para OpenAI y Google, parte de las citas viene de resúmenes automatizados y se marca como «sin confirmar en el texto literal». Los precios, ventanas y niveles de esfuerzo por defecto no se escriben a mano: salen de los datos del sitio.
+
+</Callout>
+
+<ModelTable
+  ids={['fable-5-1', 'opus-5-5', 'sonnet-5-5', 'haiku-5-5', 'gpt-6-astra', 'gpt-6-1-sol', 'gemini-4-argon']}
+  etiqueta="Modelos citados en esta página"
+/>
+
+## Claude
+
+<Callout tipo="varia">
+
+El esfuerzo por defecto no es el mismo en todas partes. En la API: Opus 5.5 <Fact id="opus-5-5.effort.default.api" />, Sonnet 5.5 <Fact id="sonnet-5-5.effort.default.api" />, Haiku 5.5 <Fact id="haiku-5-5.effort.default.api" /> y Fable 5.1 <Fact id="fable-5-1.effort.default.api" />. En Claude Code: Sonnet 5.5 <Fact id="sonnet-5-5.effort.default.claude-code" />, Opus 5.5 <Fact id="opus-5-5.effort.default.claude-code" />, Haiku 5.5 <Fact id="haiku-5-5.effort.default.claude-code" /> y Fable 5.1 <Fact id="fable-5-1.effort.default.claude-code" />. Si un resultado te parece superficial, mira primero el esfuerzo. En algunas aplicaciones de chat no se elige el esfuerzo: depende de la aplicación (ver [Esfuerzo y razonamiento](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/esfuerzo-y-razonamiento/)).
+
+</Callout>
+
+**Claude Opus 5.5.** La guía oficial aconseja empezar en el valor por defecto, fijarlo de forma explícita y probar otros niveles con tus propias evaluaciones; reservar `xhigh` y `max` para trabajo en el que hayas medido una mejora. El razonamiento no se puede desactivar: un `thinking` desactivado o con presupuesto manual devuelve un error 400. En aplicaciones de chat, la guía sugiere quitar instrucciones del tipo «piensa con cuidado antes de responder»: en su prueba, las respuestas empezaron antes sin pérdida clara de calidad (medición del proveedor). En diseño frontend, sin dirección de diseño el modelo recurre a unos pocos estilos por defecto, y una instrucción general como «evita el aspecto genérico» solo cambia unos por otros; funciona mejor nombrar los patrones concretos que no quieres.
+
+**Claude Sonnet 5.5.** La guía recomienda empezar en `high` en la API, salvo que la carga sea agéntica o sensible a la latencia; para agentes con tareas bien especificadas, `medium`. Sus niveles están recalibrados respecto a Sonnet 5, así que conviene repetir el barrido de esfuerzo. Para responder sin razonamiento previo existe `thinking: {type: "between_tools"}`, que solo vale en `low`, `medium` y `high` (con `xhigh` o `max` devuelve un error 400). En chat y trabajo de conocimiento, a veces contesta con lo que sabe cuando una búsqueda captaría datos que han cambiado (qué se permite, se exige o se cobra): la guía pide quitar frases que desaconsejen usar herramientas y añadir una instrucción para comprobar esos datos cuando haya búsqueda disponible.
+
+**Claude Haiku 5.5.** El valor por defecto es el que figura arriba y la guía lo recomienda como punto de partida, incluso en programación con agentes. Lo que más destaca la guía: en prompts largos de agente, `low` salta más búsquedas y se detiene antes; y las instrucciones del tipo «busca siempre» hicieron buscar a la mitad de los prompts que no lo necesitaban (medición publicada). Para información reciente, indica la fecha actual en el prompt.
+
+**Claude Fable 5.1.** La guía propone partir del valor por defecto y probar los demás niveles con tus evaluaciones: a `medium`, los resultados se acercan a los de Fable 5 con menor coste (medición del proveedor). Dos advertencias: a `low` busca menos con herramientas de recuperación, y los resúmenes de compactación pueden perder restricciones o decisiones, así que conviene decirle qué debe conservar. En el chat usa menos negritas, cabeceras y listas que los modelos anteriores: si tu prompt trae reglas contra el exceso de formato, quítalas o sustitúyelas por una que diga cuándo sí usarlo.
+
+<Callout tipo="recomendacion">
+
+Antes de reescribir un prompt para «arreglar» un modelo, prueba por este orden: primero el contexto que falta (quién lo lee, para qué, qué material); después el esfuerzo, que es un compromiso entre calidad, latencia y coste y que conviene medir con tus casos, no cambiar a ojo; y solo al final, la redacción. El porqué: el contexto es lo que más mejora los resultados sin coste de calidad, el esfuerzo se paga en tokens y tiempo, y reescribir sin saber qué falla es lo más fácil de equivocar.
+
+</Callout>
+
+## Otros proveedores
+
+<ProviderTabs>
+  <div slot="openai">
+
+**GPT-6 Astra y GPT-6.1 Sol.** La guía de OpenAI indica que ni Astra ni GPT-6.1 Sol admiten el esfuerzo `none`: usa `low`. También indica retirar `temperature`, `top_p` y `top_logprobs`. Sobre el comportamiento de Astra, el resumen de la guía dice: «Asks clarifying questions more often than earlier models, which can stall work that should proceed on reasonable assumptions. It is more sensitive to instructions in skills and files like AGENTS.md. It delegates to subagents less often than many workflows need.» Sin confirmar en el texto literal de la fuente: la cita procede de un resumen automatizado. Si te hace demasiadas preguntas, dile qué suposiciones razonables puede asumir.
+
+  </div>
+  <div slot="google">
+
+**Gemini 4 Argon.** El razonamiento se controla con `thinking_level`, con <Fact id="gemini-4-argon.effort.default.api" /> por defecto. Los modelos Gemini 4 y 3.6 en adelante ignoran los valores personalizados de `temperature`, `top_p` y `top_k`, y la página avisa de que las versiones futuras devolverán un error 400, así que conviene retirarlos. Sobre `max_output_tokens`, la documentación oficial recomienda dejar el valor por defecto o no fijarlo, y como mínimo 32.768 si tu aplicación tenía un límite menor. La guía de estrategias de prompting recomienda incluir ejemplos y prompts directos y bien estructurados (sin confirmar en el texto literal: cita de resumen automatizado).
+
+  </div>
+  <div slot="claude">
+
+Las notas de Claude están arriba. Para ver el equivalente de un parámetro entre proveedores, consulta [Esfuerzo y razonamiento](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/esfuerzo-y-razonamiento/).
+
+  </div>
+</ProviderTabs>
+
+## En la práctica
+
+Un hábito útil es mantener, junto a cada prompt importante, una línea que diga con qué modelo y esfuerzo se probó. Cuando cambie el modelo, sabrás qué volver a probar. Más sobre cómo elegir modelo y esfuerzo en el [módulo de modelo y esfuerzo](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/).
+
+## Ejemplo: el mismo prompt, antes y después de cambiar de modelo
+
+Un equipo usaba con un modelo anterior un asistente de consultas normativas con esta instrucción. Al pasar a Sonnet 5.5 notan que algunas respuestas sobre plazos y requisitos llevan datos desactualizados.
+
+<BeforeAfter
+  antes="Usa la búsqueda web solo si es estrictamente necesario. Responde con seguridad."
+  despues="Antes de responder sobre plazos, requisitos o importes que puedan haber cambiado (qué se permite, se exige o se cobra), comprueba la fuente oficial con la búsqueda, aunque creas conocerlos. Si no puedes comprobarlo, dilo y pon la fecha de tu información."
+>
+
+Qué cambió y por qué: la guía de Sonnet 5.5 identifica este patrón (respuestas de memoria sobre datos que cambian) y pide quitar la frase que desaconseja la herramienta y decir cuándo conviene usarla. Es una recomendación de la guía del proveedor; compruébala con tus casos.
+
+</BeforeAfter>
+
+## Errores frecuentes
+
+- **Copiar un prompt de un modelo a otro sin probarlo.** Funciona a menudo, y falla justo en los casos límite.
+- **Dejar parámetros de muestreo en la API.** En Gemini 4 se ignoran y los modelos GPT-6 piden retirarlos; límpialos.
+- **Atribuir al prompt lo que es del esfuerzo.** Un modelo con esfuerzo bajo parece menos capaz.
+- **Dar instrucciones de «busca siempre».** Hacen buscar a prompts que no lo necesitan, con coste y latencia.
+
+<Checklist
+  id="notas-por-modelo"
+  titulo="Al cambiar de modelo"
+  items={[
+    'He mirado el esfuerzo por defecto en mi superficie (API, app, Claude Code).',
+    'He retirado parámetros que el modelo ya no admite.',
+    'He releído la guía de prompting de ese modelo.',
+    'He vuelto a probar mis casos difíciles, no solo los fáciles.',
+    'Anoto con qué modelo y esfuerzo se probó cada prompt.',
+  ]}
+/>
+
+## Para profundizar
+
+Elegir modelo y esfuerzo es el tema del [módulo 4](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/). Para limpiar los prompts antiguos tras un cambio de modelo, ve a [Auditar tus prompts](/AI-Optimized_Usage_Web/m3-prompting/auditar-tus-prompts/).

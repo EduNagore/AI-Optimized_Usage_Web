@@ -6,10 +6,103 @@ sidebar:
 level: basico
 tracks: [esencial, profesional, tecnica]
 readingTime: 8
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-16
+sources: [anthropic-buenas-practicas-de-prompting, claude-code-buenas-practicas]
 ---
 
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Steps from '@components/Steps.astro';
+import BeforeAfter from '@components/BeforeAfter.astro';
+import Checklist from '@components/Checklist.astro';
 import CicloMetodo from '@components/diagrams/CicloMetodo.astro';
 
+<KeyTakeaways>
+
+- Trabajar bien con IA es un ciclo de siete pasos, no solo escribir un buen prompt.
+- Los pasos 1 a 3 se deciden antes de empezar; el 4 y el 5, al escribir; el 6 y el 7, después.
+- Sin el paso 6 (verificar) no hay método: solo hay un texto que suena bien.
+- El paso 7 convierte lo que repites en una plantilla, para no empezar de cero cada semana.
+
+</KeyTakeaways>
+
+## La idea
+
+La guía lo llama **el ciclo del encargo**: cada tarea pasa por clasificar, elegir, preparar, pedir, comprobar y guardar.
+
+Casi todo el mundo empieza por el paso 5: abre una conversación y escribe. Funciona para lo trivial. Con trabajo de verdad (un informe para dirección, un contrato de proveedor, una conciliación de facturas) se falla antes y después: se usa la herramienta equivocada, se pega demasiado material o ninguno, y el resultado se da por bueno porque está bien redactado.
+
+El ciclo reparte las decisiones en el orden en que conviene tomarlas. Cada paso es corto y tiene su desarrollo en esta guía.
+
 <CicloMetodo />
+
+Tres ideas de fondo sostienen el orden:
+
+- **Se optimiza el coste de terminar la tarea, no el precio por token.** Un modelo barato que necesita tres intentos no es barato. Lo desarrolla [coste por tarea completada](/AI-Optimized_Usage_Web/m2-metodo/coste-por-tarea/).
+- **El contexto es el recurso escaso.** Cada turno reenvía todo lo anterior y, según la documentación de Anthropic sobre ingeniería de contexto, la precisión del modelo puede degradarse a medida que crece el contexto, así que se prepara lo mínimo suficiente.
+- **Lo más simple que funcione.** Primero una llamada única; solo si no basta, un flujo o un agente.
+
+## En la práctica: los siete pasos
+
+<Steps>
+
+1. **Clasifica la tarea.** ¿Qué tipo es (resumir, analizar, redactar...), qué complejidad tiene, qué pasa si sale mal, cuántas veces se repetirá y con qué urgencia? Ver [taxonomía de tareas](/AI-Optimized_Usage_Web/m2-metodo/taxonomia-de-tareas/).
+2. **Elige la superficie.** Chat, proyecto con documentos, agente con acceso a tus ficheros, API o automatización. Ver [elegir superficie](/AI-Optimized_Usage_Web/m2-metodo/elegir-superficie/).
+3. **Elige modelo y esfuerzo.** Qué modelo y cuánto debe razonar. Se desarrolla en el [módulo 4](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/).
+4. **Prepara el contexto.** Solo lo necesario, con los documentos primero y cada fuente identificada. Ver el [módulo 5](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/).
+5. **Formula el encargo.** Objetivo, porqué, material, restricciones, formato y criterio de éxito. Ver la [plantilla de encargo](/AI-Optimized_Usage_Web/m2-metodo/plantilla-de-encargo/).
+6. **Verifica.** Comprueba evidencias, citas, cifras o pruebas; si el riesgo es alto, pide una segunda opinión en otra conversación con el contexto limpio. Ver [verificar siempre](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/verificar-siempre/).
+7. **Sistematiza y mide.** Si la tarea se repite, guarda el encargo como plantilla, skill o instrucciones, y mide lo que te cuesta cada ejecución: en la API, tokens y dinero; en una app de chat, intentos y minutos de revisión. Ver [medir](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/medir/) y [skills](/AI-Optimized_Usage_Web/m6-herramientas/skills/) y [ficheros de instrucciones](/AI-Optimized_Usage_Web/m6-herramientas/ficheros-de-instrucciones-y-memoria/).
+
+</Steps>
+
+<Callout tipo="recomendacion">
+
+Dedica un par de minutos a los pasos 1 a 3 antes de escribir nada. Es una recomendación de la guía: una tarea mal clasificada se paga después, con reintentos y con una herramienta o un modelo que no encajaban.
+
+</Callout>
+
+No toda tarea necesita los siete pasos con el mismo peso. Una pregunta rápida se resuelve casi solo con el paso 5; cuanto mayor es el riesgo, el volumen o la complejidad, más pesa el resto.
+
+| Situación                                  | Pasos que más pesan |
+| ------------------------------------------ | ------------------- |
+| Reformular un correo                       | 5                   |
+| Resumir un informe para decidir algo       | 4, 5, 6             |
+| Revisar un contrato con cláusulas críticas | 1, 3, 6             |
+| Procesar 500 facturas cada mes             | 1, 2, 6, 7          |
+
+## Ejemplo de oficina: el informe mensual de ventas
+
+Marta prepara cada mes un informe de ventas a partir de tres exportaciones de Excel. Hasta ahora pegaba los datos y pedía «hazme el informe».
+
+<BeforeAfter
+  antes="Aquí tienes los datos de ventas. Hazme el informe del mes."
+  despues="Informe de ventas de septiembre para el comité comercial, que decidirá dónde reforzar el equipo. Adjunto tres exportaciones (ventas, devoluciones, objetivos). Dame un resumen de cinco líneas, las tres regiones que más se desvían del objetivo con la cifra exacta y una tabla por región. Indica de qué hoja y columna sale cada cifra. Si falta algún dato, dilo en lugar de suponerlo."
+>
+
+Qué cambió, paso a paso: Marta **clasificó** la tarea (analizar datos, riesgo medio, mensual); eligió un **proyecto**, para no volver a pegar los objetivos cada mes; eligió un modelo equilibrado con esfuerzo medio, porque es un análisis con cifras pero sin riesgo legal (el paso 3, que ahora decide a propósito en vez de dejar el valor por defecto); preparó **solo el material necesario**; el encargo dice **para qué** sirve y **cómo comprobarlo**; y al terminar guardó el texto como plantilla.
+
+</BeforeAfter>
+
+## Errores frecuentes
+
+- **Empezar por el paso 5.** Se escribe un prompt estupendo en la herramienta equivocada, o para una tarea que no hacía falta delegar.
+- **Saltarse el paso 6 porque el texto suena bien.** La fluidez no prueba que sea correcto. Ver [errores de método](/AI-Optimized_Usage_Web/m2-metodo/errores-de-metodo/).
+- **No cerrar el ciclo.** Se repite la misma tarea veinte veces escribiendo el prompt desde cero, sin guardar lo que funcionó.
+
+<Checklist
+  id="ciclo-7-pasos"
+  titulo="Antes de dar una tarea por terminada"
+  items={[
+    'Sé qué tipo de tarea es y qué pasa si el resultado es incorrecto.',
+    'He elegido a propósito la herramienta, el modelo y el esfuerzo.',
+    'El contexto contiene lo necesario y nada más.',
+    'El encargo dice para qué sirve el resultado y cómo se comprueba.',
+    'He verificado el resultado con algo distinto de mi impresión.',
+    'Si la tarea se repite, he guardado el encargo.',
+  ]}
+/>
+
+## Para profundizar
+
+El paso 6 se amplía en el módulo de calidad y el 3 en el de modelo y esfuerzo. Para el paso 5, la guía oficial de prompting de Anthropic (abajo, en Fuentes) desarrolla la estructura del encargo.

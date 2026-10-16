@@ -6,6 +6,109 @@ sidebar:
 level: intermedio
 tracks: [profesional, tecnica]
 readingTime: 7
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-16
+sources:
+  - support-claude-com-en-articles-9517075-what-are-projects
+  - support-claude-com-en-articles-13455879-use-claude-cowork-on-team-and-enterprise
+  - claude-code-buenas-practicas
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Steps from '@components/Steps.astro';
+import ProviderTabs from '@components/ProviderTabs.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- La superficie es el lugar desde el que usas el modelo: chat, proyecto, agente, API o automatización.
+- Empieza por la más simple que resuelva la tarea y sube de escalón cuando falle de forma repetida o cuando el volumen lo exija.
+- Antes de usar un agente, comprueba cuatro criterios: complejidad, valor, viabilidad y coste del error.
+- Si alguno de los cuatro falla, usa un escalón más simple.
+
+</KeyTakeaways>
+
+## La idea
+
+Un mismo modelo se comporta de forma muy distinta según desde dónde lo uses. En un chat responde y espera. En un agente planifica, abre ficheros, ejecuta pasos y decide cuándo parar. Cada escalón da más autonomía y cuesta más: más tokens, más latencia y más cosas que pueden salir mal sin que lo veas.
+
+Por eso el principio es **lo más simple que funcione**. La escalera, de menor a mayor:
+
+1. **Una consulta de chat**: preguntas, redacción, ideas, una tarea con el material pegado.
+2. **Un proyecto con conocimiento**: un espacio con tus documentos e instrucciones fijas, para tareas que se repiten sobre el mismo material (la política de viajes, el manual de marca).
+3. **Un flujo con varias llamadas**: pasos fijos, cada uno con su encargo. Ver el módulo de [agentes](/AI-Optimized_Usage_Web/m8-agentes/escalera-de-complejidad/).
+4. **Un agente**: el modelo decide los pasos. Ejemplos: Cowork para trabajo con tus ficheros, Claude Code o Codex para código.
+5. **La API o una automatización**: volumen, ejecución programada o integración en otro sistema.
+
+<Callout tipo="recomendacion">
+
+Sube de escalón cuando el anterior falle de forma repetida o cuando el volumen o la repetición lo exijan (cientos de elementos, ejecución semanal), no por anticipado. Es una recomendación de la guía: cada escalón añade coste, latencia y superficie de error, y un chat bien encargado resuelve más tareas de las que parece.
+
+</Callout>
+
+### Los cuatro criterios antes de usar un agente
+
+Estos cuatro criterios son una recomendación de la guía, apoyada en la idea de la documentación de Anthropic de empezar por lo más simple y añadir autonomía solo cuando compensa. Un agente compensa cuando se cumplen los cuatro; si falla uno, hay un escalón más simple que encaja mejor.
+
+- **Complejidad**: ¿se puede especificar la tarea por completo de antemano? Si sí, un flujo fijo o una sola llamada basta; el agente es para cuando los pasos dependen de lo que va apareciendo.
+- **Valor**: ¿justifica el resultado más coste y más espera? Un agente que trabaja veinte minutos para ahorrar dos no sale a cuenta.
+- **Viabilidad**: ¿es el modelo capaz de hacer bien cada parte? Pruébalo primero a mano con un fragmento.
+- **Coste del error**: ¿se detecta y se recupera? Un agente que trabaja sobre una copia de los ficheros se corrige; uno que envía correos no.
+
+## En la práctica
+
+<Steps>
+
+1. Parte de la tarea ya clasificada (paso 1) y empieza en el primer escalón.
+2. Si necesitas pegar el mismo material o las mismas instrucciones más de dos veces, pasa a un proyecto.
+3. Si la tarea exige abrir muchos ficheros, ejecutar pasos o iterar contra un resultado, evalúa un agente con los cuatro criterios.
+4. Si son cientos de elementos iguales o debe ejecutarse sola cada semana, piensa en API o automatización.
+5. Anota qué escalón elegiste y por qué; es parte del paso 7.
+
+</Steps>
+
+Los nombres cambian según el proveedor:
+
+<ProviderTabs>
+  <div slot="claude">
+
+Chat y proyectos en las apps de Claude; Cowork como agente para trabajo con tus ficheros, que puede ejecutarse también en sesiones en la nube; Claude Code como agente de código; la API para volumen y automatización. Qué planes incluyen cada función cambia con el tiempo: está en los datos de funciones del sitio, con su fuente y fecha, y en las fuentes oficiales de abajo.
+
+  </div>
+  <div slot="openai">
+
+ChatGPT para chat y proyectos; Codex como agente de código; la API de OpenAI para volumen y automatización.
+
+  </div>
+  <div slot="google">
+
+La app de Gemini para chat; Gemini CLI y Antigravity CLI como agentes de código (cuál corresponde a tu cuenta depende de tu licencia: consulta las fuentes oficiales); la API de Gemini para volumen y automatización.
+
+  </div>
+</ProviderTabs>
+
+## Ejemplo de oficina: la política de gastos
+
+Lucía responde cada semana dudas de empleados sobre la política de gastos. Primero lo hizo en un chat, pegando el PDF cada vez: funcionaba, pero repetía el material. Pasó a un **proyecto** con el PDF y unas instrucciones fijas («responde citando el apartado»). ¿Un agente? Los cuatro criterios dicen que no: la tarea se especifica entera de antemano, el valor es pequeño y no hay nada que automatizar. Un día quiere conciliar 400 tickets con el extracto del banco. Aquí los criterios apuntan a otro escalón: la conciliación se puede especificar entera de antemano (casar importe, fecha y comercio), así que no necesita un agente que decida los pasos, sino un **flujo fijo** o una automatización que repita el mismo encargo por cada ticket, con una revisión humana de los que no casen. El agente solo entraría si los pasos dependieran de lo que va apareciendo (por ejemplo, investigar por qué un cargo no tiene ticket).
+
+## Errores frecuentes
+
+- **Usar un agente para una pregunta.** Gasta tokens y tiempo en planificar lo que una respuesta directa resolvía.
+- **Quedarse en el chat con tareas de volumen.** Pegar 200 documentos de uno en uno es lento y poco fiable.
+- **Dar permisos amplios a un agente sin copia de seguridad.** El coste del error es el cuarto criterio, y es el que más se olvida.
+
+<Checklist
+  id="elegir-superficie"
+  titulo="Antes de subir de escalón"
+  items={[
+    'He probado la tarea en el escalón anterior y falla de forma repetida, o el volumen lo exige.',
+    'Puedo explicar por qué la tarea no se puede especificar entera de antemano.',
+    'El resultado justifica más coste y más espera.',
+    'He probado a mano un fragmento y el modelo lo hace bien.',
+    'Si el agente se equivoca, lo detectaré y podré deshacerlo.',
+  ]}
+/>
+
+## Para profundizar
+
+La escalera completa, con sus patrones, está en el módulo de [agentes](/AI-Optimized_Usage_Web/m8-agentes/escalera-de-complejidad/).

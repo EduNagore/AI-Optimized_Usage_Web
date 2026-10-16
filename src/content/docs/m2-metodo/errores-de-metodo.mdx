@@ -6,6 +6,79 @@ sidebar:
 level: basico
 tracks: [profesional, tecnica]
 readingTime: 5
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-16
+sources: [claude-code-buenas-practicas, anthropic-buenas-practicas-de-prompting]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Checklist from '@components/Checklist.astro';
+import BeforeAfter from '@components/BeforeAfter.astro';
+
+<KeyTakeaways>
+
+- Una conversación por tarea: mezclar temas llena el contexto y empeora las respuestas.
+- Tras dos correcciones fallidas, empieza de cero con un encargo mejor.
+- Acota la investigación y no aceptes nada sin verificar.
+- Las instrucciones permanentes crecen sin control si no las podas.
+
+</KeyTakeaways>
+
+## La idea
+
+Estos errores tienen algo en común: parecen razonables en el momento y se pagan después. Cada turno de una conversación reenvía todo lo anterior, y la documentación de Anthropic advierte de que el rendimiento puede degradarse a medida que la ventana se llena. Por eso la mayoría de los errores de método son, en el fondo, errores de gestión del contexto o de verificación.
+
+## Los cinco errores
+
+**1. La conversación cajón de sastre.** Empiezas con un correo, sigues con un Excel, sigues con una duda de contrato, todo en el mismo hilo. El modelo arrastra material irrelevante y puede mezclar detalles de una tarea con otra. Una tarea, una conversación.
+
+**2. Corregir en bucle.** El resultado no es lo que querías, lo corriges, sigue sin serlo, lo corriges otra vez. Cada intento deja en el contexto los errores anteriores, que el modelo tiende a seguir.
+
+<Callout tipo="recomendacion">
+
+Tras dos correcciones fallidas sobre el mismo punto, abre una conversación nueva con un encargo mejorado que incorpore lo que has aprendido. Es la pauta que recoge la guía de buenas prácticas de Claude Code (tras corregir más de dos veces, limpia el contexto y reformula) y la adaptamos al chat: en una app, «conversación nueva». El porqué: un contexto limpio con un buen encargo suele superar a uno largo lleno de correcciones.
+
+</Callout>
+
+**3. Investigar sin acotar.** «Investiga el mercado de software de nóminas» produce un panorama genérico y caro de leer. Acota por pregunta, periodo, tipo de fuente y entregable.
+
+**4. Aceptar sin verificar.** El texto suena bien, así que se envía. La fluidez no indica que sea cierto: las citas, cifras y nombres propios son lo primero que debe comprobarse. Ver [verificar siempre](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/verificar-siempre/).
+
+**5. Instrucciones permanentes que crecen sin control.** Cada vez que algo falla, se añade una regla al fichero de instrucciones (el `CLAUDE.md` de Claude Code, las instrucciones personalizadas de un proyecto o de ChatGPT). Con los meses hay cuarenta reglas, algunas contradictorias, que se reenvían en cada turno. Poda: si una regla no cambia el resultado, fuera.
+
+## En la práctica
+
+Para el segundo error, que es el más común, conviene tener a mano el reinicio:
+
+<BeforeAfter
+  antes="No, no era eso. Hazlo más corto. Sigue sin gustarme, más formal. Otra vez, que parezca menos de robot."
+  despues="Redacta un correo de 100 palabras para un cliente que lleva dos semanas esperando su pedido. Tono formal y cercano, sin frases hechas como «lamentamos las molestias», que ya les enviamos antes. Termina con una fecha concreta de entrega."
+>
+
+Qué cambió: en lugar de corregir al azar, se resume qué fallaba (longitud, tono, frases hechas) y se convierte en un encargo nuevo y completo.
+
+</BeforeAfter>
+
+## Ejemplo de oficina: el estudio de proveedores
+
+Una responsable de compras pide «investiga proveedores de mobiliario» y recibe veinte párrafos genéricos. Lo corrige tres veces. Al final abre una conversación nueva: «Compara tres proveedores en España de sillas ergonómicas para 80 puestos: precio por unidad, plazo de entrega y garantía; usa solo sus webs oficiales y dime la fecha de cada dato». Obtiene una tabla de diez líneas, verificable.
+
+## Errores frecuentes
+
+Son, justo, los cinco de arriba. Si solo recuerdas uno, recuerda este: **si llevas más de dos correcciones, el problema es el encargo, no el modelo**.
+
+<Checklist
+  id="errores-metodo"
+  titulo="Higiene de método"
+  items={[
+    'Cada tarea tiene su conversación.',
+    'Si una corrección falla dos veces, reescribo el encargo y empiezo de cero.',
+    'Las investigaciones tienen pregunta, periodo, tipo de fuente y entregable.',
+    'Compruebo citas y cifras antes de enviar nada.',
+    'Reviso mis instrucciones permanentes cada pocas semanas y quito las que sobran.',
+  ]}
+/>
+
+## Para profundizar
+
+La gestión del contexto en conversaciones largas está en el [módulo 5](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/).

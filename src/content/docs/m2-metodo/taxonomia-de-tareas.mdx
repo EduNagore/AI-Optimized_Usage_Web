@@ -6,6 +6,95 @@ sidebar:
 level: basico
 tracks: [profesional, tecnica]
 readingTime: 7
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-16
+sources: [anthropic-buenas-practicas-de-prompting]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Clasificar la tarea es el paso 1 del método y condiciona casi todo lo demás.
+- La guía distingue doce tipos de tarea de trabajo; cada uno tiene su verificación natural.
+- Cinco ejes definen una tarea: tipo, complejidad, riesgo, volumen y urgencia.
+- El riesgo y el volumen mandan más que la dificultad aparente.
+
+</KeyTakeaways>
+
+## La idea
+
+«Usar la IA» no es una tarea. Resumir un acta, extraer importes de cien facturas y decidir si renovar un proveedor son trabajos distintos: piden otra herramienta, otro nivel de razonamiento y, sobre todo, otra forma de comprobar el resultado. Clasificar antes de empezar cuesta un par de minutos y evita elegir por costumbre.
+
+Una tarea queda definida por cinco ejes:
+
+- **Tipo**: qué hay que hacer con la información (los doce de abajo).
+- **Complejidad**: cuántos pasos, cuánto material y cuánta ambigüedad.
+- **Riesgo**: qué pasa si el resultado es incorrecto y nadie lo detecta.
+- **Volumen**: una vez o mil veces.
+- **Urgencia**: ahora mismo, o puede esperar a un proceso por lotes.
+
+## Los doce tipos
+
+| Tipo                    | Ejemplo de oficina                                                | Superficie habitual                                        | Verificación natural                                                 |
+| ----------------------- | ----------------------------------------------------------------- | ---------------------------------------------------------- | -------------------------------------------------------------------- |
+| Escribir y editar       | Redactar un correo a un cliente; ajustar el tono de una propuesta | Chat                                                       | Lectura completa; contraste con los hechos que cuentas               |
+| Resumir                 | Resumir un acta o un informe de ochenta páginas                   | Chat o proyecto                                            | Citas con página; comprobar tres al azar                             |
+| Extraer y estructurar   | Sacar fecha, importe y proveedor de facturas en PDF               | Chat; API si son muchas                                    | Muestra comparada a mano; totales que cuadren                        |
+| Analizar datos          | Desviaciones en un Excel de ventas                                | Chat con ficheros o agente                                 | Recalcular dos cifras fuera de la IA; pedir las fórmulas             |
+| Investigar              | Comparar tres proveedores de software                             | Chat con búsqueda web o modo de investigación              | Abrir las fuentes citadas; fecha de cada dato                        |
+| Razonar y decidir       | Valorar si externalizar un servicio                               | Chat con razonamiento alto                                 | Pedir los argumentos en contra; segunda opinión con contexto limpio  |
+| Programar               | Una macro, un script o una fórmula compleja                       | Chat o agente de código                                    | Ejecutarlo con casos conocidos                                       |
+| Revisar                 | Buscar incoherencias en un contrato o una presentación            | Chat o proyecto                                            | Que cada hallazgo cite el pasaje; repasar a mano lo que no encuentra |
+| Transformar en lote     | Normalizar 2.000 direcciones; traducir un catálogo                | API o automatización                                       | Muestra aleatoria; reglas de validación automáticas                  |
+| Atención conversacional | Responder preguntas frecuentes de clientes                        | Producto sobre API, con una persona para los casos dudosos | Conversaciones muestreadas; tasa de derivación                       |
+| Ideación                | Veinte nombres para un producto; líneas para una campaña          | Chat                                                       | Tu criterio: aquí verificar es elegir                                |
+| Tareas recurrentes      | El informe semanal; el resumen diario del correo                  | Proyecto, skill o automatización                           | Comprobaciones fijas en cada ejecución                               |
+
+La asociación entre cada tipo y el modelo y esfuerzo recomendados vive en la [matriz por tarea](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/matriz-por-tarea/) del módulo 4.
+
+{/* PENDIENTE: la matriz de tareas (src/data/task-matrix.json) está vacía; cuando se rellene, mostrarla aquí en lugar de remitir solo al módulo 4. */}
+
+## En la práctica
+
+<Steps>
+
+1. Escribe la tarea en una frase con un verbo: «resumir», «extraer», «decidir».
+2. Busca ese verbo en la tabla y mira su verificación natural: es lo que tendrás que hacer en el paso 6.
+3. Pon nota baja, media o alta a riesgo, volumen y complejidad.
+4. Si el riesgo es alto o el volumen grande, no sigas con el chat por costumbre: pasa al [paso 2](/AI-Optimized_Usage_Web/m2-metodo/elegir-superficie/).
+
+</Steps>
+
+<Callout tipo="recomendacion">
+
+Pon antes el riesgo que la dificultad. Es una recomendación de la guía: una tarea fácil con riesgo alto (un importe en un contrato) exige más verificación que una difícil sin consecuencias (diez ideas para un lema).
+
+</Callout>
+
+## Ejemplo de oficina: tres tareas, tres tratamientos
+
+Un departamento de compras recibe una petición con tres partes. El correo de respuesta al proveedor es **escribir**, riesgo bajo, una vez: chat y lectura propia. Los importes de 300 albaranes son **extraer**, riesgo medio, volumen alto: se prueba con diez, se valida con totales y después se automatiza. La decisión de cambiar de proveedor es **razonar y decidir**, riesgo alto: razonamiento elevado, argumentos en contra y revisión humana. Una sola petición, tres clasificaciones distintas.
+
+## Errores frecuentes
+
+- **Tratar todo como «escribir».** Un análisis de datos tratado como redacción produce prosa convincente con cifras sin comprobar.
+- **Ignorar el volumen.** Lo que funciona para un documento no escala a quinientos sin validación automática.
+- **Medir el riesgo por la dificultad.** Lo difícil impresiona; lo arriesgado es lo que cuesta dinero si falla.
+
+<Checklist
+  id="taxonomia-tareas"
+  titulo="Clasificación en un par de minutos"
+  items={[
+    'He descrito la tarea con un verbo.',
+    'Sé cómo voy a verificar este tipo de tarea.',
+    'He valorado el riesgo, el volumen y la complejidad.',
+    'Si es recurrente, he decidido si merece sistematizarse.',
+  ]}
+/>
+
+## Para profundizar
+
+Para decidir modelo y esfuerzo según el tipo de tarea, sigue con el [módulo 4](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/).

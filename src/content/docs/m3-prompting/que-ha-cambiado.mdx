@@ -6,6 +6,133 @@ sidebar:
 level: basico
 tracks: [esencial, profesional, tecnica]
 readingTime: 7
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-16
+sources:
+  [
+    anthropic-buenas-practicas-de-prompting,
+    anthropic-guia-de-migracion,
+    anthropic-razonamiento-adaptativo,
+    anthropic-esfuerzo,
+    anthropic-structured-outputs,
+    platform-claude-com-docs-en-models-opus-5-5-whats-new-opus-5-5,
+    anthropic-prompting-opus-5-5,
+    anthropic-prompting-sonnet-5-5,
+    anthropic-prompting-haiku-5-5,
+    anthropic-prompting-fable-5-1,
+    openai-guia-de-prompts,
+    ai-google-dev-gemini-api-docs-prompting-strategies,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import BeforeAfter from '@components/BeforeAfter.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Los modelos actuales hacen lo que escribes: si gritas una regla, la aplican en exceso.
+- Muchos andamios antiguos («piensa paso a paso», respuesta prellenada, «responde SOLO JSON») tienen ya un sustituto: el parámetro de esfuerzo y los structured outputs.
+- Describe el objetivo, el público y cómo se comprobará; deja el método al modelo salvo en operaciones frágiles.
+- Una restricción con su motivo vale más que una lista de prohibiciones.
+- Si reutilizas prompts de hace un año, revísalos: es probable que contengan restos que hoy estorban.
+
+</KeyTakeaways>
+
+## La idea
+
+Escribir un buen encargo sigue siendo lo que era: explicar bien qué quieres, para qué y para quién. Lo que ha cambiado es cuánto del trabajo de «dirigir» al modelo se puede quitar. Los prompts de hace un par de años estaban llenos de apoyos: mayúsculas para que no se olvidase de algo, pasos obligatorios para que razonase, plantillas de respuesta para que no se saliera del formato. Eran apoyos útiles con modelos que se despistaban. Con los modelos actuales, buena parte de ellos sobra, y algunos empeoran el resultado.
+
+La guía oficial de buenas prácticas de Anthropic parte de una imagen: trata al modelo como a una persona brillante pero nueva en tu empresa, que no conoce tus normas ni tu forma de trabajar. No necesita que le grites ni que le dictes cada gesto. Necesita contexto.
+
+<Callout tipo="recomendacion">
+
+Trata el prompt como el briefing a un colega competente que acaba de incorporarse: objetivo, contexto, límites reales y cómo saber que está bien hecho. Es una recomendación de la guía, y el porqué es práctico: lo que el modelo no sabe, lo rellena con suposiciones, y las suposiciones son la fuente de la mayoría de los resultados «casi bien».
+
+</Callout>
+
+## De antes a ahora
+
+La tabla recoge sobre todo la guía de Anthropic para Claude. Más abajo tienes qué cambia en OpenAI y Google.
+
+| Antes                                                 | Ahora                                                             | Por qué                                                                                                                                   |
+| ----------------------------------------------------- | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `CRÍTICO: DEBES…` en mayúsculas                       | «Usa X cuando…»                                                   | El lenguaje de presión provoca sobreaplicación: el modelo aplica la regla también donde no toca.                                          |
+| «Piensa paso a paso», etiquetas `<thinking>`          | Parámetro de esfuerzo (`effort`)                                  | El razonamiento ya es una función del modelo y se regula con un mando, no con una frase.                                                  |
+| `thinking` con `budget_tokens` (presupuesto fijo)     | `thinking: {type: "adaptive"}` y el parámetro de esfuerzo         | En Claude Opus 5.5 el presupuesto manual devuelve un error 400.                                                                           |
+| Respuesta prellenada del asistente                    | Structured outputs (`output_config.format`)                       | Un esquema fija la forma sin empezar la respuesta por el modelo (ver el aviso de debajo).                                                 |
+| «Responde SOLO con JSON»                              | Structured outputs                                                | Un esquema garantiza la forma; la petición en texto solo la sugiere.                                                                      |
+| Coreografía de pasos para tareas de criterio          | Objetivo, restricciones y cómo verificar                          | Los pasos fijos impiden que el modelo use mejor criterio que el tuyo.                                                                     |
+| Lista de prohibiciones sin motivo                     | La intención en positivo y las restricciones reales, con su razón | Sin motivo, el modelo no sabe dónde acaba la regla.                                                                                       |
+| «Usa herramientas solo si es estrictamente necesario» | Di cuándo conviene consultar fuentes conectadas                   | La guía de Sonnet 5.5 pide quitar ese tipo de frases: el modelo a veces contesta de memoria cuando una búsqueda captaría datos cambiados. |
+| «Máximo 200 palabras»                                 | Público y propósito                                               | El límite numérico se cumple a costa del contenido; el propósito orienta qué incluir.                                                     |
+| Recordatorios repetidos cada pocos turnos             | Una vez, bien dicho                                               | Repetir añade ruido y gasta contexto.                                                                                                     |
+
+<Callout tipo="verificado" fecha="2026-10-16">
+
+En Claude Opus 5.5, `thinking` con un presupuesto manual (`budget_tokens`) o desactivado devuelve un error 400 `invalid_request_error`; se omite el campo o se usa `thinking: {"type": "adaptive"}` y se regula con el esfuerzo. Lo mismo ocurre con `tool_choice` forzado (`any` o `tool`). Fuente: «Qué hay de nuevo en Claude Opus 5.5».
+
+</Callout>
+
+<Callout tipo="cuidado">
+
+El prellenado de la respuesta del asistente solía usarse para forzar un formato. Hemos visto citado que los modelos recientes de Anthropic lo rechazan, pero no lo hemos podido confirmar en la fuente oficial, así que no lo damos como dato: si lo usas, pruébalo en tu modelo y, para formato exacto, prefiere structured outputs.
+
+</Callout>
+
+<Callout tipo="varia">
+
+La idea es común, el mando se llama distinto. En OpenAI el razonamiento se regula con `reasoning.effort` y la guía pide retirar `temperature` y `top_p`; en Google, con `thinking_level`, y Gemini 4 ignora los valores de `temperature`, `top_p` y `top_k`. Los detalles y su verificación están en [Notas por modelo](/AI-Optimized_Usage_Web/m3-prompting/notas-por-modelo/).
+
+</Callout>
+
+## En la práctica
+
+Un modo sencillo de aplicar la tabla es hacerlo con un prompt que ya tengas. Cópialo en un documento y ve de arriba abajo.
+
+1. Busca mayúsculas, «siempre», «nunca» y «es crítico que». Sustituye cada uno por la situación concreta en la que importa.
+2. Busca cualquier cosa que suene a «piensa despacio». Quítala y, si necesitas más razonamiento, súbelo con el esfuerzo (ver [Esfuerzo y razonamiento](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/esfuerzo-y-razonamiento/)).
+3. Busca prohibiciones sin motivo y añade el motivo en media frase.
+4. Si pides un formato exacto para un programa, pásalo a structured outputs; si es para una persona, enséñale un ejemplo de lo que quieres.
+
+<Callout tipo="medicion" titulo="Medición publicada por Anthropic">
+
+La guía de Opus 5.5 aconseja quitar de los prompts de chat las instrucciones del tipo «piensa con cuidado antes de responder»: en su prueba, las respuestas empezaron antes sin pérdida clara de calidad. Es una medición del proveedor sobre su propio modelo; mide con tus casos.
+
+</Callout>
+
+## Ejemplo: de la orden a la razón
+
+Un caso de oficina. Alguien ha heredado el prompt con el que su equipo redacta respuestas a clientes.
+
+<BeforeAfter
+  antes="ERES UN ASISTENTE DE ATENCIÓN AL CLIENTE. NUNCA PROMETAS REEMBOLSOS. SIEMPRE SÉ AMABLE. RESPONDE EN MENOS DE 100 PALABRAS. ES CRÍTICO QUE NO INVENTES POLÍTICAS."
+  despues="Respondes a clientes de una tienda online en nombre del equipo de atención. Quien escribe suele estar molesto y quiere saber qué va a pasar y cuándo. No prometas reembolsos: solo los aprueba finanzas y una promesa incumplida genera una segunda queja peor. Si la política no cubre el caso, dilo y explica que lo consultarás. Responde con calidez y en pocas líneas: el cliente lee desde el móvil."
+>
+
+Qué cambió y por qué: se sustituyen las mayúsculas por contexto (quién escribe y qué necesita); la prohibición de reembolsos gana su motivo, lo que permite al modelo decidir bien en casos de frontera; el límite de 100 palabras se cambia por el propósito (se lee en el móvil); y «no inventes políticas» se convierte en una acción concreta: decir que lo consultarás.
+
+</BeforeAfter>
+
+## Errores frecuentes
+
+- **Reescribir todo el prompt de golpe.** Cambia un grupo de restos cada vez y compara el resultado con casos reales; si no, no sabrás qué ha mejorado o empeorado.
+- **Quitar también lo que sí funciona.** El contexto de la empresa, los detalles de las herramientas y los pasos exactos de una operación frágil se quedan (ver [Auditar tus prompts](/AI-Optimized_Usage_Web/m3-prompting/auditar-tus-prompts/)).
+- **Dar por hecho que lo nuevo es universal.** Cada proveedor y cada modelo tienen particularidades; consúltalas en [Notas por modelo](/AI-Optimized_Usage_Web/m3-prompting/notas-por-modelo/).
+
+<Checklist
+  id="que-ha-cambiado"
+  titulo="Revisión rápida de un prompt heredado"
+  items={[
+    'No hay mayúsculas de énfasis ni «CRÍTICO».',
+    'Las restricciones llevan su motivo.',
+    'No pido «piensa paso a paso»: uso el esfuerzo.',
+    'El formato exacto lo da un esquema, no una frase.',
+    'Digo para quién es y para qué sirve el resultado.',
+    'Dónde y cuándo consultar fuentes, dicho en positivo.',
+  ]}
+/>
+
+## Para profundizar
+
+La guía de buenas prácticas de prompting de Anthropic y su guía de migración (en Fuentes, abajo) son el origen de esta tabla. Para auditar un prompt concreto, sigue con [Auditar tus prompts](/AI-Optimized_Usage_Web/m3-prompting/auditar-tus-prompts/).
