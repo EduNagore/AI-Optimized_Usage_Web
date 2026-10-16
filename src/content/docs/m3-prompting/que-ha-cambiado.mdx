@@ -14,11 +14,10 @@ sources:
     anthropic-razonamiento-adaptativo,
     anthropic-esfuerzo,
     anthropic-structured-outputs,
+    anthropic-migracion-opus-5-5,
     platform-claude-com-docs-en-models-opus-5-5-whats-new-opus-5-5,
     anthropic-prompting-opus-5-5,
     anthropic-prompting-sonnet-5-5,
-    anthropic-prompting-haiku-5-5,
-    anthropic-prompting-fable-5-1,
     openai-guia-de-prompts,
     ai-google-dev-gemini-api-docs-prompting-strategies,
   ]
@@ -47,7 +46,7 @@ La guía oficial de buenas prácticas de Anthropic parte de una imagen: trata al
 
 <Callout tipo="recomendacion">
 
-Trata el prompt como el briefing a un colega competente que acaba de incorporarse: objetivo, contexto, límites reales y cómo saber que está bien hecho. Es una recomendación de la guía, y el porqué es práctico: lo que el modelo no sabe, lo rellena con suposiciones, y las suposiciones son la fuente de la mayoría de los resultados «casi bien».
+Trata el prompt como el briefing a un colega competente que acaba de incorporarse: objetivo, contexto, límites reales y cómo saber que está bien hecho. Es una recomendación de esta guía, y el porqué es práctico: lo que el modelo no sabe, lo rellena con suposiciones, y las suposiciones son la fuente de la mayoría de los resultados «casi bien».
 
 </Callout>
 
@@ -60,7 +59,7 @@ La tabla recoge sobre todo la guía de Anthropic para Claude. Más abajo tienes 
 | `CRÍTICO: DEBES…` en mayúsculas                       | «Usa X cuando…»                                                   | El lenguaje de presión provoca sobreaplicación: el modelo aplica la regla también donde no toca.                                          |
 | «Piensa paso a paso», etiquetas `<thinking>`          | Parámetro de esfuerzo (`effort`)                                  | El razonamiento ya es una función del modelo y se regula con un mando, no con una frase.                                                  |
 | `thinking` con `budget_tokens` (presupuesto fijo)     | `thinking: {type: "adaptive"}` y el parámetro de esfuerzo         | En Claude Opus 5.5 el presupuesto manual devuelve un error 400.                                                                           |
-| Respuesta prellenada del asistente                    | Structured outputs (`output_config.format`)                       | Un esquema fija la forma sin empezar la respuesta por el modelo (ver el aviso de debajo).                                                 |
+| Respuesta prellenada del asistente                    | Structured outputs (`output_config.format`)                       | Un esquema fija la forma sin empezar la respuesta por el modelo En Opus 4.6 y posteriores el prellenado devuelve un error 400.            |
 | «Responde SOLO con JSON»                              | Structured outputs                                                | Un esquema garantiza la forma; la petición en texto solo la sugiere.                                                                      |
 | Coreografía de pasos para tareas de criterio          | Objetivo, restricciones y cómo verificar                          | Los pasos fijos impiden que el modelo use mejor criterio que el tuyo.                                                                     |
 | Lista de prohibiciones sin motivo                     | La intención en positivo y las restricciones reales, con su razón | Sin motivo, el modelo no sabe dónde acaba la regla.                                                                                       |
@@ -74,9 +73,9 @@ En Claude Opus 5.5, `thinking` con un presupuesto manual (`budget_tokens`) o des
 
 </Callout>
 
-<Callout tipo="cuidado">
+<Callout tipo="verificado" fecha="2026-10-16">
 
-El prellenado de la respuesta del asistente solía usarse para forzar un formato. Hemos visto citado que los modelos recientes de Anthropic lo rechazan, pero no lo hemos podido confirmar en la fuente oficial, así que no lo damos como dato: si lo usas, pruébalo en tu modelo y, para formato exacto, prefiere structured outputs.
+En Claude Opus 4.6 y posteriores, incluido Opus 5.5, terminar `messages` con una respuesta del asistente prellenada devuelve un error 400. Para fijar la forma, usa structured outputs o instrucciones en el prompt de sistema (en Amazon Bedrock, Opus 5.5 no admite structured outputs).
 
 </Callout>
 

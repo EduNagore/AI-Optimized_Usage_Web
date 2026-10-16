@@ -6,6 +6,94 @@ sidebar:
 level: basico
 tracks: [profesional, tecnica]
 readingTime: 6
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-16
+sources:
+  [
+    anthropic-esfuerzo,
+    anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas,
+    claude-code-modelo-y-esfuerzo,
+    openai-ultimo-modelo-y-migracion,
+    google-ultimo-modelo,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+import TaskMatrix from '@components/TaskMatrix.astro';
+
+<KeyTakeaways>
+
+- Regla de partida: empieza con un modelo capaz (la gama equilibrada o superior) y su esfuerzo por defecto; baja el esfuerzo o el modelo solo cuando lo hayas medido en una muestra y la calidad se mantenga; sube cuando falle.
+- La matriz es un punto de partida razonado, no una verdad: todas sus filas son recomendaciones de la guía.
+- Cada fila indica gama de modelo, nivel de esfuerzo y, sobre todo, cómo comprobar el resultado.
+- Las tareas repetitivas y bien definidas van a la gama rápida; el trabajo con matices, a la equilibrada; lo delicado, a la alta o de frontera.
+- Verifica siempre: un modelo más capaz no sustituye a la comprobación.
+
+</KeyTakeaways>
+
+## La idea
+
+Escoger modelo y esfuerzo desde cero para cada tarea es lento. La matriz da un punto de partida: para cada tipo de tarea, qué gama de modelo y qué nivel de esfuerzo probar primero, y cómo verificar. Parte de la regla de la página anterior: modelo capaz y esfuerzo por defecto, y bajar solo midiendo. Las filas de gama rápida son tareas repetitivas y cerradas, donde la propia documentación de Anthropic propone empezar por eficiencia (Haiku 5.5) y subir solo si falta capacidad; en el resto, el punto de partida es la gama equilibrada o superior. El nivel de esfuerzo de cada fila es el que probar primero, no un mínimo garantizado: se confirma con cinco casos para una prueba rápida y con 20 a 30 para fijar una política.
+
+Una advertencia de honestidad: esto no es una tabla publicada por ningún proveedor. Es la propuesta de la guía, razonada con la documentación oficial de modelos y esfuerzo. Cada fila es una **recomendación**, no un dato verificado.
+
+<Callout tipo="recomendacion">
+
+Usa la matriz como hipótesis de partida y compruébala con una muestra de tus propias tareas. Es una recomendación de la guía: las diferencias entre modelos dependen de la tarea y cambian con cada versión, así que lo que aquí aparece como adecuado puede quedarse corto o sobrado en tu caso.
+
+</Callout>
+
+## La matriz
+
+Cada fila indica la superficie, los modelos recomendados de cada proveedor, el esfuerzo y la verificación. Despliega «Por qué» para ver el razonamiento.
+
+<TaskMatrix />
+
+## Cómo leer una fila
+
+El porqué de cada fila es siempre el mismo razonamiento aplicado a la tarea. Cuanto más repetitiva y cerrada sea, más abajo en la escalera; cuanto más interactúen las piezas entre sí o más cueste un error, más arriba. Dos ejemplos:
+
+- **Clasificar 50.000 tickets** va a la gama rápida a esfuerzo bajo porque lo que importa es el coste por unidad y el criterio es estable. El riesgo está en los casos ambiguos, por eso el listón incluye una muestra con ellos.
+- **Revisar un contrato** va a la gama alta con esfuerzo alto porque las cláusulas interactúan y un error cuesta mucho más que los tokens. Y aun así la verificación final es humana.
+
+Hay también una asimetría que conviene recordar. En el trabajo diario, el esfuerzo medio con un modelo equilibrado suele ser un buen término medio, pero en los dos extremos (volumen enorme y decisión crítica) el cálculo cambia: en volumen mandan los tokens, y en decisiones críticas manda el coste del error.
+
+## En la práctica
+
+<Steps>
+
+1. Localiza la fila más parecida a tu tarea. Si no hay una igual, elige la que se parezca en repetición y coste de error.
+2. Prueba con la gama y el esfuerzo indicados sobre cinco casos tuyos, incluido el más difícil (20 a 30 si vas a fijar una política).
+3. Si falla, mira por qué: ¿falta contexto, está mal el encargo o es de razonamiento? Solo en el último caso sube de esfuerzo o de gama.
+4. Si sobra calidad, baja un escalón y repite.
+5. Aplica la verificación de la fila: es la parte que no se puede saltar.
+
+</Steps>
+
+## Ejemplo de oficina: la semana de un equipo administrativo
+
+Un equipo pequeño hace cuatro tareas con IA: redactar correos, resumir actas, rellenar una hoja con datos de facturas y preparar la presentación mensual. Con la matriz: los correos van a la gama equilibrada o rápida con esfuerzo bajo; las actas, a la equilibrada con esfuerzo medio y citas de página; las facturas, a la gama rápida con validación de campos; la presentación, a la equilibrada con esfuerzo medio. Ninguna requiere la gama más alta. Si una acta incluye un acuerdo con implicaciones legales, esa sí merece una pasada de la gama alta y revisión de una persona.
+
+## Errores frecuentes
+
+- **Tratar la matriz como un dato oficial.** Es una recomendación; su valor está en el punto de partida y en su porqué.
+- **Saltarse la columna de verificación.** Es la que evita que un error llegue a un cliente.
+- **Usar la gama alta por defecto en tareas repetitivas.** Multiplicada por el volumen, la diferencia de coste es grande.
+- **No revisar la fila cuando cambia un modelo.** Lo que era adecuado hace seis meses puede haberse quedado atrás.
+
+<Checklist
+  id="matriz-por-tarea"
+  titulo="Al aplicar una fila de la matriz"
+  items={[
+    'He elegido la fila por repetición y coste de error, no por el nombre de la tarea.',
+    'He probado en una muestra con un caso difícil.',
+    'Sé por qué subo o bajo de gama o de esfuerzo.',
+    'Aplico la verificación indicada antes de usar el resultado.',
+  ]}
+/>
+
+## Para profundizar
+
+La matriz se apoya en [la taxonomía de tareas](/AI-Optimized_Usage_Web/m2-metodo/taxonomia-de-tareas/) del método y en [la estrategia de selección](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/estrategia-de-seleccion/). Para una recomendación guiada por preguntas, por ahora hay una tabla en [el selector]((/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/selector-interactivo/).

@@ -6,6 +6,114 @@ sidebar:
 level: basico
 tracks: [esencial, profesional, tecnica]
 readingTime: 5
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-16
+sources: [anthropic-buenas-practicas-de-prompting]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Hay tres rutas de lectura (Esencial, Profesional y Técnica); cada página indica a cuáles pertenece.
+- Cada página tiene un nivel: básico, intermedio o avanzado.
+- Los distintivos separan lo que dice la documentación oficial de lo que mide un proveedor y de lo que opina esta guía.
+- Los datos que caducan (modelos, precios, límites) no están escritos en el texto: se leen de una fuente con fecha de verificación.
+
+</KeyTakeaways>
+
+## La idea
+
+Esta guía mezcla tres cosas muy distintas: lo que dicen los proveedores en su documentación, lo que miden ellos mismos en sus pruebas y lo que recomienda la guía a partir de ambas. Si no se distinguen, es fácil confundir una opinión con un hecho o una cifra de marketing con una garantía. Por eso cada afirmación importante lleva un distintivo, y por eso hay rutas y niveles: para que leas solo lo que te sirve.
+
+## Las tres rutas
+
+Cada página declara a qué rutas pertenece. Una página puede estar en varias.
+
+| Ruta            | Para quién                                                                                     | Qué incluye, a grandes rasgos                                      |
+| --------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| **Esencial**    | Cualquier perfil que quiera lo imprescindible en una sola sesión.                              | El método, las diez reglas y los fundamentos para aplicarlos hoy.  |
+| **Profesional** | Quien usa Claude, ChatGPT o Gemini a diario y quiere dominar chat, prompting, modelos y coste. | Prompting, elección de modelo y esfuerzo, ahorro de tokens, casos. |
+| **Técnica**     | Quien trabaja con Claude Code, Codex, la API o agentes y orquestación.                         | Herramientas, Claude Code, agentes, calidad y seguridad.           |
+
+<Callout tipo="recomendacion">
+
+Si dudas, empieza por la Esencial: lleva unos 30 a 45 minutos y te deja el método completo en pequeño. Es una recomendación de la guía: casi todo lo que viene después es una profundización de esas pocas ideas, y entrar por el detalle sin el marco hace que cueste más aplicarlo.
+
+</Callout>
+
+## Los niveles
+
+El nivel indica cuánto conocimiento previo da por supuesto la página.
+
+- **Básico**: no necesitas haber usado nada más que un chat.
+- **Intermedio**: da por sabidos los fundamentos y el método.
+- **Avanzado**: pide haber trabajado con herramientas, agentes o la API.
+
+El nivel y la ruta son independientes: una persona de la ruta Técnica también lee páginas de nivel básico.
+
+## Qué significa cada tipo de afirmación
+
+Las afirmaciones relevantes van marcadas con un distintivo que lleva siempre icono y texto, no solo color.
+
+<Callout tipo="verificado">
+
+**Dato verificado.** Algo que figura en la documentación oficial del proveedor y que hemos contrastado en una fecha concreta. Se muestra con su fecha y su fuente. Ejemplo: el precio de un modelo, una función que existe o un límite publicado.
+
+</Callout>
+
+<Callout tipo="medicion" titulo="Medición publicada por un proveedor">
+
+Un resultado que el propio proveedor publica sobre sus modelos, normalmente en su entorno y con sus tareas. Es información útil y real, pero no una garantía para tu caso. Siempre se atribuye («Anthropic publica que…») y se invita a repetir la prueba con tus datos.
+
+</Callout>
+
+<Callout tipo="recomendacion" titulo="Recomendación de esta guía">
+
+Un consejo nuestro. Siempre se acompaña de su porqué, para que puedas juzgarlo y no tengas que fiarte. Si en tu situación el porqué no se aplica, la recomendación tampoco.
+
+</Callout>
+
+Hay además cuatro distintivos de apoyo:
+
+- **Novedad 2026**: algo que apareció o cambió este año y que probablemente tu intuición anterior no recoge.
+- **Varía según el proveedor**: lo que vale para Claude puede no valer para ChatGPT o Gemini.
+- **Cuidado**: un riesgo concreto, como perder datos, gastar de más o dar un resultado por bueno sin comprobarlo.
+- **En preparación**: la página existe, pero su contenido aún no está terminado.
+
+## Datos que caducan
+
+Los modelos, los precios, las ventanas de contexto, los niveles de esfuerzo, los comandos y los límites cambian cada pocas semanas. Por eso no se escriben a mano en las páginas: viven en ficheros de datos con su fuente y la fecha en que se verificaron, y las páginas los muestran con componentes. Cuando ves una cifra de ese tipo, junto a ella tienes la fecha de verificación. Si es antigua, desconfía y consulta la fuente oficial: sus enlaces están en las páginas de la guía.
+
+## En la práctica
+
+<Steps>
+
+1. Elige ruta: Esencial si es tu primera vez o tienes poco tiempo.
+2. Lee [las 10 reglas](/AI-Optimized_Usage_Web/m0-empieza-aqui/las-10-reglas/) y apunta la que más te cueste aplicar.
+3. Ve a [el método](/AI-Optimized_Usage_Web/m2-metodo/) y prueba el ciclo de siete pasos con una tarea real de esta semana.
+4. Vuelve al [glosario](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/) cuando aparezca una palabra que no conozcas.
+
+</Steps>
+
+## Errores frecuentes
+
+- **Leerlo todo en orden.** No está pensado así: usa tu ruta.
+- **Tomar una medición de un proveedor como promesa.** Es una cifra de su entorno, no del tuyo.
+- **Copiar una recomendación sin leer el porqué.** El porqué es lo que te dice si se aplica a tu caso.
+
+<Checklist
+  id="como-usar-guia"
+  titulo="Antes de seguir"
+  items={[
+    'He elegido una ruta de lectura.',
+    'Sé distinguir un dato verificado, una medición publicada y una recomendación de la guía.',
+    'Sé que las cifras que caducan llevan su fecha de verificación.',
+  ]}
+/>
+
+## Para profundizar
+
+Sigue con [las 10 reglas](/AI-Optimized_Usage_Web/m0-empieza-aqui/las-10-reglas/) o ve directamente al [método](/AI-Optimized_Usage_Web/m2-metodo/).

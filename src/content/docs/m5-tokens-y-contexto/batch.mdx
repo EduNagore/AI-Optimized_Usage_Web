@@ -6,6 +6,111 @@ sidebar:
 level: intermedio
 tracks: [tecnica]
 readingTime: 5
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-16
+sources: [anthropic-batch, anthropic-precios, openai-precios, claude-code-comandos]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import CostExample from '@components/CostExample.astro';
+import ProviderTabs from '@components/ProviderTabs.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Batch procesa muchas peticiones de forma asíncrona con un 50 % de descuento sobre entrada y salida.
+- Es para trabajo que nadie espera al instante: la expiración es de 24 horas, aunque la mayoría termina antes.
+- El descuento se acumula con el de la caché.
+- Cada petición del lote es una sola llamada, pero puede incluir herramientas.
+
+</KeyTakeaways>
+
+## La idea
+
+Muchas tareas no tienen prisa: clasificar el archivo de correos del año pasado, resumir mil contratos, etiquetar reseñas, generar descripciones de producto. Si no necesitas la respuesta ya, pagas por la urgencia sin necesitarla. La Message Batches API de Anthropic procesa un conjunto de peticiones de forma asíncrona y las cobra con un 50 % de descuento sobre los tokens de entrada y de salida.
+
+## Qué dice la documentación
+
+Datos de la documentación de Anthropic: un lote admite hasta 100.000 peticiones o 256 MB, lo que se alcance antes; los resultados se pueden recuperar durante 29 días tras la creación; todos los modelos activos lo soportan; y no se admiten streaming ni el modo rápido. Los lotes expiran a las 24 horas, y la documentación indica que la mayoría termina en menos de una hora, aunque no hay garantía de plazo.
+
+Sobre las herramientas: cada petición del lote es una llamada única, pero puede incluir uso de herramientas, también las herramientas del servidor (búsqueda web, ejecución de código, tool search). Lo que no hay es un bucle interactivo que espere tu respuesta entre vuelta y vuelta.
+
+El descuento **se acumula con la caché**: si las peticiones del lote comparten un prefijo largo, aplicas el descuento de lotes sobre unos precios de caché ya reducidos. Comprueba en la respuesta cuántos tokens se leen de caché dentro de tu lote en lugar de darlo por hecho: es una verificación que conviene hacer con una muestra pequeña.
+
+## Cuánto ahorra
+
+El componente calcula con el descuento de los datos. Ejemplo: 5.000 documentos de 20.000 tokens de entrada y 2.000 de salida.
+
+<CostExample ids={['haiku-5-5', 'sonnet-5-5', 'opus-5-5']} entrada={20000} salida={2000} volumen={5000} />
+
+Fíjate en la última columna: es el mismo trabajo con la mitad de coste, sin tocar la calidad. Es de las palancas más claras si el plazo lo permite.
+
+<Callout tipo="recomendacion">
+
+Pregunta de cada tarea masiva: ¿alguien necesita esto en la próxima hora? Si la respuesta es no, mándala por lotes. Por qué: la calidad es la misma que en una llamada normal y el descuento es del 50 %; el único precio es la espera.
+
+</Callout>
+
+## En otros proveedores
+
+<ProviderTabs>
+  <div slot="claude">
+
+Message Batches API, descuento del 50 %, hasta 100.000 peticiones o 256 MB por lote. En Claude Code, el comando `/batch` es **otra cosa**: reparte un cambio grande de código en unidades independientes, cada una con su subagente. No es el descuento de la API.
+
+  </div>
+  <div slot="openai">
+
+OpenAI tiene Batch y también el nivel Flex; en su tabla de precios, ambos se cobran a la mitad del precio estándar. Consulta los plazos y límites en su documentación.
+
+  </div>
+  <div slot="google">
+
+Pendiente de verificar: la documentación de precios de Google que hemos consultado no incluye una modalidad de lotes con descuento que podamos citar. Revisa la página oficial.
+
+  </div>
+</ProviderTabs>
+
+<Callout tipo="varia">
+
+La idea es común, pero el plazo, los límites y el descuento dependen del proveedor y del modelo. Mira la tabla de precios del modelo concreto.
+
+</Callout>
+
+## En la práctica
+
+<Steps>
+
+1. Junta todas las peticiones independientes en un solo lote (hasta el límite).
+2. Pon el prefijo común primero, para beneficiarte de la caché.
+3. Lanza una prueba con 10 peticiones y revisa el resultado antes de mandar las miles.
+4. Recoge los resultados cuando terminen y revisa los que fallen o expiren.
+
+</Steps>
+
+## Ejemplo de oficina: el archivo de facturas
+
+Administración quiere extraer proveedor, fecha, importe y concepto de 8.000 facturas escaneadas del año anterior. Nadie las necesita hoy. Se envían por lotes con un modelo pequeño, una instrucción común al principio y una muestra de 100 revisada a mano para medir los errores. El proceso suele terminar esa misma noche (la mayoría de los lotes acaba en menos de una hora, aunque la expiración es de 24) y cuesta la mitad que hacerlo petición a petición.
+
+## Errores frecuentes
+
+- **Usar lotes para trabajo interactivo.** No hay streaming ni plazo garantizado.
+- **Mandar miles sin probar diez.** Un error en la instrucción se paga miles de veces.
+- **No revisar los resultados fallidos.** Algunas peticiones pueden errar o expirar.
+- **Confundir `/batch` de Claude Code con la API de lotes.** Son cosas distintas.
+
+<Checklist
+  id="batch"
+  titulo="Antes de mandar un lote"
+  items={[
+    'Nadie necesita el resultado de inmediato.',
+    'He probado con una muestra pequeña.',
+    'El prefijo común va al principio de cada petición.',
+    'Tengo un plan para las peticiones que fallen.',
+  ]}
+/>
+
+## Para profundizar
+
+Cómo encaja con el resto de palancas: [el orden de las palancas](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/orden-de-las-palancas/).

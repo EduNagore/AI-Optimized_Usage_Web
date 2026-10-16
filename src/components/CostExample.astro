@@ -16,9 +16,21 @@ interface Props {
   /** Número de documentos o ejecuciones del caso de volumen. */
   volumen: number;
   etiqueta?: string;
+  /** Tokens de la entrada que se leen de la caché (caliente) en cada intento; añade una columna. */
+  cacheados?: number;
+  /** Muestra la columna «Con Batch». Por defecto, sí. */
+  batch?: boolean;
 }
 
-const { ids, entrada, salida, volumen, etiqueta = 'Coste de un intento y de un volumen' } = Astro.props;
+const {
+  ids,
+  entrada,
+  salida,
+  volumen,
+  etiqueta = 'Coste de un intento y de un volumen',
+  cacheados,
+  batch: mostrarBatch = true,
+} = Astro.props;
 const models = (await getCollection('models')).map((e) => e.data);
 const rule = await getEntry('pricing-rules', 'anthropic-batch-discount');
 if (!rule) throw new Error('<CostExample>: falta anthropic-batch-discount en pricing-rules.json');
@@ -29,7 +41,15 @@ const rows = ids.map((id) => {
   const m = models.find((r) => r.id === id);
   if (!m) throw new Error(`<CostExample>: no existe el modelo «${id}»`);
   const perAttempt = (entrada * (m.pricing.input ?? 0) + salida * (m.pricing.output ?? 0)) / 1_000_000;
-  return { m, perAttempt, total: perAttempt * volumen };
+  const cached =
+    cacheados === undefined
+      ? undefined
+      : (((entrada - cacheados) * (m.pricing.input ?? 0) +
+          cacheados * (m.pricing.cacheRead ?? 0) +
+          salida * (m.pricing.output ?? 0)) /
+          1_000_000) *
+        volumen;
+  return { m, perAttempt, total: perAttempt * volumen, cached };
 });
 const fmt = (n: number) =>
   `${new Intl.NumberFormat('es-ES', {
@@ -40,7 +60,9 @@ const verified = rows
   .map((r) => r.m.verifiedAt)
   .sort()
   .at(-1)!;
-const hasTiers = rows.filter((r) => r.m.pricing.notes?.includes('Precios hasta'));
+const tiers = rows.flatMap((r) =>
+  r.m.notes?.startsWith('Precios hasta') ? [`${r.m.name}: ${r.m.notes.split('. ')[0]}`] : [],
+);
 ---
 
 <div class="table-wrap not-content">
@@ -58,9 +80,16 @@ const hasTiers = rows.filter((r) => r.m.pricing.notes?.includes('Precios hasta')
           <th scope="col" class="num">
             {num(volumen)} documentos
           </th>
-          <th scope="col" class="num">
-            Con Batch
-          </th>
+          {cacheados !== undefined && (
+            <th scope="col" class="num">
+              Con {num(cacheados)} tokens en caché
+            </th>
+          )}
+          {mostrarBatch && (
+            <th scope="col" class="num">
+              Con Batch
+            </th>
+          )}
         </tr>
       </thead>
       <tbody>
@@ -69,16 +98,19 @@ const hasTiers = rows.filter((r) => r.m.pricing.notes?.includes('Precios hasta')
             <th scope="row">{r.m.name}</th>
             <td class="num">{fmt(r.perAttempt)}</td>
             <td class="num">{fmt(r.total)}</td>
-            <td class="num">{fmt(r.total * batch)}</td>
+            {r.cached !== undefined && <td class="num">{fmt(r.cached)}</td>}
+            {mostrarBatch && <td class="num">{fmt(r.total * batch)}</td>}
           </tr>
         ))}
       </tbody>
     </table>
   </div>
   <p class="note">
-    Cálculo con los precios de <code>models.json</code> verificados el {formatDate(verified)}. Batch aplica el
-    factor {batch} de <code>pricing-rules.json</code>
-    {hasTiers.length > 0 && ' y los precios de Haiku 5.5 valen hasta 100.000 tokens de entrada'}.
+    Cálculo con los precios de <code>models.json</code> verificados el {formatDate(verified)}.{' '}
+    {mostrarBatch && `Batch aplica el factor ${batch} de pricing-rules.json. `}
+    {cacheados !== undefined &&
+      'La columna de caché supone la caché caliente en todos los intentos (lectura a precio de lectura de caché) y no incluye la primera escritura. '}
+    {tiers.length > 0 && ` Tarifas por tramos: ${tiers.join('; ')}.`}
   </p>
 </div>
 

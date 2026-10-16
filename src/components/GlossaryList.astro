@@ -1,0 +1,48 @@
+---
+import { getCollection } from 'astro:content';
+
+/** Lista alfabética de términos, leída de glossary.json. */
+const terms = (await getCollection('glossary'))
+  .map((e) => e.data)
+  .sort((a, b) => a.term.localeCompare(b.term, 'es'));
+---
+
+<dl class="glossary not-content">
+  {terms.map((t) => (
+    <div class="entry" id={t.id}>
+      <dt>{t.term}</dt>
+      <dd>
+        {t.short}
+        {t.long && <span class="long"> {t.long}</span>}
+        {t.link && (
+          <>
+            {' '}
+            <a href={t.link}>Ver más</a>
+          </>
+        )}
+      </dd>
+    </div>
+  ))}
+</dl>
+
+<style>
+  .glossary {
+    margin-block: var(--space-5);
+  }
+  .entry {
+    padding-block: var(--space-3);
+    border-bottom: 1px solid var(--color-border);
+    scroll-margin-top: var(--space-8, 4rem);
+  }
+  dt {
+    font-weight: 600;
+    color: var(--color-heading);
+  }
+  dd {
+    margin: var(--space-1) 0 0;
+    max-width: 65ch;
+  }
+  .long {
+    color: var(--color-text-muted);
+  }
+</style>

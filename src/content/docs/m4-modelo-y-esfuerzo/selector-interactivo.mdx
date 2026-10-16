@@ -6,6 +6,102 @@ sidebar:
 level: basico
 tracks: [profesional, tecnica]
 readingTime: 4
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-16
+sources:
+  [
+    anthropic-batch,
+    anthropic-esfuerzo,
+    anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas,
+    google-ultimo-modelo,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Cuatro preguntas bastan para situar una tarea: cuánto razonamiento pide, cuánto cuesta equivocarse, cuántas veces se repite y si puede esperar.
+- Regla de partida: empieza con un modelo capaz (la gama equilibrada o superior) y su esfuerzo por defecto; baja el esfuerzo o el modelo solo cuando lo hayas medido en una muestra y la calidad se mantenga; sube cuando falle.
+- Por ahora esta página ofrece el razonamiento en forma de texto y tabla; el selector interactivo estará disponible en esta misma página.
+- La salida del selector es una hipótesis de partida, no una sentencia.
+
+</KeyTakeaways>
+
+## Qué va a ser esto
+
+Por ahora, esta página ofrece el recorrido en texto y tabla. El selector interactivo (respondes unas preguntas y devuelve una recomendación de superficie, gama de modelo y esfuerzo, con su porqué) estará disponible en esta misma página. Mientras tanto, puedes hacer a mano el mismo recorrido.
+
+<Callout tipo="preparacion">
+
+El selector interactivo estará disponible en esta misma página. Lo que sigue es su lógica en texto, y sirve para decidir hoy mismo.
+
+</Callout>
+
+## Las cuatro preguntas
+
+**1. ¿Cuánto razonamiento exige la tarea?** Redactar un correo o extraer campos exige poco. Analizar un contrato, depurar un fallo intermitente o comparar escenarios exige mucho.
+
+**2. ¿Cuánto cuesta equivocarse?** Un borrador que vas a leer antes de enviar tolera un fallo; un cálculo que alimenta una decisión, no.
+
+**3. ¿Cuántas veces se repite?** Una vez, importa tu tiempo; cinco mil veces, importan los tokens y la cola de casos difíciles.
+
+**4. ¿Puede esperar?** Si no es urgente y es en volumen, los lotes de Anthropic ofrecen descuento a cambio de esperar hasta 24 horas; si estás conversando, no aplica.
+
+## De las respuestas a la recomendación
+
+| Razonamiento | Coste del error | Repetición | Punto de partida                                                                                                                                                |
+| ------------ | --------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Poco         | Bajo            | Alta       | Gama rápida, esfuerzo bajo, lotes si puede esperar                                                                                                              |
+| Poco         | Bajo            | Baja       | Gama equilibrada o rápida, esfuerzo bajo                                                                                                                        |
+| Poco         | Medio           | Alta       | Gama rápida, esfuerzo bajo, lote y evaluación en una muestra; revisar los casos dudosos con un modelo superior                                                  |
+| Poco         | Alto            | Cualquiera | Gama equilibrada con su esfuerzo por defecto y verificación (automática o humana): un esfuerzo bajo no te protege de un error caro                              |
+| Medio        | Medio           | Cualquiera | Gama equilibrada, esfuerzo medio                                                                                                                                |
+| Mucho        | Medio           | Baja       | Gama alta o equilibrada, esfuerzo alto                                                                                                                          |
+| Mucho        | Alto            | Baja       | Gama alta o de frontera, esfuerzo alto, verificación humana                                                                                                     |
+| Mucho        | Alto            | Alta       | Gama alta con esfuerzo medio; reintentar en alto los fallos detectados (solo si tienes una señal de fallo fiable: un test, un esquema, una cifra que no cuadra) |
+
+Después, aplica los pasos de la [estrategia de selección](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/estrategia-de-seleccion/): mide en una muestra con casos difíciles y baja un escalón cada vez. Para las tareas habituales de oficina y de código tienes las filas ya razonadas en [la matriz por tarea](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/matriz-por-tarea/).
+
+<Callout tipo="recomendacion">
+
+Si dudas entre dos filas, empieza por la de la gama más capaz con su esfuerzo por defecto y baja midiendo en cinco casos (20 a 30 si vas a fijar una política). Es una recomendación de la guía: subir después, con un fallo concreto delante, es informativo, pero bajar sin medir puede ocultar errores caros; lo que te protege es la muestra, no la dirección del cambio.
+
+</Callout>
+
+## En la práctica
+
+<Steps>
+
+1. Describe tu tarea en una frase y responde a las cuatro preguntas.
+2. Localiza tu fila en la tabla y toma el punto de partida.
+3. Busca en [el mapa de modelos](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/mapa-de-modelos/) el modelo concreto de esa gama en tu proveedor.
+4. Prueba con cinco casos, uno de ellos difícil, y decide si subes o bajas (20 a 30 casos si vas a fijar una política).
+
+</Steps>
+
+## Ejemplo de oficina: cinco encargos, cinco filas
+
+Una responsable de operaciones lleva cinco encargos. Redactar un aviso interno (poco razonamiento, error bajo, una vez): gama equilibrada o rápida, esfuerzo bajo. Clasificar 3.000 incidencias (poco razonamiento, error medio, mucha repetición): gama rápida, esfuerzo bajo, lote y evaluación en una muestra. Resumir un acta (razonamiento medio): gama equilibrada, esfuerzo medio. Elegir entre dos proveedores de logística (mucho razonamiento, error alto): gama alta, esfuerzo alto y supuestos explícitos. Revisar un contrato de servicio (mucho razonamiento, error alto): gama alta con esfuerzo alto y revisión de una persona.
+
+## Errores frecuentes
+
+- **Responder según lo que te gustaría gastar.** Responde según la tarea; el coste se ajusta después, con medición.
+- **Dar el mismo peso a las cuatro preguntas.** Si el error es caro, esa pregunta manda sobre las demás.
+- **Quedarte con la primera recomendación.** Es una hipótesis: contrástala con una muestra.
+
+<Checklist
+  id="selector-interactivo"
+  titulo="Antes de dar por buena la recomendación"
+  items={[
+    'He respondido las cuatro preguntas pensando en la tarea real.',
+    'Tengo claro qué cuesta equivocarse.',
+    'Voy a probar con una muestra que incluya un caso difícil.',
+  ]}
+/>
+
+## Para profundizar
+
+Si la tarea es de frontera, mira [cuándo usar un modelo de frontera](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/modelos-de-frontera/).

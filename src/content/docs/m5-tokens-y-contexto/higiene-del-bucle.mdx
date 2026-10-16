@@ -6,6 +6,132 @@ sidebar:
 level: avanzado
 tracks: [tecnica]
 readingTime: 8
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-16
+sources:
+  [
+    anthropic-context-editing,
+    anthropic-compactacion,
+    platform-claude-com-docs-en-build-with-claude-compaction-on-demand,
+    anthropic-programmatic-tool-calling,
+    anthropic-memory-tool,
+    anthropic-preserved-thinking,
+    claude-code-subagentes,
+    claude-code-costes,
+    anthropic-prompt-caching,
+    claude-code-prompt-caching-en-claude-code,
+    anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- En un bucle de agente cada paso añade resultados al contexto, y todo se reenvía en el siguiente.
+- Context editing quita resultados y razonamiento antiguos: hace sitio, y el ahorro neto hay que medirlo. La compactación resume la conversación y tiene su propio coste.
+- En Haiku 5.5, la guía oficial recomienda compactar en un límite de tarea antes de que las peticiones superen el umbral de precio de la nota del modelo.
+- Un subagente absorbe un trabajo voluminoso en su propio contexto y devuelve solo el resumen.
+- Programmatic tool calling ahorra tokens cuando hay muchas herramientas.
+- Editar turnos anteriores puede invalidar la caché y el razonamiento conservado.
+
+</KeyTakeaways>
+
+## La idea
+
+Un agente trabaja en bucle: el modelo pide una herramienta, recibe el resultado, razona y pide otra. Cada vuelta añade al contexto la salida de la herramienta, y todo ese historial se reenvía en la siguiente vuelta. En tareas largas el contexto crece hasta que estorba o no cabe. La higiene del bucle consiste en decidir qué se queda, qué se resume y qué se hace fuera del hilo principal.
+
+Un matiz importante sobre context editing: **hace sitio**, no ahorra por sí mismo. Quitar un resultado antiguo libera espacio, pero modifica el historial e invalida la caché desde el punto de limpieza (lo dice la documentación), de modo que el ahorro neto no está garantizado. Medirlo (ver [medir](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/medir/)) importa más aquí que en cualquier otra palanca.
+
+## Context editing
+
+La API de Claude permite, con una cabecera beta, limpiar automáticamente resultados de herramientas antiguos (estrategia `clear_tool_uses`) y bloques de razonamiento (`clear_thinking`). La documentación fija valores por defecto: se activa al superar 100.000 tokens de entrada y conserva los últimos 3 usos de herramienta. Aviso de la documentación: limpiar resultados invalida la caché desde el punto de limpieza; mantener los bloques de razonamiento, en cambio, la conserva.
+
+<Callout tipo="recomendacion">
+
+Usa context editing cuando el contexto se acerca al límite o a la zona donde el rendimiento empeora, no como medida de ahorro por defecto. Por qué: la limpieza fuerza una reescritura de caché desde el punto de limpieza, y en un bucle con buena caché el ahorro de borrar puede ser menor que el sobrecoste de reescribir.
+
+</Callout>
+
+## Compactación
+
+La compactación sustituye los turnos antiguos por un resumen que escribe Claude en el servidor. La API de Claude tiene dos modos, ambos en beta: **bajo demanda** (cabecera `compact-2026-09-04`, decides tú cuándo) y **por umbral de tokens** (cabecera `compact-2026-01-12`, decide la API cuando la entrada llega al umbral que fijes). La página de compactación indica: «Use on-demand compaction wherever it is available». En Claude Code se hace con `/compact`, que admite instrucciones de enfoque, y se configura el momento de la compactación automática con `/autocompact`.
+
+Compactar tiene su coste, y en Claude Code está documentado. Invalida la capa de conversación (el historial nuevo, más corto, ya no comparte prefijo con el anterior), pero el prompt de sistema se reutiliza. Para escribir el resumen, Claude Code envía una petición aparte con el mismo prompt de sistema, herramientas e historial: con la caché caliente esa petición lee el prefijo de la caché y cuesta «una fracción» de lo que sugiere el tamaño del contexto; con la caché fría (tras una pausa más larga que su vida) vuelve a procesar todo el historial como entrada sin caché y es lo más caro. `/clear`, en cambio, no cuesta nada. En la API, que la compactación invalide la caché de la conversación es una inferencia a partir de la regla del prefijo idéntico (el historial anterior se sustituye), no una cita. Además, el resumen pierde detalle: compacta en un punto de corte natural y di qué debe conservar.
+
+<Callout tipo="recomendacion">
+
+En Haiku 5.5, compacta una sesión larga en un límite de tarea antes de que sus peticiones superen el umbral de precio por tamaño de prompt que indica la nota del modelo en la [tabla de modelos](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/mapa-de-modelos/). Es la guía de Anthropic: por encima del umbral se paga cinco veces más por cada token, salida incluida, y las lecturas y escrituras de caché cuentan para el umbral, así que un prefijo grande en caché también puede superarlo.
+
+</Callout>
+
+<Callout tipo="cuidado">
+
+El valor por defecto del umbral de compactación automática no está verificado en la documentación que hemos podido leer; no lo des por conocido. Si te importa, indícalo tú de forma explícita.
+
+</Callout>
+
+## Subagentes: el trabajo voluminoso, fuera del hilo
+
+Un subagente trabaja en su propio contexto y devuelve un resultado. Es la herramienta natural para pasos que producen mucha salida y poco valor intermedio: buscar en cien ficheros, leer un informe largo y extraer tres cifras, ejecutar un conjunto de tests. El hilo principal solo ve el resumen. En Claude Code se puede asignar un modelo menor a un subagente con el campo `model` de su definición, que acepta `sonnet`, `opus`, `haiku`, `fable`, un identificador completo o `inherit`.
+
+Pero cada subagente consume por su cuenta. Ya se vio que un equipo de agentes puede gastar unas 7 veces más que una sesión normal (en plan mode, según la documentación de costes), y que los subagentes usan una caché de 5 minutos. Se justifican cuando el trabajo es voluminoso o paralelo, no por costumbre.
+
+## Programmatic tool calling
+
+Con esta función, en lugar de llamar a una herramienta por vuelta, el modelo escribe un pequeño programa que llama a varias herramientas y devuelve solo el resultado final. Se evita meter en el contexto todos los resultados intermedios.
+
+<Callout tipo="medicion" titulo="Medición publicada por Anthropic">
+
+La documentación reporta una reducción de aproximadamente el 38 % de los tokens de entrada facturados en un benchmark de un agente de gestión de proyectos con 75 herramientas, sin cambio de precisión, y entre el 20 y el 40 % en tráfico con 10 a 49 definiciones de herramientas. En otro benchmark (τ²-bench) la puntuación no cambió y el coste subió un 8 % aproximadamente. Las llamadas secuenciales de una sola herramienta no se benefician. Es una medición del proveedor: depende de tu patrón de uso.
+
+</Callout>
+
+## Memoria para persistir entre sesiones
+
+En lugar de arrastrar una conversación eterna, el agente puede escribir lo aprendido en notas y leerlas en la sesión siguiente. La API de Claude ofrece una herramienta de memoria cuyos comandos implementa tu aplicación (ver, crear, reemplazar, insertar, borrar), sobre un directorio `/memories`. En Claude Code, el equivalente son los ficheros de memoria y la auto memoria (ver [Ficheros de instrucciones y memoria](/AI-Optimized_Usage_Web/m6-herramientas/ficheros-de-instrucciones-y-memoria/)). El efecto es que una sesión nueva empieza limpia pero informada.
+
+## Historiales «solo añadir»
+
+Los modelos Fable 5.1, Opus 5.5, Sonnet 5.5 y Haiku 5.5 aplican una comprobación de que el prefijo del razonamiento conservado no se ha modificado, y en cuentas creadas desde el 31 de agosto de 2026 esa comprobación es obligatoria por defecto. La consecuencia práctica es una norma de diseño: no edites ni borres turnos anteriores del historial. Cada edición cambia el prefijo (invalida la caché) y puede invalidar el razonamiento conservado. Si necesitas recortar, usa las funciones diseñadas para ello (context editing, compactación) en lugar de modificar mensajes a mano.
+
+## En la práctica
+
+<Steps>
+
+1. Detecta qué llena el contexto: salidas de herramientas, documentos o razonamiento (en Claude Code, `/context`).
+2. Si son resultados voluminosos de un paso concreto, pásalos a un subagente.
+3. Si el hilo se alarga, compacta en un punto de corte natural diciendo qué conservar.
+4. Si una tarea dura varias sesiones, escribe el estado en una memoria y empieza la siguiente sesión desde ella.
+5. Mide el coste por tarea antes y después de cada cambio.
+
+</Steps>
+
+## Ejemplo de oficina: el análisis trimestral
+
+Una analista pide a un agente que revise doce hojas de cálculo mensuales y prepare el cierre del trimestre. Sin higiene, las doce hojas se leen en el hilo principal y quedan allí. Con higiene: un subagente por hoja devuelve cinco cifras y las anomalías; el hilo principal solo trabaja con doce resúmenes; al terminar, el estado (criterios aplicados y decisiones) se guarda en una nota para el próximo trimestre.
+
+## Errores frecuentes
+
+- **Compactar a ciegas.** Sin decir qué conservar, el resumen puede perder la decisión que importaba.
+- **Esperar ahorro de la limpieza.** Hace sitio; el ahorro neto hay que medirlo.
+- **Editar el historial a mano.** Rompe caché y razonamiento conservado.
+- **Subagentes para todo.** Multiplican el consumo cuando el trabajo no es voluminoso.
+
+<Checklist
+  id="higiene-bucle"
+  titulo="Mi bucle está sano"
+  items={[
+    'Sé qué ocupa más contexto en mis sesiones largas.',
+    'Los pasos con mucha salida van a subagentes.',
+    'Compacto en puntos de corte y digo qué conservar.',
+    'No edito turnos anteriores del historial.',
+    'Mido el coste por tarea tras cada cambio.',
+  ]}
+/>
+
+## Para profundizar
+
+El reparto de trabajo entre agentes está en [Encargo a subagentes](/AI-Optimized_Usage_Web/m8-agentes/encargo-a-subagentes/) y en [Cuándo no orquestar](/AI-Optimized_Usage_Web/m8-agentes/cuando-no-orquestar/). Los comandos de contexto de Claude Code, en [El día a día en Claude Code](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/dia-a-dia-en-claude-code/).

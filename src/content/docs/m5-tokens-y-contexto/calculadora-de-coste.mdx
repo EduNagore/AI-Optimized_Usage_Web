@@ -6,6 +6,95 @@ sidebar:
 level: basico
 tracks: [profesional, tecnica]
 readingTime: 5
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-16
+sources: [anthropic-precios, anthropic-batch, anthropic-prompt-caching]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import CostExample from '@components/CostExample.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Para estimar un coste necesitas cuatro números: tokens de entrada, tokens de salida, tokens de razonamiento y número de ejecuciones.
+- Aquí tienes la fórmula y un ejemplo estático calculado desde los datos de precios; para tus cifras, aplica la fórmula a mano.
+- Mientras tanto, puedes hacer la cuenta tú con la fórmula de abajo.
+
+</KeyTakeaways>
+
+## La idea
+
+El coste de una tarea sale de una multiplicación sencilla: tokens por precio, sumando entrada y salida. Lo difícil no es la fórmula sino saber las cantidades, por eso [medir](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/medir/) va antes que calcular. Esta página recoge la fórmula y un ejemplo ya calculado con los precios vigentes.
+
+## La fórmula
+
+Para un intento, en dólares:
+
+`coste = (tokens de entrada × precio de entrada + tokens de salida × precio de salida) / 1.000.000`
+
+Los precios son por millón de tokens y salen de [la tabla de modelos](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/mapa-de-modelos/). Los tokens de razonamiento se facturan como salida: añádelos a los de salida. Para un volumen, multiplica por el número de ejecuciones. Cada palanca modifica una parte:
+
+- **Caché**: los tokens leídos de caché se cobran al precio de lectura en lugar del de entrada (y el primero, al de escritura).
+- **Lotes**: el descuento del 50 % se aplica a todo el coste (ver [batch](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/batch/)).
+- **Salida más corta**: reduce el segundo término.
+- **Modelo o esfuerzo**: cambian los precios y los tokens de razonamiento.
+
+## Ejemplo calculado
+
+Una tarea de oficina: resumir un contrato de 30.000 tokens de entrada con un resumen de 1.500 tokens de salida, repetida para 2.000 contratos en un trimestre. La tabla muestra el coste de un intento, el de los 2.000 y el de los 2.000 por lotes:
+
+<CostExample
+  ids={['haiku-5-5', 'sonnet-5-5', 'opus-5-5']}
+  entrada={30000}
+  salida={1500}
+  volumen={2000}
+  etiqueta="Coste de resumir 2.000 contratos de 30.000 tokens"
+/>
+
+El cálculo no incluye razonamiento ni caché. Sirve como techo para el modelo que elijas: si las instrucciones comunes ocupan una parte relevante de esos 30.000 tokens, la caché reduce la entrada; si el modelo razona mucho, la salida real es mayor.
+
+<Callout tipo="recomendacion">
+
+Haz siempre la cuenta de un mes, no solo de una tarea. Por qué: una tarea de céntimos puede ser una partida relevante multiplicada por mil, y a la inversa, una de varios euros puede no importar si ocurre una vez al mes.
+
+</Callout>
+
+## En la práctica
+
+<Steps>
+
+1. Mide o estima los tokens de entrada y salida de una ejecución (ver [medir](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/medir/)).
+2. Multiplica por el precio del modelo con la fórmula.
+3. Multiplica por el volumen mensual.
+4. Resta el efecto de cada palanca por separado: ¿cuánto bajaría con lotes? ¿Con caché? Anota el resultado.
+5. Compáralo con el valor de la tarea y con el coste de revisarla (ver [coste por tarea completada](/AI-Optimized_Usage_Web/m2-metodo/coste-por-tarea/)).
+
+</Steps>
+
+## Ejemplo de oficina: presupuesto de un proyecto piloto
+
+Un departamento quiere pilotar un asistente que clasifique y resuma 500 correos al día. Con la fórmula estima el coste por correo en cada modelo candidato, multiplica por 500 y por los días laborables del mes, y decide si cabe en el presupuesto. Si no cabe, el orden es el de [las palancas](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/orden-de-las-palancas/): primero caché y salida más corta, después lotes para los correos que no son urgentes, y solo al final un modelo menor, comprobado con una muestra.
+
+## Errores frecuentes
+
+- **Olvidar el razonamiento.** Se factura como salida.
+- **Usar precios de memoria.** Cambian: léelos de la tabla vigente.
+- **Calcular solo el coste de tokens.** Falta el tiempo de revisión.
+- **Ignorar los tramos de precio.** Algunos modelos cobran más por encima de cierto tamaño de petición; ver las notas de la tabla.
+
+<Checklist
+  id="calculadora"
+  titulo="Mi estimación"
+  items={[
+    'Tengo tokens de entrada, salida y razonamiento por ejecución.',
+    'He multiplicado por el volumen mensual.',
+    'He calculado el efecto de caché, lotes y salida más corta.',
+    'He sumado el coste de revisión.',
+  ]}
+/>
+
+## Para profundizar
+
+Los datos de precios están en el [mapa de modelos](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/mapa-de-modelos/).

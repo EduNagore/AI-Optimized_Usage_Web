@@ -6,6 +6,112 @@ sidebar:
 level: intermedio
 tracks: [profesional, tecnica]
 readingTime: 4
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-16
+sources:
+  [
+    anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas,
+    anthropic-precios,
+    anthropic-structured-outputs,
+    anthropic-buenas-practicas-de-prompting,
+    anthropic-modelos,
+    google-ultimo-modelo,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Fact from '@components/Fact.astro';
+import BeforeAfter from '@components/BeforeAfter.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- La salida es lo más caro por token: en los modelos actuales de Claude cuesta cinco veces la entrada.
+- `max_tokens` corta la respuesta, pero el modelo no sabe que existe: no lo uses para que sea breve.
+- La forma de la respuesta se pide en el prompt, con un ejemplo.
+- En los modelos con razonamiento, los tokens de razonamiento se facturan como salida y cuentan dentro de `max_tokens`.
+
+</KeyTakeaways>
+
+## La idea
+
+En Sonnet 5.5 el millón de tokens de salida cuesta <Fact id="sonnet-5-5.pricing.output" /> y el de entrada, <Fact id="sonnet-5-5.pricing.input" />. La guía de optimización de Anthropic lo resume: en Haiku 5.5, Sonnet 5.5, Opus 5.5 y Fable 5.1, la salida cuesta cinco veces la entrada. Una respuesta larga que no necesitabas es, token por token, una de las partidas más caras. Y en un bucle de agente hay un segundo motivo, que da la guía de optimización de Anthropic: cada token que escribe el modelo vuelve como entrada en todos los turnos siguientes, así que una respuesta larga se paga una y otra vez. Por otro lado, la entrada suele ser mucho mayor en volumen, así que mira siempre ambas (ver [coste por tarea completada](/AI-Optimized_Usage_Web/m2-metodo/coste-por-tarea/)).
+
+## `max_tokens` es una red de seguridad, no una palanca
+
+El parámetro `max_tokens` fija el máximo de tokens que puede generar el modelo. La guía de Anthropic aclara que limita la respuesta **sin que el modelo lo sepa**: bajarlo no hace que el modelo economice, solo que la respuesta se corte a mitad. Además, el razonamiento cuenta dentro de ese máximo, así que un valor demasiado bajo puede dejarte sin respuesta tras haber pagado por pensar.
+
+Para trabajo de agentes, la documentación recomienda fijar `max_tokens` en 64.000, o en 128.000 (el máximo de los modelos actuales) cuando un intento cortado sea costoso.
+
+<Callout tipo="recomendacion">
+
+Usa `max_tokens` como tope de seguridad, holgado, para evitar bucles descontrolados, y consigue la brevedad con el prompt. Por qué: el tope corta sin avisar; el prompt hace que el modelo planifique una respuesta corta y completa.
+
+</Callout>
+
+## Pedir la forma, no solo el contenido
+
+La palanca real está en el encargo. Dos hábitos:
+
+- **Di el formato y la longitud**: «tres frases», «una tabla con estas columnas», «solo el número».
+- **Da un ejemplo de la salida esperada**: un modelo imita el formato de un ejemplo mejor de lo que obedece una descripción.
+
+Cuando la salida la consume un programa, `structured outputs` (con `output_config.format` y un esquema JSON) fuerza una estructura válida y evita texto de relleno. Está disponible de forma general en la API de Claude.
+
+<BeforeAfter
+  antes="Analiza estos tickets de soporte y cuéntame qué ves."
+  despues="De estos tickets, devuélveme solo una tabla con tres columnas: categoría, número de tickets y un ejemplo de una línea. Máximo seis categorías, sin introducción ni conclusión."
+>
+
+Qué cambió y por qué: se fija la forma (tabla), el tamaño (seis categorías) y se prohíbe el relleno. La respuesta es más corta, más fácil de revisar y se puede pegar directamente en una hoja de cálculo.
+
+</BeforeAfter>
+
+## Secuencias de parada
+
+Las secuencias de parada (`stop_sequences`) son textos que, si el modelo los genera, hacen que se detenga. Según la referencia de la API de Claude, normalmente el modelo se detiene al completar su turno (`stop_reason` igual a `"end_turn"`); si encuentra una de tus secuencias, el `stop_reason` es `"stop_sequence"` y el campo `stop_sequence` de la respuesta contiene la que coincidió. Sirven como salida temprana cuando solo te interesa una parte de la respuesta, por ejemplo hasta la etiqueta de cierre de un bloque. El texto de la secuencia no es parte de lo que ahorras: ahorras lo que habría venido después.
+
+<Callout tipo="varia">
+
+Los límites de salida también varían por proveedor. Para Google, al migrar a Gemini 4 Argon, la guía de migración recomienda en tareas estándar mantener el valor por defecto de `max_output_tokens` (65.536) o no fijarlo, y como mínimo 32.768; en esa API, entrada, razonamiento y salida comparten una misma ventana. Para OpenAI, la documentación consultada no incluye una recomendación equivalente que podamos citar: queda pendiente.
+
+</Callout>
+
+## Ejemplo de oficina: actas de reunión
+
+Un equipo pide a un asistente «el acta de la reunión» y recibe cada vez entre 600 y 900 palabras con introducción, resumen, decisiones y un cierre cortés. Lo que el equipo usa son tres cosas: decisiones, responsables y fechas. Con un encargo que pida exactamente una tabla de esas tres columnas y diga «sin texto antes ni después», la respuesta cae a una fracción, se revisa en medio minuto y no hay que borrar relleno antes de enviarla.
+
+## En la práctica
+
+<Steps>
+
+1. Decide qué parte de la respuesta vas a usar de verdad: un número, una tabla, tres frases.
+2. Ponlo en el encargo: formato, longitud máxima y qué no incluir.
+3. Añade un ejemplo breve de la salida esperada.
+4. Fija `max_tokens` como tope holgado y, si procede, una secuencia de parada.
+5. Revisa tres respuestas: si siguen largas, concreta más el formato, no bajes el tope.
+
+</Steps>
+
+## Errores frecuentes
+
+- **Bajar `max_tokens` esperando respuestas más concisas.** Solo las corta.
+- **No pedir formato.** El modelo elige por defecto respuestas que parecen completas.
+- **Olvidar el razonamiento.** En modelos que razonan, parte de la salida facturada es invisible. Ver [esfuerzo y razonamiento](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/esfuerzo-y-razonamiento/).
+- **Pedir brevedad cuando el error cuesta caro.** Una respuesta demasiado recortada puede omitir la advertencia que importaba.
+
+<Checklist
+  id="salida"
+  titulo="Mi salida está controlada"
+  items={[
+    'Pido formato y longitud en el prompt.',
+    'Incluyo un ejemplo de la salida esperada.',
+    '`max_tokens` es un tope holgado, no mi método de brevedad.',
+    'Sé que el razonamiento se factura como salida.',
+  ]}
+/>
+
+## Para profundizar
+
+Cómo redactar el encargo con formato de salida: [Plantilla de encargo](/AI-Optimized_Usage_Web/m2-metodo/plantilla-de-encargo/).

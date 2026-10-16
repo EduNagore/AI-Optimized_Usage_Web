@@ -6,6 +6,171 @@ sidebar:
 level: intermedio
 tracks: [profesional, tecnica]
 readingTime: 8
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-16
+sources:
+  [
+    anthropic-esfuerzo,
+    anthropic-razonamiento-adaptativo,
+    anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas,
+    claude-code-modelo-y-esfuerzo,
+    claude-code-comandos,
+    claude-code-subagentes,
+    claude-code-skills,
+    openai-ultimo-modelo-y-migracion,
+    google-ultimo-modelo,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Fact from '@components/Fact.astro';
+import ModelTable from '@components/ModelTable.astro';
+import ProviderTabs from '@components/ProviderTabs.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- El esfuerzo (`effort`) regula cuánto razona el modelo antes de responder: más esfuerzo suele dar más calidad en tareas difíciles, más latencia y más coste.
+- Los tokens de razonamiento se facturan como salida, así que el esfuerzo es una palanca de coste además de una de calidad.
+- El valor por defecto depende del modelo y de la superficie: Sonnet 5.5 no arranca igual en la API que en Claude Code.
+- Los tres proveedores tienen el mismo mando con nombres distintos; los niveles disponibles también varían.
+- Subir esfuerzo es un compromiso que se mide, no un seguro gratuito.
+
+</KeyTakeaways>
+
+## La idea
+
+Los modelos actuales pueden «pensar» antes de contestar: generan un razonamiento interno que no siempre ves y que se factura como tokens de salida. El esfuerzo es el mando con el que decides cuánto de ese razonamiento permites. Con esfuerzo bajo el modelo responde rápido y gasta poco, y con esfuerzo alto se detiene más en planificar, comprobar y descartar alternativas.
+
+Eso explica por qué el mismo modelo puede ser barato o caro según cómo lo uses. También explica por qué un modelo capaz a esfuerzo bajo puede ser una opción mejor que un modelo menor a esfuerzo alto: no hay una regla general, y el único modo de saberlo es medirlo con tus tareas. La documentación de Anthropic recomienda precisamente medir con barridos de esfuerzo en lugar de fijar un nivel a ciegas.
+
+## Los mandos en cada proveedor
+
+<ProviderTabs>
+<div slot="claude">
+
+El parámetro es `output_config.effort`. La documentación de Anthropic lista los niveles `low`, `medium`, `high`, `xhigh` y `max`; no todos los modelos admiten todos (Opus 4.6 y Sonnet 4.6, por ejemplo, no tienen `xhigh`). Con los modelos recientes el razonamiento es adaptativo: se indica con `thinking: {type: "adaptive"}`, y el antiguo parámetro `budget_tokens` da error 400 en los modelos recientes.
+
+Dos detalles prácticos. En Opus 5.5 el razonamiento no se puede desactivar. Y cambiar el nivel de esfuerzo entre peticiones invalida parte de la caché de prompt; existe una función en beta para cambiarlo por mensaje sin romperla, que requiere una cabecera concreta.
+
+</div>
+<div slot="openai">
+
+El parámetro es `reasoning.effort`. En la familia GPT-6 los niveles admitidos incluyen `low`, `medium`, `high`, `xhigh` y `max`; `none` (sin razonamiento) existe en algunos modelos y no en GPT-6 Astra ni en GPT-6.1 Sol. Con un esfuerzo distinto de `none`, hay que eliminar parámetros de muestreo como `temperature` y `top_p`, porque la API no los admite en ese modo. El esfuerzo por defecto de Astra no figura en la documentación publicada.
+
+</div>
+<div slot="google">
+
+El parámetro es `thinking_level`, con `low`, `medium` y `high`. En Gemini 4 Argon el valor por defecto es `medium`. Google recomienda ejecutar tus evaluaciones en los tres niveles y quedarte con el más bajo que cumpla tu listón de calidad: es, casi literalmente, el método de esta guía.
+
+</div>
+</ProviderTabs>
+
+<Callout tipo="varia">
+
+El mismo mando se llama `output_config.effort` en Anthropic, `reasoning.effort` en OpenAI y `thinking_level` en Google. Los niveles comunes a los tres son `low`, `medium` y `high`; los demás (`xhigh`, `max`, `none`) no existen en todos los modelos. Comprueba el nivel exacto en la documentación antes de copiar una configuración de un proveedor a otro.
+
+</Callout>
+
+## Tabla de equivalencias
+
+|                                                       | Anthropic                                              | OpenAI                                                                                                        | Google                                        |
+| ----------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| Parámetro                                             | `output_config.effort`                                 | `reasoning.effort`                                                                                            | `thinking_level`                              |
+| Niveles                                               | `low`, `medium`, `high`, `xhigh`, `max`                | `none`, `low`, `medium`, `high`, `xhigh`, `max`                                                               | `low`, `medium`, `high`                       |
+| Excepciones                                           | Sin `xhigh` en Opus 4.6 ni Sonnet 4.6                  | `none` no existe en Astra ni en 6.1 Sol; `minimal` existe en el parámetro, pero ningún modelo GPT-6 lo admite | `minimal` da error en Gemini 3.8 Flash        |
+| Defecto                                               | Depende del modelo y de la superficie (tabla de abajo) | `medium` en la familia GPT-6, salvo Astra (no publicado)                                                      | `medium` en Gemini 4 Argon y Gemini 3.8 Flash |
+| Cambiarlo a mitad de conversación sin romper la caché | Función en beta por mensaje, con cabecera específica   | `configuration_update`                                                                                        | Sin dato en la guía                           |
+
+Dos avisos de OpenAI: con un esfuerzo distinto de `none` hay que eliminar `temperature`, `top_p` y `top_logprobs`, y el nombre de un nivel no equivale al mismo grado de razonamiento en otro proveedor. Un `high` de Google no es un `high` de Anthropic.
+
+## El valor por defecto depende de la superficie
+
+Quien usa Claude desde la API y desde Claude Code puede llevarse una sorpresa. Sonnet 5.5 arranca en <Fact id="sonnet-5-5.effort.default.api" /> en la API y en <Fact id="sonnet-5-5.effort.default.claude-code" /> en Claude Code. Opus 5.5 arranca en <Fact id="opus-5-5.effort.default.api" /> en ambas. Mira la columna de esfuerzo de esta tabla, que se genera desde los datos:
+
+<ModelTable
+  ids={['opus-5-5', 'sonnet-5-5', 'haiku-5-5', 'gpt-6-1-sol', 'gemini-4-argon']}
+  etiqueta="Esfuerzo por defecto en la API"
+/>
+
+<Callout tipo="cuidado">
+
+Si migras de Opus 5 (esfuerzo por defecto <Fact id="opus-5.effort.default.api" />) a Opus 5.5 (<Fact id="opus-5-5.effort.default.api" />) sin tocar nada, tu código se ejecuta un nivel por debajo. No es un error: el modelo nuevo trae otro valor por defecto. Si notas que algo empeora, fija el nivel de forma explícita y compara.
+
+</Callout>
+
+## Qué cambia al subir o bajar
+
+Aquí conviene separar tres tipos de afirmación.
+
+**Dato verificado.** El razonamiento se factura como salida, y en Haiku 5.5, Sonnet 5.5, Opus 5.5 y Fable 5.1 los tokens de salida cuestan cinco veces los de entrada (guía de optimización de Anthropic). Por tanto, bajar el esfuerzo reduce el coste de salida.
+
+**Medición publicada.** Anthropic publica, sobre un subconjunto de SWE-bench Pro (tareas de programación; cada celda reúne dos ejecuciones), que Sonnet 5.5 en `medium` quedó unos 7 puntos por debajo de `high` con aproximadamente el 59 % del coste por tarea. En la comparación de modelos de la misma guía, Opus 5.5 en `low` resolvió el 87,4 % de las tareas a 0,12 $ por tarea resuelta, y en `medium` el 92,8 % a 0,22 $; Sonnet 5.5 en `high` (su valor por defecto en la API) resolvió el 87,6 % a 0,11 $. Son cifras del proveedor sobre sus propias tareas: orientan, no se trasladan sin más a tu trabajo.
+
+<Callout tipo="medicion" titulo="Medición publicada por Anthropic" fecha="2026-10-16">
+
+La misma guía de optimización indica que ejecutar todo en `low` y repetir solo los fallos en `high` costó alrededor de un 40 % menos que todo en `high`, con la misma tasa de acierto, en sus pruebas. El texto original añade que esa política sirve para ahorrar, no para mejorar el resultado.
+
+</Callout>
+
+**Recomendación de la guía.** Trata el esfuerzo como un compromiso: sube cuando falle el razonamiento (errores lógicos, pasos saltados) y no cuando falle el encargo (formato, tono, datos que faltan). Subir esfuerzo no arregla un encargo ambiguo.
+
+<Callout tipo="recomendacion">
+
+Antes de subir el esfuerzo, mejora el encargo y aplica las palancas gratuitas (caché, contexto limpio, formato de salida). Es una recomendación de la guía: esas mejoras no cuestan calidad, mientras que bajar o subir esfuerzo cambia el coste y el resultado, y hay que medirlo.
+
+</Callout>
+
+## En Claude Code
+
+En Claude Code el esfuerzo se cambia sin tocar código:
+
+- `/effort` fija el nivel (de `low` a `xhigh`, `max` o `auto`) y `/effort status` muestra el actual.
+- `/model` cambia de modelo y lo guarda como predeterminado para sesiones nuevas (con `s` en el selector, solo para la sesión actual); con las flechas permite ajustar el esfuerzo.
+- La variable de entorno `CLAUDE_CODE_EFFORT_LEVEL` lo fija de forma persistente; el nivel `max` elegido con `/effort` solo vale para la sesión actual.
+- Las definiciones de subagentes y skills admiten su propio campo de esfuerzo, de modo que una tarea de exploración puede ir barata aunque la sesión principal vaya en alto.
+
+**`ultrathink`.** Si incluyes la palabra `ultrathink` en cualquier parte de tu prompt, Claude Code pide un razonamiento más profundo en ese turno sin cambiar el esfuerzo de la sesión: añade una instrucción en el contexto y el nivel de esfuerzo que se envía a la API no cambia. Es la única palabra de este tipo: «think», «think hard» o «think more» se pasan como texto normal y no son palabras clave.
+
+**`ultracode`.** No es un nivel de esfuerzo, sino un ajuste de Claude Code: con él activado, Claude orquesta flujos dinámicos (muchos subagentes coordinados por un script) en las tareas sustanciales, al nivel de esfuerzo en que corra la sesión. `/effort ultracode` lo activa y `/effort ultracode off` lo desactiva, sin cambiar el nivel. Arrancar con `claude --effort ultracode` (o fijarlo desde el SDK) lo activa y además pone `xhigh`. No está disponible si los flujos están desactivados o si el modelo no admite `xhigh`; en ese caso la sesión arranca sin ultracode, en el nivel más alto que permita el modelo.
+
+## En la práctica
+
+<Steps>
+
+1. Elige cinco tareas reales, incluida alguna difícil, y apunta qué consideras una respuesta aceptable.
+2. Ejecuta las cinco en el nivel por defecto y guarda el resultado y el tiempo.
+3. Repite en un nivel inferior. Compara con el listón que fijaste antes de mirar.
+4. Si la calidad aguanta, quédate con el nivel bajo. Si falla solo en las difíciles, usa el bajo por defecto y sube únicamente para ese tipo de tarea.
+5. Anota nivel, modelo y fecha: los valores por defecto cambian entre versiones.
+
+</Steps>
+
+## Ejemplo de oficina: el informe mensual
+
+Una responsable de finanzas pide cada mes a Claude que redacte el comentario del cierre a partir de una tabla de variaciones. Con el esfuerzo por defecto el comentario sale bien en un par de minutos. Prueba `low` en los últimos tres cierres, compara con lo que escribió ella y comprueba que las cifras citadas coinciden con la tabla. Si coinciden y el tono es el mismo, deja `low` para el comentario habitual y reserva `high` para el trimestre, donde hay que explicar desviaciones que interactúan entre sí. Es una hipótesis de trabajo: el ahorro real depende de sus documentos.
+
+## Errores frecuentes
+
+- **Subir el esfuerzo para arreglar un mal encargo.** Si el resultado falla por falta de contexto o por un formato mal pedido, más razonamiento solo encarece el error.
+- **Dar por hecho que el nivel por defecto es el mismo en todas partes.** Cambia con el modelo y con la superficie.
+- **Fijar `max` por si acaso.** Es el nivel de mayor coste y latencia; úsalo cuando hayas comprobado que `high` o `xhigh` no bastan.
+- **Copiar parámetros de un proveedor a otro.** Los nombres y los niveles admitidos no coinciden.
+- **Cambiar el esfuerzo en mitad de una conversación larga con caché.** En la API de Anthropic puede invalidar parte de la caché; planifícalo.
+
+<Checklist
+  id="esfuerzo-y-razonamiento"
+  titulo="Antes de tocar el esfuerzo"
+  items={[
+    'Sé qué esfuerzo usa por defecto mi modelo en mi superficie.',
+    'He descartado que el fallo sea del encargo o del contexto.',
+    'He probado el nivel inferior en una muestra con casos difíciles.',
+    'Sé que el razonamiento se factura como salida.',
+    'He anotado nivel, modelo y fecha del ajuste.',
+  ]}
+/>
+
+## Para profundizar
+
+La base teórica está en [Razonamiento y esfuerzo](/AI-Optimized_Usage_Web/m1-fundamentos/razonamiento-y-esfuerzo/). Para decidir con método, [la estrategia de selección](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/estrategia-de-seleccion/).

@@ -6,6 +6,205 @@ sidebar:
 level: intermedio
 tracks: [profesional, tecnica]
 readingTime: 12
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-16
+sources:
+  [
+    anthropic-prompt-caching,
+    anthropic-precios,
+    anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas,
+    anthropic-cookbook-de-optimizacion-de-coste,
+    claude-code-prompt-caching-en-claude-code,
+    openai-precios,
+    openai-ultimo-modelo-y-migracion,
+    google-precios,
+    ai-google-dev-gemini-api-docs-prompting-strategies,
+    platform-claude-com-docs-en-build-with-claude-cache-diagnostics,
+    anthropic-esfuerzo,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Fact from '@components/Fact.astro';
+import ProviderTabs from '@components/ProviderTabs.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+import CostExample from '@components/CostExample.astro';
+
+<KeyTakeaways>
+
+- La caché reutiliza el **comienzo** idéntico de tu prompt: lo estable va primero y lo variable, al final.
+- Leer de la caché cuesta una fracción de la entrada normal; escribir cuesta algo más que la entrada normal. Compensa en cuanto reutilizas el prefijo.
+- Cualquier cambio dentro del prefijo (herramientas, sistema, modelo, esfuerzo) invalida lo que viene después.
+- Se comprueba en la respuesta de la API (`cache_read_input_tokens`) o, en Claude Code, en `/usage`.
+- OpenAI y Google tienen su propia caché, con reglas distintas.
+
+</KeyTakeaways>
+
+## La idea
+
+Cada petición a un modelo repite gran parte de lo anterior: las instrucciones, las herramientas, los documentos, el historial. Procesar ese bloque repetido cada vez es lo que se paga. El prompt caching permite que el proveedor guarde el procesamiento de un **prefijo** de la petición y lo reutilice en la siguiente, y cobra su lectura a un precio menor.
+
+La palabra importante es prefijo. La caché solo acierta si el comienzo de la petición es idéntico, token a token, a uno guardado. La documentación de Anthropic lo dice así: los aciertos exigen segmentos idénticos al 100 %. En la API de Claude el orden de construcción es **herramientas, sistema, mensajes**, y un cambio en cualquier nivel invalida ese nivel y todos los posteriores.
+
+La consecuencia práctica es una regla de diseño: lo que casi nunca cambia (instrucciones, herramientas, documentos de referencia) va al principio, y lo que cambia en cada petición (la pregunta de hoy, la fecha, los datos del cliente) va al final.
+
+## Cuánto cuesta y cuándo compensa
+
+La caché tiene dos precios nuevos: escribir una entrada en ella y leerla. Según la tabla de precios de Anthropic, la escritura de 5 minutos cuesta 1,25 veces el precio de entrada y la de 1 hora, 2 veces; la lectura cuesta 0,1 veces (0,05 veces en Opus 5.5 y Sonnet 5.5; 0,025 veces en Fable 5.1 y Mythos 5.1). Estos son los precios resultantes en los modelos de uso diario, en dólares por millón de tokens:
+
+| Modelo     | Entrada normal                         | Escritura (5 min)                             | Escritura (1 h)                               | Lectura                                    |
+| ---------- | -------------------------------------- | --------------------------------------------- | --------------------------------------------- | ------------------------------------------ |
+| Haiku 5.5  | <Fact id="haiku-5-5.pricing.input" />  | <Fact id="haiku-5-5.pricing.cacheWrite5m" />  | <Fact id="haiku-5-5.pricing.cacheWrite1h" />  | <Fact id="haiku-5-5.pricing.cacheRead" />  |
+| Sonnet 5.5 | <Fact id="sonnet-5-5.pricing.input" /> | <Fact id="sonnet-5-5.pricing.cacheWrite5m" /> | <Fact id="sonnet-5-5.pricing.cacheWrite1h" /> | <Fact id="sonnet-5-5.pricing.cacheRead" /> |
+| Opus 5.5   | <Fact id="opus-5-5.pricing.input" />   | <Fact id="opus-5-5.pricing.cacheWrite5m" />   | <Fact id="opus-5-5.pricing.cacheWrite1h" />   | <Fact id="opus-5-5.pricing.cacheRead" />   |
+| Fable 5.1  | <Fact id="fable-5-1.pricing.input" />  | <Fact id="fable-5-1.pricing.cacheWrite5m" />  | <Fact id="fable-5-1.pricing.cacheWrite1h" />  | <Fact id="fable-5-1.pricing.cacheRead" />  |
+
+Haiku 5.5 tiene tarifas distintas para peticiones de más de 100.000 tokens de entrada; consulta la nota de [la tabla de modelos](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/mapa-de-modelos/). Las lecturas y escrituras de caché cuentan para ese umbral.
+
+### Cuándo se recupera la escritura
+
+Con Sonnet 5.5, por cada millón de tokens de prefijo, dos peticiones sin caché cuestan 2 × <Fact id="sonnet-5-5.pricing.input" /> = 4 $. Con la escritura de 5 minutos, la primera cuesta <Fact id="sonnet-5-5.pricing.cacheWrite5m" /> y la segunda, la lectura (<Fact id="sonnet-5-5.pricing.cacheRead" />): 2,60 $ en total, así que ya compensa en la segunda petición. Con la escritura de 1 hora son <Fact id="sonnet-5-5.pricing.cacheWrite1h" /> más <Fact id="sonnet-5-5.pricing.cacheRead" />: 4,10 $, más que sin caché, así que la escritura de 1 hora no se recupera en la segunda petición sino en la tercera. Son cuentas con los precios de la tabla, no mediciones.
+
+### Mínimo cacheable y puntos de corte
+
+Un prefijo más corto que el mínimo no se cachea aunque lo marques. Según la tabla de Anthropic, el mínimo es de 512 tokens en Fable, Mythos, Opus 5.5, Opus 5, Sonnet 5.5 y Haiku 5.5; de 1.024 en Opus 4.8, Sonnet 5 y Sonnet 4.6; de 2.048 en Opus 4.7, y de 4.096 en Opus 4.6 y Haiku 4.5. Se admiten hasta cuatro puntos de corte por petición, y existe una caché automática que coloca el punto de corte por ti con un solo `cache_control` en la raíz de la petición. Si no quieres gestionar puntos de corte, empieza por esa.
+
+### Cinco minutos o una hora
+
+Por defecto, una entrada vive 5 minutos, y cada acierto la refresca sin coste adicional. Se puede pedir una vida de 1 hora con `ttl: "1h"`, a cambio de una escritura más cara. Un fallo, en cualquiera de las dos, cobra todo el prefijo al precio de escritura en lugar del de lectura.
+
+<Callout tipo="recomendacion" titulo="Regla del proveedor (Anthropic)">
+
+Cita literal de la guía de optimización de coste: «If your loop waits on a person between turns, use the 1-hour cache duration once about 1 turn in 20 follows a pause between 5 minutes and an hour and few gaps run over an hour. On Claude Fable 5.1, Claude Opus 5.5, and Claude Sonnet 5.5, keeping the 5-minute cache warm can cost less.» En castellano: si tu bucle espera a una persona entre turnos, usa la hora cuando aproximadamente 1 de cada 20 turnos llega tras una pausa de entre 5 minutos y una hora y pocos huecos superan la hora; en Fable 5.1, Opus 5.5 y Sonnet 5.5, mantener caliente la caché de 5 minutos puede costar menos. La documentación de la API añade que, si tus prompts se usan con más frecuencia que cada 5 minutos, conviene la caché de 5 minutos, que se sigue refrescando sin cargo.
+
+</Callout>
+
+<Callout tipo="medicion" titulo="Medición publicada por Anthropic">
+
+En esa misma guía, Anthropic calcula que el punto de equilibrio está en torno a 1 turno de cada 30 en Sonnet 5.5 y Opus 5.5. Sin pausas, el ajuste por defecto (5 minutos) salió un 19 % más barato que el de 1 hora en Sonnet 5.5 y entre un 15 % y un 18 % más barato en Opus 5.5. Con 1 turno de cada 20 tras una pausa, ambos costaron aproximadamente lo mismo en Sonnet 5.5, dentro de la variación entre ejecuciones; con 1 de cada 10, la opción de 5 minutos costó un 54 % más. Son cifras del proveedor en sus propias pruebas.
+
+</Callout>
+
+<Callout tipo="medicion" titulo="Medición publicada por Anthropic">
+
+En el tráfico real de un día de Anthropic, los bucles de agente leyeron de la caché una mediana del 84 % de su entrada, y el 10 % superior, el 94 % o más. Son cifras del proveedor en su propio entorno, que la propia página presenta como direccionales y no como garantía. Aun así, indican que en un bucle bien construido casi toda la entrada se lee, no se paga completa.
+
+</Callout>
+
+## Qué invalida la caché
+
+La caché falla en silencio: no hay error, solo una factura mayor. Las causas de invalidación documentadas en la API de Claude (orden de construcción: herramientas, sistema, mensajes):
+
+| Si cambias…                                             | Se invalida…                                                      |
+| ------------------------------------------------------- | ----------------------------------------------------------------- |
+| Las herramientas (definiciones)                         | Todo: herramientas, sistema y mensajes                            |
+| El mensaje de sistema                                   | Sistema y mensajes                                                |
+| Activas o desactivas la búsqueda web o las citas        | Sistema y mensajes                                                |
+| El ajuste de velocidad (`speed`: fast o estándar)       | Sistema y mensajes                                                |
+| `tool_choice`, o añades o quitas imágenes               | Solo los mensajes                                                 |
+| El nivel de esfuerzo o la configuración de razonamiento | Los mensajes (y, según el modelo, también sistema y herramientas) |
+
+Dos matices que la documentación recoge. Fijar el esfuerzo explícitamente en el valor por defecto del modelo equivale a no indicarlo y no invalida. Y en los modelos con esfuerzo por mensaje, un cambio de esfuerzo transportado en un mensaje con `role: "system"` dentro de `messages` deja intacto el prefijo cacheado.
+
+En Claude Code, su documentación lista como acciones que invalidan la caché: cambiar de modelo (la siguiente petición lee todo el historial sin aciertos), cambiar el esfuerzo en la mayoría de modelos, activar el modo rápido (solo la primera vez en la conversación), conectar o quitar servidores MCP o plugins con herramientas **cuando las herramientas se cargan de entrada** (con tool search, el valor por defecto en los modelos compatibles, no), denegar una herramienta entera (también solo si no hay tool search), compactar la conversación, acumular muchas imágenes (se eliminan las más antiguas por lotes) y actualizar Claude Code (la primera conversación tras reiniciar construye la caché desde cero). Cambiar el esfuerzo conserva la caché en Opus 5.5, Sonnet 5.5, Haiku 5.5 y Fable 5.1 con clave de API o suscripción; la excepción no aplica en Amazon Bedrock, Google Cloud Agent Platform, un gateway de apps de Claude, ni con `CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS` o una configuración HIPAA. No la invalidan: editar ficheros, cambiar el modo de permisos, cambiar el estilo de salida, invocar skills o comandos (salvo que fijen otro modelo), `/rewind` ni `/recap`.
+
+Lo que sigue es una inferencia de la guía a partir de la regla del prefijo idéntico:
+
+<Callout tipo="recomendacion">
+
+Mantén fuera del comienzo del prompt todo dato que cambie con frecuencia: una marca de hora con minutos, un identificador de sesión, el nombre del usuario. Si el modelo necesita ese dato, ponlo en el mensaje de usuario, al final. Y si envías datos estructurados en el prefijo, ponlos siempre con el mismo orden de campos. Por qué: un solo carácter distinto al principio hace que el prefijo ya no sea idéntico y se pague otra escritura, aunque el resto del texto sea el mismo. Una fecha sin hora cambia una vez al día y solo rompe la caché una vez al día; una hora con minutos la rompe en cada petición hecha en un minuto distinto (y la caché vive 5 minutos o 1 hora, así que casi siempre hay una escritura nueva); un identificador de sesión, en cada sesión.
+
+</Callout>
+
+También se invalida lo que viene después cuando limpias resultados de herramientas con context editing: la documentación advierte de que limpiar invalida la caché desde el punto de limpieza (ver [higiene del bucle](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/higiene-del-bucle/)). Para cambiar el esfuerzo sin romper la caché, la API de Claude ofrece una función en beta que acepta el esfuerzo por mensaje y requiere la cabecera `mid-conversation-output-config-2026-07-01`. OpenAI tiene un mecanismo equivalente en su familia GPT-6 (los elementos `configuration_update`), descrito en las pestañas de más abajo.
+
+## En la práctica
+
+<Steps>
+
+1. Ordena el prompt: herramientas y sistema fijos, después documentos de referencia, después el historial, y la pregunta nueva al final.
+2. Saca del comienzo cualquier dato que cambie por petición.
+3. En la API de Claude, activa la caché automática (un `cache_control` en la raíz) o marca tú los puntos de corte tras el último bloque estable.
+4. Elige 5 minutos o 1 hora según tus pausas habituales.
+5. Comprueba que acierta: la respuesta incluye `cache_creation_input_tokens` (escrito), `cache_read_input_tokens` (leído) e `input_tokens`, que son solo los tokens posteriores al último punto de corte. La entrada total es la suma de los tres.
+6. Si la lectura es cero turno tras turno, busca en la tabla de causas de invalidación qué cambia entre peticiones. La documentación de Anthropic tiene además una página de diagnóstico de caché.
+
+</Steps>
+
+En Claude Code, la línea «Prompt cache» de `/usage` muestra el estado de la caché de la sesión principal (disponible desde la versión 2.1.251, según la documentación de costes). La vida de la caché en la conversación principal es de 1 hora con una suscripción de Claude dentro del uso incluido en tu plan, y de 5 minutos con créditos de uso, clave de API o proveedor en la nube; las peticiones de los subagentes usan 5 minutos.
+
+## Lo mismo en otros proveedores
+
+<ProviderTabs>
+  <div slot="claude">
+
+Caché explícita con puntos de corte o automática con un `cache_control` en la raíz. Vida de 5 minutos o 1 hora. Las escrituras y lecturas tienen precio propio y el mínimo cacheable depende del modelo (tablas de arriba).
+
+  </div>
+  <div slot="openai">
+
+Desde GPT-5.6, la vida de la caché se fija con `prompt_cache_options.ttl`, cuyo único valor admitido y por defecto es `30m` (sustituye al antiguo `prompt_cache_retention`). La documentación fija un mínimo de 1.024 tokens, una lectura al 10 % del precio de entrada (5 % en GPT-6.1 Sol) y una escritura al 125 %. En la familia GPT-6, para cambiar el esfuerzo de razonamiento a mitad de conversación sin romper el prefijo, la guía de prompting indica usar elementos `configuration_update` en lugar de modificar `reasoning.effort` en la petición.
+
+  </div>
+  <div slot="google">
+
+La caché implícita está activada por defecto en los modelos Gemini 2.5 y posteriores: no marcas nada y el descuento se aplica cuando el prefijo coincide. Para Gemini 4 Argon el mínimo es de 4.096 tokens, el descuento por acierto es del 95 % según Google, y no admite caché explícita. El número de tokens servidos desde caché se consulta en `usage.total_cached_tokens`.
+
+  </div>
+</ProviderTabs>
+
+<Callout tipo="varia">
+
+Los tres proveedores cachean prefijos, pero difieren en quién decide el punto de corte (tú, el sistema o ambos), en la vida de la entrada, en el mínimo de tokens y en cuánto cuesta escribir. Mira la documentación del modelo concreto antes de calcular ahorros.
+
+</Callout>
+
+## Ejemplo de oficina: el asistente de preguntas sobre el convenio
+
+Un departamento de personal construye un asistente interno que responde sobre el convenio colectivo. Supón que las instrucciones y el convenio ocupan 18.000 tokens y que cada pregunta, con su historial, añade 2.000. Primera versión: el prompt empieza por «Hora actual: 10:42», sigue el convenio y al final va la pregunta. La hora cambia cada minuto, así que cada pregunta hecha en un minuto distinto cambia el comienzo del prompt, y casi todas pagan la escritura completa del convenio. Segunda versión: instrucciones y convenio primero, sin hora, y la hora dentro del mensaje de la pregunta, al final. Los 18.000 tokens del comienzo ya no cambian y, mientras haya preguntas dentro de la vida de la caché (5 minutos o 1 hora), se leen de caché.
+
+Con los precios de la tabla, esto es lo que cuesta responder 1.000 preguntas de 20.000 tokens de entrada y unos 500 de salida, comparando la entrada completa con la entrada en la que 18.000 tokens se leen de caché caliente (el ejemplo supone que la caché está siempre caliente y no incluye la escritura inicial):
+
+<CostExample
+  ids={['haiku-5-5', 'sonnet-5-5']}
+  entrada={20000}
+  salida={500}
+  volumen={1000}
+  cacheados={18000}
+  batch={false}
+  etiqueta="Coste de 1.000 preguntas con 18.000 tokens de prefijo estable"
+/>
+
+Lo que enseña la tabla: con la caché caliente, la parte de entrada del prefijo cuesta una fracción de lo normal. Con la caché rota por la hora, se paga cada vez la escritura, que además es más cara que la entrada normal.
+
+## Errores frecuentes
+
+- **Poner una hora con minutos, un identificador de sesión o el nombre del usuario al principio del prompt.** Cambian a menudo y rompen la caché. (Una fecha sin hora la rompe solo una vez al día.)
+- **Cambiar de modelo a mitad de sesión.** En Claude Code, la siguiente petición lee todo el historial sin aciertos de caché.
+- **Pausas largas sin saberlo.** Si vuelves tras más de 5 minutos con una caché de 5 minutos, pagas la escritura de nuevo.
+- **Documentos por debajo del mínimo cacheable.** Marcarlos no sirve de nada: no se cachean.
+- **Dar por hecho que funciona.** Sin mirar `cache_read_input_tokens` o `/usage` no lo sabes.
+
+<Callout tipo="cuidado">
+
+Las cifras del cookbook de Anthropic sobre caché (por ejemplo, ahorros de entre un tercio y más de la mitad según la configuración) provienen de un cuaderno con datos sintéticos y 10 casos; el propio cookbook avisa de que las repeticiones variarán. No las uses como previsión: mide con tus peticiones.
+
+</Callout>
+
+<Checklist
+  id="prompt-caching"
+  titulo="Mi caché funciona"
+  items={[
+    'Lo estable va primero y lo variable, al final.',
+    'No hay horas con minutos, identificadores ni nombres de usuario en el comienzo del prompt.',
+    'Las herramientas no cambian entre peticiones.',
+    'No cambio de modelo ni de esfuerzo a mitad de tarea.',
+    'He comprobado que la lectura de caché es mayor que cero.',
+    'Sé si mi caché dura 5 minutos o 1 hora y adapto mis pausas.',
+  ]}
+/>
+
+## Para profundizar
+
+La documentación de Anthropic sobre prompt caching y su guía de optimización de coste e inteligencia son las referencias; la lista está abajo en Fuentes. Para ver dónde se ve la caché en la práctica, [El día a día en Claude Code](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/dia-a-dia-en-claude-code/) y [medir](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/medir/).

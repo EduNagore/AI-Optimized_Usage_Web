@@ -225,5 +225,23 @@
     "status": "Desde 2026-06-18 deja de dar servicio a Google AI Pro, Ultra y Code Assist for individuals (los sustituye Antigravity CLI, agy); sigue con licencias Code Assist Standard y Enterprise y claves de pago de la API",
     "source": "developers-googleblog-com-an-important-update-transitioning-gemini-cli-to-antigr",
     "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "anthropic-prefill-400",
+    "feature": "Prellenado de la respuesta del asistente",
+    "provider": "anthropic",
+    "surface": "API de Anthropic",
+    "status": "Devuelve un error 400 en Claude Opus 4.6 y posteriores, incluido Opus 5.5. No verificado para Sonnet 5.5, Haiku 5.5 ni Fable 5.1. En Amazon Bedrock, Opus 5.5 no admite structured outputs",
+    "source": "anthropic-migracion-opus-5-5",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "google-max-output-tokens-recomendado",
+    "feature": "max_output_tokens recomendado al migrar a Gemini 4 Argon",
+    "provider": "google",
+    "surface": "API de Gemini",
+    "status": "Tareas estándar: mantener el valor por defecto de 65.536 o no fijarlo; como mínimo 32.768",
+    "source": "google-ultimo-modelo",
+    "verifiedAt": "2026-10-16"
   }
 ]

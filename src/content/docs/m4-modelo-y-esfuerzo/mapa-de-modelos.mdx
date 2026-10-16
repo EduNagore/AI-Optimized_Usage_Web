@@ -6,6 +6,132 @@ sidebar:
 level: basico
 tracks: [profesional, tecnica]
 readingTime: 7
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-16
+sources:
+  [
+    anthropic-modelos,
+    anthropic-precios,
+    openai-precios,
+    openai-ultimo-modelo-y-migracion,
+    google-ultimo-modelo,
+    google-precios,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Fact from '@components/Fact.astro';
+import ModelTable from '@components/ModelTable.astro';
+import ProviderTabs from '@components/ProviderTabs.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Cada proveedor ofrece una escalera de modelos: rápido y barato, equilibrado, alto rendimiento y frontera.
+- Los escalones se parecen entre proveedores, pero no son equivalentes en precio ni en capacidad: compara siempre con las tablas.
+- Contexto, precio y esfuerzo por defecto cambian con cada versión: léelos de las tablas, no de la memoria.
+- Regla de partida: empieza con un modelo capaz (la gama equilibrada o superior) y su esfuerzo por defecto; baja el esfuerzo o el modelo solo cuando lo hayas medido en una muestra y la calidad se mantenga; sube cuando falle.
+
+</KeyTakeaways>
+
+## La idea
+
+Los tres proveedores organizan su catálogo de forma parecida. Abajo, un modelo pequeño, rápido y barato para volumen y tareas sencillas. En medio, un modelo equilibrado para el trabajo diario. Más arriba, uno de alto rendimiento y, en la cima, un modelo de frontera para el trabajo más difícil o más delicado. Los nombres cambian cada pocos meses; la estructura, bastante menos.
+
+Eso permite aprender el mapa una vez y reaprender solo los nombres. Pero ojo: que dos modelos ocupen el mismo escalón no los hace equivalentes. Gemini 4 Argon, por ejemplo, se clasifica como frontera y su precio actual (introductorio) es parecido al de Sonnet 5.5, un modelo equilibrado; Gemini 3.8 Flash cuesta bastante más que Haiku 5.5. Compara por precio y por resultados en tu muestra, no por el nombre del escalón.
+
+## El mapa, por proveedor
+
+Las tablas se generan desde datos con fuente oficial y fecha de verificación debajo de cada una. Las notas bajo cada tabla recogen condiciones que cambian el precio (tramos por tamaño de entrada, precios introductorios). La columna de esfuerzo por defecto es la de la API y puede diferir en otras superficies (se explica en [Esfuerzo y razonamiento](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/esfuerzo-y-razonamiento/)).
+
+<ProviderTabs>
+<div slot="claude">
+
+<ModelTable
+  ids={['fable-5-1', 'opus-5-5', 'sonnet-5-5', 'haiku-5-5']}
+  detalle
+  etiqueta="Modelos vigentes de Anthropic"
+/>
+
+Para situarse: Sonnet 5.5 cobra <Fact id="sonnet-5-5.pricing.input" /> por millón de tokens de entrada y <Fact id="sonnet-5-5.pricing.output" /> de salida, y Haiku 5.5 cobra <Fact id="haiku-5-5.pricing.input" /> y <Fact id="haiku-5-5.pricing.output" />. Haiku 5.5 tiene otra tarifa por encima de cierto tamaño de entrada: está en las notas bajo la tabla.
+
+</div>
+<div slot="openai">
+
+<ModelTable
+  ids={['gpt-6-astra', 'gpt-6-1-sol', 'gpt-6-luna']}
+  detalle
+  etiqueta="Modelos vigentes de OpenAI"
+/>
+
+El esfuerzo por defecto de GPT-6 Astra no está publicado en la documentación oficial, por eso su celda muestra «—». Los precios de la tabla tienen un límite de contexto por encima del cual se aplican tarifas mayores a toda la petición: está en las notas bajo la tabla.
+
+</div>
+<div slot="google">
+
+<ModelTable ids={['gemini-4-argon', 'gemini-3-8-flash']} detalle etiqueta="Modelos vigentes de Google" />
+
+Los precios de Gemini 4 Argon y de Gemini 3.8 Flash son introductorios y cambian en las fechas que indican las notas bajo la tabla. Si tu proyecto va a durar más, planifica con el precio posterior.
+
+</div>
+</ProviderTabs>
+
+<Callout tipo="varia">
+
+Los tres proveedores no llaman igual a sus parámetros ni admiten los mismos niveles de esfuerzo: la columna «Niveles de esfuerzo» de las tablas lo muestra modelo a modelo. Se detalla en la página siguiente.
+
+</Callout>
+
+## Modelos que verás en la documentación y no conviene elegir
+
+Además de los de las tablas anteriores, siguen activos modelos anteriores: por ejemplo, Claude Opus 5 y Fable 5 (marcado como heredado, con retirada no anterior a una fecha publicada) o GPT-5.6 Sol. Están ahí para que reconozcas el nombre si aparece en un proyecto antiguo; para trabajo nuevo, parte del modelo vigente de su escalón.
+
+También existe un modelo de acceso limitado, Claude Mythos 5.1, disponible solo para organizaciones verificadas dentro de un programa restringido. Se menciona por completitud y no se recomienda: no está al alcance del lector medio.
+
+<Callout tipo="verificado" fecha="2026-10-16">
+
+Los estados «heredado» y «acceso limitado» salen de la documentación oficial de modelos y precios de Anthropic.
+
+</Callout>
+
+## En la práctica
+
+La documentación de Anthropic («Choosing the right model») plantea dos formas de elegir el modelo de partida. Empezar por eficiencia: arrancar con Haiku 5.5, probar a fondo y subir solo si falta capacidad; encaja con prototipos, latencia ajustada y volumen de tareas sencillas. Empezar por capacidad: arrancar con Opus 5.5, optimizar y, con el tiempo, bajar esfuerzo o modelo; encaja con razonamiento complejo y errores caros. La propia página resume: «Most workloads start with Claude Opus 5.5». Y añade que ajustar el esfuerzo suele ser mejor palanca que cambiar de modelo: con Sonnet 5.5 se parte de su esfuerzo por defecto y se ajusta según tus pruebas.
+
+Las dos estrategias encajan con esta guía: ambas arrancan de un punto razonado y se mueven midiendo, no por intuición. Para decidir en menos de un minuto:
+
+1. Identifica el escalón por la tarea. Repetitiva y de campos cerrados (extraer, clasificar): mira el escalón rápido. Trabajo diario con matices: el equilibrado. Si fallar sale caro: el alto rendimiento o la frontera.
+2. Compara el coste por tarea completada, no por token. Un modelo más barato que necesita tres intentos no ahorra. Lo desarrolla [Coste por tarea completada](/AI-Optimized_Usage_Web/m2-metodo/coste-por-tarea/).
+3. Comprueba que el modelo está disponible en tu superficie y plan.
+
+<Callout tipo="recomendacion">
+
+Empieza con un modelo capaz (la gama equilibrada o superior) y su esfuerzo por defecto; baja el esfuerzo o el modelo solo cuando lo hayas medido en una muestra y la calidad se mantenga; sube cuando falle. Es una recomendación de la guía, alineada con la documentación citada arriba. En trabajo de oficina de bajo riesgo (un borrador que vas a leer, por ejemplo), probar antes un esfuerzo menor es barato y reversible, pero se mide: cinco casos para una prueba rápida y entre 20 y 30 para fijar una política.
+
+</Callout>
+
+## Ejemplo de oficina
+
+Una gestoría recibe cada mes 800 facturas de proveedores y quiere extraer fecha, importe y NIF a una tabla. Un gestor podría pensar «uso el mejor modelo, por si acaso». Con el mapa en la mano, la tarea es repetitiva y de campos cerrados: el escalón rápido es el primero en probarse. Se toman 30 facturas que ya están introducidas a mano, se comparan los resultados y se mira dónde falla. Si falla en las facturas escaneadas con mala calidad, se prueba el escalón equilibrado solo para ese subconjunto, no para las 800.
+
+## Errores frecuentes
+
+- **Elegir por el nombre más reciente.** Un nombre nuevo no significa que sea el que mejor encaja en coste y calidad para tu tarea.
+- **Dar por buenos los precios de hace meses.** Hay precios introductorios y promociones con fecha de fin; las tablas indican la verificación.
+- **Confundir ventana de contexto con memoria.** Que un modelo admita 1 millón de tokens no quiere decir que rinda igual de bien con la ventana llena.
+- **Comparar modelos de escalones distintos.** Un modelo rápido de un proveedor se compara con el rápido de otro, no con el de frontera.
+
+<Checklist
+  id="mapa-de-modelos"
+  titulo="Antes de fijar un modelo"
+  items={[
+    'He identificado el escalón que encaja con la tarea.',
+    'He mirado el precio y el contexto en la tabla, no de memoria.',
+    'He comprobado que el modelo está en mi superficie y plan.',
+    'Sé qué nivel de esfuerzo usa por defecto y dónde se cambia.',
+  ]}
+/>
+
+## Para profundizar
+
+Sigue con [Esfuerzo y razonamiento](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/esfuerzo-y-razonamiento/) para entender el segundo mando, y con [la estrategia de selección](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/estrategia-de-seleccion/) para saber cómo decidir midiendo.

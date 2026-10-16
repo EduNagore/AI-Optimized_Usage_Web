@@ -4,8 +4,16 @@ import { expect, test } from '@playwright/test';
 const pages = [
   ['inicio', ''],
   ['lección de ejemplo', 'm12-recursos/catalogo-de-componentes/'],
-  ['esqueleto de lección', 'm2-metodo/ciclo-de-7-pasos/'],
+  ['esqueleto de lección', 'm9-calidad-y-seguridad/verificar-siempre/'],
   ['índice de módulo', 'm2-metodo/'],
+  ['M0: las 10 reglas', 'm0-empieza-aqui/las-10-reglas/'],
+  ['M0: glosario', 'm0-empieza-aqui/glosario/'],
+  ['M2: coste por tarea', 'm2-metodo/coste-por-tarea/'],
+  ['M3: biblioteca de plantillas', 'm3-prompting/biblioteca-de-plantillas/'],
+  ['M3: notas por modelo', 'm3-prompting/notas-por-modelo/'],
+  ['M4: mapa de modelos', 'm4-modelo-y-esfuerzo/mapa-de-modelos/'],
+  ['M4: matriz por tarea', 'm4-modelo-y-esfuerzo/matriz-por-tarea/'],
+  ['M5: prompt caching', 'm5-tokens-y-contexto/prompt-caching/'],
   ['404', '404.html'],
 ] as const;
 
@@ -60,6 +68,8 @@ test('la lista de comprobación recuerda lo marcado', async ({ page }) => {
 test('el quiz comprueba una respuesta y explica', async ({ page }) => {
   await page.goto('m12-recursos/catalogo-de-componentes/');
   await page.getByLabel('Después del documento').scrollIntoViewIfNeeded();
+  // La isla se hidrata al hacerse visible: sin esperarla, la selección se pierde al hidratar.
+  await page.locator('astro-island[client="visible"]:not([ssr])').first().waitFor({ state: 'attached' });
   await page.getByLabel('Después del documento').check();
   await page.getByRole('button', { name: 'Comprobar' }).first().click();
   await expect(page.getByText('Correcto.')).toBeVisible();

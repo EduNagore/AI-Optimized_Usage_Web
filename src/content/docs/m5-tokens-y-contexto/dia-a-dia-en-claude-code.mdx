@@ -6,6 +6,149 @@ sidebar:
 level: intermedio
 tracks: [tecnica]
 readingTime: 8
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-16
+sources:
+  [
+    claude-code-costes,
+    claude-code-comandos,
+    claude-code-prompt-caching-en-claude-code,
+    claude-code-memoria-y-claude-md,
+    claude-code-skills,
+    claude-code-hooks,
+    claude-code-subagentes,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import CommandCard from '@components/CommandCard.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Mira antes de recortar: `/usage` y `/context` te dicen dónde está el gasto.
+- Una tarea, una sesión: `/clear` al cambiar de tema.
+- `/compact` con instrucciones de enfoque, no a ciegas.
+- Mantén `CLAUDE.md` por debajo de 200 líneas; lo específico va en skills.
+- Filtra con hooks las salidas largas y delega lo voluminoso a subagentes de modelo menor.
+
+</KeyTakeaways>
+
+## La idea
+
+Claude Code es un agente que lee ficheros, ejecuta comandos y reenvía todo en cada vuelta, así que ahí se aplican todas las palancas del módulo. La documentación oficial de costes de Claude Code reúne los hábitos que más pesan; esta página los ordena por frecuencia de uso y explica el porqué de cada uno.
+
+## Primero, ver
+
+<CommandCard comando="/usage" />
+
+`/usage` muestra el coste de la sesión, los límites del plan y estadísticas de actividad (`/cost` y `/stats` son alias). Desde la versión 2.1.251, según la documentación de costes, incluye una línea «Prompt cache» que indica cómo funciona la caché de la sesión principal: es la comprobación más rápida de si las [palancas de caché](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/prompt-caching/) están funcionando.
+
+<Callout tipo="cuidado">
+
+Con una suscripción Pro o Max, el coste en dólares del bloque «Session» de `/usage` no es relevante para la facturación (la documentación lo dice así: tu uso está incluido en la suscripción). En ese caso mira las barras de uso del plan y el desglose. Claude Code calcula la cifra en local a precio de lista, así que es una estimación incluso para quien paga por API.
+
+</Callout>
+
+En los planes Pro, Max, Team y Enterprise, `/usage` añade un desglose de lo que cuenta contra los límites del plan: el uso reciente atribuido a skills, subagentes, plugins y servidores MCP concretos, en porcentaje del total; avisos de comportamientos que suponen el 10 % o más del uso reciente (contexto largo, fallos de caché); y una fila por cada tarea programada o `/loop` de las que más consumen (esa fila exige la versión 2.1.242 o posterior).
+
+<CommandCard comando="/context" />
+
+`/context` dibuja el uso del contexto como una cuadrícula de colores con sugerencias de optimización. Úsalo cuando la sesión se note lenta o cara: te dice qué ocupa el espacio (conversación, herramientas, instrucciones, skills).
+
+<CommandCard comando="/skill-doctor" />
+
+`/skill-doctor` muestra lo que cada skill cuesta en contexto y con qué frecuencia se usa. `/insights` es otra cosa: genera un informe HTML sobre cómo trabajas, no sobre cuántos tokens gastas. Analiza tus sesiones recientes en tu máquina y cubre en qué trabajas, los puntos de fricción (peticiones mal entendidas, código con errores) y sugerencias para usar Claude Code mejor. Gasta tokens de tu plan o de tu API.
+
+## Después, mantener limpio
+
+<CommandCard comando="/clear" />
+
+`/clear` empieza una conversación nueva con el contexto vacío y conserva la memoria del proyecto. Es el hábito de mayor retorno: la documentación de costes lo recomienda entre tareas distintas.
+
+<Callout tipo="recomendacion">
+
+Haz `/clear` cada vez que cambies de tarea, aunque el contexto no esté lleno. Por qué: todo lo que quede de la tarea anterior se reenvía y se paga en cada turno de la nueva, y además puede distraer al modelo.
+
+</Callout>
+
+<CommandCard comando="/compact" />
+
+`/compact` libera contexto resumiendo la conversación y acepta instrucciones de enfoque: `/compact conserva las decisiones sobre el esquema de la base de datos y la lista de ficheros tocados`. Hazlo en un punto de corte natural, entre tareas. Qué cuesta, según la documentación de Claude Code: invalida la capa de conversación (el prompt de sistema se reutiliza); con la caché caliente, el resumen lee el prefijo de la caché y cuesta una fracción de lo que sugiere el tamaño del contexto; con la caché fría (tras una pausa larga, por ejemplo al retomar una sesión antigua) es lo más caro, porque vuelve a procesar todo el historial. `/clear` no cuesta nada. Y si sigues un camino que quieres abandonar del todo, `/rewind` suele ser mejor que compactar: vuelve a un prefijo que ya está en caché en lugar de construir uno nuevo. Si dejas una conversación larga en reposo con la caché de 1 hora, Claude Code puede compactarla poco antes de que caduque; se desactiva con el ajuste `idleCompaction` en `false` (desde la versión 2.1.290).
+
+<CommandCard comando="/btw" />
+
+`/btw` hace una pregunta lateral sin añadirla al historial: útil para consultas que no deben quedarse en el contexto de la tarea.
+
+<CommandCard comando="/rewind" />
+
+`/rewind` vuelve la conversación o el código a un punto anterior, o resume desde un mensaje. No invalida la caché: trunca el historial a un prefijo que ya estaba cacheado, según la documentación de caché de Claude Code.
+
+## Lo que está siempre cargado
+
+**`CLAUDE.md`.** La documentación recomienda mantener cada fichero por debajo de 200 líneas: los más largos consumen más contexto y se siguen peor. Editarlo a mitad de sesión no surte efecto hasta `/clear`, `/compact` o reiniciar. Lo específico de un tipo de tarea, a una skill (ver [higiene de entrada](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/higiene-de-entrada/)).
+
+**Servidores MCP.** En Claude Code las definiciones de herramientas MCP están diferidas por defecto: solo entran nombres de herramientas e instrucciones del servidor hasta que Claude usa una, y `/context` te muestra qué ocupa espacio. Desactiva con `/mcp` los servidores que no uses y, cuando exista una herramienta de línea de comandos equivalente (`gh`, `aws`, `gcloud`), úsala: según la documentación de costes, las CLI son más eficientes porque no añaden listado por herramienta.
+
+**Hooks que filtran.** Un hook puede reducir una salida larga antes de que llegue al contexto, por ejemplo mostrar solo los tests que fallan en lugar de todo el registro. La documentación de costes lo incluye entre sus consejos.
+
+**Subagentes con modelo menor.** Para exploración y búsqueda, un subagente con un modelo menor devuelve un resumen y deja el contexto principal limpio. La definición del subagente admite el campo `model`.
+
+## La caché en Claude Code
+
+La conversación principal usa una caché de 1 hora con una suscripción dentro del uso incluido en tu plan, y de 5 minutos con créditos de uso, clave de API o proveedor en la nube; los subagentes y las peticiones fuera de la conversación principal usan 5 minutos. Lo que la invalida: cambiar de modelo, activar el modo rápido, añadir o quitar servidores MCP o plugins con herramientas (solo si las herramientas se cargan de entrada; con tool search, el valor por defecto, conectar o desconectar a mitad de sesión no toca la caché), denegar una herramienta entera (también solo sin tool search), compactar, acumular muchas imágenes y actualizar Claude Code. No la invalidan editar ficheros, cambiar el modo de permisos, invocar skills o comandos, `/rewind` ni `/recap`.
+
+Un aviso sobre tareas repetidas: un `/loop` o una tarea programada cuyo intervalo supere la vida de la caché paga una escritura nueva en cada ejecución. Es una consecuencia directa de la caducidad, no una cifra medida: ajusta el intervalo o acepta el coste.
+
+<Callout tipo="medicion" titulo="Medición publicada por Anthropic">
+
+Según la documentación de costes, los procesos en segundo plano (resumen de conversaciones para `--resume`, comandos como `/usage`) cuestan normalmente menos de 0,04 $ por sesión, incluso con la sesión inactiva.
+
+</Callout>
+
+## En la práctica
+
+<Steps>
+
+1. Al empezar el día, `/usage` para saber desde dónde partes.
+2. Una tarea por sesión. Al terminar, `/clear`.
+3. Si el hilo se alarga, `/context` para ver qué pesa y `/compact` con instrucciones de enfoque.
+4. Una vez por semana, `/skill-doctor` y revisión de los servidores MCP conectados.
+5. Cuando una tarea produzca salidas enormes, delega en un subagente o filtra con un hook.
+
+</Steps>
+
+## Ejemplo de oficina: actualizar la web de la empresa
+
+Una responsable de comunicación usa Claude Code para actualizar las páginas de la web corporativa. Sesión 1: la página de «Equipo», con `/clear` al terminar. Sesión 2: la de «Noticias». Cada sesión carga solo lo suyo. Un `CLAUDE.md` de 60 líneas con el tono y la estructura, una skill para las notas de prensa y ningún servidor MCP conectado salvo el del gestor de contenidos. Al final de la semana ejecuta `/insights`, que le muestra en qué trabaja y dónde hay fricción, y le sugiere cambios de uso.
+
+## Otras palancas que recoge la documentación de costes
+
+- **Plugins de inteligencia de código** para lenguajes con tipos: dan navegación precisa por símbolos en lugar de búsqueda de texto, lo que reduce lecturas de ficheros innecesarias, según la documentación.
+- **Plan mode** (Shift+Tab) en tareas complejas: Claude explora y propone un enfoque antes de implementar, para evitar rehacer trabajo si la dirección inicial era mala.
+- **Prompts específicos**: «añade validación de entrada a la función de login en auth.ts» dispara menos lectura de ficheros que «mejora este código».
+
+## Errores frecuentes
+
+- **Una sola sesión para toda la semana.** El historial acumulado se reenvía siempre.
+- **`CLAUDE.md` como cajón de sastre.** Cuanto más largo, más caro y peor seguido.
+- **Compactar sin instrucciones.** El resumen decide por ti qué importa.
+- **Cambiar de modelo a mitad de sesión por probar.** La siguiente petición lee todo el historial sin aciertos de caché.
+
+<Checklist
+  id="claude-code-dia-a-dia"
+  titulo="Mi rutina en Claude Code"
+  items={[
+    'Reviso /usage al empezar y miro la línea de caché.',
+    'Hago /clear al cambiar de tarea.',
+    'Compacto con instrucciones, en puntos de corte.',
+    'CLAUDE.md por debajo de 200 líneas.',
+    'Solo tengo conectados los servidores MCP que uso.',
+    'Delego lo voluminoso a subagentes o lo filtro con hooks.',
+  ]}
+/>
+
+## Para profundizar
+
+Todos los comandos, en [Comandos de Claude Code](/AI-Optimized_Usage_Web/m7-claude-code/comandos/); el flujo de trabajo completo, en [Flujo recomendado](/AI-Optimized_Usage_Web/m7-claude-code/flujo-recomendado/).

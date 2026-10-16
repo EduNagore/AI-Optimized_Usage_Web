@@ -7,7 +7,13 @@ level: basico
 tracks: [esencial, profesional, tecnica]
 readingTime: 10
 lastReviewed: 2026-10-16
-sources: [anthropic-buenas-practicas-de-prompting, anthropic-structured-outputs, anthropic-skills]
+sources:
+  [
+    anthropic-buenas-practicas-de-prompting,
+    anthropic-structured-outputs,
+    anthropic-skills,
+    anthropic-skills-buenas-practicas,
+  ]
 ---
 
 import KeyTakeaways from '@components/KeyTakeaways.astro';
@@ -76,6 +82,7 @@ No inventes datos ni compromisos que no aparezcan en la situación. Si falta alg
 - Situación: entregamos el módulo de facturación con dos semanas de retraso (previsto 15 de septiembre, ahora 29) por un fallo de nuestro proveedor de pagos.
 - Destinatario: Marta Ruiz, responsable de compras; cuatro años de relación, sabe del retraso por teléfono pero no del motivo.
 - Objetivo: conservar su confianza y acordar una fecha de pruebas antes del viernes. Tono: cercano y profesional.
+- Lo que ofrecemos: entregar el módulo el 29 de septiembre, hacer una sesión de pruebas con su equipo el 1 de octubre y no cobrar las horas de soporte de esa semana.
 
 </PromptTemplate>
 
@@ -185,7 +192,7 @@ Compáralas en una tabla con una fila por criterio. Debajo, di cuál recomiendas
 
 **Ejemplo con los huecos rellenados.**
 
-- Propuestas: A (Formaprof, 12.400 EUR, 3 meses), B (Aula Norte, 9.800 EUR, 5 meses), C (CursoYa, 7.500 EUR, plataforma propia).
+- Propuestas: A (origen: Formaprof; 12.400 EUR, 3 meses) y B (origen: Aula Norte; 9.800 EUR, 5 meses).
 - Criterios, por orden: calidad del temario, plazo de entrega, coste total.
 - Decisión: contratar la formación en IA del segundo semestre.
 
@@ -238,7 +245,7 @@ Marca como supuesto cualquier dato que hayas tenido que asumir.`}
 
 **Cuándo usarla.** Cuando tienes un objetivo claro pero no el calendario ni los riesgos.
 
-**Configuración recomendada.** Chat, modelo de gama alta, esfuerzo medio o alto. Mejor tras una entrevista (ver «Que la IA te entreviste»).
+**Configuración recomendada.** Chat, modelo de gama alta, esfuerzo medio o alto. Mejor tras una entrevista (ver [Que la IA te entreviste](/AI-Optimized_Usage_Web/m3-prompting/que-la-ia-te-entreviste/)).
 
 **Ejemplo con los huecos rellenados.**
 
@@ -416,7 +423,8 @@ Si la respuesta no está en los documentos, dilo y no la inventes. Si la pregunt
 
 - Asistente: del equipo de RR. HH. de una empresa de 300 personas, para dudas de vacaciones, permisos y gastos.
 - Fuente de verdad: la política interna de 2026. Límite: no informa de salarios individuales, porque son confidenciales; remite a rrhh@ejemplo.com.
-- Respuestas: breves y con el apartado de la política citado.
+- Casos habituales: cuántos días de vacaciones quedan, cómo pedir un permiso y qué gastos se reembolsan.
+- Tono y longitud: respuestas breves y con el apartado de la política citado, porque la gente quiere comprobarlo.
 
 </PromptTemplate>
 
@@ -444,6 +452,7 @@ Al terminar, resume qué cambiaste, qué probaste y qué dudas te quedan.`}
 **Ejemplo con los huecos rellenados.**
 
 - Objetivo: el listado de pedidos de la API debe poder paginarse (parámetros page y size, tamaño máximo 100).
+- Contexto: el listado vive en el módulo de pedidos (src/orders); no tocar el módulo de facturación, que usa otro formato.
 - Restricción: no cambiar el formato de respuesta actual porque hay clientes que dependen de él.
 - Comprobación: npm test; añadir tests de paginación que fallen antes del cambio.
 
@@ -488,7 +497,7 @@ Cuando hayamos terminado, escribe una especificación con: objetivo, alcance y e
 
 **Cuándo usarla.** Cuando quieres convertir una idea en una especificación que una persona o un agente pueda implementar.
 
-**Configuración recomendada.** Chat o agente en modo plan, modelo de gama alta, esfuerzo medio o alto. Ver «Que la IA te entreviste».
+**Configuración recomendada.** Chat o agente en modo plan, modelo de gama alta, esfuerzo medio o alto. Ver [Que la IA te entreviste](/AI-Optimized_Usage_Web/m3-prompting/que-la-ia-te-entreviste/).
 
 **Ejemplo con los huecos rellenados.**
 
@@ -530,7 +539,7 @@ description: {{qué hace y cuándo debe usarse, en una o dos frases con las pala
 
 {{límite y su motivo}}
 
-<!-- Pautas oficiales para escribir skills: descripción en tercera persona (qué hace y cuándo usarla, máximo 1.024 caracteres), nombre de hasta 64 caracteres, SKILL.md de menos de 500 líneas y prueba con todos los modelos que vayas a usar. Borra este comentario al terminar. -->`}
+<!-- Pautas oficiales de Anthropic para escribir skills (guía de buenas prácticas de Agent Skills, https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices; verificado 2026-10-16): descripción en tercera persona (qué hace y cuándo usarla, máximo 1.024 caracteres), nombre de hasta 64 caracteres, SKILL.md de menos de 500 líneas y prueba con todos los modelos que vayas a usar. Borra este comentario al terminar. -->`}
 
 >
 
@@ -543,6 +552,8 @@ description: {{qué hace y cuándo debe usarse, en una o dos frases con las pala
 - name: informe-semanal
 - description: Prepara el informe semanal de ventas con las secciones fijas del equipo. Úsalo cuando pidan «el informe de la semana».
 - Procedimiento: leer el export del CRM, calcular tres indicadores, redactar resumen de una página.
+
+**Sobre los límites.** Los límites que menciona la plantilla (1.024 caracteres de `description`, 64 de `name` y 500 líneas para el cuerpo de `SKILL.md`) son pautas oficiales de Anthropic para escribir skills (guía de buenas prácticas de Agent Skills: https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices); verificado 2026-10-16.
 
 </PromptTemplate>
 
@@ -569,6 +580,8 @@ Devuelve solo: {{formato exacto del resultado, por ejemplo una lista de ficheros
 
 - Tarea: listar todos los sitios del repositorio donde se calcula el IVA.
 - Por qué: vamos a cambiar el tipo reducido y hay que saber qué módulos tocan.
+- Lo que ya sabes: el IVA se calcula en funciones que contienen «iva» o «tax» en el nombre; no hace falta explicar el tipo reducido.
+- Alcance: carpeta src/. Fuera de alcance: node_modules y los tests, que no se tocan.
 - Devuelve solo: lista de ficheros con una línea cada uno; sin explicar el proceso.
 
 </PromptTemplate>
@@ -607,6 +620,7 @@ Para cada criterio, escribe primero la evidencia (cita breve de la respuesta) y 
 **Ejemplo con los huecos rellenados.**
 
 - Consulta: «¿Cuántos días de vacaciones me quedan si empecé en marzo?».
+- Respuesta a evaluar: «Te quedan 22 días de vacaciones, como a todo el personal.»
 - Referencia: 17 días, según el apartado 4.2 de la política.
 - Rúbrica: exactitud respecto a la referencia, cita del apartado, no inventa datos.
 
@@ -635,14 +649,17 @@ Si falta información para hacerlo bien, pregúntame antes de empezar y no la su
 
 >
 
-**Cuándo usarla.** Cuando no hay una plantilla específica para tu tarea. Es la versión corta de la plantilla de encargo del módulo de método.
+**Cuándo usarla.** Cuando no hay una plantilla específica para tu tarea. Es la versión corta de la plantilla de encargo del [módulo de método](/AI-Optimized_Usage_Web/m2-metodo/plantilla-de-encargo/).
 
-**Configuración recomendada.** Cualquier superficie; el modelo y el esfuerzo dependen de la tarea (ver el módulo de modelo y esfuerzo).
+**Configuración recomendada.** Cualquier superficie; el modelo y el esfuerzo dependen de la tarea (ver el [módulo de modelo y esfuerzo](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/)).
 
 **Ejemplo con los huecos rellenados.**
 
 - Objetivo: preparar el guion de una presentación de 10 minutos sobre los resultados del trimestre.
 - Contexto: la verá el comité de dirección; deben decidir si ampliamos el equipo comercial.
+- Material: informe de ventas del tercer trimestre (ventas-t3.xlsx) y acta del comité anterior (acta-julio.pdf).
+- Restricciones: no incluir datos de clientes concretos, porque la presentación se archiva y es confidencial; usar solo las cifras del informe, para que sean comprobables.
+- Formato de salida: cinco diapositivas, cada una con un título que sea una conclusión y una sola cifra, p. ej. «Las ventas suben un 8 %».
 - Criterio de éxito: cinco diapositivas, una cifra por diapositiva, con la fuente de cada cifra.
 
 </PromptTemplate>

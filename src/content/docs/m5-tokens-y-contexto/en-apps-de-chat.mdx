@@ -6,6 +6,113 @@ sidebar:
 level: basico
 tracks: [profesional]
 readingTime: 5
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-16
+sources:
+  [
+    support-claude-com-en-articles-9517075-what-are-projects,
+    claude-code-costes,
+    support-claude-com-en-articles-8241126-upload-files-to-claude,
+    support-claude-com-en-articles-11817273-use-claude-s-chat-search-and-memory-to-b,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- En una app de chat no ves tokens, pero se gastan igual: cada mensaje reenvía la conversación, y eso consume tu cupo de uso.
+- Una conversación por tema; cuando cambies de asunto, abre otra.
+- Un proyecto con conocimiento evita pegar los mismos documentos una y otra vez.
+- Pega el fragmento relevante cuando baste, no el documento entero.
+- La memoria ayuda a no repetir contexto, pero conviene saber qué recuerda.
+
+</KeyTakeaways>
+
+## La idea
+
+En Claude, ChatGPT o Gemini no pagas por token: pagas una suscripción con límites de uso. Pero la mecánica es la misma que en la API: cada mensaje manda a la IA toda la conversación, y cuanto más larga y más cargada de documentos, antes se agota tu cupo. Los hábitos que ahorran en la API ahorran aquí **cupo y paciencia**.
+
+## Una conversación por tema
+
+Es el hábito más sencillo y el que más rinde. Una conversación larga sobre cinco asuntos obliga a reenviar los cinco en cada turno. Al abrir una conversación nueva por asunto, cada una arrastra solo lo suyo. Además, el modelo trabaja mejor con un contexto enfocado (ver [por qué se dispara el gasto](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/por-que-se-dispara-el-gasto/)).
+
+## Proyectos con conocimiento
+
+En Claude, los proyectos permiten subir documentos una vez y reutilizarlos en todas las conversaciones del proyecto. Según la ayuda oficial, están disponibles en todos los planes, incluido el gratuito, que permite hasta cinco proyectos. Los límites de ficheros que publica la ayuda: en un chat, 500 MB por fichero y hasta 20 ficheros; en un proyecto, 30 MB por fichero, con número no limitado pero con la condición de que el contenido total quepa en la ventana de contexto.
+
+<Callout tipo="cuidado">
+
+Según la ayuda de Claude, los proyectos consumen del uso de tu plan como cualquier otro uso de Claude, y trabajar con varios hilos a la vez lo gasta más deprisa. Además, el contenido del proyecto tiene que caber en la ventana de contexto. Un proyecto con cien documentos es cómodo, pero no es gratis: sube lo que usas.
+
+</Callout>
+
+En los planes de pago, cuando el conocimiento de un proyecto se acerca al límite de contexto, Claude activa un modo RAG (recuperación de los pasajes relevantes) que, según la ayuda de proyectos, amplía la capacidad hasta 10 veces. El RAG está disponible en Pro, Max, Team y Enterprise. Es una forma de que el proyecto crezca sin cargar todo en cada mensaje, pero no sustituye a la poda: lo que no usas, mejor fuera.
+
+<Callout tipo="recomendacion">
+
+Crea un proyecto por línea de trabajo (por ejemplo, «Contratos de proveedores 2026») con solo los documentos de referencia que usarás, y abre una conversación nueva por cada pregunta o tarea dentro de él. Por qué: así reutilizas el conocimiento sin arrastrar el historial de preguntas anteriores.
+
+</Callout>
+
+## Fragmento, no documento
+
+Si la respuesta está en dos páginas de un informe de ochenta, pega esas dos. Si necesitas todo el documento, ponlo **antes** de tu pregunta y no lo vuelvas a pegar en la misma conversación. Para trabajar con varios documentos grandes, un proyecto es mejor que adjuntarlos uno tras otro en el mismo hilo.
+
+## Memoria
+
+Claude puede recordar preferencias y datos de tus conversaciones. Según la ayuda, la memoria está activada por defecto en los planes Free, Pro y Max, y en Team y Enterprise la controla el propietario de la organización. Buscar en chats anteriores está disponible en los planes de pago. Se puede pausar, restablecer o desactivar para un chat concreto desde el menú «+» antes del primer mensaje.
+
+La memoria reduce lo que tienes que repetir (tu rol, tu formato preferido), pero no es gratuita en contexto: lo que recuerda se incorpora a lo que el modelo lee. Revísala de vez en cuando y desactiva la memoria en chats donde sea ruido.
+
+## Ventanas de uso en Team y Enterprise
+
+En Team y Enterprise, según la documentación de costes de Claude Code, el uso de cada miembro sale de una asignación por asiento que se reinicia en una ventana móvil de cinco horas y en otra semanal, y que se comparte entre el chat de Claude, Claude Code y Cowork. Para el resto de planes no hemos incluido cifras de ventanas porque no hay una fuente verificada en esta guía.
+
+## Otros proveedores
+
+<Callout tipo="varia">
+
+ChatGPT y Gemini también limitan el uso por plan y ofrecen proyectos o espacios de trabajo y memoria, con reglas distintas. Los límites de uso y las ventanas de contexto por plan de ChatGPT y de Gemini están pendientes de verificar con fuente oficial: consúltalos en la ayuda de cada producto antes de planificar el trabajo en función de ellos.
+
+</Callout>
+
+## En la práctica
+
+<Steps>
+
+1. Antes de abrir un chat, define qué quieres conseguir en él: una tarea.
+2. Si vas a usar los mismos documentos más de una vez, crea un proyecto.
+3. Pega el fragmento relevante; el documento entero, solo si lo necesitas.
+4. Al terminar, cierra el hilo. Si cambias de asunto, abre otro.
+5. Si el plan se agota pronto, revisa qué conversaciones largas tienes y cuáles arrastran documentos.
+
+</Steps>
+
+## Ejemplo de oficina: la gestora de proyectos
+
+Una gestora usa un chat para todo: actas, presupuestos, correos a clientes y planificación. A los tres días, cada mensaje arrastra las actas y los presupuestos anteriores y llega al límite de su plan antes de comer. Reorganiza: un proyecto «Cliente A» con el contrato y el presupuesto vigentes como conocimiento; una conversación por acta, una por correo. El límite deja de agotarse y las respuestas dejan de mezclar clientes.
+
+## Errores frecuentes
+
+- **Conversación-río.** Un solo hilo para todo.
+- **Subir todo «por si acaso» a un proyecto.** Cada conversación paga ese contexto.
+- **Repetir el documento entero en cada mensaje.** Basta con adjuntarlo una vez.
+- **Ignorar la memoria.** Puede ayudarte o introducir ruido; decide tú.
+
+<Checklist
+  id="apps-de-chat"
+  titulo="Mi uso en el chat"
+  items={[
+    'Una conversación por tema.',
+    'Los documentos que uso a menudo viven en un proyecto.',
+    'Pego fragmentos cuando basta un fragmento.',
+    'He revisado qué recuerda la memoria.',
+  ]}
+/>
+
+## Para profundizar
+
+Cuándo usar chat, proyecto o herramienta de código: [Elegir superficie](/AI-Optimized_Usage_Web/m2-metodo/elegir-superficie/) y [Mapa de superficies](/AI-Optimized_Usage_Web/m6-herramientas/mapa-de-superficies/).

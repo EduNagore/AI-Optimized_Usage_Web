@@ -6,6 +6,135 @@ sidebar:
 level: avanzado
 tracks: [profesional, tecnica]
 readingTime: 5
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-16
+sources:
+  [
+    anthropic-modelos,
+    anthropic-precios,
+    platform-claude-com-docs-en-models-fable-5-1-whats-new-fable-5-1,
+    platform-claude-com-docs-en-build-with-claude-refusals-and-fallback,
+    anthropic-prompting-fable-5-1,
+    code-claude-com-docs-en-goal,
+    openai-precios,
+    google-ultimo-modelo,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Fact from '@components/Fact.astro';
+import ModelTable from '@components/ModelTable.astro';
+import CostExample from '@components/CostExample.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Los modelos de frontera son el escalón más caro y potente de cada proveedor: se justifican cuando fallar sale caro o la tarea es larga y difícil.
+- No son la opción por defecto: en tareas sencillas o repetitivas pagas razonamiento que no usas.
+- Traen restricciones propias que debes conocer antes de adoptarlos, como retención de datos y posibles rechazos por clasificadores de seguridad.
+- Un modelo de acceso restringido no es una opción de trabajo: se menciona, no se recomienda.
+
+</KeyTakeaways>
+
+## La idea
+
+En la cima de cada catálogo hay un modelo diseñado para el trabajo más difícil. Compensa cuando el coste del error es alto, cuando la tarea es larga y exige mantener muchas piezas a la vez, o cuando el escalón inferior ha fallado de forma repetida en tu muestra y has descartado que el problema sea el encargo. En el resto de casos, un escalón más abajo con el esfuerzo adecuado suele dar un resultado comparable por mucho menos.
+
+## Los modelos de frontera hoy
+
+<ModelTable
+  ids={['fable-5-1', 'gpt-6-astra', 'gemini-4-argon']}
+  etiqueta="Modelos de frontera de Anthropic, OpenAI y Google"
+/>
+
+Fíjate en que «frontera» es un escalón dentro del catálogo de cada proveedor, no un precio fijo: la diferencia con el escalón de abajo varía mucho. Compara lo que cuesta un mismo trabajo en el modelo de frontera de Anthropic, en el de alto rendimiento y en el equilibrado:
+
+<CostExample ids={['fable-5-1', 'opus-5-5', 'sonnet-5-5']} entrada={20000} salida={2000} volumen={500} />
+
+La tabla excluye el razonamiento, que se factura como salida y es mayor cuanto más alto el esfuerzo. Para decidir, lo relevante no es el céntimo de una tarea, sino la proporción entre modelos al multiplicar por volumen.
+
+<Callout tipo="varia">
+
+El modelo de frontera de cada proveedor tiene restricciones distintas. En Gemini 4 Argon, por ejemplo, el precio actual es introductorio y cambia en una fecha publicada, y la disponibilidad en la API depende del plan. En GPT-6 Astra, el esfuerzo por defecto no está publicado y no admite el nivel `none`. Lee las notas bajo la tabla antes de planificar.
+
+</Callout>
+
+## Qué trae Claude Fable 5.1
+
+<Callout tipo="verificado" fecha="2026-10-16">
+
+La documentación de Anthropic sobre Fable 5.1 dice: «For most workloads, start with Claude Opus 5.5. Use Claude Fable 5.1 for demanding reasoning and long-horizon agentic work, or when your evals on Claude Opus 5.5 at higher effort still fall short». Es decir, la frontera no es el punto de partida habitual.
+
+</Callout>
+
+Particularidades del modelo de frontera de Anthropic, según su documentación oficial:
+
+- El razonamiento está siempre activo (adaptativo) y el razonamiento en bruto nunca se devuelve.
+- Lleva retención de datos de 30 días y no está disponible con retención cero, salvo autorización expresa de Anthropic.
+- Puede rechazar peticiones por clasificadores de seguridad (`stop_reason: "refusal"`), así que conviene configurar un modelo alternativo. Los destinos de fallback permitidos para Fable 5.1 son Opus 4.8 y Opus 5, no Opus 5.5.
+- Para flujos automatizados: no admite `tool_choice` de tipo `any` ni `tool` (devuelve un error 400; para forzar un esquema se usan herramientas estrictas o salida estructurada), y valores de `temperature`, `top_p` o `top_k` distintos de los predeterminados también dan error 400.
+- Su esfuerzo por defecto es <Fact id="fable-5-1.effort.default.api" />, y admite hasta `max`. Su guía de prompting recomienda empezar por el defecto y probar los demás niveles; a `low` suele ser competitivo en coste por tarea con modelos Opus y Sonnet, así que incluirlo en la comparación.
+- Su guía de prompting también avisa de que a veces hace más de lo pedido (arreglar código cercano, añadir pruebas): indica de forma explícita qué dejar fuera.
+
+<Callout tipo="cuidado">
+
+Comprueba la política de retención de datos y los rechazos posibles antes de meter un modelo de frontera en un flujo automatizado. Un rechazo en mitad de una cadena de pasos puede dejar la tarea a medias; diseña el flujo para detectarlo y reintentar con otro modelo.
+
+</Callout>
+
+También existe un modelo todavía más restringido, Claude Mythos 5.1, de acceso limitado a organizaciones verificadas en un programa específico. Se menciona para que reconozcas el nombre; no es una opción al alcance de un equipo de oficina corriente y la guía no lo recomienda.
+
+## Cuándo compensa
+
+Hay cuatro situaciones en las que el escalón de frontera suele merecer la pena:
+
+- **El error es caro y difícil de detectar.** Una conclusión de análisis que alimenta una decisión importante.
+- **La tarea es larga y encadenada.** Trabajo que supera una sesión (investigaciones de causa raíz, incidencias, decisiones de arquitectura), donde un fallo temprano arrastra el resto. En Claude Code, `/goal` mantiene el objetivo: fijas una condición de fin verificable y Claude sigue trabajando hasta que otro modelo evaluador confirma que se cumple.
+- **El escalón inferior ha fallado en tu muestra.** Y has comprobado que el fallo es de razonamiento y no del encargo.
+- **Quieres una segunda opinión sobre algo crítico.** Como revisor, no como ejecutor de todo el trabajo.
+
+<Callout tipo="recomendacion">
+
+Reserva el modelo de frontera para la parte difícil del trabajo y deja el resto al escalón inferior. Es una recomendación de la guía: así pagas la tarifa más alta solo donde cambia el resultado (y coincide con la propia documentación de Anthropic, que parte de Opus 5.5). Una forma es el patrón del asesor o del plan: la frontera planifica o revisa, el modelo equilibrado ejecuta.
+
+</Callout>
+
+## En la práctica
+
+<Steps>
+
+1. Parte del escalón inferior y mide en una muestra con los casos más difíciles (cinco para una prueba rápida; 20 a 30 para fijar una política).
+2. Si falla, comprueba si es del encargo (contexto, formato, criterio). Corrígelo primero.
+3. Si persiste, prueba el modelo de frontera solo sobre los casos que fallan y compara.
+4. Si la diferencia justifica el coste, adóptalo para ese tipo de caso, no para todo.
+5. Documenta las restricciones (retención, rechazos) y diseña el plan alternativo.
+
+</Steps>
+
+## Ejemplo de oficina: la revisión de un acuerdo de financiación
+
+Una asesoría revisa acuerdos de financiación de decenas de páginas con cláusulas que se remiten entre sí. Un modelo equilibrado con esfuerzo medio resume bien las condiciones habituales, pero en una prueba con tres acuerdos antiguos se le escapa una remisión cruzada entre un plazo y una penalización. Antes de saltar de escalón, comprueban que el encargo pide expresamente cruzar plazos y penalizaciones. Con ese cambio sigue fallando en uno de los tres. Entonces sí, pasan los acuerdos largos por el modelo de frontera como segunda lectura, con cláusula y página citadas, y una persona cualificada confirma los hallazgos. El resto de documentos siguen en el escalón inferior.
+
+## Errores frecuentes
+
+- **Usar la frontera como valor por defecto.** Multiplica el coste sin que mejore el resultado en la mayoría de tareas.
+- **Ignorar las restricciones.** Retención de datos y rechazos pueden bloquear un flujo en producción.
+- **Atribuir al modelo lo que es del encargo.** Si el escalón inferior falla por falta de contexto, la frontera fallará igual.
+- **No medir.** Sin muestra, no sabes si la diferencia compensa.
+
+<Checklist
+  id="modelos-de-frontera"
+  titulo="Antes de adoptar un modelo de frontera"
+  items={[
+    'He medido el escalón inferior con casos difíciles.',
+    'He descartado que el problema sea del encargo.',
+    'Conozco las restricciones del modelo: retención de datos y rechazos.',
+    'Lo reservo para la parte difícil y no para todo el flujo.',
+    'Tengo un plan alternativo si rechaza la petición.',
+  ]}
+/>
+
+## Para profundizar
+
+Repasa [la estrategia de selección](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/estrategia-de-seleccion/) para los patrones de planificar con uno y ejecutar con otro, y [el coste por tarea completada](/AI-Optimized_Usage_Web/m2-metodo/coste-por-tarea/) para convertir la diferencia de precio en una decisión.

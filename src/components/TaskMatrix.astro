@@ -1,0 +1,139 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+import { formatDate } from '@lib/format';
+
+/**
+ * Matriz de tareas → superficie, modelos y esfuerzo recomendados, leída de task-matrix.json.
+ * Es una recomendación de la guía (no un dato de proveedor): cada fila lleva su porqué.
+ */
+interface Props {
+  etiqueta?: string;
+}
+const { etiqueta = 'Matriz recomendada por tarea' } = Astro.props;
+
+const rows = (await getCollection('task-matrix')).map((e) => e.data);
+const models = (await getCollection('models')).map((e) => e.data);
+const nameOf = (id: string) => {
+  const m = models.find((r) => r.id === id);
+  if (!m) throw new Error(`<TaskMatrix>: no existe el modelo «${id}»`);
+  return m.name;
+};
+// Los ids de fuente viajan al final de `rationale` («Fuentes: a, b.»): se separan y se enlazan.
+const parsed = await Promise.all(
+  rows.map(async (r) => {
+    const [why, tail] = r.rationale.split(/\s*Fuentes:\s*/);
+    const ids = (tail ?? '').replace(/\.$/, '').split(/,\s*/).filter(Boolean);
+    const entries = await Promise.all(ids.map((id) => getEntry('sources', id)));
+    return { ...r, why, srcs: entries.flatMap((e) => (e ? [e.data] : [])) };
+  }),
+);
+const effortLabel: Record<string, string> = { low: 'Bajo', medium: 'Medio', high: 'Alto' };
+const verified = rows
+  .map((r) => r.verifiedAt)
+  .sort()
+  .at(-1);
+---
+
+<div class="table-wrap not-content">
+  <div class="scroller" role="region" aria-label={etiqueta} tabindex="0">
+    <table>
+      <caption class="sr-only">{etiqueta}</caption>
+      <thead>
+        <tr>
+          <th scope="col">Tarea</th>
+          <th scope="col">Superficie</th>
+          <th scope="col">Modelos</th>
+          <th scope="col">Esfuerzo</th>
+          <th scope="col">Cómo verificar</th>
+        </tr>
+      </thead>
+      <tbody>
+        {parsed.map((r) => (
+          <tr>
+            <th scope="row">
+              {r.taskType}
+              <details>
+                <summary>Por qué</summary>
+                <p>{r.why}</p>
+                {r.srcs.length > 0 && (
+                  <p class="ex">
+                    Fuentes:{' '}
+                    {r.srcs.map((x, i) => (
+                      <>
+                        {i > 0 && ', '}
+                        <a href={x.url} rel="noopener">
+                          {x.publisher}, {x.title}
+                        </a>
+                      </>
+                    ))}
+                    .
+                  </p>
+                )}
+                {r.examples.length > 0 && <p class="ex">Ejemplos: {r.examples.join('; ')}.</p>}
+              </details>
+            </th>
+            <td>{r.surface}</td>
+            <td>{r.models.map(nameOf).join(', ')}</td>
+            <td>{effortLabel[r.effort] ?? r.effort}</td>
+            <td>{r.verification}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  {verified && (
+    <p class="note">
+      Recomendación de la guía, no un dato de proveedor. Datos revisados el {formatDate(verified)}.
+    </p>
+  )}
+</div>
+
+<style>
+  .table-wrap {
+    margin-block: var(--space-5);
+  }
+  .scroller {
+    overflow-x: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md, 8px);
+  }
+  table {
+    width: 100%;
+    min-width: 46rem;
+    border-collapse: collapse;
+    font-size: var(--text-sm, 0.9rem);
+  }
+  th,
+  td {
+    padding: var(--space-2) var(--space-3);
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid var(--color-border);
+  }
+  tbody tr:last-child > * {
+    border-bottom: 0;
+  }
+  details {
+    margin-top: var(--space-1);
+    font-weight: 400;
+  }
+  summary {
+    cursor: pointer;
+    color: var(--color-accent);
+  }
+  .ex {
+    color: var(--color-text-muted);
+  }
+  .note {
+    margin-block: var(--space-2) 0;
+    font-size: var(--text-sm, 0.9rem);
+    color: var(--color-text-muted);
+  }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+</style>

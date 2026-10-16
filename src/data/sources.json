@@ -1078,5 +1078,21 @@
     "publisher": "OpenAI",
     "official": true,
     "lastChecked": "2026-10-16"
+  },
+  {
+    "id": "anthropic-migracion-opus-5-5",
+    "title": "Guía de migración a Claude Opus 5.5",
+    "url": "https://platform.claude.com/docs/en/models/opus-5-5/migration-guide",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-16"
+  },
+  {
+    "id": "anthropic-skills-buenas-practicas",
+    "title": "Agent Skills: buenas prácticas",
+    "url": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-16"
   }
 ]

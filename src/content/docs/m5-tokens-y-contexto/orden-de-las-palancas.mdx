@@ -6,6 +6,107 @@ sidebar:
 level: basico
 tracks: [esencial, profesional, tecnica]
 readingTime: 6
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-16
+sources:
+  [
+    anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas,
+    anthropic-cookbook-de-optimizacion-de-coste,
+    anthropic-prompt-caching,
+    anthropic-batch,
+    anthropic-precios,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Steps from '@components/Steps.astro';
+import Callout from '@components/Callout.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Hay dos grupos de palancas: las que no cuestan calidad (se aplican siempre) y las que sí pueden costar calidad (se miden antes).
+- Primero las gratuitas: caché, higiene de entrada, higiene del bucle, salida y lotes.
+- Después los compromisos: presupuestos, esfuerzo, modelo y arquitecturas con varios modelos.
+- Sin medir no sabes cuál de las dos familias te ahorra más en tu caso.
+
+</KeyTakeaways>
+
+## La idea
+
+Bajar el esfuerzo de razonamiento o cambiar a un modelo menor ahorra, pero puede empeorar el resultado. Ordenar el prompt para aprovechar la caché ahorra y no cambia ni una palabra de la respuesta. Parece obvio, y sin embargo la reacción habitual ante una factura alta es la primera: cambiar de modelo. El orden correcto es el inverso: agotar lo que no tiene coste de calidad y solo después decidir qué compromisos compensan, con una muestra de tus propias tareas.
+
+Este orden aplica la tesis de la guía: se optimiza el coste por tarea completada, no el precio por token (ver [coste por tarea completada](/AI-Optimized_Usage_Web/m2-metodo/coste-por-tarea/)).
+
+## Las dos columnas
+
+| Primero: no cuestan calidad                                                                                      | Después: hay que medir                                                                                               |
+| ---------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| [Prompt caching](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/prompt-caching/): prefijo estable primero          | Presupuestos de tokens y de tiempo por tarea                                                                         |
+| [Higiene de entrada](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/higiene-de-entrada/): cargar solo lo necesario | Nivel de esfuerzo ([esfuerzo y razonamiento](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/esfuerzo-y-razonamiento/)) |
+| [Higiene del bucle](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/higiene-del-bucle/): limpiar y compactar        | Modelo ([estrategia de selección](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/estrategia-de-seleccion/))            |
+| [Salida](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/salida/): forma y longitud de lo que pides                 | Arquitecturas con varios modelos (orquestador, asesor)                                                               |
+| [Batch](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/batch/): trabajo que nadie espera de inmediato              |                                                                                                                      |
+
+Dentro de cada columna el orden de la tabla es el recomendado: la caché y la higiene de entrada dan más con menos esfuerzo en casi cualquier uso; los lotes solo valen si puedes esperar.
+
+<Callout tipo="recomendacion">
+
+Aplica la columna izquierda entera antes de tocar la derecha, y mide después de cada cambio. Por qué: las palancas de la izquierda no alteran la calidad, así que no necesitan evaluación; las de la derecha sí, y una evaluación sobre un sistema que aún tiene desperdicio mide un coste inflado y lleva a decisiones equivocadas.
+
+</Callout>
+
+## Qué dicen las mediciones sobre la columna derecha
+
+Anthropic publica en su guía de optimización de coste e inteligencia comparativas que enseñan por qué hay que medir.
+
+<Callout tipo="medicion" titulo="Medición publicada por Anthropic">
+
+En un subconjunto de SWE-bench Pro (tareas de programación), Sonnet 5.5 en `medium` obtuvo unos 7 puntos menos que en `high` (su nivel por defecto en la API) con aproximadamente el 59 % del coste por tarea. Es decir: `medium` **no igualó** a `high`; ahorró coste a cambio de acierto. En el mismo documento, ejecutar en `low` y repetir en `high` los casos que fallan costó cerca de un 40 % menos que hacerlo todo en `high`, con la misma tasa de acierto en las pruebas de Anthropic. Son resultados del proveedor sobre sus propias tareas, con pocas repeticiones: orientan, no garantizan.
+
+</Callout>
+
+Dos lecciones. Una: bajar el esfuerzo tiene un precio en calidad que puede ser pequeño o grande según la tarea, y solo lo sabes probando. Dos: la política de «barato primero y repetir los fallos en el nivel alto» ahorra sin renunciar al acierto, pero la propia guía de Anthropic fija dos condiciones: necesitas una señal de fallo fiable (una comprobación que deje pasar trabajo malo deja pasar esos fallos) y cada fallo de la primera pasada cuesta el doble de tiempo, porque se ejecuta dos veces, así que el ahorro se paga en latencia. La guía añade: «Use this policy for the saving, not the lift».
+
+### Qué son los presupuestos y el asesor
+
+Un **presupuesto** es un tope de consumo por tarea o sesión: al llegar al tope, la tarea se detiene en lugar de seguir gastando. Según la guía de optimización de Anthropic, al alcanzar el tope de una sesión esta se pausa con `stop_reason: budget_reached` y se reanuda al ampliarlo. Es una red de seguridad para tareas autónomas, no una forma de mejorar el resultado.
+
+Un **asesor** es un modelo más capaz al que consulta otro más barato (el ejecutor) cuando lo necesita. En las mediciones de Anthropic, el único emparejamiento cuyo ejecutor consultó a menudo puntuó 1,7 puntos más que el ejecutor solo, al límite del ruido entre ejecuciones, con un coste de aproximadamente 2,1 veces; y la definición de la herramienta añade en torno a 1.000 tokens de prompt por petición aunque nunca se consulte. Cuándo compensa, en [estrategia de selección](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/estrategia-de-seleccion/).
+
+## En la práctica
+
+<Steps>
+
+1. Mide el punto de partida de una tarea: tokens de entrada, de salida, parte de entrada leída de caché y número de intentos.
+2. Aplica las palancas de la izquierda en el orden de la tabla y mide tras cada una.
+3. Con el consumo ya limpio, prueba una palanca de la derecha sobre una muestra de unos diez casos reales.
+4. Adopta el cambio solo si el coste por tarea completada baja y la calidad se mantiene en esa muestra.
+
+</Steps>
+
+## Ejemplo de oficina: informes semanales
+
+Un equipo genera cada viernes 40 informes de cliente con la misma plantilla de 6.000 tokens de instrucciones y datos distintos. Antes de pensar en un modelo más barato: la plantilla es un prefijo estable, así que va primero y se cachea; las instrucciones se recortan a lo esencial; el formato de salida se fija para que no haya párrafos de relleno; y como nadie lee los informes hasta el lunes, se envían por lotes. Ninguna de esas cuatro decisiones cambia el contenido de los informes. Solo si la factura sigue sin cuadrar tiene sentido probar un modelo menor con diez informes revisados a mano.
+
+## Errores frecuentes
+
+- **Empezar por el modelo.** Cambias calidad por ahorro cuando aún quedaba ahorro gratis.
+- **Dar por hecho que `medium` iguala a `high`.** Depende de la tarea y del modelo; la medición de arriba lo desmiente para Sonnet 5.5 en programación.
+- **Recortar sin medir.** Si no sabes de qué parte sale el gasto, recortas lo que no pesa. Ver [medir](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/medir/).
+- **Cambiar varias cosas a la vez.** No sabrás cuál funcionó.
+
+<Checklist
+  id="orden-palancas"
+  titulo="Antes de bajar de modelo o de esfuerzo"
+  items={[
+    'He ordenado el prompt con lo estable primero y compruebo que la caché acierta.',
+    'He quitado herramientas y documentos que no uso.',
+    'He fijado la forma de la salida.',
+    'He pasado a lotes lo que no es urgente.',
+    'Tengo una muestra de casos reales para comparar.',
+  ]}
+/>
+
+## Para profundizar
+
+Los comandos de Claude Code para ver dónde se va el gasto están en [El día a día en Claude Code](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/dia-a-dia-en-claude-code/). Para estimar el efecto de cada palanca en cifras, la [calculadora de coste](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/calculadora-de-coste/).

@@ -6,6 +6,119 @@ sidebar:
 level: intermedio
 tracks: [profesional, tecnica]
 readingTime: 8
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-16
+sources:
+  [
+    anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas,
+    anthropic-esfuerzo,
+    anthropic-prompt-caching,
+    anthropic-batch,
+    platform-claude-com-docs-en-agents-and-tools-tool-use-advisor-tool,
+    platform-claude-com-docs-en-build-with-claude-fast-mode,
+    claude-code-modelo-y-esfuerzo,
+    claude-code-comandos,
+    openai-precios,
+    google-ultimo-modelo,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Fact from '@components/Fact.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Regla de partida: empieza con un modelo capaz (la gama equilibrada o superior) y su esfuerzo por defecto; baja el esfuerzo o el modelo solo cuando lo hayas medido en una muestra y la calidad se mantenga; sube cuando falle.
+- Orden de decisión: primero las mejoras que no cuestan calidad; después, el compromiso de bajar modelo o esfuerzo, midiéndolo.
+- Mide con casos reales, incluido el 10 % más difícil: ahí se decide la factura. Cinco casos para una prueba rápida; entre 20 y 30 para fijar una política.
+- Baja de escalón en escalón, no de golpe, y deja anotado qué mediste.
+- Los patrones mixtos (planificar con uno, ejecutar con otro; consultar a un asesor) solo compensan en casos concretos y si los has medido.
+
+</KeyTakeaways>
+
+## La idea
+
+Hay dos formas de equivocarse al elegir. Una es pagar de más sin saberlo: el modelo y el esfuerzo más altos «por si acaso». La otra es ahorrar sin saberlo: un modelo menor que parece funcionar hasta que llega un caso difícil y el error cuesta más de lo ahorrado. Se evitan las dos con el mismo hábito: decidir sobre una muestra de tus tareas y no sobre una sensación.
+
+Y antes de tocar el modelo o el esfuerzo hay mejoras que no cuestan calidad: un encargo claro, contexto ordenado, formato de salida pedido, caché de prompt y lotes cuando puedes esperar. Bajar de modelo o de esfuerzo sí puede costarla, así que va después y con medición. Es el orden que desarrolla [el orden de las palancas](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/orden-de-las-palancas/).
+
+<Callout tipo="recomendacion">
+
+Aplica las palancas gratuitas antes de bajar de modelo o de esfuerzo. Es una recomendación de la guía: si recortas el modelo y a la vez tienes un encargo ambiguo o un contexto desordenado, no sabrás qué cambio explica el empeoramiento, y puede que la mejora gratuita te diera el ahorro sin riesgo.
+
+</Callout>
+
+## En la práctica
+
+<Steps>
+
+1. **Define el listón.** Escribe, antes de probar, qué es una respuesta aceptable: cifras que cuadran, formato exacto, sin datos inventados.
+2. **Reúne una muestra.** Cinco casos reales bastan para una prueba rápida; entre 20 y 30 para fijar una política. En ambos casos, con los difíciles incluidos a propósito: si todos son fáciles, cualquier modelo parecerá suficiente.
+3. **Empieza con un modelo capaz y su esfuerzo por defecto.** La documentación de Anthropic parte de ahí («Most workloads start with Claude Opus 5.5») y recomienda, con Sonnet 5.5, empezar por el esfuerzo por defecto y ajustar según tus pruebas, porque tocar el esfuerzo suele ser mejor palanca que cambiar de modelo. Un solo modelo mantiene además una única caché.
+4. **Haz un barrido de esfuerzo, cada nivel en una sesión aparte.** Cambiar el esfuerzo a mitad de sesión invalida la caché y distorsiona la comparación de coste y tiempo. Pasa la muestra por `low`, `medium` y `high` y compara calidad, coste y tiempo. Google recomienda lo mismo con `thinking_level`: evaluar los tres niveles y quedarse con el más bajo que cumpla.
+5. **Compara modelos en el 10 % más difícil.** En los casos fáciles todos aciertan; la diferencia (y la factura) se decide en la cola.
+6. **Baja un escalón cada vez.** Si pasas de Opus a Sonnet, mide; si luego quieres ir a Haiku, mide otra vez. Un salto grande hace imposible saber dónde se rompió.
+7. **Anota el resultado.** Modelo, esfuerzo, fecha y muestra. Cuando salga una versión nueva, repites la prueba en una tarde.
+   </Steps>
+
+## Cuatro políticas habituales
+
+**Un modelo capaz con su esfuerzo por defecto, y ajustar desde ahí.** Es el punto de partida que respalda la documentación oficial. Bajar el esfuerzo es la siguiente palanca: en una medición de Anthropic sobre tareas de programación, Opus 5.5 en `low` y Sonnet 5.5 en su esfuerzo por defecto quedaron en tasas de acierto casi iguales (87,4 % y 87,6 %) con costes por tarea parecidos. Es una medición del proveedor, no una ley. En trabajo de oficina de bajo riesgo, probar antes un esfuerzo menor es barato y reversible, pero se mide igualmente.
+
+**Todo en `low`, reintento en `high`.** Si tienes una señal fiable de fallo (un test que no pasa, un esquema que no valida, una cifra que no cuadra), ejecuta todo barato y repite solo los fallos en alto. Sin esa señal fiable, el reintento selectivo no funciona: no sabrás qué repetir. Anthropic publicó que esa política costó alrededor de un 40 % menos que ejecutarlo todo en `high` con la misma tasa de acierto en sus pruebas, y precisa que sirve para ahorrar, no para mejorar. Sin una señal de fallo fiable no funciona: no sabrás qué reintentar.
+
+**Escalado por escalón.** Empieza arriba, baja un escalón y mide. Es lenta, pero segura, y te deja una tabla de decisiones documentada.
+
+**Cascada de modelos.** Un modelo barato filtra y uno caro resuelve lo dudoso. Antes de montarla, comprueba que ahorra lo que cuesta mantenerla: dos modelos son dos cachés, más piezas que fallar y más pruebas.
+
+## Patrones mixtos
+
+Hay patrones que reparten el trabajo entre modelos o ajustan la velocidad. Todos son compromisos de coste y calidad y se miden.
+
+- **Planificar con uno, ejecutar con otro.** En Claude Code, el alias `opusplan` usa Opus en el modo plan y Sonnet al ejecutar. Sirve cuando el plan es la parte difícil y la ejecución es mecánica.
+- **El asesor.** El comando `/advisor` activa en Claude Code una herramienta que consulta a un segundo modelo; en la API existe como herramienta de asesor. La documentación de Anthropic lo resume así: «An advisor can help only when the executor consults it». En sus mediciones, el único emparejamiento cuyo ejecutor consultó a menudo mejoró 1,7 puntos sobre el ejecutor solo (en el límite del ruido) a un coste de unas 2,1 veces; en un caso en que casi no consultó (1 de 300 tareas) quedó 7 puntos por debajo. Mide cuántas veces consulta antes de dar por bueno el patrón.
+- **Fast mode.** Es el mismo modelo, más rápido y con una tarifa mayor que la normal (en Opus 5.5, que cuesta <Fact id="opus-5-5.pricing.input" /> de entrada y <Fact id="opus-5-5.pricing.output" /> de salida en modo normal, la documentación publica un precio propio para fast mode). Reduce la latencia, no mejora la calidad. En Claude Code se activa con `/fast`.
+- **Orquestador y trabajadores.** Un modelo reparte y varios ejecutan. Según la guía de Anthropic, delegar solo ahorró dinero en dos situaciones (medidas con trabajadores de una generación anterior): trabajo rutinario con una cola larga de coste y trabajo mayor que una ventana de contexto. Cuando el trabajo es una cadena dependiente o cabe en un solo contexto sin cola larga, el modelo del orquestador solo, a menor esfuerzo, salió mejor en todos los casos medidos. Lo desarrolla el módulo de agentes, en [modelo y esfuerzo por rol](/AI-Optimized_Usage_Web/m8-agentes/modelo-y-esfuerzo-por-rol/).
+
+<Callout tipo="varia">
+
+Estos patrones mixtos existen como tales en Claude Code (`opusplan`, `/advisor`, `/fast`) y en la API de Anthropic (herramienta de asesor). OpenAI tiene su propio fast mode (antes Priority), con un multiplicador sobre el precio estándar, y Batch y Flex con otro multiplicador (un descuento), según sus reglas de precios. No hay equivalente documentado de `opusplan` o de asesor en OpenAI ni en Google en las fuentes consultadas: si necesitas el patrón, tendrás que montarlo tú.
+
+</Callout>
+
+<Callout tipo="cuidado">
+
+Cada pieza que añades (otro modelo, otro agente, un reintento) añade coste de coordinación y un punto más que puede fallar. La escalera de complejidad que recomienda esta guía es: una llamada, un flujo, un agente y, solo si lo anterior no basta, varios agentes.
+
+</Callout>
+
+## Ejemplo de oficina: respuestas a clientes
+
+Un equipo de atención responde 600 correos al mes. La tentación es usar un modelo de frontera en todos. El procedimiento correcto: tomar 30 correos pasados, incluidos los 5 más enrevesados (reclamaciones con varias facturas, clientes enfadados), y definir el listón («cita la factura correcta, no promete nada que la política no permita, tono cordial»). Se prueba con el modelo equilibrado en `low` y en `medium`. Si en `low` falla en los 5 difíciles pero acierta en los 25 restantes, la política razonable es `low` por defecto y revisión a `medium` o escalado a una persona para los correos marcados como complejos. Sin esa muestra, la decisión es una opinión.
+
+## Errores frecuentes
+
+- **Probar solo con casos fáciles.** El modelo pequeño parecerá igual de bueno, hasta producción.
+- **Cambiar modelo y esfuerzo a la vez.** No sabrás qué cambio produjo el efecto.
+- **Montar una cascada sin medir.** La complejidad añadida puede costar más que el ahorro.
+- **Usar fast mode para ganar calidad.** Solo gana velocidad.
+- **No volver a medir.** Un modelo nuevo cambia el punto de equilibrio; repite la prueba cuando cambie la generación.
+
+<Checklist
+  id="estrategia-de-seleccion"
+  titulo="Antes de fijar la política"
+  items={[
+    'He escrito el listón de calidad antes de probar.',
+    'Mi muestra incluye los casos difíciles.',
+    'He hecho un barrido de esfuerzo con un solo modelo.',
+    'He bajado de escalón de uno en uno.',
+    'Tengo una señal fiable de fallo si planeo reintentar en alto.',
+    'He anotado modelo, esfuerzo, muestra y fecha.',
+  ]}
+/>
+
+## Para profundizar
+
+Aterriza la estrategia en [la matriz por tarea](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/matriz-por-tarea/) y repasa [el coste por tarea completada](/AI-Optimized_Usage_Web/m2-metodo/coste-por-tarea/).

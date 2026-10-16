@@ -6,6 +6,103 @@ sidebar:
 level: intermedio
 tracks: [profesional, tecnica]
 readingTime: 6
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-16
+sources:
+  [
+    anthropic-prompt-caching,
+    anthropic-admin-api-de-uso-y-coste,
+    anthropic-conteo-de-tokens,
+    platform-claude-com-docs-en-manage-claude-opentelemetry,
+    claude-code-costes,
+    claude-code-comandos,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Sin medir no sabes qué palanca funciona: la intuición sobre el gasto suele fallar.
+- La API devuelve en cada respuesta cuántos tokens se escribieron en caché, cuántos se leyeron y cuántos se pagaron enteros.
+- Para ver el gasto agregado hay informes de uso y coste en la API de administración y exportación con OpenTelemetry.
+- Los tres indicadores que importan: coste por tarea completada, tasa de acierto de caché y porcentaje de tráfico en lotes.
+
+</KeyTakeaways>
+
+## La idea
+
+Optimizar sin medir es adivinar. La primera pregunta de cualquier optimización es dónde se va el gasto, y la segunda, si el último cambio lo redujo. Esta página enumera dónde mirar según la superficie.
+
+## En la API
+
+Cada respuesta de la API de Claude incluye un objeto `usage`. Según la documentación de prompt caching, tres de sus campos describen la entrada:
+
+- `cache_creation_input_tokens`: tokens escritos en la caché al crear una entrada nueva.
+- `cache_read_input_tokens`: tokens leídos de la caché en esta petición.
+- `input_tokens`: tokens de entrada que no se leyeron ni se usaron para crear caché, es decir, los posteriores al último punto de corte.
+
+La entrada total es la suma de los tres. A partir de ahí puedes calcular tu **tasa de acierto de caché**: lectura dividida entre la entrada total. Si es cero turno tras turno, algo cambia en el prefijo (ver [prompt caching](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/prompt-caching/)). Los tokens de salida, que incluyen el razonamiento, también vienen en `usage`.
+
+Antes de enviar, el endpoint de conteo de tokens estima el tamaño de la petición; es gratuito, con límites de peticiones por minuto, y no aplica caché. En Gemini, la caché implícita se consulta en `usage.total_cached_tokens`.
+
+## Informes agregados
+
+Para ver el gasto de una organización, la API de administración de Anthropic ofrece informes de uso (`usage_report/messages`) y de coste (`cost_report`). Requieren una clave de administrador, devuelven los costes en dólares en cubetas de un minuto, una hora o un día, y según la documentación los datos aparecen unos 5 minutos después de la petición. No están disponibles para cuentas individuales; Claude Enterprise usa la Analytics API. OpenTelemetry permite exportar métricas y eventos de uso a tu propia herramienta de monitorización; Anthropic documenta esa exportación para su plataforma.
+
+## En Claude Code y en las apps
+
+- **Claude Code**: `/usage` (coste de la sesión, límites del plan, estadísticas, la línea «Prompt cache» y, en los planes de suscripción, el reparto del uso por skill, subagente, plugin y servidor MCP), `/context` para ver qué ocupa el contexto y `/insights`, que no mide tokens sino cómo trabajas (en qué, fricciones y sugerencias). Con Pro o Max, el coste en dólares de la sesión no es relevante para la facturación: la suscripción lo incluye. La barra de estado también puede mostrar el coste.
+- **Apps de chat**: no hay contador de tokens por mensaje. Mide lo que sí ves: cuántos mensajes aguantas antes del límite, cuántos intentos necesitas y cuántos minutos de revisión por entrega.
+
+## Los tres indicadores que importan
+
+1. **Coste por tarea completada.** Tokens y dinero de todos los intentos hasta que la tarea está terminada y verificada, más (si lo puedes estimar) el tiempo de revisión. Es la métrica de la tesis de la guía; el precio por token solo es un ingrediente.
+2. **Tasa de acierto de caché.** La proporción de entrada leída de caché. En un bucle de agente, Anthropic publicó en su guía una mediana del 84 % en su tráfico: es una referencia, no un objetivo contractual.
+3. **Porcentaje de tráfico en lotes.** Cuánto de tu trabajo no urgente ya se manda por [lotes](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/batch/).
+
+<Callout tipo="recomendacion">
+
+Empieza midiendo una sola tarea repetida durante una semana: tokens por intento, aciertos de caché, intentos hasta el resultado bueno. Por qué: con una tarea concreta ves el efecto de cada cambio; con el total mensual de la organización, no.
+
+</Callout>
+
+## En la práctica
+
+<Steps>
+
+1. Elige una tarea que repites. Anota el resultado de diez ejecuciones.
+2. En la API, registra `usage` de cada petición; en Claude Code, mira `/usage` antes y después.
+3. Calcula la tasa de acierto de caché y el coste por tarea completada.
+4. Cambia una cosa (por ejemplo, mover la fecha al final del prompt) y repite.
+5. Conserva el cambio solo si el indicador mejora y la calidad se mantiene.
+
+</Steps>
+
+## Ejemplo de oficina: el asistente de dudas de personal
+
+Un equipo mantiene un asistente que responde a empleados sobre vacaciones y permisos, con unas 15.000 palabras de normativa en cada petición. Registra por petición los tres campos de uso. Resultado de la primera semana: la lectura de caché es casi cero. Al revisar el prompt ve que empieza por el nombre del empleado que pregunta, que cambia en cada petición, y que la caché vive 5 minutos, así que ningún prefijo se reutiliza. Mueve el nombre al final, junto a la pregunta, y repite la medición: ahora, para las preguntas que llegan dentro de la vida de la caché, casi toda la normativa se lee de caché y el coste por pregunta baja sin tocar el modelo. Sin la medición habría probado un modelo menor sin saber que el problema estaba en otro sitio. (Es un caso hipotético para ilustrar el método.)
+
+## Errores frecuentes
+
+- **Medir solo el total.** No dice qué palanca funcionó.
+- **Comparar el precio por token y no el coste por tarea.** Un modelo más barato con más intentos puede salir más caro.
+- **Cambiar varias cosas entre mediciones.** No sabrás cuál causó la mejora.
+- **Olvidar el razonamiento.** Se factura como salida y no aparece en el texto de la respuesta.
+
+<Checklist
+  id="medir"
+  titulo="Mido lo que importa"
+  items={[
+    'Registro los campos de uso de cada petición en mis integraciones.',
+    'Conozco mi tasa de acierto de caché.',
+    'Calculo el coste por tarea completada, no el precio por token.',
+    'Cambio una cosa cada vez.',
+  ]}
+/>
+
+## Para profundizar
+
+Cómo traducir las mediciones en estimaciones: [Calculadora de coste](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/calculadora-de-coste/). Cómo montar una evaluación mínima para comprobar que la calidad se mantiene: [Evals mínimas](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/evals-minimas/).

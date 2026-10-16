@@ -1,1 +1,323 @@
-[]
+[
+  {
+    "id": "correo-y-texto-breve",
+    "taskType": "Correo, reformulación y texto breve",
+    "examples": [
+      "Responder a un cliente",
+      "Suavizar el tono de un mensaje",
+      "Resumir un hilo de cinco correos"
+    ],
+    "surface": "Chat",
+    "models": [
+      "sonnet-5-5",
+      "gpt-6-1-sol",
+      "gemini-3-8-flash"
+    ],
+    "effort": "low",
+    "verification": "Lectura completa antes de enviar",
+    "rationale": "Tarea acotada con poco que razonar: el esfuerzo bajo reduce latencia y tokens de razonamiento (que se facturan como salida) y un modelo de gama equilibrada o rápida sobra. Si el resultado flojea, mejora primero el encargo (destinatario, tono, ejemplo) antes de subir esfuerzo. Recomendación de la guía. Fuentes: anthropic-esfuerzo, anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas, google-ultimo-modelo.",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "resumen-documento-largo",
+    "taskType": "Resumen de un documento largo con decisiones",
+    "examples": [
+      "Informe de 80 páginas",
+      "Acta de comité",
+      "Contrato con anexos"
+    ],
+    "surface": "Chat con proyecto o adjunto",
+    "models": [
+      "sonnet-5-5",
+      "gpt-6-1-sol",
+      "gemini-3-8-flash"
+    ],
+    "effort": "medium",
+    "verification": "Cada afirmación con cita de página y comprobación de una muestra contra el original",
+    "rationale": "Hay que localizar y sopesar decisiones repartidas por el texto, lo que justifica algo de razonamiento, pero no el máximo. Pedir la página de cada afirmación convierte la verificación en una lectura de segundos. Recomendación de la guía. Google no tiene escalón equilibrado en los datos de modelos (Gemini 4 Argon es de frontera): se propone Gemini 3.8 Flash como opción rápida y se sube a Argon solo si la muestra lo exige. Fuentes: anthropic-esfuerzo, openai-ultimo-modelo-y-migracion, google-ultimo-modelo.",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "extraccion-en-volumen",
+    "taskType": "Extracción a tabla o JSON en volumen",
+    "examples": [
+      "Datos de 5.000 facturas",
+      "Campos de formularios escaneados",
+      "Lista de compromisos de actas"
+    ],
+    "surface": "API con lotes y salida estructurada",
+    "models": [
+      "haiku-5-5",
+      "gpt-6-luna",
+      "gemini-3-8-flash"
+    ],
+    "effort": "low",
+    "verification": "Validación contra el esquema y muestreo manual de una muestra etiquetada",
+    "rationale": "Tarea repetitiva y bien definida donde manda el coste por unidad; la gama rápida suele bastar y el esquema atrapa los formatos rotos. Los lotes de Anthropic ofrecen descuento si se puede esperar hasta 24 horas. Antes de generalizar, mide en una muestra, incluida la cola de casos difíciles. Recomendación de la guía. Fuentes: anthropic-batch, anthropic-structured-outputs, anthropic-precios.",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "clasificacion-masiva",
+    "taskType": "Clasificación masiva",
+    "examples": [
+      "Correos de soporte por urgencia",
+      "Comentarios de clientes por tema",
+      "Tickets por equipo"
+    ],
+    "surface": "API con lotes",
+    "models": [
+      "haiku-5-5",
+      "gpt-6-luna",
+      "gemini-3-8-flash"
+    ],
+    "effort": "low",
+    "verification": "Evaluación sobre 20 a 30 casos etiquetados a mano y revisión de la tasa de error por categoría",
+    "rationale": "Salida corta y criterio estable: es el caso de uso típico de la gama rápida. El riesgo está en la cola difícil, por eso la evaluación debe incluir casos ambiguos; los dudosos pueden repasarse con un modelo superior. Recomendación de la guía. Fuentes: anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas, anthropic-batch.",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "analisis-de-datos",
+    "taskType": "Análisis de datos en hojas de cálculo o CSV",
+    "examples": [
+      "Variaciones mensuales de ventas",
+      "Detectar anomalías en gastos",
+      "Cruzar dos listados"
+    ],
+    "surface": "Chat con ejecución de código, o Claude en Excel",
+    "models": [
+      "opus-5-5",
+      "sonnet-5-5",
+      "gpt-6-1-sol",
+      "gemini-4-argon"
+    ],
+    "effort": "medium",
+    "verification": "Recalcular las cifras clave con código o fórmulas y contrastar totales con el original",
+    "rationale": "Mezcla de comprensión del problema y cálculo; las cifras deben salir de código ejecutado, no del texto del modelo, y eso pesa más que subir el esfuerzo. Empieza en medio y sube solo si falla el razonamiento sobre los datos. Recomendación de la guía. Gemini 4 Argon es un modelo de frontera, no equilibrado: se incluye como opción de Google para análisis, y conviene comparar su precio vigente (introductorio) con el de Sonnet 5.5. Fuentes: anthropic-esfuerzo, claude-com-docs-office-agents-excel.",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "investigacion-con-fuentes",
+    "taskType": "Investigación con fuentes",
+    "examples": [
+      "Estado de la normativa sobre un tema",
+      "Comparativa de proveedores",
+      "Informe de mercado"
+    ],
+    "surface": "Modo de investigación o agente con búsqueda web",
+    "models": [
+      "opus-5-5",
+      "gpt-6-astra",
+      "gemini-4-argon"
+    ],
+    "effort": "high",
+    "verification": "Fuentes primarias enlazadas y verificación cruzada de las cifras que sustentan la conclusión",
+    "rationale": "Hay que planificar la búsqueda, contrastar fuentes y detectar contradicciones; ahí el razonamiento adicional rinde. Escala a la gama de frontera solo si el coste de equivocarse es alto. Recomendación de la guía. Fuentes: anthropic-esfuerzo, openai-ultimo-modelo-y-migracion, google-ultimo-modelo.",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "decision-estrategica",
+    "taskType": "Decisión estratégica o análisis con alto impacto",
+    "examples": [
+      "Entrar o no en un mercado",
+      "Elegir entre dos proveedores caros",
+      "Escenarios para un plan anual"
+    ],
+    "surface": "Chat",
+    "models": [
+      "opus-5-5",
+      "fable-5-1",
+      "gpt-6-astra",
+      "gemini-4-argon"
+    ],
+    "effort": "high",
+    "verification": "Supuestos explícitos, contraargumentos pedidos al modelo y revisión humana de las cifras",
+    "rationale": "Pocas ejecuciones y mucho en juego: el coste de tokens es irrelevante frente al de una mala decisión, así que compensa la gama alta con razonamiento profundo. El modelo apoya la decisión; no la toma. Recomendación de la guía. Fuentes: anthropic-esfuerzo, anthropic-modelos.",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "programacion-diaria",
+    "taskType": "Programación diaria",
+    "examples": [
+      "Corregir un error acotado",
+      "Añadir un campo a un formulario",
+      "Escribir tests de una función"
+    ],
+    "surface": "Claude Code o Codex",
+    "models": [
+      "sonnet-5-5",
+      "gpt-6-1-sol"
+    ],
+    "effort": "medium",
+    "verification": "Ejecutar los tests y revisar el diff",
+    "rationale": "Es el equilibrio de calidad y coste para el grueso del trabajo. Anthropic publica, sobre un subconjunto de SWE-bench Pro, que Sonnet 5.5 en medium queda unos 7 puntos por debajo de high con alrededor del 59 % del coste por tarea: es un compromiso que hay que medir en tu código, no un dato general. Recomendación de la guía. Fuentes: anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas, claude-code-modelo-y-esfuerzo.",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "arquitectura-y-depuracion-compleja",
+    "taskType": "Arquitectura o depuración compleja",
+    "examples": [
+      "Fallo intermitente entre servicios",
+      "Diseño de un módulo con varias restricciones",
+      "Refactor de varias capas"
+    ],
+    "surface": "Claude Code o Codex",
+    "models": [
+      "opus-5-5",
+      "fable-5-1",
+      "gpt-6-astra"
+    ],
+    "effort": "high",
+    "verification": "Tests, reproducción del fallo antes y después, y revisión adversarial en sesión limpia",
+    "rationale": "Problemas con varias hipótesis y dependencias donde un modelo flojo malgasta más iteraciones de las que ahorra. Sube a xhigh solo tras comprobar que high no basta. Recomendación de la guía. Fuentes: claude-code-modelo-y-esfuerzo, anthropic-esfuerzo.",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "migracion-masiva-de-codigo",
+    "taskType": "Migración masiva de código",
+    "examples": [
+      "Actualizar una librería en 300 ficheros",
+      "Cambiar de convención de nombres",
+      "Pasar de una API a otra"
+    ],
+    "surface": "Flujo dinámico o subagentes en paralelo en Claude Code",
+    "models": [
+      "sonnet-5-5",
+      "opus-5-5"
+    ],
+    "effort": "medium",
+    "verification": "Integración continua por lote y revisión de una muestra de cambios",
+    "rationale": "El patrón se repite en cada fichero, así que los trabajadores no necesitan la gama más alta; el orquestador sí debe entender el plan. Verificar por lote evita que un error se propague a todo. Recomendación de la guía. Fuentes: claude-code-flujos-dinamicos, claude-code-subagentes.",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "revision-de-codigo",
+    "taskType": "Revisión de código",
+    "examples": [
+      "Revisar una pull request",
+      "Buscar vulnerabilidades en un cambio",
+      "Auditar un módulo antes de publicarlo"
+    ],
+    "surface": "Claude Code con un subagente de contexto limpio",
+    "models": [
+      "opus-5-5",
+      "gpt-6-1-sol"
+    ],
+    "effort": "high",
+    "verification": "Cada hallazgo debe poder reproducirse o señalar la línea concreta",
+    "rationale": "Revisar con contexto limpio evita el sesgo de quien escribió el código, y un revisor capaz con esfuerzo alto encuentra más problemas sutiles. Pide hallazgos reproducibles para descartar falsos positivos. Recomendación de la guía. Fuentes: claude-code-buenas-practicas, claude-code-subagentes.",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "tarea-recurrente",
+    "taskType": "Tarea recurrente automatizada",
+    "examples": [
+      "Informe semanal de métricas",
+      "Resumen diario de incidencias",
+      "Revisión nocturna de enlaces rotos"
+    ],
+    "surface": "Rutina o tarea programada",
+    "models": [
+      "sonnet-5-5",
+      "haiku-5-5"
+    ],
+    "effort": "low",
+    "verification": "Comprobaciones automáticas del formato y alerta cuando la salida se desvía",
+    "rationale": "Se ejecuta muchas veces sin supervisión, así que cada token se multiplica; fija un modelo y esfuerzo que hayas medido y compruébalo con reglas automáticas. Sube a medium solo si la medición lo exige. Recomendación de la guía. Fuentes: claude-code-rutinas, anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas.",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "asistente-interno",
+    "taskType": "Asistente interno conversacional",
+    "examples": [
+      "Preguntas sobre políticas de RR. HH.",
+      "Soporte de primer nivel a empleados",
+      "Guía de procedimientos"
+    ],
+    "surface": "Proyecto de chat o API con caché de prompt",
+    "models": [
+      "sonnet-5-5",
+      "haiku-5-5",
+      "gpt-6-1-sol",
+      "gemini-3-8-flash"
+    ],
+    "effort": "low",
+    "verification": "Evaluación con un conjunto de conversaciones reales y revisión periódica de respuestas",
+    "rationale": "La mayoría de preguntas son consulta de información ya presente en el contexto; con la parte estable del prompt en caché, el esfuerzo bajo es barato y rápido. Las conversaciones difíciles pueden derivarse a una persona. Recomendación de la guía. Fuentes: anthropic-prompt-caching, anthropic-esfuerzo.",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "traduccion-y-localizacion",
+    "taskType": "Traducción y adaptación de textos",
+    "examples": [
+      "Traducir una nota de prensa",
+      "Adaptar un manual a otro mercado",
+      "Revisar terminología de un contrato"
+    ],
+    "surface": "Chat o API con glosario en el contexto",
+    "models": [
+      "sonnet-5-5",
+      "gpt-6-1-sol",
+      "gemini-3-8-flash"
+    ],
+    "effort": "low",
+    "verification": "Revisión por una persona que domine ambos idiomas en textos de cara al público",
+    "rationale": "El trabajo está más en el glosario y el registro que en razonar; dar el glosario y el público objetivo mejora más que subir esfuerzo. En textos jurídicos o contractuales, mantén siempre la revisión humana. Recomendación de la guía. Google no tiene escalón equilibrado en los datos de modelos (Gemini 4 Argon es de frontera): se propone Gemini 3.8 Flash como opción rápida y se sube a Argon solo si la muestra lo exige. Fuentes: anthropic-buenas-practicas-de-prompting, google-ultimo-modelo.",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "revision-de-contrato",
+    "taskType": "Revisión de contratos y documentos legales",
+    "examples": [
+      "Detectar cláusulas de riesgo",
+      "Comparar dos versiones de un acuerdo",
+      "Listar obligaciones y plazos"
+    ],
+    "surface": "Chat con proyecto",
+    "models": [
+      "opus-5-5",
+      "gpt-6-astra",
+      "gemini-4-argon"
+    ],
+    "effort": "high",
+    "verification": "Citar cláusula y página, y revisión final por una persona cualificada",
+    "rationale": "Un error aquí cuesta mucho más que los tokens, y las cláusulas interactúan entre sí, lo que favorece más razonamiento. La IA señala y resume; la responsabilidad jurídica sigue siendo humana. Recomendación de la guía. Fuentes: anthropic-esfuerzo, anthropic-buenas-practicas-de-prompting.",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "presentacion-y-borradores-largos",
+    "taskType": "Preparar una presentación o un borrador largo",
+    "examples": [
+      "Estructura de una presentación para dirección",
+      "Borrador de un informe trimestral",
+      "Propuesta comercial"
+    ],
+    "surface": "Chat con proyecto o artefactos",
+    "models": [
+      "sonnet-5-5",
+      "gpt-6-1-sol",
+      "gemini-3-8-flash"
+    ],
+    "effort": "medium",
+    "verification": "Revisión de cifras y afirmaciones contra las fuentes que aportaste",
+    "rationale": "Hay que estructurar y mantener coherencia en un texto largo, pero el contenido lo aportas tú. Medium da buen equilibrio y las iteraciones sobre un esquema aprobado son más baratas que reescribir de cero. Recomendación de la guía. Google no tiene escalón equilibrado en los datos de modelos (Gemini 4 Argon es de frontera): se propone Gemini 3.8 Flash como opción rápida y se sube a Argon solo si la muestra lo exige. Fuentes: anthropic-esfuerzo, anthropic-buenas-practicas-de-prompting.",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "exploracion-de-codigo-y-busqueda",
+    "taskType": "Exploración de código y búsqueda de información",
+    "examples": [
+      "Localizar dónde se calcula un impuesto",
+      "Listar usos de una función",
+      "Resumir la estructura de un repositorio"
+    ],
+    "surface": "Subagente de exploración en Claude Code",
+    "models": [
+      "haiku-5-5",
+      "gpt-6-luna"
+    ],
+    "effort": "low",
+    "verification": "Comprobar las rutas y líneas citadas antes de actuar sobre ellas",
+    "rationale": "Es lectura y búsqueda, no decisión; delegar en un modelo rápido mantiene limpio el contexto del principal y abarata la sesión. La guía «Choosing the right model» de Anthropic asigna a Haiku 5.5 las tareas de subagente («sub-agent tasks»). Recomendación de la guía. Fuentes: claude-code-subagentes, anthropic-modelos.",
+    "verifiedAt": "2026-10-16"
+  }
+]

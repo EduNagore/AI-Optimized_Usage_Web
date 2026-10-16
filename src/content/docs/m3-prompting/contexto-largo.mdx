@@ -20,6 +20,17 @@ import Callout from '@components/Callout.astro';
 import BeforeAfter from '@components/BeforeAfter.astro';
 import PromptTemplate from '@components/PromptTemplate.astro';
 import Steps from '@components/Steps.astro';
+export const textoVariosDocumentos = [
+  '<documento nombre="{{nombre 1}}" fecha="{{fecha}}" origen="{{origen}}">{{contenido}}</documento>',
+  '',
+  '<documento nombre="{{nombre 2}}" fecha="{{fecha}}" origen="{{origen}}">{{contenido}}</documento>',
+  '',
+  'Pregunta: {{pregunta, y qué decisión apoya}}',
+  '',
+  'Paso 1: copia literalmente los pasajes relevantes, indicando de qué documento y apartado salen.',
+  'Paso 2: responde solo con esos pasajes. Si no bastan, dilo y señala qué falta.',
+].join(String.fromCharCode(10));
+
 import Checklist from '@components/Checklist.astro';
 
 <KeyTakeaways>
@@ -46,7 +57,7 @@ Lo que sigue son tres hábitos que ayudan en cualquier modelo y cualquier provee
 
 <Callout tipo="recomendacion">
 
-Pide siempre las citas con su ubicación (página, apartado o cláusula). Es una recomendación de la guía: una afirmación con su apartado se comprueba en segundos; sin él, hay que releer todo el documento para saber si es verdad.
+Pide siempre las citas con su ubicación (página, apartado o cláusula). Es una recomendación de esta guía: una afirmación con su apartado se comprueba en segundos; sin él, hay que releer todo el documento para saber si es verdad.
 
 </Callout>
 
@@ -86,16 +97,7 @@ Qué cambió y por qué: los documentos van primero y etiquetados, así se puede
 <PromptTemplate
   titulo="Preguntar sobre varios documentos con citas"
   archivo="preguntar-varios-documentos"
-  texto={`<documento nombre="{{nombre 1}}" fecha="{{fecha}}" origen="{{origen}}">{{contenido}}</documento>
-
-<documento nombre="{{nombre 2}}" fecha="{{fecha}}" origen="{{origen}}">
-  {{ contenido }}
-</documento>
-
-Pregunta: {{pregunta, y qué decisión apoya}}
-
-Paso 1: copia literalmente los pasajes relevantes, indicando de qué documento y apartado salen.
-Paso 2: responde solo con esos pasajes. Si no bastan, dilo y señala qué falta.`}
+  texto={textoVariosDocumentos}
 
 >
 

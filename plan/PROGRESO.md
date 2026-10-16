@@ -3,7 +3,7 @@
 > Memoria entre sesiones. Actualízalo al cerrar cada tarea: qué se hizo, qué falta, decisiones con su motivo y coste de la fase.
 
 ## Estado actual
-- **Fase en curso:** 3 (contenido núcleo): M2 redactado, revisado y corregido; M3 redactado y revisado, con las correcciones de la revisión **a medias** (sesión interrumpida por el usuario); quedan M4, M5 y M0. Fases 0–2 cerradas (puntos de control 1 y 2 pendientes de confirmación del usuario).
+- **Fase en curso:** 3 (contenido núcleo) **terminada**: M2, M3, M4, M5 y M0 redactados, revisados por `revisor-editorial` y corregidos. Fases 0–2 cerradas. Puntos de control 1 y 2 siguen pendientes de confirmación del usuario.
 - **Rama:** `feat/web`
 - **Última actualización:** 2026-10-16 (Fase 2 completada, pendiente de confirmación del usuario: capturas, nombre del sitio y decisiones de diseño)
 
@@ -11,7 +11,7 @@
 - [x] 0. Preparación (2026-10-15: `npm run build`, `npm run check` y `npm run test:e2e` pasan)
 - [x] 1. Investigación y verificación (2026-10-16; punto de control 1 pendiente de confirmación del usuario)
 - [x] 2. Diseño y arquitectura (2026-10-16; punto de control 2 pendiente de confirmación del usuario)
-- [ ] 3. Contenido núcleo: M2 ✔ (2026-10-16), M3 (redactado; correcciones pendientes), M4, M5, M0
+- [x] 3. Contenido núcleo: M2, M3, M4, M5, M0 (2026-10-16)
 - [ ] 4. Contenido avanzado: M7, M8, M6, M9, M10, M1, M12
 - [ ] 5. Interactivos
 - [ ] 6. Calidad final (punto de control 3)
@@ -50,6 +50,12 @@
 | 2026-10-16 | `PromptTemplate` no antepone `# Título` al descargar si el texto empieza por `---` | Si no, un SKILL.md descargado no era válido |
 | 2026-10-16 | `src/content/plantillas/*.md` (25 ficheros) en `.prettierignore`; sin ruta pública todavía | Son texto de plantilla con huecos; se publicarán en M12 «Plantillas descargables» (Fase 4) |
 | 2026-10-16 | `cspell-project.txt`: añadidos clíticos y etiquetas de plantilla sin tilde | Falsos positivos de M2/M3 |
+| 2026-10-16 | Regla de partida única: «modelo capaz y su esfuerzo por defecto; bajar midiendo; subir si falla» (M0 regla 3, M4) | La revisión mostró que «bajo o medio» contradecía la guía oficial (`choosing-a-model`, empezar por el esfuerzo por defecto) y la tesis (bajar es un compromiso medido) |
+| 2026-10-16 | Nuevos componentes: `TaskMatrix` (lee `task-matrix.json`, con fuentes enlazadas), `GlossaryList` (lee `glossary.json`, 51 términos), `ModelTable detalle`, `CostExample cacheados/batch` | Sustituyen tablas y cifras escritas a mano |
+| 2026-10-16 | `task-matrix.json` (17 filas) y `glossary.json` rellenados desde `research/*-propuesta.json` | Las propuestas las escriben los redactores; solo la sesión principal toca `src/data/` |
+| 2026-10-16 | Corregido el error de la línea base sobre prellenado: 400 en Opus 4.6+ (guía de migración a Opus 5.5), no «modelos 4.6 y posteriores» en general; `plan/02` actualizado | Verificado con la fuente oficial |
+| 2026-10-16 | `tool_choice` e imágenes invalidan solo los mensajes de la caché (no sistema); corregido en `research/anthropic-api.json` | Revisión de M5 contra la documentación oficial |
+| 2026-10-16 | e2e: axe en claro/oscuro y 360 px sobre una lección de M0, M2, M3, M4 y M5 (43 pruebas); espera a hidratar la isla del quiz | La prueba del quiz era una carrera de hidratación con `client:visible` |
 | 2026-10-16 | `e2e/smoke.spec.ts` reescrito: axe en claro y oscuro sobre cinco páginas, sin desbordamiento horizontal a 360 px, tooltip de `<Fact>`, lista de comprobación y quiz | La página de prueba `prueba/hola` ya no existe |
 
 ## Conflictos entre fuentes y datos pendientes
@@ -90,16 +96,16 @@
 | 2 | _pendiente de anotar por el usuario con `/usage`_ | Sin subagentes: sesión principal (Sonnet 5.5, esfuerzo high) |
 | 1 | _pendiente de anotar por el usuario con `/usage`_ | 5 investigadores (Haiku, ≈1,0 M tokens de subagente en total: 152K + 100K + 123K + 297K + 306K) y 3 verificadores (Opus, ≈0,45 M: 222K + 84K + 140K) |
 
-## Pendientes de Fase 3 (M2 y M3)
-- **Retomar M3 (primera tarea):** el redactor se detuvo a mitad de aplicar las 20 correcciones de la revisión editorial. Hay ediciones parciales en `src/content/docs/m3-prompting/` (el build y `npm run check` pasan). Falta comprobar página a página, y volver a pasar el revisor, estos puntos: (1) prellenado/error 400 sin fuente: quitar o verificar con `whats-new-claude-4-6`, y nunca con `tipo="verificado"`; (2) callout «Dos filas son datos de la API» de `que-ha-cambiado` no cuadra con la tabla; (3) citar en `sources` las 5 guías nuevas; (4) `notas-por-modelo`: no citar «el temario»; verificar o retirar lo de Sonnet literal, Opus frontend y Fable; idea clave de Haiku; orden de ajuste contexto → esfuerzo → redacción; Astra con cita; (5) `principios`: callout de Google mal etiquetado, «ocho principios de la guía oficial», rol; (6) `contexto-largo`: `<pasted_content>` es técnica de la guía, no del sistema; (7) `tareas-largas-y-agentes`: causa de la reducción de un tercio (no lanzar subagentes revisores a `max`) y «puede no preguntarte»; (8) valores por defecto de esfuerzo solo con `<Fact>`; (9) plantilla de `contexto-largo` con `{{ contenido }}` distinta de su `.md`; (10) quitar la frase de «Plantillas descargables» en `biblioteca`; (11) ejemplos de huecos rellenos reales; (12) quitar referencias a «Fase 5»; (13) sección de ejemplo en `notas-por-modelo` y distintivo «varía según el proveedor» en `que-ha-cambiado`; (14) enlazar referencias sueltas a módulos. Detalle completo: el informe del revisor se perdió con la sesión; relanzar `revisor-editorial` sobre `m3-prompting/` y comparar con esta lista.
-- M2: correcciones de la revisión aplicadas (coste por tarea con `<CostExample>`, criterios de superficie, ciclo, errores). Falta solo ver el resultado final en el navegador tras los cambios.
-- `task-matrix.json` vacío: `taxonomia-de-tareas` lleva un comentario PENDIENTE y enlaza a M4 «matriz por tarea».
-- `elegir-superficie` no muestra planes de Cowork/Proyectos desde datos: falta un componente `FeatureMatrix` (Fase 5) para `features.json` y `pricing-rules.json`.
-- Datos candidatos a `features.json`: structured outputs (`output_config.format`), prellenado, nombres de parámetro (`thinking_level`, `between_tools`) y niveles de `reasoning.effort`. Ver informe final del redactor de M3.
-- Sin verificar con fuente literal: prellenado → error 400 (retirado o marcado), citas de OpenAI y Google procedentes de resúmenes (marcadas «pendiente»).
-- `laboratorio-antes-despues` es estático (`BeforeAfter`); el `PromptLab` interactivo es de la Fase 5.
-- M5 «orden de las palancas» y `medir` deben mantener los slugs enlazados desde M2 (`coste-por-tarea`, `ciclo-de-7-pasos`).
-- Glosario (`glossary.json`): términos acumulados en M2/M3: superficie, effort, ventana de contexto, proyecto, agente, Cowork, skill, CLAUDE.md/AGENTS.md, batch, coste por tarea completada, contexto limpio, criterio de éxito, structured outputs, prellenado, few-shot, rúbrica, etiquetas XML, SPEC.md. Se rellena en M0.
+## Pendientes tras la Fase 3
+- **Revisión por fases posteriores:** los enlaces de M0 (glosario, reglas) a páginas de M6–M9 que aún son esqueleto deben comprobarse al redactarlas (`skills`, `conectores-y-mcp`, `ficheros-de-instrucciones-y-memoria`, M7, `m8-agentes/patrones`, `escalera-de-complejidad`, M9). Definiciones del glosario sin cita directa: `auto-mode`, `plan-mode`, `hook`, `worktree`, `cowork`, `ttl`.
+- **Datos sin componente (están en prosa con cita; riesgo para `freshness`):** reglas de `pricing-rules.json` (multiplicadores de caché, mínimos cacheables, reglas de OpenAI y Google), niveles y parámetros de `effort.json`, `features.json` (planes de Cowork/Proyectos). Falta un componente `<Rule>` / `FeatureMatrix` / tabla de equivalencias de esfuerzo (Fase 5 o antes).
+- **Candidatos a `features.json`:** structured outputs (`output_config.format`), esfuerzo por mensaje (cabecera `mid-conversation-output-config-2026-07-01`), `opusplan`, `/fast`, herramienta asesor (beta 2026-04-09), fast mode de Opus 5.5 (fuera de vista previa 2026-10-15), `ultracode`, compactación bajo demanda y por umbral, context editing, tool search/`defer_loading`, programmatic tool calling, `prompt_cache_options.ttl` y `configuration_update` de OpenAI, caché implícita de Gemini, `promptCacheTtl` y línea «Prompt cache» de `/usage` en Claude Code.
+- **Sin verificar con fuente literal (marcado en el texto):** citas de OpenAI y Google procedentes de resúmenes; prellenado → 400 solo verificado en Opus 4.6+ (no Sonnet/Haiku/Fable); `budget_reached` (¿Messages API o Managed Agents?); modelos con esfuerzo por mensaje; «herramientas con parámetros estrechos» (recomendación sin cita); tokens por imagen, Files API, `stop_sequences` por proveedor, lotes de Google, límites por plan de ChatGPT/Gemini.
+- **Interactivos pendientes (Fase 5):** `PromptLab` (laboratorio antes/después), selector de modelo y esfuerzo (M4), calculadora de coste (M5), simulador de caché. Las páginas son estáticas y no prometen fecha.
+- Quizzes de cierre de módulo: ninguno de M0–M5 lo lleva todavía.
+- `ultrathink` verificado (model-config); entrada de «pendiente» en `research/claude-code.json` por retirar.
+- M2 `elegir-superficie` no muestra planes de Cowork/Proyectos desde datos (falta `FeatureMatrix`).
+- Plantillas descargables: los 25 `.md` de `src/content/plantillas/` se publicarán en M12 (Fase 4).
 
 ## Pendientes y siguientes pasos
 - Tras el punto de control 2: elegir el nombre del sitio (cambiar `title` en `astro.config.mjs` y en `index.mdx`), confirmar o ajustar la dirección visual y empezar la Fase 3 (M2 → M3 → M4 → M5 → M0).

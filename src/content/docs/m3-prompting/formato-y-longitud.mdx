@@ -11,6 +11,7 @@ sources:
   [
     anthropic-buenas-practicas-de-prompting,
     anthropic-structured-outputs,
+    anthropic-migracion-opus-5-5,
     anthropic-prompting-fable-5-1,
     openai-guia-de-prompts,
     ai-google-dev-gemini-api-docs-prompting-strategies,
@@ -47,9 +48,9 @@ Los structured outputs están disponibles de forma general (salieron de beta) y 
 
 </Callout>
 
-<Callout tipo="cuidado">
+<Callout tipo="verificado" fecha="2026-10-16">
 
-También se usaba prellenar la respuesta del asistente para forzar un formato. No hemos podido confirmar en la fuente oficial qué ocurre con esa técnica en los modelos recientes de Anthropic: si dependes de ella, pruébala en tu modelo y, para una forma exacta, pasa a un esquema.
+En Claude Opus 4.6 y posteriores, incluido Opus 5.5, terminar `messages` con una respuesta del asistente prellenada devuelve un error 400. Para fijar la forma, usa structured outputs o instrucciones en el prompt de sistema (en Amazon Bedrock, Opus 5.5 no admite structured outputs).
 
 </Callout>
 
@@ -84,7 +85,7 @@ Para los modelos GPT-6, la guía de prompts de OpenAI es la referencia; no hemos
   </div>
   <div slot="google">
 
-En Gemini, la guía de estrategias de prompting de Google recomienda incluir ejemplos de la salida deseada. Si usas la API de Gemini 4 Argon, la documentación oficial recomienda dejar `max_output_tokens` en su valor por defecto o sin fijar, y como mínimo 32.768 si tu aplicación tenía un límite menor.
+En Gemini, la guía de estrategias de prompting de Google recomienda incluir ejemplos de la salida deseada. Si usas la API de Gemini 4 Argon, la recomendación oficial de Google es mantener `max_output_tokens` en su valor por defecto de 65.536 o no fijarlo, y como mínimo 32.768 si tu aplicación tenía un límite menor (fuente: «google-ultimo-modelo»).
 
   </div>
 </ProviderTabs>
@@ -103,7 +104,7 @@ Qué cambió y por qué: el límite de palabras se cambia por quién lee, dónde
 ## Errores frecuentes
 
 - **«Responde solo con JSON» y analizarlo con un script frágil.** Se rompe el día que el modelo añade una frase. Usa structured outputs.
-- **Depender del prellenado de la respuesta.** No está confirmado que siga funcionando en los modelos recientes: usa un esquema.
+- **Depender del prellenado de la respuesta.** En los modelos Opus recientes devuelve un error 400: usa un esquema.
 - **Pedir tablas para todo.** Una tabla ayuda a comparar; para razonar, la prosa es más clara.
 - **Corregir el formato en cada turno.** Dilo una vez en el encargo, con un ejemplo.
 

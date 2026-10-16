@@ -12,9 +12,11 @@ interface Props {
   ids?: string[];
   /** Nombre accesible de la región desplazable. */
   etiqueta?: string;
+  /** Añade las columnas «Niveles de esfuerzo» y «Destaca en». */
+  detalle?: boolean;
 }
 
-const { provider, tier, ids, etiqueta = 'Tabla de modelos' } = Astro.props;
+const { provider, tier, ids, etiqueta = 'Tabla de modelos', detalle = false } = Astro.props;
 const providerNames = { anthropic: 'Anthropic', openai: 'OpenAI', google: 'Google' } as const;
 
 const all = (await getCollection('models')).map((e) => e.data);
@@ -39,7 +41,7 @@ const statusLabel = {
   beta: 'Beta',
   'acceso-limitado': 'Acceso limitado',
 } as const;
-const withNotes = rows.filter((r) => r.pricing.notes);
+const withNotes = rows.filter((r) => r.pricing.notes || r.notes);
 ---
 
 <div class="table-wrap not-content">
@@ -64,6 +66,8 @@ const withNotes = rows.filter((r) => r.pricing.notes);
             Lectura de caché
           </th>
           <th scope="col">Esfuerzo por defecto (API)</th>
+          {detalle && <th scope="col">Niveles de esfuerzo</th>}
+          {detalle && <th scope="col">Destaca en</th>}
           <th scope="col">Estado</th>
         </tr>
       </thead>
@@ -81,6 +85,8 @@ const withNotes = rows.filter((r) => r.pricing.notes);
             <td class="num">{price(r.pricing.output)}</td>
             <td class="num">{price(r.pricing.cacheRead)}</td>
             <td>{r.effort.default['api'] ?? '—'}</td>
+            {detalle && <td>{r.effort.levels.join(', ') || '—'}</td>}
+            {detalle && <td>{r.bestFor.join('; ') || '—'}</td>}
             <td>{statusLabel[r.status]}</td>
           </tr>
         ))}
@@ -94,7 +100,7 @@ const withNotes = rows.filter((r) => r.pricing.notes);
     <ul class="notes">
       {withNotes.map((r) => (
         <li>
-          <strong>{r.name}:</strong> {r.pricing.notes}
+          <strong>{r.name}:</strong> {[r.pricing.notes, r.notes].filter(Boolean).join(' ')}
         </li>
       ))}
     </ul>

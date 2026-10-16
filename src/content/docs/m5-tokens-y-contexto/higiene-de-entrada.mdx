@@ -6,6 +6,127 @@ sidebar:
 level: intermedio
 tracks: [profesional, tecnica]
 readingTime: 7
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-16
+sources:
+  [
+    anthropic-skills,
+    anthropic-tool-search,
+    anthropic-conteo-de-tokens,
+    anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas,
+    anthropic-com-engineering-effective-context-engineering-for-ai-agents,
+    claude-code-costes,
+    anthropic-precios,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Carga lo que la tarea necesita ahora; lo demás, que esté disponible pero no puesto.
+- Skills en lugar de instrucciones permanentes: solo su descripción está siempre presente.
+- Con muchas herramientas, `defer_loading` y tool search las cargan bajo demanda.
+- Un documento entero rara vez hace falta: el fragmento, o una herramienta que lo consulte, suele bastar.
+- Cuenta los tokens antes de enviar; el tokenizador de los modelos recientes produce más tokens para el mismo texto.
+
+</KeyTakeaways>
+
+## La idea
+
+Lo que entra en el contexto se paga en cada turno y, además, compite por la atención del modelo. La técnica que lo resuelve se llama **divulgación progresiva**: el modelo empieza con un índice breve de lo que existe y va pidiendo el detalle cuando lo necesita. Anthropic la formula en su guía de ingeniería de contexto como buscar el conjunto más pequeño de tokens de alta señal.
+
+Es la palanca con más variantes. Estas son las que funcionan hoy.
+
+## Skills en lugar de instrucciones permanentes
+
+Una skill es una carpeta con instrucciones y recursos que se cargan por niveles. Según la documentación de Anthropic, los metadatos de cada skill (nombre y descripción) están siempre en el contexto y rondan los 100 tokens por skill; el cuerpo de las instrucciones (menos de 5.000 tokens recomendados) solo se carga cuando la skill se activa, y los ficheros de apoyo, cuando hacen falta. Una instrucción de 3.000 tokens en un fichero de instrucciones permanentes se paga en cada turno; la misma instrucción en una skill se paga solo en las tareas que la usan.
+
+<Callout tipo="recomendacion">
+
+Si una instrucción solo vale para un tipo de tarea (por ejemplo, «cómo redactamos las actas»), conviértela en skill y deja en el fichero permanente solo lo que aplica siempre. Por qué: lo permanente se reenvía en cada turno de cada tarea, necesites la instrucción o no.
+
+</Callout>
+
+En Claude Code, `/skill-doctor` muestra cuánto contexto ocupa cada skill y con qué frecuencia se usa, lo que permite podar las que cuestan y no se usan.
+
+## Herramientas: tool search y `defer_loading`
+
+Cada herramienta disponible mete su definición (nombre, descripción y esquema) en cada petición. En la API, sin `defer_loading`, con un par de herramientas es irrelevante; con varios servidores MCP puede ser la mayor parte de la entrada. En Claude Code, según su documentación de costes, las definiciones de las herramientas MCP están diferidas por defecto: solo entran en el contexto los nombres de las herramientas y las instrucciones del servidor hasta que Claude usa una. La API de Claude permite marcar herramientas con `defer_loading` para que no se carguen hasta que el modelo las busque con la herramienta de búsqueda (variantes regex y BM25).
+
+<Callout tipo="medicion" titulo="Medición publicada por Anthropic">
+
+La documentación de tool search da un ejemplo con servidores MCP de cinco proveedores, cuyas definiciones suman unos 55.000 tokens, y afirma que tool search reduce más del 85 % de ese coste. En la guía de optimización de coste e inteligencia, con un catálogo de hasta 502 herramientas reales de servidores MCP públicos cargadas, el coste de una ejecución sube de 0,55 a 1,02 $; con tool search se queda en 0,56 $. Son resultados del proveedor en su propio montaje: confirma con tus herramientas.
+
+</Callout>
+
+El umbral orientativo de la documentación para plantearse tool search es tener 10 o más herramientas, o definiciones de más de 10.000 tokens (basta uno de los dos criterios). Los esquemas que sí se cargan cuentan como entrada normal: la búsqueda en sí no tiene un coste aparte.
+
+En la API, añadir o quitar herramientas cargadas de entrada cambia el comienzo del prompt e [invalida la caché](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/prompt-caching/); con `defer_loading`, las herramientas diferidas no forman parte de ese prefijo inicial. En Claude Code, con tool search (el valor por defecto en los modelos compatibles), conectar o desconectar un servidor MCP a mitad de sesión no toca la caché; solo la invalida cuando las herramientas se cargan de entrada.
+
+<Callout tipo="recomendacion">
+
+Conecta solo los servidores MCP que usarás en la tarea de hoy, y cuando exista una herramienta de línea de comandos que haga lo mismo, usa esa en lugar de un servidor MCP. Por qué: la documentación de costes de Claude Code recomienda ambas cosas, y señala que las herramientas de línea de comandos (`gh`, `aws`, `gcloud`, `sentry-cli`) son más eficientes en contexto porque no añaden listado por herramienta; un servidor MCP, incluso diferido, aporta nombres e instrucciones.
+
+</Callout>
+
+## Documentos detrás de una herramienta, fragmentos y archivos
+
+Un contrato de 60 páginas pegado en el chat se reenvía entero en cada turno. Hay tres alternativas según la superficie:
+
+- **Pegar el fragmento** que contiene la respuesta, en lugar del documento, cuando sabes dónde está.
+- **Ponerlo detrás de una herramienta de búsqueda** (en una integración propia): el modelo consulta los pasajes que necesita en lugar de recibirlo todo.
+- **Usar un proyecto con conocimiento** en las apps de chat (ver [En las apps de chat](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/en-apps-de-chat/)).
+
+La API de Claude también dispone de una Files API para subir ficheros una vez y citarlos. El detalle de cómo se factura cada fichero referenciado queda pendiente de verificar en la documentación; no asumas que sale gratis.
+
+## Herramientas con parámetros estrechos
+
+Una herramienta que acepta parámetros precisos (un identificador, un rango de fechas, una lista de campos) y devuelve solo lo pedido mete menos en el contexto que otra que devuelve el registro entero para que el modelo filtre. Es una recomendación de la guía, no una cifra del proveedor: el porqué es que todo lo que devuelve una herramienta entra en el contexto y se reenvía en cada turno siguiente.
+
+## Imágenes y contar antes de enviar
+
+Las imágenes consumen tokens según su tamaño. Reducirlas a la resolución que el trabajo necesita (un gráfico legible, no una foto de 12 millones de píxeles) baja el consumo. La fórmula exacta de tokens por imagen está pendiente de verificar en la documentación de visión, así que no se publica aquí.
+
+Para saber cuánto vas a enviar, la API de Claude ofrece un endpoint de conteo de tokens (`count_tokens`). La documentación indica que es gratuito, que está sujeto a límites de peticiones por minuto y que el resultado es una estimación. Hay un motivo concreto para usarlo con modelos recientes: el tokenizador de Opus 4.7 y posteriores produce aproximadamente un 30 % más de tokens para el mismo texto que los modelos anteriores. Si migras un prompt y comparas costes con la cuenta antigua, recuenta con el modelo de destino.
+
+## En la práctica
+
+<Steps>
+
+1. Abre tu configuración y lista lo que se carga siempre: instrucciones permanentes, skills, servidores MCP y herramientas.
+2. Por cada elemento, pregunta si lo usaste esta semana. Lo que no, se desactiva o se vuelve opcional.
+3. Pasa las instrucciones de un solo caso de uso a skills.
+4. Si tienes muchas herramientas en una integración, prueba `defer_loading` con tool search y compara el coste por tarea.
+5. Antes de enviar un documento grande, pregúntate si basta un fragmento y, si es una integración propia, cuenta los tokens.
+
+</Steps>
+
+## Ejemplo de oficina: el departamento de RR. HH.
+
+Un equipo de RR. HH. tiene un fichero de instrucciones de 4.000 palabras con las normas de redacción de cartas de oferta, comunicados de despido, actas de comité y respuestas a candidatos. Todo se carga siempre, aunque hoy solo se redacte una carta. Se separan cuatro skills, una por tipo de documento, y el fichero permanente se queda en tono y datos de la empresa. El consumo fijo por turno baja a una fracción, y las cartas siguen saliendo igual porque la skill de cartas se activa cuando se pide una carta.
+
+## Errores frecuentes
+
+- **Volcar la base de conocimiento entera «por si acaso».** Pagas cada turno por documentos que el 95 % de las preguntas no toca.
+- **Instalar conectores y no revisarlos.** Se quedan cargados semanas.
+- **Skills con descripciones vagas.** Si el modelo no sabe cuándo activarlas, o no se activan o se activan siempre.
+- **Cambiar la lista de herramientas a mitad de sesión.** Rompe la caché.
+
+<Checklist
+  id="higiene-entrada"
+  titulo="Mi entrada está limpia"
+  items={[
+    'Las instrucciones permanentes son solo las que valen para todo.',
+    'Lo específico de un tipo de tarea está en skills.',
+    'No tengo conectores ni servidores MCP sin usar.',
+    'Pego fragmentos cuando basta un fragmento.',
+    'He contado los tokens de lo que envío en las integraciones grandes.',
+  ]}
+/>
+
+## Para profundizar
+
+Cómo escribir y mantener skills e instrucciones: [Skills](/AI-Optimized_Usage_Web/m6-herramientas/skills/) y [Ficheros de instrucciones y memoria](/AI-Optimized_Usage_Web/m6-herramientas/ficheros-de-instrucciones-y-memoria/). Para qué es un conector y cuándo usarlo: [Conectores y MCP](/AI-Optimized_Usage_Web/m6-herramientas/conectores-y-mcp/).

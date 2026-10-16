@@ -100,7 +100,7 @@ Otros datos del mismo origen:
 - **Opus 5.5**: el razonamiento no se puede desactivar; esfuerzo por defecto `medium` en la API; fast mode (vista previa, solo Claude API) a 8 $ / 40 $ por MTok.
 - **Sonnet 5.5**: esfuerzo por defecto `high` en la API, con niveles recalibrados respecto a Sonnet 5; para apagar el razonamiento se usa `thinking: {type: "between_tools"}`.
 - **Haiku 5.5**: esfuerzo por defecto `medium`. Pasó a ser el Haiku por defecto en Claude Code el 2026-10-07 (v2.1.293).
-- El prellenado de la respuesta del asistente da error 400 en los modelos 4.6 y posteriores; se sustituye por structured outputs.
+- El prellenado de la respuesta del asistente da error 400 en Opus 4.6 y posteriores, incluido Opus 5.5 (guía de migración a Opus 5.5, verificado 2026-10-16); no verificado en otros modelos. Se sustituye por structured outputs o instrucciones en el prompt de sistema.
 - `tool_choice` forzado (`any` o `tool`) da error en Fable 5.1, Opus 5.5 y Sonnet 5.5.
 - El tokenizador introducido con Opus 4.7 usa entre 1× y 1,35× los tokens de los anteriores.
 

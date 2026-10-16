@@ -6,6 +6,101 @@ sidebar:
 level: basico
 tracks: [profesional, tecnica]
 readingTime: 6
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-16
+sources:
+  [
+    anthropic-com-engineering-effective-context-engineering-for-ai-agents,
+    claude-code-costes,
+    anthropic-prompt-caching,
+    claude-code-prompt-caching-en-claude-code,
+    anthropic-precios,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Fact from '@components/Fact.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Cada turno de una conversación reenvía todo lo anterior: el coste de un mensaje depende del tamaño de la conversación, no del mensaje.
+- Una pausa larga puede hacer que se pague de nuevo, a precio completo, lo que la caché ya tenía.
+- Herramientas, documentos e historial pesan más que tu pregunta.
+- Subagentes y equipos de agentes multiplican el consumo: es una decisión de coste, no solo de calidad.
+
+</KeyTakeaways>
+
+## La idea
+
+Un modelo de lenguaje no recuerda tu conversación: en cada turno recibe de nuevo todo lo que hay en la ventana de contexto (instrucciones, herramientas, mensajes anteriores, documentos adjuntos) y responde. Por eso el mensaje número treinta de una conversación cuesta mucho más que el primero aunque sea igual de corto. Las apps de chat te lo ocultan; en la API y en Claude Code la mecánica es esa, y en los planes de suscripción se traduce en un uso del plan que se agota antes.
+
+Hay una segunda razón para cuidar el contexto, además del coste. La guía de ingeniería de contexto de Anthropic plantea el objetivo como encontrar el conjunto más pequeño de tokens de alta señal que maximice la probabilidad del resultado que buscas. Es un principio de método, no una cifra: más contexto no es mejor contexto.
+
+## Las causas habituales
+
+**El historial que se reenvía.** Cuanto más larga la conversación, más caro cada turno. Si además la conversación mezcla temas, pagas por contexto que ya no sirve.
+
+**La caché que caduca.** La caché de prompts hace que el prefijo repetido se cobre a una fracción del precio de entrada: en Sonnet 5.5, <Fact id="sonnet-5-5.pricing.cacheRead" /> por millón de tokens leídos frente a <Fact id="sonnet-5-5.pricing.input" /> de entrada normal. Pero las entradas de caché caducan. Si vuelves después de una pausa más larga que su vida útil, el siguiente turno reescribe el prefijo completo, y escribirlo cuesta algo más que la entrada normal (<Fact id="sonnet-5-5.pricing.cacheWrite5m" /> en la escritura de 5 minutos). Los detalles están en [prompt caching a fondo](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/prompt-caching/).
+
+**Los cambios que rompen la caché sin avisar.** Cambiar de modelo, tocar las herramientas o modificar un dato al principio del prompt hace que la caché no acierte aunque no haya pausa. La documentación de Claude Code lista, entre otras acciones, cambiar de modelo, activar el modo rápido o compactar. Conectar o quitar servidores MCP solo la invalida cuando las herramientas se cargan de entrada (con tool search, el valor por defecto, no).
+
+**Las definiciones de herramientas.** Aquí hay que distinguir. En la API, sin `defer_loading`, cada definición de herramienta cuenta como entrada en cada petición, la uses o no, y con muchas herramientas ese coste fijo puede superar al de tu pregunta. En Claude Code, según su documentación de costes, las definiciones de las herramientas MCP están diferidas por defecto: solo entran en el contexto los nombres de las herramientas y las instrucciones del servidor hasta que Claude usa una. Ver [higiene de entrada](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/higiene-de-entrada/).
+
+**Los resultados voluminosos.** Una salida de tests de miles de líneas, un PDF entero o un volcado de datos entran en el contexto y se reenvían turno tras turno.
+
+**Subagentes y equipos de agentes.** Cada agente tiene su propio contexto y su propio consumo. La documentación de costes de Claude Code recoge que los equipos de agentes consumen aproximadamente 7 veces más tokens que una sesión normal cuando los compañeros trabajan en plan mode.
+
+**El trabajo que ocurre mientras no miras (Claude Code).** La misma página de costes enumera por qué una sesión abierta durante horas gasta más de lo que sugiere tu actividad: una tarea programada se dispara en su intervalo aunque la sesión esté en reposo y envía todo el contexto cada vez; un mensaje de otra de tus sesiones llega como un turno nuevo cuando esta está en reposo; mientras trabajo en segundo plano mantiene un objetivo (`/goal`) pendiente, Claude Code pide comprobaciones aunque estés ausente (como máximo tres por objetivo entre tus mensajes, desde la versión 2.1.246); y `/compact` es en sí una petición grande, porque lee la conversación que resume.
+
+<Callout tipo="medicion" titulo="Medición publicada por Anthropic">
+
+La documentación de costes de Claude Code da, para uso empresarial, un coste medio de unos 13 $ por desarrollador y día activo y de 150 a 250 $ por desarrollador y mes, con menos de 30 $ por día activo para el 90 % de los usuarios. Es una media del proveedor: sirve para situarte, no para predecir tu factura.
+
+</Callout>
+
+## Ejemplo de oficina: el hilo eterno
+
+Una responsable de compras abre una conversación el lunes para analizar un contrato de 60 páginas. El martes pega otro contrato en la misma conversación, el miércoles un tercero, y el jueves pregunta algo sobre el primero. En cada mensaje el modelo recibe los tres contratos, aunque la pregunta solo necesite uno. (Si la herramienta usa una caché con vida corta, como la de 5 minutos de la API, volver tras horas de pausa significa pagar de nuevo el prefijo: es una inferencia a partir de la caducidad de la caché, no un dato de las apps de chat, cuyo funcionamiento interno no está documentado en las fuentes de esta guía.) Con una conversación por contrato (o un proyecto con los tres como conocimiento y una conversación por pregunta) el consumo por mensaje se reduce a lo necesario.
+
+<Callout tipo="recomendacion">
+
+Trata la conversación como una mesa de trabajo, no como un archivo: una tarea por conversación, y cuando cambies de tema abre una nueva. Por qué: cada turno reenvía el historial, así que todo lo que ya no necesitas lo pagas igual y además estorba al modelo.
+
+</Callout>
+
+## En la práctica
+
+<Steps>
+
+1. Mira cuánto pesa tu conversación: en Claude Code, `/context` y `/usage`; en una app de chat, cuántos mensajes y documentos lleva.
+2. Si cambias de tema, abre una conversación nueva.
+3. Lista lo que se carga siempre (herramientas, conectores, instrucciones) y quita lo que no uses.
+4. Si dejas trabajo en reposo (tareas programadas, objetivos, otras sesiones), decide si merece su consumo.
+5. Al volver de una pausa larga, asume que la caché ha caducado y no encadenes tareas pesadas sin necesidad.
+
+</Steps>
+
+## Errores frecuentes
+
+- **Pensar que el precio lo marca el mensaje nuevo.** Lo marca la conversación entera.
+- **Dejar conectados servidores MCP que no usas.** En la API suman definiciones a cada petición; en Claude Code, nombres e instrucciones del servidor.
+- **Lanzar agentes en paralelo «por si acaso».** Cada uno es un consumo propio; úsalos cuando el trabajo realmente se reparte.
+- **Culpar al modelo cuando el gasto sube.** Casi siempre ha cambiado la forma de trabajar (más contexto, más pausas, más herramientas), no el precio.
+
+<Checklist
+  id="gasto-causas"
+  titulo="Diagnóstico rápido"
+  items={[
+    'Mi conversación actual trata de un solo tema.',
+    'Sé qué herramientas o conectores están cargados y los uso.',
+    'No pego documentos enteros cuando basta un fragmento.',
+    'Sé si mi caché dura 5 minutos o 1 hora en mi herramienta.',
+    'Uso subagentes o equipos solo donde el trabajo se reparte de verdad.',
+  ]}
+/>
+
+## Para profundizar
+
+Las bases de tokens y ventana de contexto están en [Tokens](/AI-Optimized_Usage_Web/m1-fundamentos/tokens/) y [Ventana de contexto](/AI-Optimized_Usage_Web/m1-fundamentos/ventana-de-contexto/). Para decidir qué atacar primero, sigue con [el orden de las palancas](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/orden-de-las-palancas/).
