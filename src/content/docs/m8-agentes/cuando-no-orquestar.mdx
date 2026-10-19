@@ -1,11 +1,128 @@
 ---
 title: 'Cuándo no orquestar'
-description: 'Cadenas dependientes, trabajo que cabe en un contexto y el sobrecoste de repartir.'
+description: 'Cadenas dependientes, trabajo que cabe en un contexto y el sobrecoste de planificar, repartir y fusionar: señales para quedarte con un solo modelo.'
 sidebar:
   order: 4
 level: intermedio
 tracks: [profesional, tecnica]
-readingTime: 5
-status: en-preparacion
-sources: []
+readingTime: 6
+lastReviewed: 2026-10-19
+sources:
+  [
+    anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas,
+    claude-code-costes,
+    claude-code-agent-teams,
+    platform-claude-com-docs-en-managed-agents-multiagent-orchestration-2,
+    codex-subagents,
+    anthropic-modelos,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Fact from '@components/Fact.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- No orquestes una cadena de pasos que dependen unos de otros: no hay nada que repartir, solo coordinación que pagar.
+- No orquestes lo que cabe en un contexto: un modelo solo, a menor esfuerzo, suele salir mejor.
+- Repartir cuesta tres veces: planificar el reparto, ejecutar con un contexto por agente y fusionar los resultados.
+- Anthropic midió que delegar solo ahorró dinero en dos situaciones: trabajo rutinario con cola larga de coste y trabajo mayor que una ventana de contexto (en el segundo, con 10 a 12 puntos menos de acierto). En una cadena única o en un trabajo que cabe en un contexto, el modelo coordinador solo y a menor esfuerzo salió mejor en todos los casos medidos.
+- El criterio para dudar: construye el equipo solo si supera a un único modelo en la curva de acierto frente a gasto.
+
+</KeyTakeaways>
+
+## La idea
+
+Orquestar tiene un coste que no se ve en la demo. Para repartir una tarea hay que **planificarla** (el [orquestador](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#orquestador) gasta tokens en decidir cómo), **ejecutarla en varios contextos** (cada agente carga el suyo, y el material común se paga varias veces) y **fusionar** los resultados (alguien lee todo lo que devolvieron los demás y resuelve contradicciones). Si el reparto no ahorra más de lo que esos tres costes suman, el equipo sale peor que el modelo solo.
+
+Hay tres situaciones en las que ese saldo casi siempre es negativo.
+
+**1. La tarea es una cadena.** Cada paso necesita el resultado del anterior: no se puede hacer a la vez lo que depende de lo que aún no existe. Redactar una carta, corregir su tono y adaptarla al destinatario es una secuencia. Repartirla en tres agentes no la acelera y obliga a pasar el texto de uno a otro.
+
+**2. Cabe en un contexto.** Las ventanas de contexto actuales de la gama de Claude llegan a <Fact id="sonnet-5-5.contextWindow" /> en Sonnet 5.5, y un informe de 80 páginas cabe de sobra. Si todo el material cabe y el modelo puede razonar sobre él, partirlo solo añade pérdida de visión de conjunto: ningún agente ve el informe entero.
+
+**3. El sobrecoste de coordinar supera el ahorro.** Con piezas pequeñas, el plan y la fusión cuestan más que hacer el trabajo.
+
+<Callout tipo="medicion" titulo="Medición publicada por Anthropic">
+
+La página de optimización de coste de Anthropic mide el patrón orquestador y trabajadores y concluye que delegar ahorró dinero en solo dos situaciones, con trabajadores de una generación anterior (Sonnet 5): trabajo rutinario con una cola larga de coste, y trabajo mayor que una ventana de contexto. En el segundo caso, la prueba fue una búsqueda interna de defectos: Fable 5.1 solo costó entre 468 y 552 dólares por ejecución según el esfuerzo y tardó de 15 a 20 horas; con trabajadores de la generación anterior, el orquestador con trabajadores de la generación anterior costó aproximadamente la mitad, a cambio de una puntuación entre 10 y 12 puntos más baja. Y la conclusión negativa: cuando el trabajo era una cadena dependiente o cabía en un contexto sin cola larga, el modelo del orquestador solo y a menor esfuerzo salió mejor en todos los casos medidos. Son resultados del proveedor en sus propias pruebas, con modelos de una generación anterior: sirven como orientación, no como ley.
+
+</Callout>
+
+### El precio de la cola
+
+La «cola larga» importa porque el gasto de una tanda no se reparte por igual. En una ejecución de 20 problemas de una prueba de búsqueda (WideSearch), Anthropic midió que dos problemas concentraron el 43 % del gasto. Si tu trabajo tiene unos pocos casos enormes y muchos pequeños, una política mixta puede ahorrar mucho, pero hay que medirla: los casos grandes son los que deciden la factura y los que más importa acertar. El porqué de medir la cola está en [coste por tarea completada](/AI-Optimized_Usage_Web/m2-metodo/coste-por-tarea/).
+
+### Cuánto cuesta repartir en las herramientas
+
+- **Claude Code, agent teams:** según la documentación de costes, usan unas 7 veces más tokens que una sesión normal cuando los compañeros trabajan en plan mode. La documentación de agent teams recomienda empezar con 3 a 5 compañeros. Son experimentales y están desactivados por defecto.
+- **Codex (OpenAI):** su documentación advierte de que los flujos con subagentes consumen más tokens que ejecuciones comparables de un solo agente, porque cada subagente hace su propio trabajo de modelo y de herramientas.
+- **Managed Agents:** la delegación en subagentes tiene un solo nivel de profundidad, y una sesión admite como máximo 25 hilos hijos a la vez; en los flujos dinámicos, cada agente de la ejecución gasta tokens, por lo que la documentación recomienda fijar un presupuesto de sesión.
+
+Estas cifras son del proveedor; la lista completa de límites está en [implementación por superficie](/AI-Optimized_Usage_Web/m8-agentes/implementacion-por-superficie/).
+
+## Señales de que no debes orquestar
+
+| Señal                                                   | Qué significa                                | Qué hacer                                                        |
+| ------------------------------------------------------- | -------------------------------------------- | ---------------------------------------------------------------- |
+| Cada paso necesita el resultado del anterior            | Es una cadena: nada se puede hacer a la vez  | Un solo agente, o un flujo secuencial en código                  |
+| Todo el material cabe en la ventana y no hay cola larga | No hay nada que repartir por tamaño          | Modelo solo, esfuerzo por defecto; baja el esfuerzo si mide bien |
+| Las piezas se contradicen o comparten decisiones        | Los agentes tomarán decisiones incompatibles | Un único agente con el panorama completo                         |
+| No sabes qué es «terminado»                             | Cada agente decidirá por su cuenta           | Escribe el criterio antes de repartir                            |
+| Un solo caso grande pesa más que los demás juntos       | La factura la decide la cola                 | Trata la cola aparte y mide                                      |
+| Es una tarea que haces una vez y en diez minutos        | No amortizas ni el plan ni la prueba         | Hazla a mano o con una llamada                                   |
+
+## En la práctica
+
+<Steps>
+
+1. **Mide primero el modelo capaz solo.** Elige el modelo y el esfuerzo de partida (la [regla de partida](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/estrategia-de-seleccion/)) y pásale cinco casos reales, con los más difíciles incluidos (la [escalera](/AI-Optimized_Usage_Web/m8-agentes/escalera-de-complejidad/) explica para qué sirve cada tamaño de prueba). Anota acierto, coste y tiempo.
+2. **Baja el esfuerzo antes de repartir.** Si a esfuerzo bajo acierta, ya tienes la solución más barata y sin coordinación.
+3. **Pregunta si es una cadena o si cabe.** Si sí a cualquiera, para aquí.
+4. **Si hay volumen o el material no cabe, prueba el reparto con tres elementos** y compara contra el paso 1.
+5. **Quédate con el equipo solo si gana** en coste o en tiempo sin perder acierto, o si hace posible lo que un contexto no podía.
+
+</Steps>
+
+<Callout tipo="recomendacion">
+
+Construye un equipo de agentes únicamente si supera, en acierto y gasto, a un modelo solo con esfuerzo ajustado. Es una recomendación de la guía, en línea con lo que sugiere la página de optimización de coste de Anthropic (montar un emparejamiento solo si supera la curva completa de acierto frente a gasto del modelo único; paráfrasis nuestra). Su porqué: el modelo solo es la alternativa más barata de mantener y de verificar, así que tiene que ser la línea base que el equipo bate.
+
+</Callout>
+
+## Ejemplo de oficina: el informe de 80 páginas
+
+Una responsable de estrategia quiere extraer las decisiones de un informe de 80 páginas y se plantea un equipo: un agente por capítulo y un coordinador.
+
+- **Lo que parece atractivo:** ocho agentes en paralelo terminan antes.
+- **Lo que sale mal:** las decisiones del capítulo 6 dependen de un supuesto del capítulo 2. Ningún agente ve ambos, así que la síntesis contiene contradicciones que el coordinador tiene que detectar sin haber leído los capítulos.
+- **Lo que funciona:** una sola llamada con el informe entero, el criterio («decisiones que requieren acción, con página y responsable») y un esfuerzo por defecto. Para comprobarlo, se contrastan cinco decisiones con el original. Probablemente más barato (lo confirmas midiéndolo), más coherente y verificable.
+- **Cuándo cambiaría la respuesta:** con 80 informes en vez de uno, hay volumen, y un fan-out por lotes (un agente por informe) sí compensa. El material de cada pieza cabe en un contexto, pero el conjunto, no.
+
+## Errores frecuentes
+
+- **Orquestar por la demo.** Ver diez agentes trabajando impresiona; que el trabajo salga mejor o más barato es otra cuestión.
+- **Dividir lo que comparte decisiones.** Las piezas dependientes divergen.
+- **Pagar un coordinador caro para fusionar tres párrafos.** El plan y la fusión cuestan más que el reparto.
+- **No tener la línea base del modelo solo.** Sin ella no sabes si el equipo mejora algo.
+- **Confundir velocidad con ahorro.** Repartir puede acortar el tiempo y subir la factura.
+
+<Checklist
+  id="m8-no-orquestar"
+  titulo="Antes de montar un equipo"
+  items={[
+    'He medido el modelo capaz solo, a su esfuerzo por defecto y a uno más bajo, en cinco casos con los difíciles.',
+    'La tarea no es una cadena de pasos dependientes.',
+    'El material no cabe en un contexto, o hay volumen que justifica repartir.',
+    'He probado el reparto con tres elementos y lo he comparado con la línea base.',
+    'Sé qué cuestan el plan, el reparto y la fusión.',
+    'Tengo claro qué es «terminado» y cómo lo verificaré.',
+  ]}
+/>
+
+## Para profundizar
+
+Si tras esta página sigues pensando que compensa, los [patrones](/AI-Optimized_Usage_Web/m8-agentes/patrones/) te dicen cuál; si no, vuelve a la [escalera de complejidad](/AI-Optimized_Usage_Web/m8-agentes/escalera-de-complejidad/) y quédate en el escalón de abajo.

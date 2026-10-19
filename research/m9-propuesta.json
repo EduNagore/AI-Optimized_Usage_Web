@@ -1,0 +1,183 @@
+{
+  "modulo": "M9",
+  "fecha": "2026-10-19",
+  "fuentesNuevas": [
+    { "id": "claude-code-security", "title": "Seguridad de Claude Code", "url": "https://code.claude.com/docs/en/security", "publisher": "Anthropic" },
+    { "id": "claude-code-sandboxing", "title": "Sandbox de Bash en Claude Code", "url": "https://code.claude.com/docs/en/sandboxing", "publisher": "Anthropic" },
+    { "id": "claude-code-data-usage", "title": "Uso de datos de Claude Code", "url": "https://code.claude.com/docs/en/data-usage", "publisher": "Anthropic" },
+    { "id": "claude-code-zero-data-retention", "title": "Retención cero (ZDR) en Claude Code", "url": "https://code.claude.com/docs/en/zero-data-retention", "publisher": "Anthropic" },
+    { "id": "claude-code-managed-settings", "title": "Desplegar configuración gestionada", "url": "https://code.claude.com/docs/en/managed-settings", "publisher": "Anthropic" },
+    { "id": "claude-code-plugins-org", "title": "Gestionar plugins de Claude Code para la organización", "url": "https://code.claude.com/docs/en/plugins/org", "publisher": "Anthropic" },
+    { "id": "claude-code-plugin-marketplaces", "title": "Crear un marketplace de plugins", "url": "https://code.claude.com/docs/en/plugin-marketplaces", "publisher": "Anthropic" },
+    { "id": "claude-code-analytics", "title": "Analíticas de equipo de Claude Code", "url": "https://code.claude.com/docs/en/analytics", "publisher": "Anthropic" },
+    { "id": "anthropic-reduce-hallucinations", "title": "Reduce hallucinations", "url": "https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/reduce-hallucinations", "publisher": "Anthropic" },
+    { "id": "anthropic-mitigate-jailbreaks", "title": "Mitigate jailbreaks and prompt injections", "url": "https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/mitigate-jailbreaks", "publisher": "Anthropic" },
+    { "id": "anthropic-develop-tests", "title": "Define success criteria and build evaluations", "url": "https://platform.claude.com/docs/en/test-and-evaluate/develop-tests", "publisher": "Anthropic" },
+    { "id": "gemini-api-terms", "title": "Términos adicionales de la API de Gemini", "url": "https://ai.google.dev/gemini-api/terms", "publisher": "Google" }
+  ],
+  "datosNuevos": [
+    {
+      "id": "claude-code.rate-limits.per-user-tpm-rpm",
+      "afirmacion": "Recomendación de TPM y RPM por usuario para Claude Code en la API, según tamaño del equipo (organización).",
+      "valor": "1-5: 200k-300k TPM, 5-7 RPM; 5-20: 100k-150k, 2,5-3,5; 20-50: 50k-75k, 1,25-1,75; 50-100: 25k-35k, 0,62-0,87; 100-500: 15k-20k, 0,37-0,47; 500+: 10k-15k, 0,25-0,35",
+      "fuenteUrl": "https://code.claude.com/docs/en/costs",
+      "cita": "1-5 users | 200k-300k | 5-7 ... 500+ users | 10k-15k | 0.25-0.35"
+    },
+    {
+      "id": "claude-code.costs.enterprise-average",
+      "afirmacion": "Coste medio por desarrollador en despliegues empresariales de Claude Code.",
+      "valor": "13 $ por desarrollador y día activo; 150-250 $ por desarrollador y mes; menos de 30 $ por día activo para el 90 % de los usuarios",
+      "fuenteUrl": "https://code.claude.com/docs/en/costs",
+      "cita": "the average cost is around $13 per developer per active day and $150-250 per developer per month, with costs remaining below $30 per active day for 90% of users"
+    },
+    {
+      "id": "claude-code.data.retention.consumer",
+      "afirmacion": "Retención de datos de Claude Code en cuentas de consumo (Free, Pro, Max).",
+      "valor": "5 años si se permite el uso para mejorar modelos; 30 días si no",
+      "fuenteUrl": "https://code.claude.com/docs/en/data-usage",
+      "cita": "Users who allow data use for model improvement: 5-year retention period ... Users who don't allow data use for model improvement: 30-day retention period"
+    },
+    {
+      "id": "claude-code.data.retention.commercial",
+      "afirmacion": "Retención estándar de datos de Claude Code en cuentas comerciales (Team, Enterprise, API).",
+      "valor": "30 días; retención cero solo para cuentas cualificadas de Enterprise, activada por organización",
+      "fuenteUrl": "https://code.claude.com/docs/en/data-usage",
+      "cita": "Standard: 30-day retention period; Zero data retention: available to qualified accounts for Claude Code on Claude for Enterprise. ZDR is not included in the standard Enterprise plan"
+    },
+    {
+      "id": "claude-code.data.local-transcripts",
+      "afirmacion": "Claude Code guarda transcripciones de sesión en local en texto plano durante 30 días por defecto.",
+      "valor": "~/.claude/projects/, 30 días (cleanupPeriodDays)",
+      "fuenteUrl": "https://code.claude.com/docs/en/data-usage",
+      "cita": "Claude Code clients store session transcripts locally in plaintext under ~/.claude/projects/ for 30 days by default"
+    },
+    {
+      "id": "claude-code.data.feedback-retention",
+      "afirmacion": "Las transcripciones enviadas con /feedback, /bug y /share se conservan 5 años.",
+      "valor": "5 años",
+      "fuenteUrl": "https://code.claude.com/docs/en/data-usage",
+      "cita": "Transcripts shared via /feedback, or via /bug and /share, which report through the same path, are retained for 5 years."
+    },
+    {
+      "id": "claude-code.zdr.scope",
+      "afirmacion": "La retención cero de Claude Code no cubre chat de claude.ai, Cowork, integraciones de terceros ni analíticas con metadatos; desactiva sesiones en la nube, Remote Control, artefactos y /feedback.",
+      "valor": "ver cita",
+      "fuenteUrl": "https://code.claude.com/docs/en/zero-data-retention",
+      "cita": "ZDR does not extend to the following ... Chat on claude.ai | Cowork | Claude Code Analytics | User and seat management | Third-party integrations; Features disabled under ZDR: cloud sessions, Artifacts, Feedback submission, Remote Control"
+    },
+    {
+      "id": "claude-code.zdr.fable-requires-retention",
+      "afirmacion": "Claude Fable 5.1 y Fable 5 requieren retención de datos por defecto (modelos cubiertos), por lo que pueden no estar disponibles en organizaciones con retención cero.",
+      "valor": "requieren retención",
+      "fuenteUrl": "https://code.claude.com/docs/en/zero-data-retention",
+      "cita": "Claude Fable 5.1 and Fable 5 are Covered Models that require data retention by default"
+    },
+    {
+      "id": "claude-code.sandbox.scope",
+      "afirmacion": "El sandbox de Bash limita ficheros y dominios de red de los comandos de shell (Bash, PowerShell, Monitor); no cubre herramientas de ficheros, servidores MCP ni hooks; funciona en macOS, Linux y WSL2; en Windows nativo los comandos se ejecutan sin aislamiento.",
+      "valor": "macOS, Linux, WSL2",
+      "fuenteUrl": "https://code.claude.com/docs/en/sandboxing",
+      "cita": "The sandbox covers shell commands only. Claude's file tools, MCP servers, and hooks run outside it. The sandbox runs on macOS, Linux, and WSL2. On native Windows, Claude Code runs commands unsandboxed."
+    },
+    {
+      "id": "claude-code.managed-settings.paths",
+      "afirmacion": "Rutas del fichero managed-settings.json por sistema operativo.",
+      "valor": "macOS: /Library/Application Support/ClaudeCode/managed-settings.json; Linux y WSL: /etc/claude-code/managed-settings.json; Windows: C:\\Program Files\\ClaudeCode\\managed-settings.json",
+      "fuenteUrl": "https://code.claude.com/docs/en/managed-settings",
+      "cita": "Windows: C:\\Program Files\\ClaudeCode\\managed-settings.json ... Claude Code doesn't read the legacy Windows path C:\\ProgramData\\ClaudeCode\\managed-settings.json."
+    },
+    {
+      "id": "claude-code.managed-settings.limitation-groups",
+      "afirmacion": "La consola de claude.ai aún no puede dirigir ajustes gestionados a un grupo concreto; una pasarela de apps de Claude autoalojada sí los entrega por grupo del IdP.",
+      "valor": "sin segmentación por grupo en la consola",
+      "fuenteUrl": "https://code.claude.com/docs/en/managed-settings",
+      "cita": "the claude.ai console can't target a group yet, while a self-hosted Claude apps gateway delivers managed settings per IdP group"
+    },
+    {
+      "id": "claude-code.plugins.org-controls",
+      "afirmacion": "Claves de configuración gestionada para plugins: extraKnownMarketplaces, enabledPlugins, strictKnownMarketplaces (alias allowedMarketplaces), blockedMarketplaces, disableSideloadFlags, strictPluginOnlyCustomization, allowManagedHooksOnly.",
+      "valor": "lista de claves",
+      "fuenteUrl": "https://code.claude.com/docs/en/plugins/org",
+      "cita": "The managed strictKnownMarketplaces allowlist and blockedMarketplaces blocklist decide which marketplace sources plugins may come from."
+    },
+    {
+      "id": "claude-code.analytics.teams-enterprise",
+      "afirmacion": "Panel de analíticas de Claude Code para Teams y Enterprise: líneas aceptadas, tasa de aceptación, usuarios y sesiones activos, métricas de contribución con GitHub (beta pública, no disponible con ZDR); acceso para Admins y Owners. La API de analíticas de Enterprise no está en el plan Teams.",
+      "valor": "ver cita",
+      "fuenteUrl": "https://code.claude.com/docs/en/analytics",
+      "cita": "Admins and Owners can view the dashboard. Contribution metrics are not available for organizations with Zero Data Retention enabled. The API is not available on the Teams plan."
+    },
+    {
+      "id": "claude-code.analytics.attribution-window",
+      "afirmacion": "Ventana de atribución de las métricas de contribución: sesiones de 21 días antes a 2 días después de la fecha de fusión del PR; el código reescrito en más de un 20 % no se atribuye.",
+      "valor": "21 días antes, 2 días después; 20 %",
+      "fuenteUrl": "https://code.claude.com/docs/en/analytics",
+      "cita": "Sessions from 21 days before to 2 days after the PR merge date are considered for attribution matching."
+    },
+    {
+      "id": "anthropic.hallucinations.techniques",
+      "afirmacion": "Técnicas de Anthropic para reducir alucinaciones: permitir decir «no lo sé», citas literales primero en documentos largos (más de 20k tokens), verificar con citas y retirar lo no respaldado, verificación con razonamiento, best-of-N, refinamiento iterativo y restricción a conocimiento externo. No eliminan las alucinaciones del todo.",
+      "valor": "lista de técnicas",
+      "fuenteUrl": "https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/reduce-hallucinations",
+      "cita": "while these techniques significantly reduce hallucinations, they don't eliminate them entirely. Always validate critical information, especially for high-stakes decisions."
+    },
+    {
+      "id": "anthropic.injection.indirect-defenses",
+      "afirmacion": "Defensas de Anthropic contra inyección indirecta: contenido de terceros solo en tool_result, indicar origen y naturaleza, declarar la política de contenido no fiable en el prompt de sistema, codificar en JSON, no poner instrucciones propias en tool_result, mínimo privilegio, filtrar salidas de herramientas con un modelo pequeño y hacer red teaming del propio agente.",
+      "valor": "lista de defensas",
+      "fuenteUrl": "https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/mitigate-jailbreaks",
+      "cita": "Apply the principle of least privilege so that a successful injection can do minimal damage"
+    },
+    {
+      "id": "anthropic.evals.design-principles",
+      "afirmacion": "Principios de diseño de evals de Anthropic: específicas a la tarea, automatizar la corrección cuando se pueda, priorizar volumen sobre calidad de corrección manual; usar un modelo distinto del generador para evaluar con LLM.",
+      "valor": "ver cita",
+      "fuenteUrl": "https://platform.claude.com/docs/en/test-and-evaluate/develop-tests",
+      "cita": "More questions with slightly lower signal automated grading is better than fewer questions with high-quality human hand-graded evals. Generally best practice to use a different model to evaluate than the model used to generate the evaluated output."
+    },
+    {
+      "id": "google.gemini-api.data-use",
+      "afirmacion": "Términos de la API de Gemini: en servicios de pago Google no usa prompts ni respuestas para mejorar sus productos pero los registra un tiempo limitado para detectar abusos; en servicios gratuitos puede usarlos y revisores humanos pueden leerlos.",
+      "valor": "pago: sin uso para mejora, con registro limitado; gratuito: con uso para mejora",
+      "fuenteUrl": "https://ai.google.dev/gemini-api/terms",
+      "cita": "Google doesn't use your prompts ... or responses to improve our products. / Google logs prompts and responses for a limited period of time, solely for detecting and preventing violations."
+    },
+    {
+      "id": "claude-code.goal.evaluator",
+      "afirmacion": "El evaluador de /goal juzga la condición contra lo que Claude ha mostrado en la conversación; no ejecuta comandos ni lee ficheros; /goal es una envoltura de un hook Stop basado en prompt; no está disponible con disableAllHooks o allowManagedHooksOnly.",
+      "valor": "ver cita",
+      "fuenteUrl": "https://code.claude.com/docs/en/goal",
+      "cita": "It doesn't run commands or read files independently, so write the condition as something Claude's own output can demonstrate."
+    }
+  ],
+  "verificadoEnRevision": [
+    "stop_reason max_tokens: platform.claude.com/docs/en/build-with-claude/handling-stop-reasons — 'Claude stopped because it reached the max_tokens limit specified in your request.' Valores: end_turn, max_tokens, stop_sequence, tool_use, pause_turn, refusal, model_context_window_exceeded.",
+    "SDK Python: 'Python 3.10 or later is required'; ValueError si una petición sin streaming se espera de más de ~10 minutos (stream=True o timeout lo desactivan): platform.claude.com/docs/en/cli-sdks-libraries/sdks/python.",
+    "ZDR (code.claude.com/docs/en/zero-data-retention): NO cubre chat de claude.ai, Cowork, Claude Code Analytics (metadatos), gestión de usuarios y asientos, integraciones de terceros incluidos servidores MCP. Desactiva cloud sessions, chat y Cowork unificados, Claude Tag, Artifacts, /feedback, Remote Control. Fable 5.1 y Fable 5 requieren retención.",
+    "managed-settings: disableBypassPermissionsMode, allowManagedPermissionRulesOnly, rutas por SO, polling horario del servidor, rol Owner para ajustes de servidor, consola sin segmentación por grupo (code.claude.com/docs/en/managed-settings y plugins/org). forceLoginMethod y forceLoginOrgUUID (zero-data-retention). allowedMcpServers y allowManagedMcpServersOnly (managed-settings). UsageView, workspace 'Claude Code', Analytics APIs (analytics y costs).",
+    "plugins/org: ejemplo con strictKnownMarketplaces (github anthropics/claude-plugins-official, your-org/*, skills-dir), extraKnownMarketplaces, enabledPlugins y disableSideloadFlags existe; los nombres del texto son de relleno (se etiqueta 'adaptado').",
+    "security: WebDAV en Windows, llavero macOS / fichero 0600 en Linux / fichero con ACL de perfil en Windows, cinco buenas prácticas con contenido no fiable.",
+    "Presupuestos de Managed Agents (platform.claude.com/docs/en/managed-agents/budgets): tope duro por sesión (beta), pausa al alcanzarlo, la petición en curso termina. La página NO recomienda fijarlo antes de flujos grandes: se retiró la atribución a Anthropic.",
+    "Citas del API de Claude (platform.claude.com/docs/en/build-with-claude/citations): devuelven los pasajes exactos que respaldan cada afirmación; todos los modelos activos las admiten. Búsqueda web OpenAI (developers.openai.com/api/docs/guides/tools-web-search): citas en línea por defecto. Grounding with Google Search (ai.google.dev/gemini-api/docs/google-search): conecta con contenido web y cita fuentes.",
+    "Opus 5.5: thinking disabled devuelve 400 en todos los niveles (research/anthropic-api.json, effort.thinking-disabled)."
+  ],
+  "fuentesNuevasRevision": [
+    { "id": "anthropic-claude-citations", "title": "Citations (API de Claude)", "url": "https://platform.claude.com/docs/en/build-with-claude/citations", "publisher": "Anthropic" },
+    { "id": "anthropic-handling-stop-reasons", "title": "Handling stop reasons", "url": "https://platform.claude.com/docs/en/build-with-claude/handling-stop-reasons", "publisher": "Anthropic" },
+    { "id": "openai-web-search", "title": "Web search (Responses API)", "url": "https://developers.openai.com/api/docs/guides/tools-web-search", "publisher": "OpenAI" },
+    { "id": "google-grounding-search", "title": "Grounding with Google Search", "url": "https://ai.google.dev/gemini-api/docs/google-search", "publisher": "Google" }
+  ],
+  "afirmacionesSinVerificar": [
+    "Condiciones de retención y entrenamiento de las apps de chat de Claude (consumo), ChatGPT y Gemini: no verificadas en esta tarea (help.openai.com y openai.com/enterprise-privacy dieron 403).",
+    "Límites de gasto duros de OpenAI (changelog 2026-07-22): solo el resumen del changelog en research/openai.json; sin leer la documentación de configuración.",
+    "Límites de gasto en Google AI / Gemini API: sin investigar.",
+    "Marketplace de plugins de Cowork con controles de administrador (notas de versión 2026-02-24): sin leer la página de administración.",
+    "En evals-minimas.mdx se dice que los tokens de razonamiento consumen parte de max_tokens: es el comportamiento general documentado del thinking, no leído en esta tarea (el texto ya no lo afirma).",
+    "El umbral exacto con el que el SDK de Python lanza ValueError en peticiones sin streaming: la página solo dice 'approximately 10 minutes'; el techo de 16.000 tokens es criterio de la guía.",
+    "Si las reglas de permisos de Bash cubren o no la herramienta PowerShell (Remove-Item, del): no verificado; el texto lo dice y remite a /permissions.",
+    "Read-Host -MaskInput solo en PowerShell 7: dato general de PowerShell, no de documentación de Anthropic.",
+    "Apps de chat de OpenAI y Google (recuperación sobre documentos, navegación, citas): no verificadas.",
+    "Argumentos build-eval y hillclimb de /claude-api: solo constan en la ficha del comando; no se sabe qué hacen.",
+    "Hooks de tipo command en Windows: no verificado qué shell los ejecuta; la página no da ningún comando de hook."
+  ]
+}

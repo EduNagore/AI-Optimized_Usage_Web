@@ -1,0 +1,294 @@
+---
+import Diagram from '../Diagram.astro';
+
+/**
+ * Diagramas de los patrones de M8 (plan/01_TEMARIO.md §8.2): cajas y flechas en columna, que
+ * se leen igual a 360 px que a 1000 px. Cada patrón es una lista de filas; una fila tiene uno a
+ * tres nodos y las flechas unen cada fila con la siguiente. Lo que no cabe en una caja va como
+ * `nota` debajo.
+ */
+type Node = { t: string; s?: string; tone?: 'accent' | 'muted' };
+interface Pattern {
+  titulo: string;
+  descripcion: string;
+  rows: Node[][];
+  nota?: string;
+  texto: string;
+}
+
+const patterns: Record<string, Pattern> = {
+  escalera: {
+    titulo: 'La escalera de complejidad',
+    descripcion:
+      'Cuatro escalones: llamada única, flujo, agente y multiagente. Cada uno conserva lo del anterior y suma coste.',
+    rows: [
+      [{ t: '1. Llamada única', s: 'encargo y respuesta' }],
+      [{ t: '2. Flujo', s: 'varias llamadas en un orden fijo' }],
+      [{ t: '3. Agente', s: 'un bucle de modelo y herramientas' }],
+      [{ t: '4. Multiagente', s: 'varios bucles y su coordinación', tone: 'accent' }],
+    ],
+    nota: 'Sube un escalón solo cuando el anterior falle al medirlo.',
+    texto:
+      'Una columna de cuatro escalones, de menor a mayor complejidad: llamada única, flujo, agente y multiagente. Cada escalón conserva lo del anterior y le suma coste y coordinación.',
+  },
+  encadenamiento: {
+    titulo: 'Encadenamiento de prompts',
+    descripcion: 'Tres pasos en serie con una comprobación entre cada par.',
+    rows: [
+      [{ t: 'Paso 1', s: 'extraer' }],
+      [{ t: 'Comprobación', s: '¿cuadra?', tone: 'muted' }],
+      [{ t: 'Paso 2', s: 'redactar' }],
+      [{ t: 'Comprobación', s: '¿cumple?', tone: 'muted' }],
+      [{ t: 'Paso 3', s: 'revisar' }],
+    ],
+    texto:
+      'El encargo pasa por el paso 1, una comprobación, el paso 2, otra comprobación y el paso 3. Si una comprobación falla, la cadena se detiene.',
+  },
+  enrutado: {
+    titulo: 'Enrutado',
+    descripcion:
+      'Un clasificador barato reparte cada entrada entre un modelo rápido, uno capaz y una persona.',
+    rows: [
+      [{ t: 'Entrada' }],
+      [{ t: 'Clasificador', s: 'modelo barato', tone: 'accent' }],
+      [
+        { t: 'Sencillos', s: 'modelo rápido' },
+        { t: 'Complejos', s: 'modelo capaz' },
+        { t: 'Sensibles', s: 'persona' },
+      ],
+    ],
+    texto:
+      'Cada entrada llega a un clasificador. Según su dificultad, la envía a un modelo rápido (casos sencillos), a un modelo capaz (casos complejos) o a una persona (casos sensibles).',
+  },
+  'paralelo-secciones': {
+    titulo: 'Paralelización por secciones',
+    descripcion: 'El encargo se parte en piezas independientes que se hacen a la vez y se fusionan.',
+    rows: [
+      [{ t: 'Encargo' }],
+      [{ t: 'Pieza A' }, { t: 'Pieza B' }, { t: 'Pieza C' }],
+      [{ t: 'Fusión', s: 'resultado', tone: 'accent' }],
+    ],
+    texto:
+      'El encargo se divide en tres piezas independientes, A, B y C, que se resuelven a la vez. Después se fusionan en un resultado.',
+  },
+  'paralelo-votacion': {
+    titulo: 'Paralelización por votación',
+    descripcion: 'La misma pregunta, tres lecturas con contexto limpio y una comparación.',
+    rows: [
+      [{ t: 'Misma pregunta' }],
+      [{ t: 'Lectura 1' }, { t: 'Lectura 2' }, { t: 'Lectura 3' }],
+      [{ t: 'Comparar', s: 'coinciden: sigues; difieren: persona', tone: 'accent' }],
+    ],
+    texto:
+      'La misma pregunta se hace tres veces, cada una en un contexto limpio. Se comparan las respuestas: si coinciden hay confianza; si difieren, pasa a revisión humana.',
+  },
+  orquestador: {
+    titulo: 'Orquestador y trabajadores',
+    descripcion: 'Un modelo planifica el reparto, lanza a los trabajadores y fusiona sus resultados.',
+    rows: [
+      [{ t: 'Orquestador', s: 'lee la tarea y planifica', tone: 'accent' }],
+      [{ t: 'Trabajador 1' }, { t: 'Trabajador 2' }, { t: 'Trabajador 3' }],
+      [{ t: 'Orquestador', s: 'fusiona y entrega', tone: 'accent' }],
+    ],
+    nota: 'El reparto no está fijado de antemano: lo decide el orquestador.',
+    texto:
+      'El orquestador lee la tarea y decide cómo repartirla. Lanza tres trabajadores, cada uno con su contexto y su encargo, y al final reúne sus resultados en la entrega.',
+  },
+  evaluador: {
+    titulo: 'Evaluador y optimizador',
+    descripcion:
+      'Un escritor produce, un revisor con contexto limpio comprueba contra una rúbrica y se repite hasta cumplir.',
+    rows: [
+      [{ t: 'Escritor', s: 'redacta el borrador' }],
+      [{ t: 'Revisor', s: 'contexto limpio y rúbrica', tone: 'accent' }],
+      [{ t: 'Resultado', s: 'si cumple la rúbrica' }],
+    ],
+    nota: 'Si no cumple, las correcciones vuelven al escritor. Fija un máximo de vueltas.',
+    texto:
+      'El escritor redacta un borrador y el revisor, con contexto limpio, lo contrasta con una rúbrica. Si cumple, es el resultado; si no, las correcciones vuelven al escritor, hasta un máximo de vueltas.',
+  },
+  asesor: {
+    titulo: 'Asesor',
+    descripcion:
+      'Un ejecutor barato hace el trabajo y consulta a un modelo más capaz solo en las decisiones difíciles.',
+    rows: [
+      [{ t: 'Ejecutor', s: 'modelo barato, hace la tarea' }],
+      [{ t: '¿Decisión difícil?', s: 'lo decide el ejecutor', tone: 'muted' }],
+      [{ t: 'Asesor', s: 'modelo más capaz, solo aconseja', tone: 'accent' }],
+    ],
+    nota: 'El consejo vuelve al ejecutor, que sigue trabajando. El asesor no actúa.',
+    texto:
+      'El ejecutor trabaja en la tarea. Ante una decisión difícil, consulta al asesor, un modelo más capaz que solo aconseja. El consejo vuelve al ejecutor, que continúa.',
+  },
+  fanout: {
+    titulo: 'Fan-out por lotes',
+    descripcion: 'El mismo encargo se aplica a cada elemento de una lista y los resultados se unen.',
+    rows: [
+      [{ t: 'Lista de N elementos' }],
+      [{ t: 'Agente 1' }, { t: 'Agente 2' }, { t: 'Agente N' }],
+      [{ t: 'Unión', s: 'N resultados', tone: 'accent' }],
+    ],
+    nota: 'Todos reciben el mismo encargo. Prueba con tres elementos antes de lanzar el resto.',
+    texto:
+      'Una lista de N elementos se reparte entre N agentes (o llamadas) con el mismo encargo. Los N resultados se unen al final. Un error en el encargo se multiplica por N.',
+  },
+  flujo: {
+    titulo: 'Flujo dinámico con verificación cruzada',
+    descripcion: 'El agente escribe un programa que produce, verifica con otros agentes y contrasta.',
+    rows: [
+      [{ t: 'El agente escribe el flujo', s: 'un programa por fases' }],
+      [{ t: 'Fase 1', s: 'varios agentes producen' }],
+      [{ t: 'Fase 2', s: 'otros agentes verifican', tone: 'accent' }],
+      [{ t: 'Fase 3', s: 'contraste y síntesis' }],
+    ],
+    texto:
+      'El agente escribe un programa que se ejecuta por fases. En la fase 1 varios agentes producen o investigan; en la fase 2 otros agentes, con contexto limpio, verifican; en la fase 3 se contrasta y se sintetiza el informe.',
+  },
+};
+
+interface Props {
+  patron: keyof typeof patterns;
+  id?: string;
+}
+const { patron, id = `flujo-${patron}` } = Astro.props;
+const p = patterns[patron];
+if (!p) throw new Error(`<FlujoAgentes>: patrón «${String(patron)}» desconocido`);
+
+const W = 360;
+const padX = 14;
+const gap = 10;
+const arrow = 28;
+const lineH = 17;
+
+/** Envuelve un texto en líneas de como mucho `max` caracteres. */
+const wrap = (s: string, max: number) => {
+  const out: string[] = [''];
+  for (const word of s.split(' ')) {
+    const last = out[out.length - 1];
+    if (last && (last + ' ' + word).length > max) out.push(word);
+    else out[out.length - 1] = last ? last + ' ' + word : word;
+  }
+  return out;
+};
+
+let y = 8;
+const laid = p.rows.map((row) => {
+  const n = row.length;
+  const w = (W - padX * 2 - gap * (n - 1)) / n;
+  const nodes = row.map((node, i) => ({
+    node,
+    x: padX + i * (w + gap),
+    w,
+    t: wrap(node.t, Math.floor(w / 8)),
+    s: node.s ? wrap(node.s, Math.floor(w / 7)) : [],
+  }));
+  const h = Math.max(...nodes.map((o) => 16 + (o.t.length + o.s.length) * lineH));
+  const top = y;
+  y += h + arrow;
+  return { n, h, top, nodes };
+});
+const bottom = y - arrow;
+
+const arrows: string[] = [];
+for (let i = 0; i < laid.length - 1; i++) {
+  const a = laid[i]!;
+  const b = laid[i + 1]!;
+  const y1 = a.top + a.h;
+  const y2 = b.top - 2;
+  const cx = (o: { x: number; w: number }) => o.x + o.w / 2;
+  if (a.n === b.n) a.nodes.forEach((o) => arrows.push(`M ${cx(o)} ${y1} V ${y2}`));
+  else if (a.n === 1) b.nodes.forEach((o) => arrows.push(`M ${cx(a.nodes[0]!)} ${y1} L ${cx(o)} ${y2}`));
+  else a.nodes.forEach((o) => arrows.push(`M ${cx(o)} ${y1} L ${cx(b.nodes[0]!)} ${y2}`));
+}
+
+const noteLines = p.nota ? wrap(p.nota, 48) : [];
+const noteY = bottom + 26;
+const H = noteLines.length ? noteY + (noteLines.length - 1) * 16 + 10 : bottom + 8;
+---
+
+<Diagram id={id} titulo={p.titulo} descripcion={p.descripcion}>
+  <svg class="flujo" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={p.titulo}>
+    <defs>
+      <marker
+        id={`${id}-punta`}
+        viewBox="0 0 10 10"
+        refX="8"
+        refY="5"
+        markerWidth="8"
+        markerHeight="8"
+        orient="auto-start-reverse"
+      >
+        <path d="M 0 1 L 9 5 L 0 9 z" class="punta"></path>
+      </marker>
+    </defs>
+    {arrows.map((d) => (
+      <path d={d} class="arc" marker-end={`url(#${id}-punta)`} />
+    ))}
+    {laid.map((r) =>
+      r.nodes.map((o) => (
+        <g>
+          <rect x={o.x} y={r.top} width={o.w} height={r.h} rx="6" class={`box ${o.node.tone ?? ''}`} />
+          {o.t.map((l, k) => (
+            <text x={o.x + o.w / 2} y={r.top + 21 + k * lineH} class="t" text-anchor="middle">
+              {l}
+            </text>
+          ))}
+          {o.s.map((l, k) => (
+            <text x={o.x + o.w / 2} y={r.top + 21 + (o.t.length + k) * lineH} class="s" text-anchor="middle">
+              {l}
+            </text>
+          ))}
+        </g>
+      )),
+    )}
+    {noteLines.map((l, k) => (
+      <text x={padX} y={noteY + k * 16} class="n">
+        {l}
+      </text>
+    ))}
+  </svg>
+  <Fragment slot="texto">
+    <p>{p.texto}</p>
+  </Fragment>
+</Diagram>
+
+<style>
+  .flujo {
+    max-width: 30rem;
+    margin-inline: auto;
+  }
+  .box {
+    fill: var(--color-bg);
+    stroke: var(--color-border-strong);
+    stroke-width: 1.2;
+  }
+  .box.accent {
+    fill: color-mix(in srgb, var(--color-accent) 14%, var(--color-bg));
+    stroke: var(--color-accent);
+  }
+  .box.muted {
+    fill: color-mix(in srgb, var(--color-text) 6%, var(--color-bg));
+    stroke-dasharray: 5 4;
+  }
+  .arc {
+    fill: none;
+    stroke: var(--color-text-muted);
+    stroke-width: 1.5;
+  }
+  .punta {
+    fill: var(--color-text-muted);
+  }
+  .t {
+    fill: var(--color-heading);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .s {
+    fill: var(--color-text-muted);
+    font-size: 12.5px;
+  }
+  .n {
+    fill: var(--color-text-muted);
+    font-size: 13px;
+  }
+</style>

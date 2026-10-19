@@ -4,7 +4,6 @@ import { expect, test } from '@playwright/test';
 const pages = [
   ['inicio', ''],
   ['lección de ejemplo', 'm12-recursos/catalogo-de-componentes/'],
-  ['esqueleto de lección', 'm9-calidad-y-seguridad/verificar-siempre/'],
   ['índice de módulo', 'm2-metodo/'],
   ['M0: las 10 reglas', 'm0-empieza-aqui/las-10-reglas/'],
   ['M0: glosario', 'm0-empieza-aqui/glosario/'],
@@ -14,6 +13,16 @@ const pages = [
   ['M4: mapa de modelos', 'm4-modelo-y-esfuerzo/mapa-de-modelos/'],
   ['M4: matriz por tarea', 'm4-modelo-y-esfuerzo/matriz-por-tarea/'],
   ['M5: prompt caching', 'm5-tokens-y-contexto/prompt-caching/'],
+  ['M1: ventana de contexto', 'm1-fundamentos/ventana-de-contexto/'],
+  ['M6: skills', 'm6-herramientas/skills/'],
+  ['M7: comandos', 'm7-claude-code/comandos/'],
+  ['M8: patrones', 'm8-agentes/patrones/'],
+  ['M9: evals mínimas', 'm9-calidad-y-seguridad/evals-minimas/'],
+  ['M10: clasificar 50.000 tickets', 'm10-casos-practicos/clasificar-50000-tickets/'],
+  ['M12: chuleta', 'm12-recursos/chuleta/'],
+  ['M12: novedades', 'm12-recursos/novedades/'],
+  ['M12: fuentes', 'm12-recursos/fuentes/'],
+  ['M12: plantillas', 'm12-recursos/plantillas/'],
   ['404', '404.html'],
 ] as const;
 

@@ -1,11 +1,127 @@
 ---
 title: 'Chuleta imprimible'
-description: 'Una página con las reglas, los comandos y las equivalencias que más se consultan, lista para imprimir.'
+description: 'Una hoja a doble cara con las reglas, los comandos y las equivalencias que más se consultan, lista para imprimir.'
 sidebar:
   order: 1
 level: basico
 tracks: [profesional, tecnica]
 readingTime: 3
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-19
+sources:
+  [
+    anthropic-esfuerzo,
+    openai-ultimo-modelo-y-migracion,
+    google-ultimo-modelo,
+    claude-code-comandos,
+    claude-code-modo-interactivo,
+    anthropic-buenas-practicas-de-prompting,
+  ]
 ---
+
+import Callout from '@components/Callout.astro';
+import Fact from '@components/Fact.astro';
+
+**Cómo imprimirla.** Pulsa `Ctrl+P` (`Cmd+P` en Mac), elige papel A4 y, si no te cabe en una hoja a doble cara, activa «ajustar a la página» o baja la escala. Las cifras de esfuerzo y los comandos se actualizan en la web, no en el papel: si han pasado más de 45 días desde la fecha del pie de la página, comprueba la fuente.
+
+## La regla de partida
+
+<Callout tipo="recomendacion">
+
+**Modelo capaz y su esfuerzo por defecto; baja midiendo, sube solo si falla.** El esfuerzo es la palanca que cambia a la vez coste y calidad; antes de tocarla, aplica las mejoras gratuitas (caché, contexto limpio, formato).
+
+</Callout>
+
+## Las diez reglas
+
+Con su porqué, en [las 10 reglas](/AI-Optimized_Usage_Web/m0-empieza-aqui/las-10-reglas/).
+
+| N.º | Regla (recomendación de la guía)                                    |
+| --- | ------------------------------------------------------------------- |
+| 1   | Clasifica la tarea antes de abrir el chat.                          |
+| 2   | Elige la superficie más simple que la resuelva.                     |
+| 3   | Modelo capaz y esfuerzo por defecto; baja midiendo, sube si falla.  |
+| 4   | Da contexto y el porqué; las mayúsculas sobran.                     |
+| 5   | Pide el formato exacto, con un ejemplo.                             |
+| 6   | Dale una forma de verificar su trabajo.                             |
+| 7   | Una tarea, una conversación: limpia el contexto al cambiar de tema. |
+| 8   | Lo estable, primero: así se aprovecha la caché.                     |
+| 9   | Lo que repitas, hazlo plantilla, skill o automatización.            |
+| 10  | Mide el coste por tarea completada, no por mensaje.                 |
+
+## El ciclo de siete pasos
+
+Detalle en [el ciclo](/AI-Optimized_Usage_Web/m2-metodo/ciclo-de-7-pasos/).
+
+| Paso | Pregunta                                                      |
+| ---- | ------------------------------------------------------------- |
+| 1    | ¿Qué tipo de tarea es y qué pasa si sale mal?                 |
+| 2    | ¿Qué superficie basta: chat, proyecto, agente, API?           |
+| 3    | ¿Qué modelo y cuánto esfuerzo?                                |
+| 4    | ¿Qué contexto necesita, y solo ese? Documentos primero.       |
+| 5    | ¿Cómo lo formulo? Con la plantilla de abajo.                  |
+| 6    | ¿Cómo lo compruebo? Citas, totales, pruebas, segunda opinión. |
+| 7    | ¿Se repite? Guárdalo y mide su coste.                         |
+
+## Encargo universal, en una línea
+
+```text
+Objetivo · para quién y qué decide (el porqué) · material primero · restricciones, cada una con su motivo · formato, con un ejemplo · criterio de éxito y cómo lo compruebo · «si falta información, dilo en lugar de suponerla»
+```
+
+## Esfuerzo
+
+| Proveedor | Parámetro              | Niveles                                         | Por defecto                                                                                                                                                                                                                                                                                      |
+| --------- | ---------------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Claude    | `output_config.effort` | `low`, `medium`, `high`, `xhigh`, `max`         | Opus 5.5 <Fact id="opus-5-5.effort.default.api" />; Sonnet 5.5 <Fact id="sonnet-5-5.effort.default.api" /> (API) y <Fact id="sonnet-5-5.effort.default.claude-code" /> (Claude Code); Haiku 5.5 <Fact id="haiku-5-5.effort.default.api" />; Fable 5.1 <Fact id="fable-5-1.effort.default.api" /> |
+| OpenAI    | `reasoning.effort`     | `none`, `low`, `medium`, `high`, `xhigh`, `max` | GPT-6.1 Sol <Fact id="gpt-6-1-sol.effort.default.api" />; sin `none` en Astra ni en 6.1 Sol                                                                                                                                                                                                      |
+| Google    | `thinking_level`       | `low`, `medium`, `high`                         | Gemini 4 Argon <Fact id="gemini-4-argon.effort.default.api" />                                                                                                                                                                                                                                   |
+
+`low` razona menos (más rápido y barato); `xhigh` no existe en Opus 4.6 ni en Sonnet 4.6; `max` en Claude Code solo vale para la sesión actual, salvo que lo fijes con `CLAUDE_CODE_EFFORT_LEVEL`. Con OpenAI, si el esfuerzo no es `none`, retira `temperature`, `top_p` y `top_logprobs`. **Sube cuando falle el razonamiento, no cuando falle el encargo** (recomendación: más esfuerzo no arregla un encargo ambiguo). Fuentes: documentación de esfuerzo de Anthropic y guías del último modelo de OpenAI y de Google.
+
+## Quince comandos de Claude Code
+
+`/` en el prompt lista los de tu instalación. La columna «Cuándo» es recomendación de la guía.
+
+| Comando         | Qué hace y cuándo                                                            |
+| --------------- | ---------------------------------------------------------------------------- |
+| `/init`         | Crea el fichero de instrucciones del proyecto; una vez, al empezar.          |
+| `/plan`         | Modo plan: propone antes de tocar nada; en cambios grandes.                  |
+| `/model`        | Cambia de modelo; al empezar, porque cambiarlo a mitad invalida la caché.    |
+| `/effort`       | Fija el esfuerzo (`low` a `xhigh`, `max` o `auto`); sube solo si falla.      |
+| `/clear`        | Empieza de cero; cada vez que cambias de tarea.                              |
+| `/compact`      | Resume la conversación; en un punto de corte, diciendo qué conservar.        |
+| `/rewind`       | Vuelve a un punto anterior; mejor que compactar para abandonar un camino.    |
+| `/resume`       | Retoma una conversación guardada.                                            |
+| `/goal`         | Sigue hasta cumplir una condición de fin demostrable; gasta tokens.          |
+| `/batch`        | Reparte un cambio grande en piezas paralelas; gasta mucho, prueba con pocas. |
+| `/diff`         | Qué ha cambiado; siempre antes de un commit.                                 |
+| `/code-review`  | Revisa los cambios antes de fusionar (alias `/review`).                      |
+| `/usage`        | Coste, límites y desglose (alias `/cost`, `/stats`).                         |
+| `/context`      | Qué ocupa la ventana; antes de decidir entre `/compact` y `/clear`.          |
+| `/skill-doctor` | Coste en contexto de cada skill y cuánto se usa; una vez por semana.         |
+
+Atajos: `Shift+Tab` recorre los modos de permiso; `Esc` `Esc` rebobina; `Ctrl+G` abre el prompt en tu editor. Más en [la referencia de comandos](/AI-Optimized_Usage_Web/m7-claude-code/comandos/).
+
+## Equivalencias mínimas
+
+| Qué                       | Claude                 | OpenAI             | Google                                               |
+| ------------------------- | ---------------------- | ------------------ | ---------------------------------------------------- |
+| Mando de razonamiento     | `output_config.effort` | `reasoning.effort` | `thinking_level`                                     |
+| Agente de código          | Claude Code            | Codex (CLI)        | Gemini CLI o Antigravity CLI (`agy`)                 |
+| Instrucciones permanentes | `CLAUDE.md`            | `AGENTS.md`        | `GEMINI.md` (Gemini CLI; Antigravity, no confirmado) |
+| Ejecución sin interfaz    | `claude -p`            | `codex exec`       | `-p` (Gemini CLI)                                    |
+
+Según las páginas oficiales de cada herramienta; «no confirmado» significa que no lo hemos encontrado. Más en [equivalencias entre herramientas](/AI-Optimized_Usage_Web/m7-claude-code/equivalencias-codex-gemini/).
+
+## Seis preguntas antes de pegar datos
+
+No es asesoramiento legal. Más en [privacidad y seguridad](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/privacidad-y-seguridad/).
+
+1. ¿Hay datos personales de terceros?
+2. ¿Es confidencial o está bajo un acuerdo de confidencialidad?
+3. ¿Hay contraseñas, claves de API o tokens?
+4. ¿Mi organización ha aprobado esta herramienta y este plan para este dato?
+5. ¿Puedo anonimizar o pegar solo el fragmento necesario?
+6. ¿Sé qué pasa con lo que envío (retención, entrenamiento) en mi plan?
+
+Y una más: lo que venga de fuera (un correo, una web, un PDF) es dato, no instrucciones.

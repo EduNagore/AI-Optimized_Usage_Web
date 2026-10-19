@@ -6,6 +6,161 @@ sidebar:
 level: avanzado
 tracks: [tecnica]
 readingTime: 9
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-19
+sources:
+  [
+    claude-code-flujos-dinamicos,
+    claude-code-agentes-en-paralelo,
+    claude-code-subagentes,
+    claude-code-comandos,
+    claude-code-costes,
+    anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas,
+    anthropic-precios,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Fact from '@components/Fact.astro';
+import CommandCard from '@components/CommandCard.astro';
+import Steps from '@components/Steps.astro';
+import PromptTemplate from '@components/PromptTemplate.astro';
+import CostExample from '@components/CostExample.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Una migración mecánica y repetida en muchos ficheros independientes es el caso ideal para repartir; una migración con dependencias entre ficheros, no.
+- Prueba con tres ficheros, mide tokens y calidad, y solo entonces reparte.
+- Orquestador capaz que entiende el plan; trabajadores de gama equilibrada porque el patrón se repite.
+- Cada trabajador en su propio worktree; la integración continua se ejecuta por lote, no al final de todo.
+- `/batch` de Claude Code no es la API de lotes con descuento: son cosas distintas.
+
+</KeyTakeaways>
+
+## La tarea
+
+Hay que actualizar una librería de formularios en unos 300 componentes: cambia el nombre de una propiedad, un par de importaciones y la forma de gestionar un evento. El patrón es el mismo en cada fichero, con excepciones ocasionales. Hacerlo a mano llevaría días y es fácil dejarse alguno.
+
+## Configuración recomendada
+
+- **Superficie.** Claude Code en un repositorio git, con `/batch` o con un flujo dinámico ([trabajo en paralelo](/AI-Optimized_Usage_Web/m7-claude-code/trabajo-en-paralelo/)).
+- **Modelo.** Orquestador en Opus 5.5 (o el modelo de tu sesión) y trabajadores en Sonnet 5.5. **Con `/batch`, la documentación no indica qué modelo usan los trabajadores**, así que no des por hecho que serán Sonnet. Para fijarlo: usa un flujo dinámico o subagentes definidos con los campos `model` y `effort`, o la variable de entorno `CLAUDE_CODE_SUBAGENT_MODEL` (que establece un modelo por defecto para los subagentes; `CLAUDE_CODE_SUBAGENT_MODEL_FORCE` lo impone a todos). En un flujo, cada agente elige modelo por el mismo orden que un subagente y, si nada lo asigna, usa el modelo de tu sesión. Compruébalo en la prueba de tres ficheros (`/tasks` o `/workflows` muestran qué hace cada agente).
+- **Esfuerzo.** `medium` en los trabajadores, que coincide con el defecto de Sonnet 5.5 en Claude Code (<Fact id="sonnet-5-5.effort.default.claude-code" />); el orquestador, en el que tengas para planificar.
+
+<Callout tipo="recomendacion">
+
+Es la fila «Migración masiva de código» de la [matriz por tarea](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/matriz-por-tarea/). Por qué: el patrón se repite en cada fichero, así que los trabajadores no necesitan la gama más alta; el orquestador sí debe entender el plan. Y la medición publicada por Anthropic va en la misma dirección sin darte la razón por defecto: un orquestador con trabajadores baratos compensa cuando hay volumen que repartir, mientras que en tareas de una sola cadena el modelo coordinador solo con menos esfuerzo salió mejor. Tu migración tiene que demostrar que es de las primeras ([cuándo no orquestar](/AI-Optimized_Usage_Web/m8-agentes/cuando-no-orquestar/)).
+
+</Callout>
+
+## `/batch` o flujo dinámico
+
+- **`/batch <instrucción>`** reparte un cambio grande en 5 a 30 unidades independientes, cada una en su worktree y con su subagente, tras aprobar tú el plan. Necesita un repositorio git (o un hook `WorktreeCreate`). Es la opción más guiada.
+- **Flujo dinámico** (`ultracode` en el prompt o `/effort ultracode`): un script orquesta muchos subagentes y permite contrastar o verificar por piezas; avisa cuando proyecta muchos agentes o tokens. Es la opción cuando las piezas son más de 30 o hay un paso de verificación propio. Según la documentación, los flujos están disponibles en los planes de pago, y en Pro hay que activarlos en la fila «Dynamic workflows» de `/config`. La guía de tamaño por defecto es `medium` (menos de 10 agentes) y, con la sesión iniciada en un plan Pro y una versión reciente, `small` (menos de 5): si quieres repartir 300 ficheros, cámbiala con `/config` (`workflowSizeGuideline`) o pídelo expresamente en el prompt, porque es una indicación a Claude, no un tope.
+
+<CommandCard comando="/batch" />
+
+Un worktree es una copia de trabajo independiente del repositorio, en otra carpeta y rama: permite que varias sesiones cambien ficheros a la vez sin pisarse ([glosario](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#worktree)).
+
+## Preparación del contexto
+
+<Steps>
+
+1. **Cuenta lo que hay.** Un listado de los ficheros afectados (`git grep -l "PropiedadAntigua"` funciona igual en PowerShell, macOS y Linux) te da el tamaño real. Por qué: el coste crece con el número de piezas.
+2. **Comprueba la independencia.** Si el componente A importa de B y ambos cambian, el orden importa: agrúpalos en una misma pieza o migra primero B.
+3. **Escribe el patrón de migración una vez**, con un ejemplo antes/después y las excepciones conocidas. Es lo que recibirá cada trabajador.
+4. **Deja la rama limpia y la integración continua verde.** Si ya falla antes de migrar, no podrás saber qué rompió la migración.
+5. **Permisos.** Los trabajadores solo necesitan editar el directorio de su pieza y ejecutar los tests; no les des acceso a secretos ni a la red.
+6. **Prueba con tres ficheros** y revisa el diff a mano.
+
+</Steps>
+
+## El encargo
+
+<PromptTemplate
+  titulo="Migración repartida entre trabajadores"
+  archivo="migracion-masiva-encargo"
+  texto={`Objetivo: migrar {{librería o API antigua}} a {{nueva}} en los ficheros de {{ruta}}, sin cambiar el comportamiento.
+
+Patrón (aplícalo a cada fichero):
+Antes: {{ejemplo de código antiguo}}
+Después: {{ejemplo de código nuevo}}
+Excepciones conocidas: {{casos que no siguen el patrón y qué hacer con ellos}}.
+
+Restricciones: no cambiar la API pública; no tocar los ficheros fuera de {{ruta}}; motivo: {{por qué}}.
+
+Cómo comprobar cada pieza: ejecuta {{comando de tests o de tipos}} sobre los ficheros de tu pieza y no des la pieza por terminada hasta que pase. Si un fichero no encaja en el patrón, no lo fuerces: déjalo sin tocar y anótalo en el informe.
+
+Al terminar cada pieza, informa de: ficheros cambiados, ficheros dejados sin tocar y por qué, resultado de los tests.
+
+Antes de repartir, enséñame el plan con las piezas y espera mi aprobación.`}
+/>
+
+Con `/batch`, pega esta instrucción tras el comando. Con un flujo dinámico, añade la palabra clave `ultracode` y la guía de tamaño que quieras.
+
+## Verificación
+
+1. **Plan primero.** Aprueba cómo se parten las piezas antes de que empiecen.
+2. **Integración continua por lote.** Cada trabajador comprueba su pieza; tú ejecutas la suite completa al integrar cada lote de piezas, no al final. Por qué: un error sistemático se propaga a 300 ficheros si no lo cazas en las tres primeras.
+3. **Revisa una muestra del diff.** Lee a fondo diez cambios al azar y todos los que cada trabajador marcó como excepción.
+4. **Busca lo que queda.** Repite el `git grep` de la preparación: no debe quedar ningún uso de la API antigua, salvo las excepciones anotadas.
+5. **Vigila mientras corre:** `/tasks` para los subagentes de `/batch` y `/workflows` para un flujo. Detén lo que se desvíe.
+
+<Callout tipo="cuidado">
+
+Cada trabajador tiene su propio contexto y se paga aparte. La documentación de Claude Code muestra un aviso «Large workflow» cuando un flujo programa más de 25 agentes o proyecta más de 1,5 millones de tokens: léelo antes de continuar. Los agentes de un mismo flujo con el mismo prefijo comparten caché, pero la vida por defecto de esa caché es de 5 minutos incluso con suscripción; el ajuste `subagentPromptCacheTtl` la amplía a 1 hora (con escrituras más caras).
+
+</Callout>
+
+## Coste estimado
+
+Supuesto de la guía, no una medición: cada fichero requiere unos 15.000 tokens de entrada (el fichero, el patrón, los resultados de los tests y las vueltas del trabajador) y unos 3.000 de salida. Volumen: 300 ficheros. Orquestación, plan y revisión se suman aparte. No se muestra la columna de Batch porque `/batch` de Claude Code no es la API de lotes con descuento.
+
+<CostExample
+  ids={['haiku-5-5', 'sonnet-5-5', 'opus-5-5']}
+  entrada={15000}
+  salida={3000}
+  volumen={300}
+  batch={false}
+  etiqueta="Migración de 300 ficheros (supuesto de la guía)"
+/>
+
+Cambia los tamaños en la [calculadora de coste](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/calculadora-de-coste/) y lee [coste por tarea completada](/AI-Optimized_Usage_Web/m2-metodo/coste-por-tarea/). La tabla es una referencia a precios de API. Con suscripción no se factura por token, pero los trabajadores consumen tu límite de uso, y varios agentes lo consumen más deprisa que una sola sesión.
+
+## Versión económica frente a premium
+
+- **Económica (a probar midiendo):** trabajadores en Haiku 5.5, fijado con `CLAUDE_CODE_SUBAGENT_MODEL` o en la definición del agente. Prueba con tres ficheros que incluyan una excepción conocida. Si deja pasar excepciones o rompe tests, el ahorro es falso: el reproceso lo paga el equipo.
+- **Estándar:** trabajadores en Sonnet 5.5 a `medium`.
+- **Premium:** trabajadores en Opus 5.5, solo para las piezas que los de Sonnet dejaron sin migrar (la cola difícil). Aplicar el modelo caro a las excepciones y no a todo es la misma lógica de cascada del caso de los [50.000 tickets](/AI-Optimized_Usage_Web/m10-casos-practicos/clasificar-50000-tickets/).
+
+## Equivalente de oficina
+
+La misma lógica sirve fuera del código: aplicar un cambio de cláusula a 300 plantillas de contrato o actualizar la razón social en 300 documentos. Ahí no hace falta Claude Code: si nadie espera el resultado hoy, el patrón es un lote por la API con un modelo pequeño, un prompt fijo con el cambio y un paso de validación (el que cada documento conserve el resto del texto sin tocar), como en los [50.000 tickets](/AI-Optimized_Usage_Web/m10-casos-practicos/clasificar-50000-tickets/); lo que cambia es que la salida es un documento y no una etiqueta, así que la muestra se revisa a mano. Cuándo repartir y cuándo no, en [escalera de complejidad](/AI-Optimized_Usage_Web/m8-agentes/escalera-de-complejidad/) y [casos completos](/AI-Optimized_Usage_Web/m8-agentes/casos-completos/). En contratos, la revisión humana sigue siendo obligatoria ([revisión de un contrato](/AI-Optimized_Usage_Web/m10-casos-practicos/revision-de-un-contrato/)).
+
+## Errores típicos
+
+- **Repartir lo que depende entre sí.** Los trabajadores se contradicen y el resultado no compila.
+- **Escalar sin probar tres.** El coste y el fallo sistemático aparecen al final.
+- **Sin worktrees, con varias sesiones editando los mismos ficheros.**
+- **Esperar al final para pasar la integración continua.**
+- **Confundir `/batch` con la API de lotes.** El primero reparte trabajo; la segunda da descuento por esperar.
+- **Dejar sesiones en segundo plano.** Siguen gastando hasta que las detienes.
+
+<Checklist
+  id="m10-migracion-masiva"
+  titulo="Antes de repartir"
+  items={[
+    'Las piezas son independientes entre sí.',
+    'Tengo el patrón con un ejemplo antes/después y las excepciones.',
+    'He probado con tres ficheros y he revisado el diff.',
+    'Los trabajadores solo pueden editar su pieza.',
+    'He aprobado el plan de reparto.',
+    'Ejecuto la integración continua por lote y reviso una muestra.',
+    'Sé cómo vigilar y detener lo que lance.',
+  ]}
+/>
+
+## Para profundizar
+
+[Escalera de complejidad](/AI-Optimized_Usage_Web/m8-agentes/escalera-de-complejidad/), [patrones](/AI-Optimized_Usage_Web/m8-agentes/patrones/) y [modelo y esfuerzo por rol](/AI-Optimized_Usage_Web/m8-agentes/modelo-y-esfuerzo-por-rol/) para decidir el reparto; [encargo a subagentes](/AI-Optimized_Usage_Web/m8-agentes/encargo-a-subagentes/) para escribir bien el encargo de cada trabajador.

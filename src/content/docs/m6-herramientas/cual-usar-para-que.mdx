@@ -5,7 +5,107 @@ sidebar:
   order: 2
 level: basico
 tracks: [profesional, tecnica]
-readingTime: 5
-status: en-preparacion
-sources: []
+readingTime: 7
+lastReviewed: 2026-10-19
+sources:
+  [
+    support-claude-com-en-articles-9517075-what-are-projects,
+    support-claude-com-en-articles-11088861-use-research-on-claude,
+    support-claude-com-en-articles-13455879-use-claude-cowork-on-team-and-enterprise,
+    support-claude-com-en-articles-12012173-get-started-with-claude-in-chrome,
+    support-claude-com-en-articles-12138966-release-notes,
+    claude-com-docs-office-agents-excel,
+    claude-code-buenas-practicas,
+    claude-code-rutinas,
+    learn-chatgpt-com-docs-whats-new,
+    openai-codex-y-chatgpt-work,
+    anthropic-batch,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Elige la superficie por la tarea: qué material necesita, si debe actuar fuera de la conversación, cuántas veces se repite y cuánto cuesta un error.
+- La tabla de abajo es una **recomendación de la guía**, no un dato de ningún proveedor. Cada fila lleva su porqué.
+- Empieza por la superficie más simple y sube cuando falle de forma repetida o cuando el volumen lo exija.
+- Si la tarea toca datos sensibles o puede tener consecuencias fuera (enviar, pagar, borrar), decide primero cómo se revisa.
+
+</KeyTakeaways>
+
+## La idea
+
+Para decidir no necesitas conocer todas las herramientas: necesitas hacerte cuatro preguntas sobre la tarea. ¿Qué material hay que darle? ¿Tiene que **actuar** (abrir ficheros, navegar, escribir en un sistema) o basta con que responda? ¿Se repite, y cuántas veces? ¿Qué pasa si se equivoca? La respuesta a esas cuatro preguntas elige el escalón que describe [Elegir superficie](/AI-Optimized_Usage_Web/m2-metodo/elegir-superficie/); la tabla de aquí lo traduce a herramientas concretas. Estas cuatro preguntas son la versión rápida; antes de usar un agente aplica además los cuatro criterios de Elegir superficie (complejidad, valor, viabilidad y coste del error).
+
+Los perfiles son los de las rutas de la guía: **esencial** (uso diario en chat, sin tocar configuración), **profesional** (trabajas con documentos, hojas de cálculo y equipos) y **técnica** (código, automatización, API).
+
+## La tabla de decisión
+
+<Callout tipo="recomendacion">
+
+Esta tabla es una recomendación de la guía. El porqué de cada fila es el mismo criterio: lo más simple que resuelva la tarea con el mínimo permiso necesario. Los nombres de las funciones y los planes que las incluyen están en el [mapa de superficies](/AI-Optimized_Usage_Web/m6-herramientas/mapa-de-superficies/) con su fuente; aquí no se repiten. Para elegir además modelo y esfuerzo, usa la [matriz por tarea](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/matriz-por-tarea/) del módulo 4.
+
+</Callout>
+
+| Tarea                                                                                | Perfil                | Superficie recomendada                                                                                                                                                     | Por qué                                                                                                                                                                                                                                                                                                                                                   | Sube de escalón cuando                                                                                                                   |
+| ------------------------------------------------------------------------------------ | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Redactar, reformular o resumir un texto corto                                        | Esencial              | Chat, sin proyecto                                                                                                                                                         | Es una tarea acotada; mejorar el encargo rinde más que cualquier herramienta extra                                                                                                                                                                                                                                                                        | Repites el mismo material más de dos veces: pasa a un proyecto                                                                           |
+| Responder dudas recurrentes sobre los mismos documentos (política de gastos, manual) | Esencial, profesional | Proyecto con los documentos y unas instrucciones fijas                                                                                                                     | No repites el material en cada chat; el contenido del proyecto sí cuenta para el contexto, así que sube solo lo que uses                                                                                                                                                                                                                                  | Hay cientos de consultas al día o debe integrarse en otro sistema: API                                                                   |
+| Resumir o extraer datos de un documento largo                                        | Profesional           | Chat con el adjunto o un proyecto, pidiendo la página de cada afirmación                                                                                                   | Con la cita, comprobar es leer unos segundos                                                                                                                                                                                                                                                                                                              | El documento no cabe o son muchos: flujo por API                                                                                         |
+| Entender, depurar o modificar un libro de Excel                                      | Profesional           | Claude en Excel si tu plan lo incluye; si no, un chat con ejecución de código y una copia del libro                                                                        | Las cifras deben salir de cálculo y no del texto del modelo. La ayuda oficial de Claude en Excel excluye macros, VBA y tablas de datos, y no lo recomienda para entregables finales ni cálculos de auditoría sin revisión                                                                                                                                 | El libro tiene datos regulados: primero [privacidad y seguridad](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/privacidad-y-seguridad/) |
+| Investigar un tema con fuentes                                                       | Esencial, profesional | El modo de investigación de la app (Research en Claude; Deep Research en Gemini)                                                                                           | Planifica la búsqueda y cita fuentes; consume más uso que un chat normal                                                                                                                                                                                                                                                                                  | La conclusión sostiene una decisión cara: contrasta tú las cifras con las fuentes primarias                                              |
+| Tareas por pasos sobre una carpeta de ficheros (ordenar, consolidar, renombrar)      | Profesional           | Un agente con acceso a la carpeta: Cowork en Claude, o un proyecto local en ChatGPT                                                                                        | El chat no puede abrir tu carpeta; un agente sí, y por eso es el que más cuidado exige                                                                                                                                                                                                                                                                    | Es código o hay que versionarlo: agente de código                                                                                        |
+| Gestiones en el navegador (extraer datos de una web, rellenar un formulario)         | Profesional           | Claude en Chrome                                                                                                                                                           | Trabaja dentro del navegador, así que no hay que copiar y pegar entre la web y el chat; la contrapartida es que lee páginas que no controlas (ver [Conectores y MCP](/AI-Optimized_Usage_Web/m6-herramientas/conectores-y-mcp/)). Evita las páginas con datos que el modelo no deba ver o que no sean de confianza, y confirma tú el envío del formulario | La tarea se repite a diario: tarea programada o API                                                                                      |
+| Informe o resumen que se repite cada semana                                          | Profesional, técnica  | Tareas programadas (ChatGPT, Cowork o las rutinas de Claude Code, que están en vista previa: ver [automatización](/AI-Optimized_Usage_Web/m7-claude-code/automatizacion/)) | Ejecutarlo a mano cada vez es trabajo y olvido; programado, se mide y se corrige una vez                                                                                                                                                                                                                                                                  | La salida alimenta un sistema: API con comprobaciones automáticas                                                                        |
+| Cambios en código, scripts o tests                                                   | Técnica               | Claude Code o Codex                                                                                                                                                        | Leen el repositorio, ejecutan los tests y enseñan el diff                                                                                                                                                                                                                                                                                                 | Cambio masivo e independiente por fichero: [trabajo en paralelo](/AI-Optimized_Usage_Web/m7-claude-code/trabajo-en-paralelo/)            |
+| Cientos o miles de elementos iguales (clasificar, extraer)                           | Técnica               | API con lotes y salida estructurada                                                                                                                                        | El coste por unidad manda; los lotes de Anthropic admiten un descuento si puedes esperar hasta 24 horas                                                                                                                                                                                                                                                   | Cada elemento exige criterio: sube de modelo en los dudosos                                                                              |
+| Algo que envía, paga, borra o publica                                                | Todos                 | Cualquier superficie, pero con la acción final siempre confirmada por una persona                                                                                          | El coste de un error aquí es el criterio que más se olvida                                                                                                                                                                                                                                                                                                | Nunca se elimina la confirmación en la primera versión                                                                                   |
+
+## En la práctica
+
+<Steps>
+
+1. ¿Basta con que responda? Usa el chat. Si pegas lo mismo más de dos veces, crea un proyecto.
+2. ¿Tiene que actuar sobre tus ficheros, tu navegador o un servicio? Usa un agente, sobre una copia y con confirmación de cada acción que tenga efecto fuera. Detalles de permisos en [Conectores y MCP](/AI-Optimized_Usage_Web/m6-herramientas/conectores-y-mcp/).
+3. ¿Se repite? Primero hazlo bien a mano dos veces; después, prográmalo. Programar una tarea mal hecha solo la repite mejor.
+4. ¿Son cientos de elementos iguales? Es un caso de API y lotes, no de chat.
+5. ¿Hay datos personales, de clientes o regulados? Decide antes qué cuenta y qué plan usas, con tu equipo de seguridad si lo hay.
+
+</Steps>
+
+## Ejemplo de oficina: el departamento de compras
+
+Tres peticiones llegan a la vez a un departamento de compras.
+
+La primera: comparar tres ofertas en PDF y preparar un resumen para el comité. Es una tarea de **chat con adjuntos**: se piden la tabla comparativa y la página de cada cifra, y una persona comprueba una muestra contra los originales. No hace falta nada más.
+
+La segunda: cada trimestre, consolidar 40 hojas de cálculo de proveedores en una sola. Mientras sea una vez al trimestre y las hojas tengan el mismo formato, un agente con acceso a la carpeta (sobre una **copia**) lo resuelve. Si las hojas cambian de formato cada vez, se vuelve a la ayuda manual: el agente no arregla un proceso desordenado.
+
+La tercera: enviar un recordatorio de pago a los proveedores con facturas vencidas. Aquí el modelo puede **preparar** los borradores, pero el envío lo confirma una persona. La razón no es la calidad del texto, sino que un correo enviado no se deshace.
+
+## Errores frecuentes
+
+- **Usar el agente para todo.** Gasta más tokens, tarda más y añade riesgo. Una respuesta directa resolvía la mayoría.
+- **Programar antes de validar.** Una tarea recurrente sin comprobaciones repite el mismo fallo cada semana sin que nadie lo vea.
+- **Elegir por moda.** Elegir una herramienta porque es la nueva, no porque encaje con la tarea.
+- **Saltarse la copia.** Dar a un agente acceso directo a los originales: el coste del error es el criterio más olvidado.
+
+<Checklist
+  id="m6-cual-usar"
+  titulo="Antes de elegir superficie"
+  items={[
+    'Sé qué material necesita la tarea y dónde está.',
+    'Sé si tiene que actuar fuera de la conversación.',
+    'He decidido cuántas veces se repetirá y quién revisa el resultado.',
+    'Si actúa sobre ficheros o servicios, trabajo sobre una copia o con confirmación.',
+    'Si hay datos sensibles, he decidido antes qué cuenta y qué plan uso.',
+  ]}
+/>
+
+## Para profundizar
+
+La escalera completa, con los cuatro criterios antes de usar un agente, en [Elegir superficie](/AI-Optimized_Usage_Web/m2-metodo/elegir-superficie/) y [la escalera de complejidad](/AI-Optimized_Usage_Web/m8-agentes/escalera-de-complejidad/). Modelo y esfuerzo por tarea, en la [matriz por tarea](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/matriz-por-tarea/).

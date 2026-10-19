@@ -1,11 +1,227 @@
 ---
 title: 'Dos casos completos'
-description: 'Un informe de mercado con verificación cruzada y una migración de 300 ficheros, paso a paso.'
+description: 'Un informe de mercado con verificación cruzada y una migración de 300 ficheros, paso a paso: patrón, roles, modelo y verificación.'
 sidebar:
   order: 8
 level: avanzado
 tracks: [tecnica]
-readingTime: 10
-status: en-preparacion
-sources: []
+readingTime: 12
+lastReviewed: 2026-10-19
+sources:
+  [
+    platform-claude-com-docs-en-managed-agents-multiagent-orchestration-2,
+    claude-code-flujos-dinamicos,
+    claude-code-agentes-en-paralelo,
+    claude-code-subagentes,
+    claude-code-comandos,
+    claude-code-costes,
+    anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas,
+    anthropic-batch,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Fact from '@components/Fact.astro';
+import Steps from '@components/Steps.astro';
+import CommandCard from '@components/CommandCard.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Dos casos, una misma secuencia: pasar los criterios del [diseñador](/AI-Optimized_Usage_Web/m8-agentes/disenador-de-equipos/), elegir el patrón por la forma de la tarea, asignar roles con la regla de partida, depurar el encargo con uno o dos elementos, estimar el coste con tres y verificar antes de usar.
+- El informe de mercado justifica un equipo por tiempo y por calidad, no por tamaño: cuatro líneas independientes que se pueden hacer a la vez y una verificación con contexto limpio. Probablemente no baja el coste.
+- La migración de 300 ficheros compensa un fan-out porque hay volumen homogéneo e independiente; lo que la hace segura es el script determinista que comprueba el resultado.
+- En ambos, lo que se puede calcular se calcula con código, y el verificador no es quien produjo el trabajo.
+- Las cifras de coste de cada caso salen de tu prueba de tres elementos, no de esta página.
+
+</KeyTakeaways>
+
+## La idea
+
+Los patrones y las tablas se entienden mejor aplicados. Estos dos casos recorren el mismo camino que propone esta guía y dejan a la vista las decisiones intermedias: por qué esa topología, por qué ese modelo, qué se mide y qué se comprueba. No son resultados medidos: son ejemplos trabajados de la metodología, con la tarea inventada pero verosímil. Los modelos aparecen con su nombre desde los datos del sitio, y los precios y límites de cada herramienta, en las páginas anteriores.
+
+## Caso 1: informe de mercado con verificación cruzada
+
+**La tarea.** El responsable de estrategia de una empresa de movilidad urbana necesita, para un comité dentro de dos semanas, un informe de mercado de bicicletas eléctricas compartidas con cuatro líneas: competencia, precios, regulación y demanda. Cada afirmación con cifra debe llevar fuente. Un error en una cifra clave sería caro, porque el comité fijará con ella el precio de entrada.
+
+### Paso 1: los criterios y la elección del escalón
+
+| Criterio            | Respuesta                                                                                                           | Consecuencia                                                   |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| Cabe en un contexto | Quizá sí: con una ventana de <Fact id="sonnet-5-5.contextWindow" /> caben muchas fuentes; el tamaño no es el motivo | No se reparte por tamaño                                       |
+| Dependencia         | Las cuatro líneas son independientes entre sí; la síntesis depende de las cuatro                                    | Se paraleliza la investigación, no la síntesis: se gana tiempo |
+| Volumen             | Cuatro líneas distintas, no 400 elementos iguales                                                                   | Una pieza por línea, no fan-out                                |
+| Coste del error     | Alto: una cifra mal contrastada llega al comité                                                                     | Verificación cruzada con contexto limpio                       |
+| Urgencia            | Dos semanas                                                                                                         | No hace falta el modo más rápido                               |
+
+El resultado es el escalón 4 de la [escalera](/AI-Optimized_Usage_Web/m8-agentes/escalera-de-complejidad/), con un patrón: el **flujo dinámico con verificación cruzada** de los [patrones](/AI-Optimized_Usage_Web/m8-agentes/patrones/) (el agente reparte las cuatro líneas en fases y otros agentes, con contexto limpio, verifican las cifras). Los verificadores no son el patrón evaluador y optimizador: no corrigen en bucle, solo confirman o rechazan cada cifra. Antes de aceptarlo, se hace la prueba de [cuándo no orquestar](/AI-Optimized_Usage_Web/m8-agentes/cuando-no-orquestar/): ¿lo resolvería un modelo solo? Probablemente sí, más despacio y con menos independencia entre la investigación y su comprobación. Los motivos del equipo son **ganar tiempo** con cuatro líneas a la vez y **verificar con contexto limpio**; no se justifica por ahorro, y lo más probable es que el coste suba. Si el plazo y el riesgo no lo piden, la versión económica de abajo es la respuesta correcta.
+
+### Paso 2: los roles, el modelo y el esfuerzo
+
+Es la tabla de [modelo y esfuerzo por rol](/AI-Optimized_Usage_Web/m8-agentes/modelo-y-esfuerzo-por-rol/) con los nombres del caso. Todos parten de la regla: modelo capaz y esfuerzo por defecto; se baja midiendo.
+
+| Rol                      | Cantidad | Modelo de partida                            | Qué hace                                                                                  | Qué devuelve                                                          |
+| ------------------------ | -------- | -------------------------------------------- | ----------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Orquestador (tu sesión)  | 1        | <Fact id="opus-5-5.name" />                  | Reparte las cuatro líneas, fija el formato y las fuentes permitidas, y sintetiza al final | El informe final                                                      |
+| Investigador de línea    | 4        | <Fact id="sonnet-5-5.name" />                | Investiga una línea con fuentes dadas                                                     | Tabla: cifra, fuente (URL), fecha, cita literal                       |
+| Lector de fuentes largas | 0 a N    | <Fact id="haiku-5-5.name" /> si se mide bien | Extrae de PDFs largos los pasajes con cifras                                              | Tabla de pasajes con página                                           |
+| Verificador              | 2 o 3    | <Fact id="opus-5-5.name" />, contexto limpio | Comprueba cada cifra clave contra su fuente, sin ver el razonamiento del investigador     | Para cada cifra: confirmada, no confirmada o contradicha, con la cita |
+| Paso determinista        | 1        | Código                                       | Une tablas, comprueba que cada cifra tiene fuente y URL, y que los totales cuadran        | Informe de comprobaciones                                             |
+
+Por qué estos roles: el plan es lo que más cuesta si falla, así que el orquestador es el modelo capaz. Los investigadores consumen el volumen, así que son el sitio donde probar a bajar (primero el esfuerzo, después el modelo). Los verificadores no ven cómo llegaron los investigadores a sus cifras, porque quien ha hecho el trabajo tiende a validar sus propias premisas.
+
+### Paso 3: el encargo a un investigador
+
+Aplicando los seis elementos de [encargo a subagentes](/AI-Optimized_Usage_Web/m8-agentes/encargo-a-subagentes/):
+
+```text
+Tarea: reunir las tarifas públicas actuales de las 8 empresas de bicicletas eléctricas
+compartidas de la lista adjunta (empresas.xlsx, columna A) en las 5 ciudades de la hoja 2.
+Para qué: el comité fijará nuestro precio de entrada; importa más la exactitud de los
+rangos que cubrir todas las empresas.
+Contexto: ya tenemos las tarifas de 2025 en tarifas-2025.csv; compara contra ellas, no las repitas.
+Alcance: solo las webs oficiales de cada empresa y las del ayuntamiento. No uses foros ni reseñas.
+Límites: no modifiques ningún fichero.
+Devuelve solo: una tabla (empresa, ciudad, concepto, tarifa, URL, fecha de consulta, cita literal)
+y tres frases sobre variaciones respecto a 2025. No incluyas el proceso.
+Terminado: cada fila tiene URL, fecha y cita literal. Si una empresa no publica una tarifa,
+escribe «no publicado»; no la estimes. Si no puedes completar algo, dime qué falta.
+```
+
+La cita literal es lo que permite que el verificador compruebe la cifra sin repetir toda la investigación.
+
+### Paso 4: cómo se ejecuta
+
+En Claude Code hay dos caminos, de menor a mayor control. El primero es `/deep-research` por línea: lanza búsquedas en paralelo, contrasta fuentes y devuelve un informe citado. Es lo más rápido de probar (recomendación de la guía), pero **no controlas** sus roles, sus modelos ni el formato de salida: la tabla de roles de arriba se aplica al flujo que pides tú, no a `/deep-research`. El segundo es pedir un flujo dinámico con el reparto descrito arriba (palabra clave `ultracode` en el prompt), para que Claude escriba el flujo con las fases de investigación y verificación, indicando el formato y el modelo de cada fase. El flujo se puede guardar y repetir el trimestre siguiente. El orquestador es tu sesión, con su modelo; el modelo de los agentes de un flujo se resuelve como el de un subagente (ver [implementación por superficie](/AI-Optimized_Usage_Web/m8-agentes/implementacion-por-superficie/#subagentes-un-rol-un-fichero)).
+
+<CommandCard comando="/deep-research" />
+
+<Callout tipo="cuidado">
+
+Antes de lanzar el flujo completo, ejecútalo sobre una sola línea y mira `/workflows` y `/usage`: tokens por agente, tiempo y calidad de la tabla. Claude Code muestra el aviso «Large workflow» cuando un flujo proyecta más de 25 agentes o 1,5 millones de tokens, y una guía de tamaño (`small`, `medium`, `large`) limita cuántos agentes propone Claude. Pon el tamaño más bajo que cubra tu caso. Ojo: con `/effort ultracode` activado en la sesión el aviso no aparece, porque ya te incluye en las ejecuciones grandes; si quieres verlo, usa la palabra clave `ultracode` en el prompt de esa tarea (la documentación solo exime del aviso al ajuste de sesión; que la palabra clave no lo exima es una deducción nuestra).
+
+</Callout>
+
+### Paso 5: la verificación
+
+La verificación forma parte del diseño, no es un añadido:
+
+1. El **script determinista** comprueba que cada cifra de la tabla final tiene URL, fecha y cita, y que los totales y porcentajes cuadran.
+2. Los **verificadores** reciben la tabla de cifras y las fuentes, sin la narrativa del investigador, y devuelven por cada cifra clave si la fuente la confirma, la contradice o no permite comprobarla.
+3. Lo que no se confirma **no entra** en el informe como dato: se marca como «sin confirmar» o se descarta.
+4. **Una persona** lee el informe final y comprueba una muestra de cifras directamente contra las fuentes.
+
+### Versión económica y versión premium
+
+|              | Económica                                                                           | Premium                                                               |
+| ------------ | ----------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Estructura   | Un solo modelo, cuatro conversaciones secuenciales (una por línea), una de síntesis | Orquestador, cuatro investigadores, dos o tres verificadores y script |
+| Verificación | La persona comprueba una muestra                                                    | Verificación cruzada con contexto limpio más muestra humana           |
+| Cuándo       | Informe interno, error de bajo coste                                                | Cifras que llegan a un comité o a un cliente                          |
+| Coste        | Lo menor posible; mídelo con una línea                                              | Más caro; mídelo con una línea y multiplica con criterio              |
+
+La decisión entre ambas es el coste del error, no la tecnología. Con la calculadora de [coste de la tarea](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/calculadora-de-coste/) estimas el orden de magnitud, y con tu prueba de una línea, la cifra real.
+
+## Caso 2: migración de 300 ficheros
+
+**La tarea.** Un departamento de operaciones tiene 300 plantillas de documento en Markdown con el formato antiguo (cabecera con campos entre llaves, secciones con otro orden, enlaces rotos a un portal ya retirado). Hay que pasarlas a la plantilla nueva: cabecera con metadatos estándar, secciones reordenadas y enlaces al portal actual. Sirve igual para 300 ficheros de código con una API que cambia de nombre.
+
+### Paso 1: los criterios y la elección del patrón
+
+| Criterio            | Respuesta                                                                            | Consecuencia                                                           |
+| ------------------- | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------- |
+| Cabe en un contexto | Cada fichero sí; el conjunto depende del tamaño (cuenta los tokens antes de decidir) | Se reparte por volumen y por independencia, aunque el conjunto cupiera |
+| Dependencia         | Cada fichero es independiente de los demás                                           | Se puede paralelizar                                                   |
+| Volumen             | 300 elementos iguales                                                                | Fan-out por lotes                                                      |
+| Coste del error     | Medio: un fallo se detecta con un script, pero uno silencioso estropea un documento  | Verificación determinista más muestra                                  |
+| Urgencia            | Se quiere hoy                                                                        | Claude Code, no la API en lotes de 24 horas                            |
+
+El patrón es **fan-out por lotes** con un **paso determinista de verificación**. No hay orquestador que decida el reparto: el reparto es mecánico, uno por fichero o por grupo de ficheros.
+
+### Paso 2: las reglas antes que el reparto
+
+El error caro en un fan-out es un encargo mal escrito multiplicado por 300. Por eso lo primero no es repartir, sino escribir las reglas de migración y depurarlas con uno o dos ficheros a mano o con un solo agente, y estimar después el coste con tres:
+
+- Una **guía de migración** de una página: estructura de cabecera nueva, orden de secciones, tabla de enlaces antiguos a nuevos.
+- **Tres ficheros de ejemplo** ya migrados a mano (uno típico, uno raro, uno con enlaces rotos).
+- Un **script de validación** que, dado un fichero, comprueba: cabecera con todos los campos, secciones en orden, ningún patrón del formato antiguo, ningún enlace al portal retirado.
+
+Los ejemplos y el validador son el criterio de terminado del encargo.
+
+### Paso 3: los roles, el modelo y el esfuerzo
+
+| Rol                     | Cantidad                            | Modelo de partida                                   | Qué hace                                                                   |
+| ----------------------- | ----------------------------------- | --------------------------------------------------- | -------------------------------------------------------------------------- |
+| Tu sesión (orquestador) | 1                                   | El modelo de la sesión                              | Prepara la guía y el validador, aprueba el plan, revisa muestras           |
+| Trabajador de migración | Uno por unidad (grupos de ficheros) | <Fact id="sonnet-5-5.name" />, esfuerzo por defecto | Migra sus ficheros siguiendo la guía y ejecuta el validador sobre cada uno |
+| Validador               | Código                              | Script                                              | Comprueba cada fichero migrado y que no falte ninguno de los 300           |
+| Revisor de muestra      | 1                                   | <Fact id="opus-5-5.name" />, contexto limpio        | Lee una muestra de ficheros migrados contra el original y contra la guía   |
+
+Si tras la prueba el trabajador acierta de forma estable, se puede probar a bajar el esfuerzo o el modelo con una muestra de cinco ficheros que incluya los más raros, un escalón cada vez. No antes. El orquestador de `/batch` es tu propia sesión; la documentación no indica qué modelo usan los trabajadores de `/batch` (**no consta**), así que si importa, mídelo en la prueba.
+
+### Paso 4: la ejecución con `/batch`
+
+En un repositorio git, `/batch` descompone un cambio grande en 5 a 30 unidades independientes, cada una en su worktree y su subagente, y pide que apruebes el plan antes de ejecutar. Con 300 ficheros, eso son entre 10 y 60 ficheros por unidad. Cada trabajador recibe la guía, los ejemplos y el validador, y migra su grupo en una rama aparte.
+
+<CommandCard comando="/batch" />
+
+<Steps>
+
+1. **Escribe la guía, los tres ejemplos y el validador.** Prueba con un agente sobre uno o dos ficheros nuevos, corrige la guía hasta que el validador pase y estima el coste con tres.
+2. **Lanza `/batch` con la descripción del cambio** y revisa el plan que propone antes de aprobarlo: cuántas unidades, cómo reparte y si cada una queda con ficheros relacionados.
+3. **Vigila con `/tasks`** y detén lo que se desvíe.
+4. **Ejecuta el validador sobre el conjunto** al terminar: debe pasar en los 300 y confirmar que ninguno falta ni está duplicado.
+5. **Revisa una muestra con el revisor de contexto limpio**: ficheros elegidos al azar más los más raros, contra el original.
+6. **Fusiona las ramas** solo cuando el validador y la muestra estén en verde.
+
+</Steps>
+
+Si los ficheros no están en un repositorio y no necesitas verlos ya, la alternativa es la API en lotes: una petición por fichero, con el 50 % de descuento a cambio de esperar hasta 24 horas, aunque sin bucle de herramientas; sirve cuando la migración es una transformación de texto que puedes validar después. Más en [Batch](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/batch/).
+
+<Callout tipo="recomendacion">
+
+El validador determinista manda; el revisor con modelo, solo muestrea. Es una recomendación de la guía. Su porqué: un script comprueba los 300 ficheros con el mismo criterio y sin coste de modelo, mientras que un revisor con modelo es más caro, más lento y no es 100 % repetible; úsalo donde un script no llega (¿el texto sigue diciendo lo mismo que el original?).
+
+</Callout>
+
+### Versión económica y versión premium
+
+|            | Económica                                           | Premium                                                           |
+| ---------- | --------------------------------------------------- | ----------------------------------------------------------------- |
+| Estructura | Un solo agente, ficheros de diez en diez, validador | `/batch` con 30 unidades, validador y revisor con contexto limpio |
+| Tiempo     | Más lento                                           | Más rápido                                                        |
+| Cuándo     | Sin prisa y con poco presupuesto                    | Plazo ajustado                                                    |
+| Riesgo     | Menor coordinación, más espera                      | Más agentes, más coste, más ramas que fusionar                    |
+
+Repartir en 30 unidades acorta el tiempo; no reduce el coste. El coste lo marcan los tokens de cada fichero, y lo conoces con tu prueba de tres.
+
+## Qué tienen en común
+
+Los dos casos pasan por lo mismo: **criterios antes que topología**, **depurar con uno o dos elementos y estimar con tres antes de escalar**, **lo determinista en código**, **verificador independiente** y **una persona que comprueba una muestra**. Cambia el patrón (flujo dinámico con verificación cruzada en uno, fan-out en el otro), no el método.
+
+## Errores frecuentes
+
+- **Lanzar el equipo sin depurar el encargo ni estimar el coste con tres elementos.** En el informe, un investigador mal encargado contamina las cuatro líneas; en la migración, una guía floja se multiplica por 300.
+- **Verificar con quien produjo.** Un investigador que se comprueba a sí mismo valida sus propias premisas.
+- **Dejar la validación en manos de un modelo.** Lo que se puede calcular se calcula.
+- **No fijar un tope.** Un máximo de agentes y de gasto es parte del diseño.
+- **Fusionar sin muestra humana.** El validador atrapa lo que sabe buscar; la muestra, lo demás.
+
+<Checklist
+  id="m8-casos"
+  titulo="Antes de lanzar un caso así"
+  items={[
+    'He pasado los criterios y el escalón elegido se justifica.',
+    'Tengo las reglas o el encargo escritos y probados con tres elementos.',
+    'Cada rol tiene modelo y esfuerzo de partida según la regla del sitio.',
+    'Lo determinista está en un script, no en un modelo.',
+    'El verificador tiene contexto limpio o un modelo distinto.',
+    'Hay un tope de agentes y de gasto, y sé cómo detener la ejecución.',
+    'Una persona comprobará una muestra antes de usar el resultado.',
+  ]}
+/>
+
+## Para profundizar
+
+Los playbooks completos de M10 desarrollan casos parecidos con la ficha común de coste y versión económica frente a premium: [migración masiva de código](/AI-Optimized_Usage_Web/m10-casos-practicos/migracion-masiva-de-codigo/), [investigación con fuentes](/AI-Optimized_Usage_Web/m10-casos-practicos/investigacion-con-fuentes/) y [clasificar 50.000 tickets](/AI-Optimized_Usage_Web/m10-casos-practicos/clasificar-50000-tickets/). Para decidir el diseño de un caso tuyo, el [diseñador de equipos](/AI-Optimized_Usage_Web/m8-agentes/disenador-de-equipos/). Para medir el resultado, [verificar siempre](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/verificar-siempre/).

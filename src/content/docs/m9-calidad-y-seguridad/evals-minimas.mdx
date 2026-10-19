@@ -1,11 +1,338 @@
 ---
 title: 'Evals mínimas'
-description: 'Un conjunto de entre 20 y 30 casos reales, un criterio de juicio y un script para comparar acierto y coste.'
+description: 'Un conjunto de entre 20 y 30 casos reales, un criterio de juicio y un script para comparar acierto y coste por tarea.'
 sidebar:
   order: 2
 level: intermedio
 tracks: [profesional, tecnica]
-readingTime: 8
-status: en-preparacion
-sources: []
+readingTime: 11
+lastReviewed: 2026-10-19
+sources:
+  [
+    platform-claude-com-docs-en-cli-sdks-libraries-sdks-python,
+    anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas,
+    anthropic-precios,
+    anthropic-modelos,
+    anthropic-conteo-de-tokens,
+    anthropic-develop-tests,
+    anthropic-esfuerzo,
+    claude-code-comandos,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Steps from '@components/Steps.astro';
+import Fact from '@components/Fact.astro';
+import PromptTemplate from '@components/PromptTemplate.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Una [eval](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#eval) es una prueba repetible: las mismas tareas reales, el mismo criterio, cada vez que cambias de modelo, de esfuerzo o de prompt.
+- Con 20 a 30 casos reales y congelados ya distingues una mejora clara de una impresión. No necesitas una plataforma.
+- Elige el criterio más barato que valga: un comprobador automático, una respuesta de referencia o una rúbrica.
+- Mide dos cosas por tarea: **acierto** y **coste**. La opción buena es la que no tiene otra mejor y más barata (la frontera de Pareto).
+- Con tan pocos casos, una diferencia de uno o dos aciertos es ruido: repite antes de decidir.
+
+</KeyTakeaways>
+
+## La idea
+
+Cuando cambias de modelo, de nivel de esfuerzo o reescribes un prompt, ¿has mejorado algo? Sin una prueba, la respuesta es una sensación, y las sensaciones se dejan llevar por el último ejemplo que viste. Una eval sustituye la sensación por una tabla: sobre las mismas tareas, qué porcentaje sale bien y cuánto cuesta cada una.
+
+El módulo de [método](/AI-Optimized_Usage_Web/m2-metodo/coste-por-tarea/) insiste en medir el coste **por tarea completada**, no por mensaje. Esta página es la herramienta para hacerlo: te dice si el modelo barato basta para tu trabajo o si merece la pena pagar el caro.
+
+La documentación de Anthropic sobre cómo desarrollar pruebas ([develop-tests](https://platform.claude.com/docs/en/test-and-evaluate/develop-tests)) da criterios que encajan con este enfoque: definir antes criterios de éxito específicos y medibles, diseñar las pruebas como tu tarea real (incluidos los casos límite), automatizar la corrección cuando se pueda y preferir **más casos con corrección automática** a pocos casos corregidos a mano con mucho cuidado.
+
+<Callout tipo="recomendacion">
+
+La cifra de 20 a 30 casos es una recomendación de esta guía, no de la documentación del proveedor. El porqué: es lo bastante pequeño para armarlo en una tarde con tus propios documentos y lo bastante grande para que un fallo aislado no decida el resultado. Si tu tarea tiene muchos subtipos, sube la cifra hasta que cada subtipo tenga al menos tres o cuatro casos.
+
+</Callout>
+
+## En la práctica
+
+<Steps>
+
+1. **Reúne 20 a 30 casos reales.** Saca de tu trabajo de las últimas semanas las entradas tal como llegaron: el acta con sus erratas, el correo mal escrito, el Excel con filas vacías. Incluye casos fáciles, casos difíciles y alguno sin respuesta posible. Si contienen datos personales o confidenciales, anonimízalos antes (ver [privacidad y seguridad](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/privacidad-y-seguridad/)).
+2. **Congélalos.** Un caso no se edita después de ver qué tal le sienta al modelo. Si descubres un fallo nuevo en producción, añade un caso nuevo; no retoques los viejos. Por qué: si ajustas el examen a las respuestas, ya no mide nada.
+3. **Escribe el criterio de cada caso.** Elige el más barato que sirva (siguiente sección).
+4. **Ejecuta con un script que registre salida y uso.** Sin guardar la respuesta, el número de tokens de entrada y de salida y el coste, no podrás comparar después.
+5. **Compara acierto y coste por tarea** entre las opciones que te interesan, y repite la ejecución si la diferencia es pequeña.
+6. **Guarda la tabla con la fecha y las opciones probadas.** En tres meses habrá otro modelo y querrás ver si el resultado cambia.
+
+</Steps>
+
+## Tres formas de juzgar una respuesta
+
+| Criterio                      | Cuándo sirve                                                               | Coste de preparar |
+| ----------------------------- | -------------------------------------------------------------------------- | ----------------- |
+| Comprobador automático        | Hay algo verificable por código: un dato, una fecha, una etiqueta, un JSON | Bajo              |
+| Respuesta de referencia       | Existe una respuesta correcta que puedes escribir tú de antemano           | Medio             |
+| Rúbrica (evaluada por modelo) | La calidad es cualitativa: tono, completitud, utilidad                     | Medio             |
+
+**Comprobador automático.** Es el que usa el script de abajo: la respuesta debe contener ciertas cadenas («Marta», «15 de noviembre») y no contener otras. Barato, rápido y sin discusión, pero solo vale para lo que se pueda comprobar con texto.
+
+**Respuesta de referencia.** Escribes la respuesta ideal y la comparas con la salida, a mano o con un modelo. Vale cuando hay una respuesta correcta clara.
+
+**Rúbrica con un modelo juez.** Para lo cualitativo, un segundo modelo puntúa cada criterio. La documentación de Anthropic aconseja usar un modelo distinto del que generó la respuesta para evaluarla. La guía añade un porqué razonable (no medido aquí): un juez que comparte modelo con el autor puede dar por buenas sus mismas costumbres y errores.
+
+<PromptTemplate
+  titulo="Prompt de evaluación con rúbrica"
+  archivo="prompt-de-evaluacion"
+  texto={`Vas a evaluar una respuesta según una rúbrica.
+
+<consulta>
+{{consulta original}}
+</consulta>
+
+<respuesta>
+{{respuesta a evaluar}}
+</respuesta>
+
+<referencia>
+{{respuesta ideal o hechos que debe contener, si los hay}}
+</referencia>
+
+Rúbrica (puntúa cada criterio de 0 a 2):
+
+- {{criterio 1: por ejemplo, exactitud respecto a la referencia}}
+- {{criterio 2: por ejemplo, tono adecuado}}
+- {{criterio 3: por ejemplo, no inventa datos}}
+
+Para cada criterio, escribe primero la evidencia (cita breve de la respuesta) y después la puntuación. Termina con la suma y una frase sobre el fallo principal. Puntúa solo con lo que ves; no premies la longitud.`}
+
+>
+
+Úsala con un modelo distinto del que generó la respuesta. Pide la evidencia antes de la puntuación: así el juez no puntúa «a ojo». Revisa tú una muestra de sus veredictos, porque el juez también se equivoca.
+
+</PromptTemplate>
+
+## El script: registra salida, tokens y coste
+
+Este script lee tus casos desde un fichero, los envía a un modelo con el SDK de Python de Anthropic, aplica el comprobador y escribe una tabla con todo. Solo usa lo que documenta la página oficial del SDK: `messages.create`, el contenido de texto de la respuesta y los campos `usage.input_tokens` y `usage.output_tokens`.
+
+**Requisitos.** Python 3.10 o posterior (lo indica la [página oficial del SDK](https://platform.claude.com/docs/en/cli-sdks-libraries/sdks/python), consultada el 19 de octubre de 2026), `python -m pip install anthropic` y una clave de API en la variable de entorno `ANTHROPIC_API_KEY`. Si en Windows `python` abre la Microsoft Store, usa el lanzador: `py -m pip install anthropic` y `py evals_minimas.py casos.jsonl`. El modelo y los precios no están escritos en el script: los pasas por variables de entorno para que no se queden obsoletos.
+
+**Antes de ejecutarlo.** El identificador del modelo y su precio por millón de tokens los tomas de la ficha del modelo. Por ejemplo, para Sonnet 5.5 el identificador de la API es <Fact id="sonnet-5-5.apiId" />, con <Fact id="sonnet-5-5.pricing.input" /> por millón de tokens de entrada y <Fact id="sonnet-5-5.pricing.output" /> por millón de salida. Sustituye esos valores por los del modelo que compares; consulta el [mapa de modelos](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/mapa-de-modelos/) para ver los vigentes.
+
+**1. El fichero `casos.jsonl`.** Una línea por caso, en formato JSON. Guárdalo con codificación UTF-8 desde un editor como VS Code (en Windows PowerShell 5, redirigir con `>` o `Out-File` guarda en UTF-16 y el script no lo leerá bien).
+
+```text
+{"id": "acta-01", "entrada": "Acta del 3 de noviembre. Marta enviará el presupuesto revisado antes del 15 de noviembre. Luis queda pendiente de confirmar la sala. Pregunta: ¿quién envía el presupuesto y para cuándo?", "debe_contener": ["marta", "15 de noviembre"], "no_debe_contener": ["luis"]}
+{"id": "acta-02", "entrada": "Acta del 10 de noviembre. Se acuerda revisar los plazos. Pregunta: ¿qué fecha se fijó para la entrega?", "debe_contener": ["no lo se"]}
+```
+
+El segundo caso no tiene respuesta en el texto: lo correcto es decir que no lo sabe. Los casos sin respuesta detectan a los modelos que inventan. Ojo: el comprobador de `acta-01` es estricto (basta con que la respuesta mencione «Luis» para fallar, aunque sea para explicar que no es el responsable). Un comprobador por cadenas es barato pero tosco: ajusta las cadenas hasta que juzgue como lo haría una persona, **antes** de congelar el caso.
+
+**2. El script `evals_minimas.py`.**
+
+```python
+"""Eval mínima: ejecuta cada caso, comprueba la respuesta y registra tokens y coste."""
+import csv
+import json
+import os
+import re
+import sys
+
+import anthropic
+
+INSTRUCCION = (
+    "Responde solo con lo que se pide, sin introducción. "
+    "Si el texto no permite responder, di exactamente: NO LO SE."
+)
+# Techo prudente: el SDK rechaza (ValueError) las peticiones sin streaming que prevé muy largas.
+TECHO_MAX_TOKENS = 16000
+MAX_TOKENS = min(int(os.environ.get("EVAL_MAX_TOKENS", "4096")), TECHO_MAX_TOKENS)
+
+
+def leer_entorno(nombre):
+    valor = os.environ.get(nombre)
+    if not valor:
+        sys.exit(f"Falta la variable de entorno {nombre}.")
+    return valor
+
+
+def leer_numero(nombre):
+    # Acepta "3.75" y "3,75" (separador decimal español).
+    return float(leer_entorno(nombre).replace(",", "."))
+
+
+def normalizar(texto):
+    # Minúsculas y sin tildes en el caso más habitual, para que "sé" y "se" no discriminen.
+    tabla = str.maketrans("áéíóúü", "aeiouu")
+    return texto.lower().translate(tabla)
+
+
+def comprueba(texto, caso):
+    t = normalizar(texto)
+    tiene = all(normalizar(s) in t for s in caso.get("debe_contener", []))
+    no_tiene = not any(normalizar(s) in t for s in caso.get("no_debe_contener", []))
+    return tiene and no_tiene
+
+
+def main(ruta_casos):
+    modelo = leer_entorno("EVAL_MODELO")
+    precio_entrada = leer_numero("EVAL_PRECIO_ENTRADA")  # $ por millón de tokens
+    precio_salida = leer_numero("EVAL_PRECIO_SALIDA")  # $ por millón de tokens
+    client = anthropic.Anthropic()  # lee ANTHROPIC_API_KEY del entorno
+
+    with open(ruta_casos, encoding="utf-8") as f:
+        casos = [json.loads(linea) for linea in f if linea.strip()]
+    if not casos:
+        sys.exit("El fichero de casos está vacío.")
+
+    filas = []
+    for caso in casos:
+        texto, tok_ent, tok_sal, parada, error = "", 0, 0, "", ""
+        try:
+            msg = client.messages.create(
+                model=modelo,
+                max_tokens=MAX_TOKENS,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": f"{INSTRUCCION}\n\n{caso['entrada']}",
+                    }
+                ],
+            )
+            texto = "".join(b.text for b in msg.content if b.type == "text")
+            tok_ent = msg.usage.input_tokens
+            tok_sal = msg.usage.output_tokens
+            parada = msg.stop_reason
+        except (anthropic.APIError, ValueError) as e:
+            # Un fallo de red, de límite o del propio SDK no es un fallo del modelo:
+            # se anota aparte y se avisa al final, para no comparar peras con manzanas.
+            error = f"{type(e).__name__}: {e}"
+        coste = (tok_ent * precio_entrada + tok_sal * precio_salida) / 1_000_000
+        filas.append(
+            {
+                "id": caso["id"],
+                "acierto": int(comprueba(texto, caso)) if not error else 0,
+                "tokens_entrada": tok_ent,
+                "tokens_salida": tok_sal,
+                "coste": round(coste, 6),
+                "stop_reason": parada,
+                "error": error,
+                "respuesta": texto,
+            }
+        )
+        print(f"{caso['id']}: acierto={filas[-1]['acierto']} coste={coste:.5f}")
+
+    nombre = "resultados-" + re.sub(r"[^A-Za-z0-9._-]", "_", modelo) + ".csv"
+    with open(nombre, "w", encoding="utf-8-sig", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=list(filas[0].keys()))
+        w.writeheader()
+        w.writerows(filas)
+
+    aciertos = sum(r["acierto"] for r in filas)
+    coste_total = sum(r["coste"] for r in filas)
+    print(f"\nModelo: {modelo}")
+    print(f"Acierto: {aciertos}/{len(filas)} ({100 * aciertos / len(filas):.0f} %)")
+    print(f"Coste total: {coste_total:.4f} $  |  por caso: {coste_total / len(filas):.5f} $")
+    if aciertos:
+        print(f"Coste por acierto: {coste_total / aciertos:.5f} $")
+    fallos_tecnicos = sum(1 for r in filas if r["error"])
+    cortadas = sum(1 for r in filas if r["stop_reason"] == "max_tokens")
+    if fallos_tecnicos:
+        print(f"AVISO: {fallos_tecnicos} caso(s) fallaron por error de la API o del SDK (no del modelo).")
+        print("       Cuentan como fallo, pero esta ejecución no es comparable: repítela.")
+    if cortadas:
+        print(f"AVISO: {cortadas} respuesta(s) cortadas por max_tokens: sube EVAL_MAX_TOKENS.")
+    print(f"Detalle guardado en {nombre}")
+
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        sys.exit("Uso: python evals_minimas.py casos.jsonl")
+    main(sys.argv[1])
+```
+
+**3. Ejecución en PowerShell** (Windows). Las variables solo viven en esa ventana, de modo que la clave no queda guardada en ningún fichero:
+
+```powershell
+python -m pip install anthropic
+$env:ANTHROPIC_API_KEY = Read-Host -MaskInput "Clave de API"   # PowerShell 7
+$env:EVAL_MODELO = "ID-DEL-MODELO"
+$env:EVAL_PRECIO_ENTRADA = "0.0"   # dólares por millón de tokens de entrada (con punto decimal)
+$env:EVAL_PRECIO_SALIDA = "0.0"    # dólares por millón de tokens de salida (con punto decimal)
+python evals_minimas.py casos.jsonl
+```
+
+`Read-Host -MaskInput` solo existe en PowerShell 7. En Windows PowerShell 5, define antes la variable de entorno con la clave por otra vía de tu organización (o escribe `$env:ANTHROPIC_API_KEY = "..."` en esa ventana, sabiendo que queda en su historial) y quita esa línea. El script acepta punto o coma decimal en los precios.
+
+Para comparar dos opciones, cambia `EVAL_MODELO` y los dos precios y vuelve a ejecutar: cada ejecución genera su `resultados-<modelo>.csv`. En macOS o Linux, sustituye cada `$env:X = "..."` por `export X="..."`.
+
+<Callout tipo="cuidado">
+
+Tres limitaciones del script, a propósito. Primero, el coste se calcula con los precios que tú introduces y con los tokens que devuelve la API; contrasta el total con la página de uso de la consola antes de fiarte. Segundo, no usa caché de prompts ni lotes, así que el coste por tarea en producción puede ser menor si los activas (ver [medir](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/medir/)). Tercero, no fija el nivel de esfuerzo: para comparar esfuerzos necesitarías añadir ese parámetro, y su nombre y valores dependen del modelo; consúltalos en [esfuerzo y razonamiento](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/esfuerzo-y-razonamiento/). Ojo: en algunos modelos el razonamiento no se puede desactivar (la documentación de esfuerzo indica que en Opus 5.5 una petición con `thinking: {"type": "disabled"}` devuelve un error 400), así que no lo añadas sin mirar la ficha del modelo.
+
+Además, el script distingue dos cosas que conviene no mezclar. Un error de la API o del SDK (red, límite de uso, o el `ValueError` con el que el SDK rechaza las peticiones sin streaming que prevé demasiado largas) se anota en la columna `error` y se avisa al final: el caso cuenta como fallo, pero esa ejecución ya no es comparable y debes repetirla. Y una respuesta con `stop_reason` igual a `max_tokens` está cortada porque llegó al límite de la petición (valor documentado por Anthropic en su página de razones de parada): sube `EVAL_MAX_TOKENS`. El script lo limita a 16.000, un techo prudente de esta guía; no hemos verificado el umbral exacto del SDK, que prevé el tiempo según el modelo. Si lo necesitas mayor, usa streaming.
+
+</Callout>
+
+Si trabajas en Claude Code, la skill integrada `/claude-api` lista entre sus argumentos `build-eval` y `hillclimb`. La ficha oficial solo los enumera: no hemos verificado qué hace cada uno, así que léela antes de fiarte.
+
+## Lee la tabla: acierto, coste y frontera de Pareto
+
+Cuando tengas dos o tres opciones, ponlas una al lado de otra. Lo que importa es el **coste por tarea completada**, que incluye los intentos fallidos: una opción barata que falla la mitad de las veces y te obliga a repetir puede acabar costando más.
+
+La **frontera de Pareto** es una forma sencilla de elegir sin discutir. Una opción está _dominada_ si existe otra que acierta igual o más y cuesta igual o menos. Descarta las dominadas; las que quedan forman la frontera, y entre ellas decides según lo que valga un error en tu trabajo.
+
+Ejemplo con cifras **inventadas para ilustrar** (no son mediciones de ningún modelo), sobre 25 casos:
+
+| Opción | Aciertos | Coste por caso | ¿Dominada? |
+| ------ | -------- | -------------- | ---------- |
+| A      | 18       | 0,002 $        | No         |
+| B      | 22       | 0,010 $        | No         |
+| C      | 21       | 0,030 $        | Sí, por B  |
+| D      | 22       | 0,012 $        | Sí, por B  |
+
+La opción C acierta menos que B y cuesta el triple: no hay motivo para elegirla. A y B son la frontera. Si un error de una tarea de este tipo te cuesta 10 minutos de revisión, A puede bastar; si te cuesta un cliente, B. La decisión es tuya, pero ahora la tomas con números.
+
+<Callout tipo="medicion" titulo="Medición publicada por Anthropic">
+
+Anthropic publica comparativas de coste e inteligencia por modelo y nivel de esfuerzo en su guía de optimización. Son cifras del proveedor sobre sus propias tareas de referencia: sirven como orden de magnitud para saber por dónde empezar a probar, no como promesa para las tuyas. Tu eval existe precisamente para comprobar si se cumplen en tu trabajo. Detalles y fecha en [la estrategia de selección](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/estrategia-de-seleccion/).
+
+</Callout>
+
+<Callout tipo="recomendacion">
+
+Con 20 a 30 casos, un caso son 3 a 5 puntos porcentuales. No concluyas nada de una diferencia de uno o dos casos: repite la ejecución (las respuestas de un modelo pueden variar entre ejecuciones) y, si sigue igual de ajustada, elige la opción más barata o más sencilla. El porqué es estadístico: con muestras tan pequeñas, el azar mueve la tabla tanto como la calidad del modelo. Es una recomendación de la guía, no una medición.
+
+</Callout>
+
+## Ejemplo de oficina: clasificar correos de proveedores
+
+Un equipo de compras recibe 200 correos al mes y quiere que un modelo los etiquete como «factura», «reclamación» o «presupuesto». Reúnen 25 correos reales de los últimos meses (anonimizados), con la etiqueta correcta puesta por una persona. El comprobador es una coincidencia exacta de la etiqueta. Ejecutan el script con un modelo ligero y con uno intermedio, y comparan.
+
+Si el ligero acierta lo mismo, el equipo ahorra coste en los 200 correos. Si falla en las reclamaciones, ven exactamente en qué casos, y pueden probar a mejorar el prompt, no el modelo. El mismo fichero de casos les servirá dentro de seis meses para probar el modelo que aparezca entonces. Para el caso a gran escala, ver [clasificar 50.000 tickets](/AI-Optimized_Usage_Web/m10-casos-practicos/clasificar-50000-tickets/).
+
+## Errores frecuentes
+
+- **Probar con casos inventados o demasiado limpios.** El modelo brilla con ejemplos de manual y falla con tu realidad. Usa entradas reales.
+- **Editar los casos para que «salgan».** Congélalos; lo que cambia es el modelo o el prompt.
+- **Comparar solo el precio por token.** El coste que cuenta es por tarea completada, con los reintentos y tu tiempo de revisión.
+- **Decidir con una diferencia de uno o dos casos.** Es ruido.
+- **Juzgar con el mismo modelo que genera.** Prefiere un juez distinto, y revisa una muestra de sus veredictos.
+- **Medir una sola vez.** Los modelos y los precios cambian; guarda la tabla con su fecha y repite cuando cambie algo importante.
+
+<Checklist
+  id="m9-evals"
+  titulo="Mi eval mínima"
+  items={[
+    'Tengo entre 20 y 30 casos reales, anonimizados si hacía falta.',
+    'Incluyen casos difíciles y alguno sin respuesta posible.',
+    'Los casos están congelados: no los edito tras ver los resultados.',
+    'Cada caso tiene un criterio: comprobador, referencia o rúbrica.',
+    'El script guarda respuesta, tokens y coste por caso.',
+    'Comparo acierto y coste por tarea, y descarto las opciones dominadas.',
+    'No decido con diferencias de uno o dos casos.',
+    'Guardé la tabla con fecha y opciones probadas.',
+  ]}
+/>
+
+## Para profundizar
+
+Cómo medir el gasto real en producción, con informes de uso y OpenTelemetry: [Medir](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/medir/). Cómo elegir entre modelos y esfuerzos antes de probar: [Estrategia de selección](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/estrategia-de-seleccion/). La referencia del SDK, en la fuente oficial citada abajo.

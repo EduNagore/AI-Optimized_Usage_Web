@@ -1,11 +1,216 @@
 ---
 title: 'Patrones de orquestación'
-description: 'Encadenamiento, enrutado, paralelización, orquestador, evaluador, asesor y fan-out: cuándo compensa cada uno.'
+description: 'Encadenamiento, enrutado, paralelización, orquestador, evaluador, asesor, fan-out y flujos dinámicos: cuándo compensa cada uno y cuándo no.'
 sidebar:
   order: 2
 level: avanzado
 tracks: [tecnica]
-readingTime: 12
-status: en-preparacion
-sources: []
+readingTime: 13
+lastReviewed: 2026-10-19
+sources:
+  [
+    platform-claude-com-docs-en-managed-agents-multiagent-orchestration-2,
+    platform-claude-com-docs-en-agents-and-tools-tool-use-advisor-tool,
+    anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas,
+    anthropic-batch,
+    anthropic-prompt-caching,
+    claude-code-flujos-dinamicos,
+    claude-code-subagentes,
+    claude-code-comandos,
+    openai-ultimo-modelo-y-migracion,
+    codex-subagents,
+    anthropic-managed-agents-outcomes,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+import CommandCard from '@components/CommandCard.astro';
+import FlujoAgentes from '@components/diagrams/FlujoAgentes.astro';
+
+<KeyTakeaways>
+
+- Estos ocho patrones recogen los casos más habituales: encadenamiento, enrutado, paralelización, orquestador y trabajadores, evaluador y optimizador, asesor, fan-out por lotes y flujos dinámicos con verificación cruzada.
+- Cada patrón resuelve una forma de tarea concreta: pasos en serie, casos de dificultad mixta, piezas independientes, trabajo mayor que una ventana de contexto, necesidad de revisión o decisiones difíciles puntuales.
+- Antes de elegir uno, comprueba que subes la [escalera](/AI-Optimized_Usage_Web/m8-agentes/escalera-de-complejidad/) por una razón concreta y no por inercia.
+- Los que reparten entre modelos distintos pierden reutilización de caché, porque cada modelo tiene la suya.
+- Todo patrón se mide contra el modelo capaz solo, a su esfuerzo por defecto y a uno más bajo: si no lo mejora en acierto o en coste, sobra.
+
+</KeyTakeaways>
+
+## La idea
+
+Un patrón es una forma de repartir el trabajo que ya se ha probado en muchas tareas parecidas. No es una receta cerrada: los llamamos así en esta guía por comodidad, y varios se combinan. Lo útil es saber **qué problema resuelve cada uno** para no usar un martillo de cuatro agentes cuando bastaba un destornillador.
+
+| Patrón                                    | Idea en una frase                                       | Compensa cuando                                                  | Riesgo principal                             |
+| ----------------------------------------- | ------------------------------------------------------- | ---------------------------------------------------------------- | -------------------------------------------- |
+| Encadenamiento                            | Pasos en serie, la salida de uno alimenta al siguiente  | La tarea se parte en fases y cada una se puede comprobar         | Un fallo temprano se arrastra                |
+| Enrutado                                  | Un clasificador decide quién atiende cada caso          | Hay casos fáciles y difíciles mezclados                          | Que el clasificador se equivoque             |
+| Paralelización                            | Varias piezas a la vez: por secciones o por votación    | Las piezas son independientes, o necesitas segundas opiniones    | Fusionar mal los resultados                  |
+| Orquestador y trabajadores                | Un modelo reparte y otros ejecutan                      | Hay volumen que repartir o el trabajo excede un contexto         | Coste de planificar y fusionar               |
+| Evaluador y optimizador                   | Uno escribe y otro revisa, en bucle                     | Hay un criterio de calidad claro y comprobable                   | Bucles sin fin y revisor complaciente        |
+| Asesor                                    | Un ejecutor consulta a un modelo superior en lo difícil | Pocas decisiones difíciles dentro de mucho trabajo mecánico      | Que casi no consulte, o que consulte siempre |
+| Fan-out por lotes                         | El mismo encargo repetido sobre muchos elementos        | Mucho volumen homogéneo                                          | Un error de encargo se multiplica por N      |
+| Flujos dinámicos con verificación cruzada | El modelo escribe el programa que reparte y contrasta   | Muchas piezas, homogéneas o no, sobre todo si hay que contrastar | Coste difícil de predecir                    |
+
+<Callout tipo="recomendacion">
+
+Elige el patrón por la forma de la tarea, no por lo moderno que suene. Es una recomendación de la guía. Su porqué: cada patrón paga un coste fijo de coordinación; solo se amortiza si la tarea tiene exactamente la forma que ese patrón aprovecha.
+
+</Callout>
+
+## 1. Encadenamiento de prompts
+
+<FlujoAgentes patron="encadenamiento" />
+
+La tarea se parte en fases, cada una con su propio encargo y su propio formato de salida. Entre fases puede haber una comprobación (un esquema que valida, una cifra que debe cuadrar) que decide si se continúa. Es el patrón más simple y es, en rigor, un flujo del escalón 2.
+
+**Compensa cuando** la tarea tiene fases claras y cada una se beneficia de un encargo propio: un paso de extracción y otro de redacción rinden mejor por separado que mezclados. **No compensa cuando** la tarea cabe cómoda en un solo encargo, porque cada eslabón añade una llamada y una ocasión de que el formato se rompa.
+
+_Ejemplo de oficina._ Informe trimestral: primero se extraen las cifras de las hojas de cálculo a una tabla, luego se redacta el texto solo con esa tabla, y por último se revisa el tono. Cada paso recibe solo lo que necesita, así que el contexto de cada llamada es corto. Más en [encadenar y autocorregir](/AI-Optimized_Usage_Web/m3-prompting/encadenar-y-autocorregir/).
+
+## 2. Enrutado
+
+<FlujoAgentes patron="enrutado" />
+
+Un clasificador barato mira cada entrada y decide quién la atiende. La idea es no pagar el modelo capaz por lo que el rápido hace igual de bien.
+
+**Compensa cuando** hay mezcla real de dificultades, un volumen alto y una señal fiable para distinguirlas. **No compensa cuando** casi todo es del mismo tipo, o cuando un error del clasificador es caro: un caso difícil mandado al modelo flojo sale peor que haberlo mandado a todos al capaz. Además, **cada modelo tiene su propia caché**, así que repartir el tráfico entre varios modelos reduce los aciertos de caché de cada uno.
+
+_Ejemplo de oficina._ Correos a atención al cliente: las preguntas de «¿dónde está mi pedido?» van a un modelo rápido con una plantilla; las reclamaciones con varias facturas, a un modelo capaz; las amenazas legales, a una persona. Antes de montarlo, mide el clasificador sobre 30 correos pasados, incluidos los más difíciles. Es la cascada que describe [estrategia de selección](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/estrategia-de-seleccion/).
+
+## 3. Paralelización: por secciones o por votación
+
+<FlujoAgentes patron="paralelo-secciones" />
+
+<FlujoAgentes patron="paralelo-votacion" />
+
+Hay dos variantes. **Por secciones**, el trabajo se parte en piezas independientes que se hacen a la vez. **Por votación**, la misma pregunta se hace varias veces con contextos limpios y se comparan las respuestas: donde coinciden hay confianza; donde difieren, hay que mirar.
+
+**Compensa cuando** las piezas son realmente independientes (secciones) o cuando el error es caro y quieres una segunda opinión (votación). **No compensa cuando** las piezas dependen unas de otras, o cuando la votación se hace con el mismo contexto: si las lecturas comparten sesgos, coinciden en el error. En la votación, la independencia es lo que da valor.
+
+_Ejemplo de oficina._ Una cláusula ambigua de un contrato se pasa a tres lecturas en sesiones nuevas; si las tres la interpretan igual, avanzas; si no, la cláusula va a revisión humana. Para lo que ya existe en Claude Code, [trabajo en paralelo](/AI-Optimized_Usage_Web/m7-claude-code/trabajo-en-paralelo/).
+
+## 4. Orquestador y trabajadores
+
+<FlujoAgentes patron="orquestador" />
+
+Un [orquestador](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#orquestador) planifica el reparto, lanza a los trabajadores, cada uno con su contexto y su encargo, y reúne los resultados. A diferencia de la paralelización por secciones, aquí **el reparto no está fijado de antemano**: el orquestador lo decide leyendo la tarea.
+
+<Callout tipo="medicion" titulo="Medición publicada por Anthropic">
+
+Según la página de optimización de coste de Anthropic, delegar ahorró dinero en solo dos situaciones, medidas con trabajadores de una generación anterior: trabajo rutinario con una cola larga de coste, y trabajo mayor que una ventana de contexto. Cuando el trabajo era una cadena dependiente, o cabía en un único contexto sin cola larga, el modelo del orquestador solo y a menor esfuerzo salió mejor en todos los casos medidos. Son mediciones del proveedor sobre sus propias pruebas: el detalle, en [cuándo no orquestar](/AI-Optimized_Usage_Web/m8-agentes/cuando-no-orquestar/).
+
+</Callout>
+
+**Compensa cuando** hay volumen que repartir y el trabajo se parte en subtareas de contexto propio. **No compensa cuando** la tarea es una cadena o cabe en una ventana: pagas el plan, el reparto y la fusión por nada.
+
+_Ejemplo de oficina._ Informe de mercado: el orquestador identifica cuatro subtemas (competencia, precios, regulación, demanda) y cada trabajador investiga uno con sus fuentes. El orquestador escribe después la síntesis. Caso completo en [casos completos](/AI-Optimized_Usage_Web/m8-agentes/casos-completos/).
+
+## 5. Evaluador y optimizador (escritor y revisor)
+
+<FlujoAgentes patron="evaluador" />
+
+Uno produce, otro revisa contra un criterio explícito, y el escritor corrige. Se repite hasta que se cumple el criterio o se agotan las vueltas.
+
+**Compensa cuando** el criterio de calidad se puede escribir y comprobar (una rúbrica, un test, un esquema) y un fallo cuesta más que una vuelta extra. **No compensa cuando** el criterio es una sensación («que suene bien»): el revisor inventa objeciones o se da por satisfecho sin motivo. Dos cuidados: pon **un máximo de vueltas**, y que el revisor tenga un **contexto limpio** o, mejor, un modelo distinto, porque quien ha hecho el trabajo tiende a validar sus propias premisas (es razonamiento de la guía, no una medición). Pide al revisor solo los fallos que afectan a la corrección, para no sobredimensionar el trabajo, como se desarrolla en [verificar siempre](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/verificar-siempre/).
+
+Existen versiones ya montadas. En Managed Agents, los _outcomes_ ponen a un evaluador con contexto separado a puntuar el resultado contra una rúbrica en markdown, con 3 iteraciones por defecto y hasta 20 como máximo (la función está en beta). En Claude Code, `/goal` fija una condición de finalización que un modelo evaluador comprueba tras cada turno.
+
+<CommandCard comando="/goal" />
+
+_Ejemplo de oficina._ Una propuesta comercial: el escritor la redacta, el revisor la contrasta con el pliego del cliente punto por punto («¿responde a cada requisito? ¿hay precios que no cuadran con la tarifa?») y devuelve una lista de fallos. Con dos vueltas máximo.
+
+## 6. Asesor
+
+<FlujoAgentes patron="asesor" />
+
+Un modelo ejecuta toda la tarea y, solo en los puntos difíciles (planificar, revisar el final), consulta a otro más potente. El asesor no actúa: aconseja.
+
+<Callout tipo="medicion" titulo="Medición publicada por Anthropic">
+
+Anthropic resume el patrón con una frase: un asesor solo puede ayudar si el ejecutor lo consulta. En sus mediciones, el único emparejamiento cuyo ejecutor consultó a menudo mejoró 1,7 puntos sobre el ejecutor solo, en el límite del ruido entre ejecuciones, a un coste de unas 2,1 veces. Donde el ejecutor consultó poco o nada, el resultado quedó dentro del ruido o por debajo; en una de las pruebas, 7 puntos por debajo del ejecutor solo. Además, la definición de la herramienta añade unos 1.000 tokens de entrada por petición aunque nunca se consulte. Mide cuántas veces consulta tu ejecutor antes de dar por bueno el patrón.
+
+</Callout>
+
+En la práctica es una herramienta. En la API de Claude es el tipo `advisor_20260301` (en beta, con la cabecera `anthropic-beta: advisor-tool-2026-03-01`); en Claude Code se activa con `/advisor`; en Managed Agents, la sesión puede consultar a un modelo asesor. Una restricción documentada: el asesor debe ser al menos tan capaz como el ejecutor, y los ejecutores Fable 5.1 o Mythos 5.1 solo se emparejan con asesores de esas mismas gamas.
+
+<CommandCard comando="/advisor" />
+
+**Compensa cuando** hay mucho trabajo mecánico con pocas decisiones críticas y el ejecutor sabe cuándo consultar. **No compensa cuando** el ejecutor casi no consulta, o cuando consulta tanto que pagas dos modelos por cada paso. Detalle en [estrategia de selección](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/estrategia-de-seleccion/).
+
+## 7. Fan-out por lotes
+
+<FlujoAgentes patron="fanout" />
+
+El mismo encargo se aplica a muchos elementos similares: 300 ficheros, 5.000 facturas, 40 plantillas. Es la paralelización por secciones llevada a gran escala, con un solo molde.
+
+**Compensa cuando** hay mucho volumen homogéneo y el trabajo por elemento es pequeño y comprobable. **No compensa cuando** los elementos dependen entre sí o el encargo no está probado: **un error de encargo se multiplica por N**. Por eso, la regla práctica es depurar el encargo con uno o dos elementos, estimar el coste con tres y solo entonces lanzar el resto (los [tamaños de prueba](/AI-Optimized_Usage_Web/m8-agentes/escalera-de-complejidad/) y su función, explicados en la escalera).
+
+Según la superficie, el fan-out toma formas distintas. En la API, el [Batch](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/batch/) (descuento del 50 % sobre todos los tokens a cambio de esperar hasta 24 horas, sin bucle de herramientas) encaja con elementos independientes que no necesitan respuesta inmediata. En Claude Code, `/batch` reparte un cambio grande en 5 a 30 unidades independientes, cada una en su [worktree](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#worktree) y su [subagente](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#subagente).
+
+<CommandCard comando="/batch" />
+
+_Ejemplo de oficina._ Pasar 300 documentos de un formato antiguo a una plantilla nueva: la migración paso a paso está en los [casos completos](/AI-Optimized_Usage_Web/m8-agentes/casos-completos/).
+
+## 8. Flujos dinámicos con verificación cruzada
+
+<FlujoAgentes patron="flujo" />
+
+Aquí no eres tú quien diseña el reparto: **el agente escribe un programa** que ejecuta muchos agentes en segundo plano por fases y combina sus resultados. Una de las fases suele ser de verificación cruzada: agentes distintos, con contexto limpio, comprueban lo que otros han producido.
+
+En Claude Code, un flujo dinámico es un script que orquesta muchos subagentes, disponible en los planes de pago (en Pro hay que activarlo en `/config`). Se activa pidiéndolo, con la palabra clave `ultracode` en el prompt (una sola tarea), con `/effort ultracode` (toda la sesión) o con un comando guardado, y `/deep-research` es un flujo integrado que lanza búsquedas en paralelo, contrasta fuentes y devuelve un informe citado. Límites documentados por defecto: 16 agentes concurrentes y 1.000 agentes por ejecución, y un aviso «Large workflow» cuando se proyectan más de 25 agentes o 1,5 millones de tokens. Ese aviso no aparece con `/effort ultracode` activado, porque ya te incluye en las ejecuciones grandes; la palabra clave en un prompt solo afecta a esa tarea y no activa el ajuste de sesión, así que con ella el aviso sí puede aparecer (la documentación solo exime del aviso al ajuste activado; el caso de la palabra clave es una deducción nuestra). En Managed Agents, los flujos dinámicos están en beta desde el 9 de octubre de 2026.
+
+<CommandCard comando="/workflows" />
+
+<CommandCard comando="/deep-research" />
+
+**Compensa cuando** el trabajo es grande, tiene muchas piezas (homogéneas o no) y necesitas contrastar. Anthropic cita como ejemplos las auditorías, las migraciones, la investigación profunda y las comprobaciones cruzadas. **No compensa cuando** la tarea cabe en un contexto, o cuando no sabes cuánto vas a gastar: el aviso de flujo grande existe porque el coste es proporcional al número de agentes. Fija antes un presupuesto o un tamaño máximo de flujo. Los agentes de un mismo flujo que comparten prefijo comparten caché (vida por defecto de 5 minutos), un efecto que tienes que aprovechar con encargos de prefijo idéntico; ver [prompt caching](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/prompt-caching/).
+
+_Ejemplo de oficina._ Un informe de mercado con verificación cruzada: un grupo de agentes recoge datos por subtema, otro grupo comprueba cada cifra contra su fuente y un último agente contrasta contradicciones. Caso completo en [casos completos](/AI-Optimized_Usage_Web/m8-agentes/casos-completos/).
+
+<Callout tipo="varia">
+
+Los patrones son transversales, pero las herramientas no. En OpenAI, la guía de GPT-6 enlaza una guía de orquestación multiagente en la Responses API (sin verificar), y la de GPT-6 Astra describe que el modelo está entrenado para dividir y delegar trabajo en subagentes en paralelo, aunque advierte de que delega menos de lo que muchos flujos necesitan; Codex tiene subagentes definidos en ficheros TOML. En Google, la documentación consultada no recoge orquestación multiagente en la API de Gemini (Gemini CLI sí tiene subagentes, con formato sin confirmar; mira [equivalencias](/AI-Optimized_Usage_Web/m7-claude-code/equivalencias-codex-gemini/)). Dónde está cada cosa, en [implementación por superficie](/AI-Optimized_Usage_Web/m8-agentes/implementacion-por-superficie/).
+
+</Callout>
+
+## En la práctica
+
+<Steps>
+
+1. **Escribe la forma de tu tarea en una frase**: «300 ficheros iguales», «un informe con cuatro líneas de investigación», «mil tickets de dificultad mixta».
+2. **Busca el patrón en la tabla del principio.** Si ninguno encaja, probablemente no necesitas orquestar.
+3. **Fija una línea base**: el modelo capaz solo, a su esfuerzo por defecto y a uno más bajo, sobre cinco casos reales con los difíciles incluidos. Es el listón que debe superar el patrón.
+4. **Monta la versión mínima del patrón** y compárala con la línea base en acierto, coste y tiempo.
+5. **Pon un límite**: número máximo de agentes, de vueltas o de gasto.
+6. **Añade verificación** del resultado antes de usarlo; el patrón no la sustituye.
+
+</Steps>
+
+## Errores frecuentes
+
+- **Combinar tres patrones a la vez sin haber probado uno.** Cuando algo falla, no sabes qué pieza es la culpable.
+- **Votar con el mismo contexto.** Las lecturas comparten sesgos y coinciden en el error.
+- **Revisor sin criterio escrito.** Sin rúbrica, el bucle de revisión no converge.
+- **Enrutar sin medir el clasificador.** Un clasificador flojo es peor que no enrutar.
+- **Lanzar el fan-out completo sin depurar el encargo y estimar el coste con tres elementos.** Un fallo de encargo se multiplica.
+
+<Checklist
+  id="m8-patrones"
+  titulo="Antes de montar un patrón"
+  items={[
+    'Sé la forma de mi tarea y el patrón que la aprovecha.',
+    'Tengo una línea base: el modelo solo, medido en casos reales.',
+    'Las piezas que reparto son independientes (o lo he comprobado).',
+    'Hay un máximo de agentes, vueltas o gasto.',
+    'El revisor, si lo hay, tiene criterio escrito y contexto limpio.',
+    'Verificaré el resultado final antes de usarlo.',
+  ]}
+/>
+
+## Para profundizar
+
+Qué modelo y esfuerzo asignar en cada rol, en [modelo y esfuerzo por rol](/AI-Optimized_Usage_Web/m8-agentes/modelo-y-esfuerzo-por-rol/); cómo escribir el encargo a cada trabajador, en [encargo a subagentes](/AI-Optimized_Usage_Web/m8-agentes/encargo-a-subagentes/); y una tabla de decisión para elegir topología, en el [diseñador de equipos](/AI-Optimized_Usage_Web/m8-agentes/disenador-de-equipos/).

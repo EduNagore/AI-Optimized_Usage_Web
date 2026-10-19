@@ -1,11 +1,143 @@
 ---
 title: 'Trabajo en paralelo'
-description: 'Subagentes, agent view, agent teams, worktrees y /batch: qué es cada uno, cuándo usarlo y cuánto cuesta.'
+description: 'Subagentes, agent view, agent teams, projects, flujos dinámicos, worktrees y /batch: qué es cada uno, cuándo usarlo, cuánto cuesta y cómo vigilarlo.'
 sidebar:
   order: 5
 level: avanzado
 tracks: [tecnica]
-readingTime: 8
-status: en-preparacion
-sources: []
+readingTime: 10
+lastReviewed: 2026-10-19
+sources:
+  [
+    claude-code-agentes-en-paralelo,
+    claude-code-subagentes,
+    claude-code-agent-teams,
+    claude-code-flujos-dinamicos,
+    claude-code-comandos,
+    claude-code-costes,
+    claude-code-prompt-caching-en-claude-code,
+    claude-code-referencia-cli,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import CommandCard from '@components/CommandCard.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Paralelizar reparte el tiempo, no el coste: cada agente tiene su propia ventana de contexto y se paga aparte.
+- Anthropic documenta cinco formas (subagentes, agent view, agent teams, projects y flujos dinámicos) y tres complementos (worktrees, mensajería entre sesiones y `/batch`).
+- Antes de escalar, prueba con tres elementos y mide. Después, repartes.
+- Cada forma se vigila con un comando distinto: `/tasks`, `claude agents`, `/workflows`, `/list-agents`.
+- Si las piezas no son independientes, paralelizar solo añade coordinación.
+
+</KeyTakeaways>
+
+## La idea
+
+Un agente trabaja de uno en uno. Cuando una tarea se parte en piezas independientes (leer treinta actas, revisar doce ofertas, actualizar cuarenta plantillas), lanzar varios a la vez acorta el tiempo total. Pero cada uno carga su propio contexto, así que el coste crece con el número de agentes, y todo lo que produzcan tienes que revisarlo.
+
+La pregunta útil no es «¿cuántos agentes puedo lanzar?», sino «¿son las piezas realmente independientes y compensa el coste?». Para esa decisión, la [escalera de complejidad](/AI-Optimized_Usage_Web/m8-agentes/escalera-de-complejidad/) y los [patrones](/AI-Optimized_Usage_Web/m8-agentes/patrones/) del módulo 8 son el marco; cuándo no hacerlo, [cuándo no orquestar](/AI-Optimized_Usage_Web/m8-agentes/cuando-no-orquestar/).
+
+## Las formas de paralelizar
+
+| Forma                         | Qué es                                                                                                                                  | Cuándo                                                                                 | Coste                                                        | Cómo vigilarla                                                 |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------ | -------------------------------------------------------------- |
+| **Subagentes**                | Un agente con su propio contexto que devuelve un resumen. Se definen en `.claude/agents/` o se lanzan con `/subtask`                    | Exploración y lecturas voluminosas que no quieres en tu hilo                           | Su propia ventana; el hilo principal se mantiene limpio      | `/tasks`, `/list-agents`                                       |
+| **Agent view**                | Pantalla única para despachar y vigilar sesiones en segundo plano (`claude agents`). Vista previa de investigación                      | Varias tareas independientes que quieres lanzar y olvidar                              | Una sesión completa por tarea                                | `claude agents`, `claude logs`, `claude attach`, `claude stop` |
+| **Agent teams**               | Un líder y compañeros que se coordinan entre sí. Experimental y desactivado por defecto                                                 | Trabajo en el que los agentes deben hablar entre ellos                                 | Muy alto (ver recuadro)                                      | `/list-agents`                                                 |
+| **Projects**                  | Una conversación continua en claude.ai/code o en la app de escritorio que lanza sesiones paralelas (threads). Beta pública en Pro y Max | Trabajo que dura días o semanas y debe seguir con tu equipo apagado                    | Uso de tu suscripción                                        | La propia conversación del project                             |
+| **Flujos dinámicos**          | Un script que orquesta muchos subagentes en segundo plano                                                                               | Repartir una tarea en muchas piezas, homogéneas o no, sobre todo si hay que contrastar | Proporcional al número de agentes; hay aviso de flujo grande | `/workflows`                                                   |
+| **Worktrees**                 | Una copia de trabajo independiente del repositorio, en otra carpeta y rama (`claude --worktree`)                                        | Que varias sesiones cambien ficheros a la vez sin pisarse                              | Ninguno propio: es aislamiento                               | `/tasks`, `/diff` en cada una                                  |
+| **Mensajería entre sesiones** | Sesiones de Claude Code que se envían mensajes entre sí (solo macOS y Linux)                                                            | Coordinar sesiones ya abiertas                                                         | El de cada sesión                                            | `/list-agents` (alias `/peers`)                                |
+| **`/batch`**                  | Reparte un cambio grande en 5 a 30 unidades independientes, cada una en su worktree y subagente, tras aprobar el plan                   | Un mismo cambio aplicado a muchas piezas de un repositorio                             | Alto: cada unidad es un subagente                            | `/tasks`                                                       |
+
+<Callout tipo="verificado" fecha="2026-10-16">
+
+La tabla recoge lo que documentan las páginas de agentes en paralelo, subagentes, flujos dinámicos y agent teams de Claude Code. Que agent view sea una vista previa, que agent teams sea experimental y que projects esté en beta pública cambia con el tiempo: consulta el estado en la fuente. Las columnas «Cuándo», «Coste» y «Cómo vigilarla» son valoración de la guía.
+
+</Callout>
+
+<Callout tipo="medicion" titulo="Medición publicada por Anthropic">
+
+Según la documentación de costes, los agent teams usan unas 7 veces más tokens que una sesión normal cuando los compañeros trabajan en modo plan (cifra del proveedor, sin verificar todavía en los datos del sitio). La documentación de agent teams recomienda empezar con entre 3 y 5 compañeros. Por qué: cada compañero tiene su propia ventana de contexto, así que el coste crece con el tamaño del equipo.
+
+</Callout>
+
+## Detalles que cambian la decisión
+
+**Subagentes.** Se pueden limitar por concurrencia y profundidad con variables de entorno (`CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS`, `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH`). En sesiones interactivas, los subagentes se ejecutan en segundo plano por defecto. `/subtask` lanza un subagente bifurcado que hereda tu conversación y devuelve el resultado aquí. Si agent view está desactivado, `/subtask` no está disponible y `/fork` lanza ese subagente bifurcado; con agent view activo, `/fork` copia toda la sesión en una sesión nueva en segundo plano.
+
+<CommandCard comando="/subtask" />
+
+**Agent view.** Una sesión despachada desde agent view se mueve a un worktree propio antes de editar ficheros. `/background` pasa tu sesión actual a segundo plano y libera la terminal; `/fork` copia la conversación en una sesión nueva en segundo plano.
+
+<CommandCard comando="/background" />
+
+**Agent teams.** Se activan con `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`. Limitaciones documentadas: no se pueden reanudar compañeros en proceso con `/resume` o `/rewind`, hay un equipo por sesión, no hay equipos anidados y el líder es fijo. Los compañeros no se aíslan en worktrees: reparte los ficheros entre ellos para que no se pisen.
+
+**Flujos dinámicos.** Se activan con la palabra clave `ultracode` en el prompt, con `/effort ultracode` o con un comando guardado, y están disponibles en los planes de pago (en Pro hay que activarlos en `/config`). Hay una guía de tamaño (`small`, `medium`, `large`, `unrestricted`) que limita cuántos agentes propone Claude, y Claude Code avisa cuando un flujo proyecta muchos agentes o muchos tokens. Los agentes de un mismo flujo con el mismo prefijo comparten caché, con una vida por defecto de 5 minutos. `/deep-research` es un flujo integrado: lanza búsquedas en paralelo, contrasta fuentes y devuelve un informe citado.
+
+<CommandCard comando="/workflows" />
+
+**Worktrees y `/batch`.** `claude --worktree` (o `-w`) arranca en un [worktree](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#worktree) aislado dentro de `.claude/worktrees/`. `/batch` necesita un repositorio git o un hook `WorktreeCreate`.
+
+<CommandCard comando="/batch" />
+
+## En la práctica
+
+<Steps>
+
+1. **Comprueba que las piezas son independientes.** Si el resultado de una alimenta a otra, no es paralelo.
+2. **Prueba con tres.** Lanza el reparto sobre tres elementos y mide con `/usage`: tokens, tiempo y calidad.
+3. **Elige la forma más sencilla que lo resuelva.** Un subagente antes que un equipo; un flujo antes que un equipo si las piezas son muchas y poco dependientes entre sí.
+4. **Fija modelo y esfuerzo del trabajador.** El orquestador puede necesitar uno capaz; los trabajadores, a menudo, uno menor. Ver [modelo y esfuerzo por rol](/AI-Optimized_Usage_Web/m8-agentes/modelo-y-esfuerzo-por-rol/).
+5. **Vigila mientras corre** (última columna de la tabla) y detén lo que se desvíe.
+6. **Revisa las salidas antes de fusionarlas.** Cada agente puede equivocarse de forma distinta.
+
+</Steps>
+
+## Ejemplo de oficina: treinta actas de comité
+
+Una responsable de gobierno corporativo tiene treinta actas de comité en Markdown y necesita una tabla única de acuerdos, responsables y fechas.
+
+- **Primero, tres actas.** Pide a un subagente que procese tres y mide cuántos tokens gasta y si la tabla es correcta. Ajusta el encargo.
+- **Después, reparto.** Con el encargo afinado, un flujo dinámico procesa las treinta en paralelo, un agente por acta, y un último paso une las tablas.
+- **Vigilancia.** `/workflows` para ver el progreso; si el aviso de flujo grande aparece, decide si merece la pena.
+- **Verificación.** Cuadra el número de acuerdos de la tabla con una muestra de cinco actas leídas a mano.
+
+Por qué así: las actas son independientes (condición para paralelizar), el coste se conoce con tres antes de pagar por treinta, y la verificación por muestreo detecta errores sistemáticos.
+
+<Callout tipo="cuidado">
+
+Si repites una tarea (con `/loop`, una rutina o un script) con un intervalo mayor que la vida de la caché, cada ejecución paga una escritura nueva del contexto. Esa vida es, en la conversación principal, de 1 hora con una suscripción dentro del uso incluido y de 5 minutos con clave de API o créditos de uso; los subagentes usan 5 minutos (cifras de la documentación, explicadas en [prompt caching](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/prompt-caching/)). Es una consecuencia de la caducidad, no una medición: ajusta el intervalo o acepta el coste. Más en [prompt caching](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/prompt-caching/) y [higiene del bucle](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/higiene-del-bucle/).
+
+</Callout>
+
+## Errores frecuentes
+
+- **Lanzar un equipo para una tarea que cabe en un subagente.** Pagas la coordinación sin necesitarla.
+- **Piezas que dependen unas de otras.** El paralelismo se rompe y los agentes se contradicen.
+- **Escalar sin medir con un lote pequeño.** El coste real aparece al final.
+- **Editar los mismos ficheros desde varias sesiones sin worktrees.** Se pisan los cambios.
+- **Olvidar las sesiones en segundo plano.** Siguen ejecutándose hasta que terminan o las detienes (`/stop`, `claude stop`).
+
+<Checklist
+  id="m7-paralelo"
+  titulo="Antes de paralelizar"
+  items={[
+    'Las piezas son independientes entre sí.',
+    'He probado con un lote de tres y he medido el coste.',
+    'He elegido la forma más sencilla que resuelve la tarea.',
+    'Cada trabajador tiene modelo y esfuerzo fijados.',
+    'Sé cómo vigilar y detener lo que lance.',
+    'Verificaré el resultado por muestreo.',
+  ]}
+/>
+
+## Para profundizar
+
+Diseño de equipos, patrones y casos completos en el [módulo 8](/AI-Optimized_Usage_Web/m8-agentes/), y cómo se encarga el trabajo a un subagente en [encargo a subagentes](/AI-Optimized_Usage_Web/m8-agentes/encargo-a-subagentes/). Si lo que buscas es que se ejecute sin ti delante, [automatización](/AI-Optimized_Usage_Web/m7-claude-code/automatizacion/).

@@ -1,11 +1,199 @@
 ---
 title: 'Extender Claude Code'
-description: 'Skills, subagentes, hooks, plugins, MCP, output styles y status line.'
+description: 'Skills, subagentes, hooks, plugins, MCP, output styles y status line: qué extensión usar para cada necesidad y cuánto cuesta en contexto.'
 sidebar:
   order: 4
 level: avanzado
 tracks: [tecnica]
-readingTime: 10
-status: en-preparacion
-sources: []
+readingTime: 11
+lastReviewed: 2026-10-19
+sources:
+  [
+    claude-code-skills,
+    claude-code-subagentes,
+    code-claude-com-docs-en-hooks,
+    claude-code-hooks,
+    claude-code-memoria-y-claude-md,
+    claude-code-comandos,
+    claude-code-costes,
+    claude-code-modelo-y-esfuerzo,
+    claude-code-changelog,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import CommandCard from '@components/CommandCard.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Cada extensión resuelve un problema distinto: `CLAUDE.md` para lo que siempre aplica, skill para un procedimiento ocasional, subagente para trabajo voluminoso, hook para una regla que no puede fallar, MCP para llegar a un servicio.
+- Todas se cargan en contexto de alguna forma: mide su coste con `/context` y `/skill-doctor`.
+- Una skill o un subagente se crean escribiendo un fichero Markdown con una cabecera; no hace falta programar.
+- Un hook que sale con código 2 bloquea la acción. Para configurarlo sin escribir JSON, pídeselo a `/update-config`.
+- Los plugins empaquetan todo lo anterior para compartirlo.
+
+</KeyTakeaways>
+
+## La idea
+
+Claude Code se puede ampliar de muchas formas. El riesgo no es que te falten extensiones, sino que acumules tantas que cada turno cargue instrucciones, definiciones de herramientas y resúmenes de skills que la tarea no necesita. Eso es gasto fijo, y se paga en cada vuelta.
+
+Por eso la regla para elegir es de **frecuencia y garantía**: lo que se necesita siempre va a un sitio que se carga siempre; lo que se necesita a veces, a uno que se carga solo cuando hace falta; y lo que no puede fallar, a algo que no dependa de que el modelo se acuerde.
+
+| Necesito                                                | Uso                      | Se carga                                                                          | Garantía                                 |
+| ------------------------------------------------------- | ------------------------ | --------------------------------------------------------------------------------- | ---------------------------------------- |
+| Normas del proyecto que aplican siempre                 | `CLAUDE.md`              | Al empezar cada sesión                                                            | Baja: el modelo las sigue, no las impone |
+| Un procedimiento que uso a veces (acta, nota de prensa) | Skill                    | Su descripción siempre; el contenido, al usarla                                   | Media                                    |
+| Trabajo voluminoso que solo quiero resumido             | Subagente                | Su descripción, siempre en el contexto principal; el resto, en su propio contexto | Media                                    |
+| Una regla que debe cumplirse siempre                    | Hook o regla de permisos | El script no va al contexto: solo su salida, si la devuelve                       | Alta: lo ejecuta el sistema              |
+| Llegar a un servicio externo                            | MCP o línea de comandos  | Nombres de herramientas (diferido)                                                | Depende del servicio                     |
+| Compartir un paquete de todo lo anterior                | Plugin                   | Según lo que contenga                                                             | Según lo que contenga                    |
+
+Esta tabla es una **recomendación de la guía**: el porqué de cada fila es la frecuencia de carga y quién garantiza el cumplimiento. Los detalles de memoria y skills como concepto están en el [módulo 6](/AI-Optimized_Usage_Web/m6-herramientas/skills/).
+
+## Skills
+
+Una [skill](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#skill) es una carpeta con un `SKILL.md`: una cabecera con nombre y descripción, y debajo las instrucciones. Claude lee la descripción de todas las skills disponibles y carga el cuerpo solo cuando la tarea encaja. Eso es la [divulgación progresiva](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/higiene-de-entrada/) aplicada a tus procedimientos.
+
+Dónde viven, por orden de precedencia según la documentación: las de la organización (ajustes gestionados), las personales (`~/.claude/skills`), las del proyecto (`.claude/skills`), las de subcarpetas, las de directorios añadidos con `--add-dir`, las de plugins y las sincronizadas desde claude.ai. Una skill del proyecto con el mismo nombre que una personal pierde frente a ella.
+
+La cabecera admite, entre otros, `name`, `description`, `when_to_use`, `disable-model-invocation` (solo tú la invocas), `user-invocable: false` (la oculta del menú `/`), `allowed-tools`, `model`, `effort` y `context: fork` (la ejecuta en un subagente). Todos son opcionales, aunque la documentación recomienda `description`.
+
+Ejemplo mínimo, en `.claude/skills/acta-de-reunion/SKILL.md`:
+
+```markdown
+---
+name: acta-de-reunion
+description: Convierte las notas de una reunión en un acta con acuerdos, responsables y fechas límite. Úsala cuando se pida un acta o un resumen de reunión.
+---
+
+Escribe el acta con estas secciones: asistentes, acuerdos (uno por línea), pendientes con responsable y fecha, y próxima reunión.
+Si falta el responsable o la fecha de un pendiente, escribe «por confirmar»; no los inventes.
+```
+
+<Callout tipo="recomendacion">
+
+Escribe la descripción pensando en **cuándo** debe activarse, no solo en qué hace. Por qué: es lo único que Claude ve de la skill hasta que decide usarla; una descripción vaga hace que no se active o que se active a destiempo. La documentación avisa además de que descripción y `when_to_use` se truncan en el listado.
+
+</Callout>
+
+Dos comandos útiles: `/skills` lista las disponibles y `/reload-skills` vuelve a escanear el disco sin reiniciar. `/skill-doctor` muestra lo que cuesta cada skill en contexto y cuánto se usa.
+
+## Subagentes
+
+Un [subagente](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#subagente) trabaja en su propia ventana de contexto y devuelve un resumen, de modo que la exploración voluminosa no ensucia tu hilo. Se definen en `.claude/agents/*.md`. Solo `name` y `description` son obligatorios. Entre los campos opcionales importan para el gasto:
+
+- `model`: `sonnet`, `opus`, `haiku`, `fable`, un ID completo o `inherit`. Un modelo menor para explorar es una de las palancas de ahorro de la [documentación de costes](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/dia-a-dia-en-claude-code/).
+- `effort`: de `low` a `max`.
+- `tools` y `disallowedTools`: limitan lo que puede hacer.
+- `isolation`: con el valor `worktree`, el subagente trabaja en un [worktree](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#worktree) temporal de git, una copia aislada del repositorio; se limpia solo si el subagente no hace cambios.
+- `background`: lo ejecuta en segundo plano.
+- `permissionMode`, `maxTurns`, `skills`, `mcpServers`, `hooks` y `memory`, entre otros.
+
+Ejemplo mínimo:
+
+```markdown
+---
+name: lector-de-contratos
+description: Lee un contrato y devuelve plazos, importes y cláusulas de renovación. Úsalo cuando haya que extraer datos de uno o varios contratos largos.
+model: haiku
+effort: low
+---
+
+Lee el contrato completo y devuelve solo una tabla con: partes, fecha de inicio, duración, importe, renovación automática (sí/no) y penalizaciones. Si un dato no aparece, escribe «no consta».
+```
+
+<Callout tipo="cuidado">
+
+El modelo del subagente y el del resto de la sesión interactúan con la variable `CLAUDE_CODE_SUBAGENT_MODEL`. Según el registro de cambios, hasta la versión 2.1.251 se imponía sobre el campo `model` de la definición; desde la 2.1.251 funciona como valor por defecto y ya no lo sobrescribe, y existe `CLAUDE_CODE_SUBAGENT_MODEL_FORCE` para imponerlo. Dato muy sujeto a cambios: ante la duda, consulta la documentación de subagentes.
+
+</Callout>
+
+Cómo repartir bien el encargo entre subagentes, en [Encargo a subagentes](/AI-Optimized_Usage_Web/m8-agentes/encargo-a-subagentes/) (módulo 8).
+
+## Hooks
+
+Un [hook](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#hook) es un script (o una llamada HTTP, una herramienta MCP, o un prompt evaluado por un modelo) que se ejecuta **automáticamente** cuando ocurre un evento: antes de usar una herramienta (`PreToolUse`), después (`PostToolUse`), al enviar un mensaje (`UserPromptSubmit`), al terminar el turno (`Stop`), entre más de treinta eventos de ciclo de vida. A diferencia de una instrucción en `CLAUDE.md`, el sistema lo ejecuta siempre; no depende de que el modelo se acuerde.
+
+Reglas que importan, según la documentación de hooks:
+
+- Un hook que **sale con código 2 bloquea** la acción en los eventos que pueden bloquear (como `PreToolUse` o `Stop`). Un JSON válido no anula ese bloqueo.
+- `PostToolUse` y `SessionStart` no bloquean: muestran el error.
+- Los hooks de tipo `command` y `http` admiten `onFailure` con valor `continue` (por defecto) o `block`.
+
+Usos típicos: filtrar una salida larga antes de que llegue al contexto (mostrar solo los tests que fallan), impedir el borrado de una carpeta protegida o exigir que pasen las comprobaciones antes de dar la tarea por terminada.
+
+<CommandCard comando="/update-config" />
+
+Para no escribir la configuración a mano, describe el hook y deja que Claude edite el `settings.json`: «Añade un hook que bloquee cualquier comando que borre ficheros dentro de `Contratos/`». Revisa el cambio antes de aceptarlo. `/hooks` muestra los hooks configurados.
+
+## Plugins
+
+Un plugin empaqueta skills, subagentes, hooks y servidores MCP para instalarlos y compartirlos como una unidad. Se gestionan con `/plugin` (listar, instalar, activar, desactivar) y `/reload-plugins` aplica los cambios sin reiniciar. Desde el terminal existe también `claude plugin`, por ejemplo `claude plugin install code-review@claude-plugins-official`. `/plugin-authoring` carga la referencia para escribir los tuyos.
+
+**Marketplaces.** Un marketplace es un catálogo de plugins. Claude Code registra el oficial de Anthropic (`claude-plugins-official`) la primera vez que abres una sesión interactiva en terminal. Para otro, lo añades una vez con `/plugin marketplace add` seguido del origen (un repositorio de GitHub como `propietario/repositorio`, una URL de git o una ruta local) y luego instalas con `/plugin install nombre@marketplace`. Desde la terminal, `claude plugin marketplace add` acepta los mismos orígenes. Al instalar eliges el alcance: solo para ti, para todos los colaboradores del repositorio o solo para ti en ese repositorio. Para ver cuánto contexto añade un plugin ya instalado, `claude plugin details <nombre>` muestra los tokens que suma a cada sesión.
+
+<Callout tipo="cuidado">
+
+Instalar un plugin es instalar código y prompts de terceros que se ejecutarán con tus permisos. Instala solo de fuentes que conozcas y revisa qué hooks incluyen. Cambiar los plugins con herramientas a mitad de sesión puede, además, invalidar la caché (ver [prompt caching](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/prompt-caching/)).
+
+</Callout>
+
+## MCP y alternativas
+
+MCP conecta Claude con servicios externos; `/mcp` gestiona las conexiones y su autenticación. En Claude Code las definiciones de herramientas MCP van diferidas por defecto (solo entran los nombres hasta que se usa una). Aun así, la documentación de costes recomienda preferir una herramienta de línea de comandos (`gh`, `aws`, `gcloud`) cuando exista, porque no añade listado por herramienta. Desactiva con `/mcp` los servidores que no uses. Más en [Conectores y MCP](/AI-Optimized_Usage_Web/m6-herramientas/conectores-y-mcp/).
+
+## Output styles y barra de estado
+
+`/output-style` lista los estilos de salida o cambia a uno, por ejemplo `/output-style concise`: un estilo es un ajuste persistente de cómo responde Claude. El estilo integrado Concise, según el registro de cambios, hace que la respuesta empiece por el resultado y omita preámbulos; es razonable esperar menos tokens de salida, pero mídelo (ver [salida](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/salida/)). `/statusline` configura la barra de estado a partir de una descripción: puedes pedir que muestre, por ejemplo, el modelo y el coste de la sesión.
+
+## En la práctica
+
+<Steps>
+
+1. Antes de crear nada, ejecuta `/context` y `/skill-doctor`: mira qué ocupa espacio hoy.
+2. Si repites unas instrucciones cada semana, conviértelas en una skill con una descripción que diga cuándo usarla.
+3. Si una tarea te llena el hilo de lecturas, defínela como subagente con `model: haiku` o `sonnet` y `effort` bajo.
+4. Lo que no puede fallar va desde el principio a un hook o a una regla de permisos, no a `CLAUDE.md`. Si una norma de `CLAUDE.md` se incumple dos veces y resulta ser crítica, pásala también.
+5. Desactiva con `/mcp` y `/plugin` lo que no hayas usado esta semana.
+
+</Steps>
+
+## Ejemplo de oficina: el equipo de comunicación
+
+Un equipo de comunicación tiene tres rutinas: notas de prensa, actas y respuestas a periodistas. Montan:
+
+- Un `CLAUDE.md` de unas pocas líneas con el tono de la marca y los nombres que no se pueden escribir mal.
+- Tres skills (`nota-de-prensa`, `acta-de-reunion`, `respuesta-a-prensa`), cada una con una descripción de cuándo usarla.
+- Un hook que bloquea cualquier escritura fuera de la carpeta `Borradores/`, para que nada se publique sin revisar.
+- Ningún servidor MCP, salvo el del gestor de contenidos, que se activa solo en las sesiones de publicación.
+
+Por qué funciona: lo de siempre es corto, lo ocasional se carga bajo demanda y la única regla crítica (no publicar sin revisar) no depende de que el modelo la recuerde.
+
+## Errores frecuentes
+
+- **Meter todo en `CLAUDE.md`.** Se reenvía en cada turno y se sigue peor cuanto más largo. Lo específico, a una skill.
+- **Skill con descripción vaga.** No se activa cuando toca. Di cuándo usarla.
+- **Reglas críticas solo como instrucción.** Una instrucción es una petición; un hook es una garantía.
+- **Subagentes que heredan el modelo caro para tareas mecánicas.** Fija `model` y `effort` en la definición.
+- **Plugins instalados «por probar» y olvidados.** Cargan contexto y amplían la superficie de riesgo.
+
+<Checklist
+  id="m7-extender"
+  titulo="Mis extensiones"
+  items={[
+    'Sé qué extensión elegir para cada necesidad (tabla de arriba).',
+    'Mis skills tienen una descripción que dice cuándo usarlas.',
+    'Mis subagentes de exploración usan un modelo menor y esfuerzo bajo.',
+    'Las reglas que no pueden fallar son hooks, no instrucciones.',
+    'He revisado /skill-doctor y /mcp esta semana.',
+    'Solo instalo plugins de fuentes que conozco.',
+  ]}
+/>
+
+## Para profundizar
+
+Cómo se combinan varios subagentes, en [trabajo en paralelo](/AI-Optimized_Usage_Web/m7-claude-code/trabajo-en-paralelo/). Cómo automatizar sin estar delante, en [automatización](/AI-Optimized_Usage_Web/m7-claude-code/automatizacion/).

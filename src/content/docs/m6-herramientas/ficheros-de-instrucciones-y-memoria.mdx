@@ -5,7 +5,212 @@ sidebar:
   order: 5
 level: intermedio
 tracks: [profesional, tecnica]
-readingTime: 7
-status: en-preparacion
-sources: []
+readingTime: 10
+lastReviewed: 2026-10-19
+sources:
+  [
+    claude-code-memoria-y-claude-md,
+    claude-code-costes,
+    code-claude-com-docs-en-hooks,
+    codex-agents-md,
+    gemini-cli-gemini-md,
+    support-claude-com-en-articles-9517075-what-are-projects,
+    support-claude-com-en-articles-11817273-use-claude-s-chat-search-and-memory-to-b,
+    claude-com-docs-office-agents-excel,
+    openai-codex-y-chatgpt-work,
+    chatgpt-personalizar,
+    anthropic-memory-tool,
+    anthropic-com-engineering-effective-context-engineering-for-ai-agents,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import ProviderTabs from '@components/ProviderTabs.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+import CommandCard from '@components/CommandCard.astro';
+
+<KeyTakeaways>
+
+- Un modelo no recuerda nada entre conversaciones. Lo que sabe de ti y de tu trabajo lo recibe de tres sitios: instrucciones que escribes tú, [memoria](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#memoria) que genera el sistema y lo que pegas en el momento.
+- Un fichero de instrucciones ([`CLAUDE.md` / `AGENTS.md`](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#claude-md)) se carga al empezar cada sesión: cuanto más largo, más contexto consume y peor se sigue.
+- Incluye solo lo que el modelo **no puede deducir**; deja fuera lo obvio, lo que cambia a menudo y lo que ya está en el código.
+- Son instrucciones, no garantías. Lo que no puede fallar va a un hook o a una regla de permisos.
+- Revisa lo que ha memorizado el sistema: es contexto que se reenvía y puede estar equivocado.
+
+</KeyTakeaways>
+
+## La idea
+
+Cada conversación empieza con una ventana de contexto vacía. Para que el modelo conozca tu forma de trabajar sin que se lo repitas, existen tres mecanismos, y conviene no mezclarlos.
+
+| Mecanismo     | Quién lo escribe                           | Cuándo llega al modelo                     | Ejemplos                                                                                       |
+| ------------- | ------------------------------------------ | ------------------------------------------ | ---------------------------------------------------------------------------------------------- |
+| Instrucciones | Tú                                         | Al empezar cada sesión o conversación      | `CLAUDE.md`, `AGENTS.md`, instrucciones de un proyecto, instrucciones del complemento de Excel |
+| Memoria       | El sistema, a partir de tus conversaciones | Al empezar, o cuando el modelo la consulta | Memoria de Claude en las apps, memoria automática de Claude Code, memorias de ChatGPT          |
+| Garantías     | Tú, como configuración                     | Las ejecuta el sistema, no el modelo       | Hooks, reglas de permisos                                                                      |
+
+La tercera fila es la clave de la página. La documentación de Claude Code lo dice sin rodeos: `CLAUDE.md` y la memoria automática son contexto, no configuración que se imponga. Para bloquear una acción pase lo que pase, la documentación manda usar un hook de tipo `PreToolUse` (o una regla de permisos). En una app de chat no hay hooks: el equivalente es no conceder al conector la herramienta de envío o escritura, mantener la aprobación acción a acción y no usar «Allow always» (ver [Conectores y MCP](/AI-Optimized_Usage_Web/m6-herramientas/conectores-y-mcp/)). Todo lo que sigue es una guía para escribir bien las dos primeras filas sabiendo que la tercera existe.
+
+## Qué incluir y qué dejar fuera
+
+El criterio es uno: **incluye lo que el modelo no puede deducir** leyendo tus ficheros o conociendo el oficio. Anthropic lo expresa en términos de ingeniería de contexto: busca el conjunto más pequeño de tokens de alta señal que maximice la probabilidad del resultado que quieres.
+
+| Incluye                                                                                                  | Deja fuera                                                                                                                                               |
+| -------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Comandos y flags específicos de tu proyecto («para tener el informe completo, ejecuta esto, no aquello») | Lo obvio: «escribe código limpio», «sé claro y profesional»                                                                                              |
+| Convenciones que se apartan de lo habitual y su porqué                                                   | Lo que ya está en el código o los documentos: estructura de carpetas, listas de dependencias, descripciones de arquitectura que se leen en cinco minutos |
+| Trampas conocidas: lo que falló y cómo evitarlo                                                          | Lo que cambia a menudo: cifras vigentes, estado de un proyecto, precios. Mejor un fichero aparte o pegarlo al pedirlo                                    |
+| Vocabulario del dominio y nombres que no se pueden escribir mal                                          | Instrucciones contradictorias entre sí o con otras de otro fichero                                                                                       |
+| Formatos y criterios de revisión («un acta lleva acuerdos, responsables y fechas»)                       | Reglas que no pueden fallar: van a un hook o a permisos                                                                                                  |
+| Quién decide qué y cuándo hay que parar y preguntar                                                      | Secretos, claves y datos personales                                                                                                                      |
+
+Esta tabla es una **recomendación de la guía**, apoyada en la documentación de Claude Code. Dos puntos son citas oficiales: las instrucciones deben ser concretas y verificables («usa sangría de dos espacios» en vez de «formatea bien el código») y, si dos instrucciones se contradicen, el modelo puede elegir una al azar. La herramienta `/doctor`, además, propone recortar contenido deducible del código, como estructuras de carpetas, listas de dependencias y descripciones de arquitectura, y conservar las trampas, las razones y las convenciones que se apartan de lo estándar.
+
+Cuándo añadir una línea: la documentación sugiere hacerlo cuando el modelo comete el mismo error de criterio o de convención por segunda vez, cuando una revisión detecta algo que debía saber o cuando te ves tecleando la misma corrección que la sesión anterior. Es una buena regla porque evita escribir por anticipado instrucciones que no hacen falta.
+
+## En Claude Code
+
+`CLAUDE.md` se lee al empezar la sesión. Puede vivir en cuatro sitios, de lo más general a lo más específico: la política de la organización, tus preferencias personales (`~/.claude/CLAUDE.md`), el proyecto (`./CLAUDE.md` o `./.claude/CLAUDE.md`, que se comparte con el equipo por control de versiones) y las preferencias locales del proyecto (`./CLAUDE.local.md`, que no se versiona). En Windows, `~` es tu carpeta de usuario, por ejemplo `$HOME\.claude\CLAUDE.md` en PowerShell.
+
+Los `CLAUDE.md` del directorio de trabajo y de los de encima se cargan al arrancar; los de subcarpetas, solo cuando Claude lee o edita algún fichero de esa subcarpeta. Un cambio en `CLAUDE.md` a mitad de sesión no surte efecto hasta `/clear`, `/compact` o reiniciar.
+
+Cuatro cosas que ahorran contexto y problemas, según la documentación de memoria (consultada el 19 de octubre de 2026):
+
+- **Tamaño.** Apunta a menos de 200 líneas por fichero: los más largos consumen más contexto y reducen el seguimiento. La documentación de costes da el mismo consejo.
+- **Reglas por ruta.** Lo que solo importa en una parte del proyecto va a `.claude/rules/` con un campo `paths`, y solo se carga cuando se trabaja con ficheros que coinciden.
+- **Importaciones.** `@ruta/al/fichero` ayuda a organizar, pero **no reduce el coste**: los ficheros importados también se cargan al arrancar.
+- **Comentarios.** Los comentarios HTML de bloque de un `CLAUDE.md` se eliminan antes de enviar el contenido al modelo: son notas gratuitas para quien mantiene el fichero.
+
+Para empezar, `/init` genera un `CLAUDE.md` inicial a partir del proyecto; revisa lo que escribe y quita lo que el modelo podría deducir. `/memory` muestra qué ficheros de memoria hay y `/context` lista los que se han cargado. Con `/doctor prompt-audit`, Claude revisa tus ficheros en busca de instrucciones obsoletas, referencias a ficheros o comandos que ya no existen, y contradicciones; propone cambios sin aplicarlos hasta que se lo pides.
+
+<CommandCard comando="/doctor" />
+
+**Memoria automática.** Además de lo que escribes, Claude Code puede anotar lo que aprende de tus correcciones: preferencias, correcciones, contexto del proyecto que no se deduce del código y dónde encontrar información externa. Se guarda en ficheros Markdown en `~/.claude/projects/<proyecto>/memory/`, es local a tu máquina y se comparte entre las ramas de trabajo ([worktrees](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#worktree)) del mismo repositorio. Al empezar la sesión solo se cargan las primeras 200 líneas o 25 KB (lo que ocurra antes) del índice `MEMORY.md`; el resto lo lee el modelo bajo demanda. Son ficheros normales: puedes leerlos, editarlos o borrarlos desde `/memory`.
+
+<Callout tipo="recomendacion">
+
+Revisa la memoria automática de vez en cuando, igual que revisas el fichero de instrucciones. Por qué: se carga en cada sesión, y una nota equivocada o antigua se aplica con la misma autoridad que una correcta.
+
+</Callout>
+
+Dónde va cada cosa en Claude Code (la documentación lo resume en esta distinción entre configuración técnica y orientación):
+
+| Preocupación                                                              | Dónde configurarla                                             |
+| ------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| Bloquear una herramienta, un comando o una ruta                           | Reglas de permisos (`permissions.deny`) o un hook `PreToolUse` |
+| Exigir el aislamiento de un sandbox                                       | Ajustes gestionados                                            |
+| Estilo de código o de redacción, recordatorios de cumplimiento            | `CLAUDE.md`                                                    |
+| Cómo hacer un procedimiento que no siempre se necesita                    | Una [skill](/AI-Optimized_Usage_Web/m6-herramientas/skills/)   |
+| Algo que debe ejecutarse siempre antes de cada commit o tras cada edición | Un hook                                                        |
+
+## `AGENTS.md` y otras herramientas
+
+`AGENTS.md` es el fichero de instrucciones que lee Codex. Según su documentación (consultada el 19 de octubre de 2026), carga el de `~/.codex` y los del proyecto desde la raíz hasta el directorio actual; si existe `AGENTS.override.md`, tiene prioridad en ese nivel, y los más cercanos al directorio de trabajo prevalecen. Hay un límite de tamaño combinado, de 32 KiB por defecto, configurable (`project_doc_max_bytes`): al alcanzarlo, Codex deja de añadir ficheros. Gemini CLI usa `GEMINI.md`.
+
+Si un equipo usa más de una herramienta, la recomendación es tener **un único fichero** por proyecto, para no pagar contexto por reglas contradictorias. Claude Code lee `AGENTS.md` por sí solo solo cuando no hay `CLAUDE.md`, `CLAUDE.local.md` ni `.claude/CLAUDE.md` en el directorio de trabajo ni en los de encima. Si ya hay un `CLAUDE.md`, la forma que documenta Anthropic es importarlo desde allí. El contenido de `CLAUDE.md` sería:
+
+```markdown
+@AGENTS.md
+
+## Claude Code
+
+Usa el modo plan para los cambios en la carpeta de facturación.
+```
+
+Un enlace simbólico de `CLAUDE.md` a `AGENTS.md` es otra opción, pero la propia documentación recomienda la importación si alguien del equipo trabaja en Windows: crear enlaces simbólicos exige permisos de administrador o el modo de desarrollador, y Git puede dejar el enlace como un fichero de una línea. Ver también las [equivalencias](/AI-Optimized_Usage_Web/m7-claude-code/equivalencias-codex-gemini/) entre herramientas.
+
+## En las apps de chat
+
+<ProviderTabs>
+  <div slot="claude">
+
+**Instrucciones de proyecto.** Cada proyecto de Claude admite instrucciones propias, que sirven, por ejemplo, para fijar un tono o un rol, y una base de conocimiento de documentos. El contenido del proyecto cuenta para el contexto de cada conversación, así que sube solo lo que uses (ver [En las apps de chat](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/en-apps-de-chat/)).
+
+**Instrucciones del complemento de Excel.** En la barra lateral de Claude en Excel hay un campo de instrucciones que se aplican a todas las conversaciones en Excel (formatos numéricos, divisa, contexto de tu flujo). Son independientes de las que fijes en PowerPoint o en Word.
+
+**Memoria.** Según la ayuda oficial, Claude guarda la memoria como temas individuales a medida que conversas. Cada proyecto tiene su propia memoria, y para mantenerlo totalmente separado se desactiva «Use account memory» en la página del proyecto. Se puede pausar (conserva lo guardado pero no lo usa), restablecer (borra todo, también la de los proyectos, y no se puede deshacer), usar un chat en modo incógnito o desactivarla en un chat concreto antes del primer mensaje. Por defecto no guarda temas como salud, religión o política, y hay datos, como números de documentos de identidad o de cuentas financieras, que no guarda aunque se lo pidas.
+
+  </div>
+  <div slot="openai">
+
+Según la documentación de OpenAI (consultada el 19 de octubre de 2026): en ChatGPT hay un apartado de personalización con estilo base y tono, instrucciones personalizadas para preferencias que valgan en todos los chats, y memorias que llevan contexto de chats anteriores a los futuros. Los proyectos tienen instrucciones compartidas que se aplican a todos sus chats. En Codex, las instrucciones personales se guardan en tu `AGENTS.md` global.
+
+La propia página separa los dos mundos: las memorias son distintas de la guía obligatoria de un proyecto, y lo que siempre debe aplicarse pertenece a `AGENTS.md` o a la documentación versionada del proyecto. No hemos verificado límites de tamaño de las instrucciones ni de la memoria; la página no los da.
+
+  </div>
+  <div slot="google">
+
+No hemos verificado en la documentación oficial de Google cómo funcionan las instrucciones personalizadas ni la memoria en la app de Gemini. Para Gemini CLI, el fichero de contexto del proyecto es `GEMINI.md`. Cuando lo verifiquemos, lo añadiremos aquí.
+
+  </div>
+</ProviderTabs>
+
+Para quien desarrolla con la API, Anthropic ofrece una herramienta de memoria que el cliente implementa (el modelo pide leer y escribir ficheros bajo `/memories` y tu código decide qué hacer con cada petición). Es otra pieza, con otro propósito: no es la memoria de las apps.
+
+## En la práctica
+
+<Steps>
+
+1. Escribe tres cosas que el modelo debe saber siempre y que no puede deducir. Si no te salen tres, no necesitas un fichero largo.
+2. Redáctalas de forma concreta y comprobable. «Los importes van en euros con coma decimal» es verificable; «cuida los números» no.
+3. Añade el porqué de cada convención. Con el porqué, el modelo generaliza al caso que no previste.
+4. Quita todo lo que se pueda deducir del propio material.
+5. Pasa las reglas que no pueden fallar a un hook o a una regla de permisos.
+6. Cuando el modelo repita por segunda vez un error de criterio o de convención, añade la línea que lo evita. Cuando una línea lleve un mes sin hacer falta, bórrala: cada línea se reenvía en cada sesión y las que ya no sirven solo gastan contexto y pueden contradecir a las nuevas.
+
+</Steps>
+
+## Ejemplo de oficina: el cierre trimestral
+
+El equipo de finanzas tiene un proyecto de chat (o una carpeta con Claude Code) para preparar el informe de cierre. Esta es su primera versión, escrita en diez minutos:
+
+```markdown
+Eres un asistente experto en finanzas. Sé claro, profesional y cuidadoso con los números.
+Estructura del proyecto: /datos tiene los CSV y /informes los informes.
+Los ingresos del tercer trimestre fueron 1,2 M€.
+Nunca envíes nada sin revisar.
+```
+
+Tiene casi todo lo que no hay que escribir: una frase obvia, una descripción de carpetas que el modelo ve por sí solo, una cifra que caduca y una regla que no puede fallar. La versión corregida:
+
+```markdown
+# Informe de cierre trimestral
+
+- Los importes van en euros, con punto de millar y coma decimal (1.234,50 €). Por qué: el comité lee el informe impreso y los formatos mezclados provocaron una confusión en el cierre anterior.
+- Las variaciones se expresan frente al mismo trimestre del año anterior, nunca frente al trimestre previo. Por qué: la actividad es estacional.
+- «Ingresos recurrentes» y «ingresos totales» son cifras distintas; no las intercambies. Si no sabes cuál se pide, pregunta.
+- Cada cifra del informe lleva entre paréntesis el fichero del que sale.
+- Si un dato falta en los CSV, escribe «no consta»; no lo estimes.
+```
+
+Y en un sitio aparte: la cifra de ingresos se pide cada vez desde el fichero de datos; y «no enviar nada sin revisar» no es una línea, sino un permiso: el modelo prepara borradores y la persona los envía. Es un ejemplo ilustrativo, no un caso medido.
+
+## Errores frecuentes
+
+- **El fichero que crece sin control.** Cada incidente suma una línea y nunca se quita ninguna. Revisa y poda; en Claude Code, `/doctor prompt-audit` ayuda.
+- **Instrucciones que se contradicen.** Entre el fichero personal, el del proyecto y las reglas. El modelo puede seguir cualquiera.
+- **Creer que una instrucción es una garantía.** Si algo debe ocurrir o no ocurrir siempre, no depende de que el modelo se acuerde.
+- **Guardar secretos.** Un fichero versionado lo ve cualquiera que clone el repositorio, y una memoria o un historial no son una caja fuerte.
+- **Dos ficheros que dicen cosas distintas.** `CLAUDE.md` y `AGENTS.md` duplicados se desincronizan: importa uno desde el otro.
+- **Memoria sin revisar.** Una nota antigua o equivocada se aplica con la misma autoridad que una buena.
+
+<Checklist
+  id="m6-instrucciones"
+  titulo="Mis instrucciones y mi memoria"
+  items={[
+    'Cada línea del fichero cuenta algo que el modelo no puede deducir.',
+    'Cada convención lleva su porqué.',
+    'No hay cifras ni estados que caduquen.',
+    'Lo que no puede fallar está en un hook o en un permiso, no solo en una frase.',
+    'El fichero está por debajo de 200 líneas (Claude Code).',
+    'Solo hay un fichero de instrucciones por proyecto, o uno importa al otro.',
+    'He revisado lo que la memoria ha guardado este mes.',
+    'No hay secretos ni datos personales en ningún fichero.',
+  ]}
+/>
+
+## Para profundizar
+
+Primeros pasos con `/init` y los modos de permiso, en [Primeros pasos](/AI-Optimized_Usage_Web/m7-claude-code/primeros-pasos/); hooks, skills y subagentes, en [Extender Claude Code](/AI-Optimized_Usage_Web/m7-claude-code/extender-claude-code/). Cómo la memoria y el historial afectan a lo que gastas, en [En las apps de chat](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/en-apps-de-chat/) y [El día a día en Claude Code](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/dia-a-dia-en-claude-code/). Privacidad de lo que guardas, en [privacidad y seguridad](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/privacidad-y-seguridad/).

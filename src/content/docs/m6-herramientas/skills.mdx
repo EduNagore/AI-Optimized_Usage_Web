@@ -5,7 +5,201 @@ sidebar:
   order: 4
 level: intermedio
 tracks: [profesional, tecnica]
-readingTime: 7
-status: en-preparacion
-sources: []
+readingTime: 9
+lastReviewed: 2026-10-19
+sources:
+  [
+    anthropic-skills,
+    anthropic-skills-buenas-practicas,
+    support-claude-com-en-articles-12512180-use-skills-in-claude,
+    claude-code-skills,
+    claude-code-memoria-y-claude-md,
+    code-claude-com-docs-en-hooks,
+    claude-code-subagentes,
+    claude-com-docs-office-agents-excel,
+    openai-codex-y-chatgpt-work,
+    antigravity-migracion-gemini-cli,
+    codex-skills,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import PromptTemplate from '@components/PromptTemplate.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+import CommandCard from '@components/CommandCard.astro';
+
+<KeyTakeaways>
+
+- Una [skill](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#skill) es una carpeta con un fichero `SKILL.md`: una cabecera con nombre y descripción y, debajo, las instrucciones de un procedimiento.
+- Se carga por niveles: la descripción está siempre en contexto; el cuerpo y los ficheros de apoyo, solo cuando la tarea lo pide. Por eso una skill es barata para lo que usas a veces.
+- La descripción es lo único que el modelo ve hasta que decide usarla: escríbela pensando en **cuándo** debe activarse.
+- Para lo que aplica siempre, un fichero de instrucciones; para lo que no puede fallar, un hook o una regla de permisos; para trabajo voluminoso, un subagente.
+- Una skill de terceros es código y prompts que se ejecutan con tus permisos: léela antes de activarla.
+
+</KeyTakeaways>
+
+## La idea
+
+Si metes en tu fichero de instrucciones cómo se redacta un acta, cómo se prepara una nota de prensa y cómo se concilia un extracto, el modelo carga las tres cosas en cada turno aunque hoy solo necesites una. Una skill resuelve eso con [divulgación progresiva](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#divulgacion-progresiva): el modelo ve primero un índice muy breve de lo que sabe hacer y pide el detalle solo cuando la tarea encaja.
+
+Los niveles de carga, según la documentación:
+
+- **Nivel 1, siempre.** El nombre y la descripción de cada skill. En la API, Anthropic cifra esos metadatos en unos 100 tokens por skill. En Codex, la lista inicial incluye también la ruta de cada skill y, por defecto, ocupa como máximo el 2 % de la ventana de contexto; si es muy larga, Codex puede acortar descripciones u omitir skills.
+- **Nivel 2, al activarse.** El cuerpo de `SKILL.md`. La documentación de la API lo sitúa por debajo de 5.000 tokens, y la guía de buenas prácticas recomienda que el cuerpo no pase de 500 líneas.
+- **Nivel 3, bajo demanda.** Ficheros de apoyo (referencias, ejemplos, plantillas) que el cuerpo menciona y se leen solo si hacen falta. Los scripts se ejecutan sin cargarse en contexto.
+
+Eso son datos de la documentación de cada proveedor, con la fecha de consulta que figura en las fuentes. En Claude Code hay una excepción útil: con `disable-model-invocation: true` (solo la invocas tú) la descripción deja de estar en contexto.
+
+<Callout tipo="recomendacion">
+
+Piensa en una skill como una receta que el modelo consulta, no como una norma que cumple siempre. Por qué: se activa cuando el modelo decide que encaja, y esa decisión depende de la descripción. Si necesitas que se aplique siempre, no es una skill.
+
+</Callout>
+
+## El formato
+
+Una skill es una carpeta con un `SKILL.md`. La cabecera lleva `name` y `description`; el resto del fichero son las instrucciones. En Claude Code todos los campos de la cabecera son opcionales, aunque la documentación recomienda `description`; en Codex, `SKILL.md` debe llevar `name` y `description`. Cuando escribes para varios entornos, ponlos siempre.
+
+Estas son las pautas de la guía oficial de Anthropic para escribir skills (guía de buenas prácticas, revisada el 16 de octubre de 2026):
+
+- Escribe la descripción en tercera persona e incluye **qué hace y cuándo usarla**. Máximo 1.024 caracteres; el nombre, 64.
+- Mantén el cuerpo de `SKILL.md` por debajo de 500 líneas y mueve el detalle a ficheros de apoyo con referencias de un solo nivel.
+- Crea las evaluaciones **antes** de escribir mucha documentación: define varios escenarios (la guía recomienda al menos tres), mide cómo se comporta el modelo sin la skill y escribe lo mínimo para cubrir esas carencias.
+- Prueba la skill con todos los modelos con los que vayas a usarla.
+
+Además, Claude Code trunca la suma de `description` y `when_to_use` a 1.536 caracteres en el listado: pon lo importante al principio.
+
+Plantilla de partida, lista para copiar:
+
+<PromptTemplate
+  titulo="Fichero de skill (SKILL.md)"
+  archivo="fichero-skill"
+  texto={`---
+name: {{nombre-en-minusculas-con-guiones}}
+description: {{qué hace y cuándo debe usarse, en una o dos frases con las palabras que diría el usuario}}
+---
+
+# {{Título}}
+
+## Cuándo usarlo
+
+{{situaciones concretas}}
+
+## Procedimiento
+
+1. {{paso 1}}
+2. {{paso 2}}
+3. {{paso 3}}
+
+## Qué hace falta saber
+
+{{reglas del dominio y por qué existen}}
+
+## Cómo comprobar que está bien
+
+{{criterios verificables}}
+
+## Qué no hacer
+
+{{límite y su motivo}}
+
+<!-- Pautas oficiales de Anthropic para escribir skills (guía de buenas prácticas de Agent Skills, https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices; verificado 2026-10-16): descripción en tercera persona (qué hace y cuándo usarla, máximo 1.024 caracteres), nombre de hasta 64 caracteres, SKILL.md de menos de 500 líneas y prueba con todos los modelos que vayas a usar. Borra este comentario al terminar. -->`}
+
+>
+
+**Cuándo usarla.** Cuando repites un procedimiento cada semana o cada mes y las instrucciones no caben en una frase. Guárdala como `SKILL.md` dentro de una carpeta con el nombre de la skill.
+
+</PromptTemplate>
+
+## Dónde viven
+
+<Callout tipo="varia">
+
+El formato de `SKILL.md` es parecido entre herramientas, pero la ubicación y las reglas cambian. Esta tabla recoge lo que dicen las páginas oficiales consultadas.
+
+</Callout>
+
+| Entorno         | Dónde                                                                                                                                                    | Observaciones                                                                                                                                                                            |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Claude Code     | `~/.claude/skills/<nombre>/SKILL.md` (personales), `.claude/skills/<nombre>/SKILL.md` (proyecto) y dentro de plugins                                     | Precedencia de mayor a menor: organización, personales, proyecto, subcarpetas, directorios añadidos y plugins. Los antiguos comandos de `.claude/commands/` se fusionaron con las skills |
+| Apps de Claude  | En Personalizar, Skills: se sube una carpeta comprimida en ZIP                                                                                           | Todos los planes; requiere activar la ejecución de código. En Team y Enterprise se pueden compartir, y los destinatarios las ven en solo lectura                                         |
+| API de Claude   | Con la herramienta de ejecución de código y el identificador de la skill                                                                                 | La documentación avisa de que las skills personalizadas no se sincronizan entre claude.ai, la API y Claude Code                                                                          |
+| Codex           | `.agents/skills` en cada directorio desde el actual hasta la raíz del repositorio; `$HOME/.agents/skills` (usuario); `/etc/codex/skills` (administrador) | Se invocan con `/skills` o escribiendo `$` en la CLI y la extensión de IDE                                                                                                               |
+| Gemini CLI      | Agent Skills; ruta no confirmada                                                                                                                         | Su documentación tiene página de skills; no hemos leído los detalles                                                                                                                     |
+| Antigravity CLI | `.agents/skills/` (antes `.gemini/skills/`)                                                                                                              | Conserva las Agent Skills de Gemini CLI, sin paridad uno a uno                                                                                                                           |
+
+La documentación de la API dice que las skills personalizadas no se sincronizan entre superficies; la de Claude Code menciona, en cambio, skills «sincronizadas desde claude.ai». No hemos podido conciliar ambas, así que, si usas una skill en dos sitios, súbela o cópiala en cada uno y comprueba que aparece.
+
+Gemini CLI tiene Agent Skills, pero no hemos confirmado su ruta. En la app de Gemini, la ayuda oficial incluye «Skills» entre las funciones de todos los planes; no hemos verificado su formato ni si coincide con `SKILL.md`, así que no la trates como equivalente.
+
+## Skill, fichero de instrucciones, hook o subagente
+
+La regla de elección es de **frecuencia y garantía**: lo que se necesita siempre va a un sitio que se carga siempre; lo que se necesita a veces, a uno que se carga bajo demanda; y lo que no puede fallar, a algo que no dependa de que el modelo se acuerde. Es la misma tabla de [Extender Claude Code](/AI-Optimized_Usage_Web/m7-claude-code/extender-claude-code/), vista desde las superficies:
+
+| Necesito                                                                      | Uso                                                                              | Se carga                                                       | Garantía                                 |
+| ----------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------- | ---------------------------------------- |
+| Normas que aplican siempre (tono de la marca, nombres que no se escriben mal) | Fichero de instrucciones (`CLAUDE.md`, `AGENTS.md`) o instrucciones del proyecto | Al empezar cada sesión                                         | Baja: el modelo las sigue, no las impone |
+| Un procedimiento que uso a veces (acta, nota de prensa)                       | Skill                                                                            | Su descripción siempre; el contenido, al usarla                | Media                                    |
+| Trabajo voluminoso del que solo quiero un resumen                             | Subagente                                                                        | Su descripción, en el contexto principal; el resto, en el suyo | Media                                    |
+| Una regla que debe cumplirse siempre (no escribir fuera de una carpeta)       | Hook o regla de permisos                                                         | El script no va al contexto; lo ejecuta el sistema             | Alta                                     |
+
+Esta tabla es una **recomendación de la guía**; la propia documentación de Claude Code la respalda en tres puntos: si una entrada del fichero de instrucciones es un procedimiento de varios pasos o solo importa en una parte del proyecto, muévela a una skill o a una regla por ruta; los ficheros de instrucciones son contexto, no configuración que se imponga; y, para bloquear una acción pase lo que pase, hay que usar un hook.
+
+Un criterio práctico para decidir entre skill y fichero de instrucciones: ¿lo necesito en más de la mitad de mis conversaciones? Si sí, va al fichero; si no, es skill. El umbral «la mitad» es una regla de la guía, no un dato oficial: sirve para no cargar en cada turno lo que usas una vez a la semana.
+
+## En la práctica
+
+<Steps>
+
+1. Detecta un procedimiento que repites y que explicas más de dos veces: escríbelo en tres escenarios reales (entrada y salida buena).
+2. Haz una pasada **sin** skill y guarda el resultado. Es tu línea base.
+3. Escribe la skill mínima: descripción con el «cuándo», procedimiento en pasos y criterios para comprobarlo.
+4. Prueba los mismos escenarios con la skill y compara con la línea base. Si no mejora, no la sigas ampliando.
+5. Pruébala también con el modelo más barato con el que vayas a usarla.
+6. Revisa cada mes qué skills se usan: en Claude Code, `/skill-doctor` muestra lo que cuesta cada una en contexto y cuánto se usa.
+
+</Steps>
+
+<CommandCard comando="/skill-doctor" />
+
+## Ejemplo de oficina: la conciliación de gastos
+
+Una responsable de administración repite cada mes el mismo encargo: «concilia el extracto con los tickets, apunta las discrepancias y prepara el correo a quien corresponda». Siempre lo explica de nuevo, y cada vez olvida algo distinto.
+
+Crea una skill `conciliacion-mensual` con una descripción que dice cuándo usarla («cuando se pida conciliar un extracto bancario con tickets o facturas»), un procedimiento (casar por importe, fecha y comercio; listar lo que no casa), una regla del dominio con su porqué («los cargos de fin de mes pueden aparecer en el extracto con dos días de retraso, así que no los marques como discrepancia hasta el día 3») y un criterio de comprobación («la suma de lo casado más lo pendiente coincide con el total del extracto»).
+
+Por qué funciona: la regla de los dos días estaba en la cabeza de una persona y ahora está donde el modelo la lee solo cuando la necesita, y la comprobación final convierte la revisión en una suma.
+
+Y lo que **no** pone en la skill: la regla de que «nunca se envía un correo sin su aprobación». Eso es un permiso, no una receta. En Claude Code, va a una regla de permisos o a un hook. En una app de chat, no concedas al conector la herramienta de envío, mantén la aprobación acción a acción y no uses «Allow always».
+
+## Seguridad
+
+Una skill puede incluir scripts y pedir herramientas. La documentación de Claude Code avisa de que una skill puede concederse a sí misma acceso amplio a herramientas, y recomienda revisar `allowed-tools` en las skills incluidas en un repositorio antes de ejecutar Claude Code ahí. La ayuda de Claude nombra la inyección de instrucciones y la exfiltración de datos como los riesgos principales, pide instalar skills solo de fuentes de confianza y, antes de activar una de una fuente menos fiable (incluso la de un compañero), leer sus ficheros incluidos, sobre todo scripts y cualquier instrucción de conectarse a redes externas. Es el mismo principio que en [Conectores y MCP](/AI-Optimized_Usage_Web/m6-herramientas/conectores-y-mcp/): el contenido que no escribiste tú se revisa.
+
+## Errores frecuentes
+
+- **Descripción vaga.** «Ayuda con informes» no activa la skill cuando toca. Di qué hace y cuándo usarla.
+- **Meterlo todo en una skill gigante.** Pasa de 500 líneas y se sigue peor. Divide o mueve detalle a ficheros de apoyo.
+- **Poner en una skill lo que debe cumplirse siempre.** Una skill se consulta, no se impone.
+- **No medir.** Sin línea base no sabes si la skill mejora o solo añade contexto.
+- **Instalar skills de terceros sin leerlas.**
+- **Dar por hecho que una skill sirve en otra herramienta.** El formato se parece; la ubicación y las reglas, no.
+
+<Checklist
+  id="m6-skills"
+  titulo="Mis skills"
+  items={[
+    'Cada skill tiene una descripción que dice qué hace y cuándo usarla.',
+    'El cuerpo de SKILL.md está por debajo de 500 líneas.',
+    'Tengo una línea base sin la skill para compararla.',
+    'Lo que debe cumplirse siempre no está en una skill, sino en un hook o en una regla de permisos.',
+    'He leído los scripts y los permisos de las skills que no escribí yo.',
+    'Revisé el último mes qué skills uso y quité las demás.',
+  ]}
+/>
+
+## Para profundizar
+
+Skills, subagentes, hooks y plugins en Claude Code, con sus campos y comandos, en [Extender Claude Code](/AI-Optimized_Usage_Web/m7-claude-code/extender-claude-code/). Para el fichero de instrucciones que acompaña a las skills, [Ficheros de instrucciones y memoria](/AI-Optimized_Usage_Web/m6-herramientas/ficheros-de-instrucciones-y-memoria/). Para plantillas de prompt que no son skills, la [biblioteca de plantillas](/AI-Optimized_Usage_Web/m3-prompting/biblioteca-de-plantillas/).

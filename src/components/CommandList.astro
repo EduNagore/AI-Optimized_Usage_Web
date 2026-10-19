@@ -1,0 +1,149 @@
+---
+import { getCollection } from 'astro:content';
+import { formatDate } from '@lib/format';
+
+/**
+ * Lista estática de comandos `/` de Claude Code agrupada por categoría, leída de
+ * claude-code-commands.json. La Fase 5 la sustituye por el explorador interactivo.
+ *   <CommandList />                                  todos los comandos
+ *   <CommandList categoria="Contexto y memoria" />   solo una categoría
+ */
+interface Props {
+  categoria?: string;
+  incluirRetirados?: boolean;
+}
+
+const { categoria, incluirRetirados = true } = Astro.props;
+const all = (await getCollection('claude-code-commands'))
+  .map((c) => c.data)
+  .filter((c) => (categoria ? c.category === categoria : true))
+  .filter((c) => incluirRetirados || c.status !== 'eliminado')
+  .sort((a, b) => a.command.localeCompare(b.command));
+const groups = new Map<string, typeof all>();
+for (const cmd of all) groups.set(cmd.category, [...(groups.get(cmd.category) ?? []), cmd]);
+const verifiedAt = all
+  .map((c) => c.verifiedAt)
+  .sort()
+  .at(-1);
+const statusLabel = { activo: '', alias: 'alias', eliminado: 'retirado' } as const;
+---
+
+<div class="command-list not-content">
+  {[...groups.entries()].map(([name, cmds]) => (
+    <details>
+      <summary>
+        {name} <span class="count">({cmds.length})</span>
+      </summary>
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Comando</th>
+            <th scope="col">Fase</th>
+            <th scope="col">Qué hace</th>
+          </tr>
+        </thead>
+        <tbody>
+          {cmds.map((c) => (
+            <tr>
+              <th scope="row">
+                <code>{c.command}</code>
+                {c.args && <code class="args">{c.args}</code>}
+                {statusLabel[c.status] && <span class="tag">{statusLabel[c.status]}</span>}
+              </th>
+              <td>{c.phase}</td>
+              <td>{c.summary}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </details>
+  ))}
+  {verifiedAt && (
+    <p class="foot">
+      Datos verificados el {formatDate(verifiedAt)} en la documentación oficial de Claude Code.
+    </p>
+  )}
+</div>
+
+<style>
+  .command-list {
+    margin-block: var(--space-4);
+  }
+  details {
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    margin-block-end: var(--space-2);
+  }
+  summary {
+    padding: var(--space-2) var(--space-4);
+    cursor: pointer;
+    color: var(--color-heading);
+    font-weight: 500;
+  }
+  .count {
+    color: var(--color-text-muted);
+    font-weight: 400;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+  }
+  th,
+  td {
+    padding: var(--space-2) var(--space-3);
+    border-top: var(--border-width) solid var(--color-border);
+    text-align: start;
+    vertical-align: top;
+  }
+  thead th {
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    font-weight: 500;
+  }
+  tbody th {
+    font-weight: 400;
+    white-space: nowrap;
+  }
+  .args {
+    margin-inline-start: var(--space-1);
+    color: var(--color-text-muted);
+  }
+  .tag {
+    margin-inline-start: var(--space-1);
+    padding: 1px var(--space-2);
+    border: var(--border-width) solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+  }
+  .foot {
+    margin: var(--space-2) 0 0;
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+  }
+  @media (max-width: 36rem) {
+    thead {
+      display: none;
+    }
+    table,
+    tbody {
+      display: block;
+    }
+    tr {
+      display: block;
+      border-top: var(--border-width) solid var(--color-border);
+    }
+    th,
+    td {
+      display: block;
+      border: 0;
+      padding-block: var(--space-1);
+    }
+    tbody th {
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+  }
+</style>

@@ -1,11 +1,259 @@
 ---
 title: 'Gobernanza para equipos'
-description: 'Límites de gasto, analítica, configuración gestionada y plan de adopción.'
+description: 'Límites de gasto, analítica, configuración gestionada, marketplaces privados de plugins y un plan de adopción por fases.'
 sidebar:
   order: 5
 level: intermedio
 tracks: [profesional]
-readingTime: 7
-status: en-preparacion
-sources: []
+readingTime: 11
+lastReviewed: 2026-10-19
+sources:
+  [
+    claude-code-costes,
+    claude-code-managed-settings,
+    claude-code-plugins-org,
+    claude-code-plugin-marketplaces,
+    claude-code-analytics,
+    platform-claude-com-docs-en-manage-claude-opentelemetry,
+    platform-claude-com-docs-en-manage-claude-compliance-api,
+    anthropic-admin-api-de-uso-y-coste,
+    platform-claude-com-docs-en-managed-agents-budgets,
+    claude-code-modos-de-permiso,
+    code-claude-com-docs-en-hooks,
+    support-claude-com-en-articles-12138966-release-notes,
+    developers-openai-com-api-docs-changelog,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Gobernar no es prohibir: es decidir quién usa qué, cuánto puede gastar, qué puede hacer el asistente y qué queda registrado.
+- Los controles viven en cuatro sitios: **límites de gasto**, **analítica**, **configuración gestionada** (que los usuarios no pueden saltarse) y **catálogo de plugins**.
+- Empieza con un piloto pequeño y mide una línea base antes de generalizar; es lo que recomienda la propia documentación de costes de Anthropic.
+- Muchas funciones dependen de tu plan (Team, Enterprise, API) y de tu proveedor: comprueba qué te corresponde antes de prometer un control.
+- Las métricas de actividad (líneas aceptadas, uso) no miden valor; no las conviertas en una clasificación de personas.
+
+</KeyTakeaways>
+
+## La idea
+
+Un asistente sin gobierno acaba de una de dos formas: o nadie lo usa porque nadie sabe qué está permitido, o lo usan todos con configuraciones propias, gastos que nadie vigila y datos que van a donde no deberían. Gobernarlo bien consiste en poner **fronteras sensatas** y hacerlas visibles.
+
+Esta página reúne lo que la documentación oficial de Anthropic describe para equipos que usan Claude y Claude Code. Casi todo lo concreto es de ese proveedor, porque es del que hemos podido verificar la documentación de administración; lo que no hemos verificado de OpenAI y Google lo decimos expresamente. Lo que depende de tu plan o de tu contrato va marcado: confírmalo con tu administrador o con tu equipo de cuenta.
+
+<Callout tipo="recomendacion">
+
+Antes de tocar ninguna consola, escribe en una página qué datos se pueden usar, con qué herramientas aprobadas y quién responde de cada cosa. Por qué: los controles técnicos aplican una decisión; si la decisión no está tomada, cada administrador aplicará la suya. Para el contenido de esa política, ver [privacidad y seguridad](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/privacidad-y-seguridad/).
+
+</Callout>
+
+## 1. Límites de gasto
+
+Dónde se ve y dónde se limita el gasto depende de cómo acceda tu organización. Lo siguiente resume la [documentación de costes de Claude Code](https://code.claude.com/docs/en/costs) (consultada el 19 de octubre de 2026):
+
+| Cómo accedes                                     | Dónde ves el gasto                                    | Dónde lo limitas                                                                     |
+| ------------------------------------------------ | ----------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Claude for Teams o Enterprise                    | Informe de gasto en las analíticas de la organización | Límites de gasto en los ajustes de administración, por organización, grupo o persona |
+| Claude Console (API)                             | Página de uso de la consola                           | Límites de gasto por _workspace_ (espacio de trabajo)                                |
+| Amazon Bedrock, Google Cloud o Microsoft Foundry | Consola de facturación de tu nube                     | Los controles de presupuesto de tu nube                                              |
+
+Algunos detalles que importan:
+
+- En Teams y Enterprise, el uso de cada persona sale de una **asignación por asiento** que se renueva en una ventana móvil de cinco horas y otra semanal, compartida con el chat y Cowork. El tope por defecto es esa asignación; para dejar que se sigan usando pasada la asignación hay que activar los créditos de uso y fijar límites de gasto.
+- En la Console, la primera autenticación de Claude Code crea un workspace llamado «Claude Code» con seguimiento centralizado de costes. Puedes fijarle un límite de tasa propio para que Claude Code no consuma el cupo de otras cargas de producción.
+- En Bedrock, Vertex y Foundry, **las analíticas de Anthropic no cubren ese uso**; para atribuir gasto por persona hay que usar OpenTelemetry o una pasarela.
+- En Managed Agents (en beta), la [documentación de presupuestos](https://platform.claude.com/docs/en/managed-agents/budgets) describe un tope de gasto opcional por sesión, calculado a precios de lista: la sesión se pausa al alcanzarlo, y la petición en curso termina, así que el gasto final puede pasarse un poco. Que fijarlo antes de un flujo grande es buena idea es recomendación de esta guía (el porqué: cada agente gasta tokens y, sin tope, lo decide el modelo); la página citada describe el mecanismo, no da ese consejo. Ver [implementación por superficie](/AI-Optimized_Usage_Web/m8-agentes/implementacion-por-superficie/).
+
+**Otros proveedores.** Del lado de OpenAI, su registro de cambios de la API anota desde julio de 2026 límites de gasto mensuales «duros» por organización y por proyecto que devuelven un error 429 al alcanzarse. Es el único dato de OpenAI sobre este punto que hemos podido apoyar en fuente; los detalles de configuración quedan **sin verificar**. De Google, no hemos verificado nada sobre límites de gasto.
+
+### Recomendaciones de límite por usuario (API de Anthropic)
+
+Para equipos que usan Claude Code a través de la API, Anthropic publica una recomendación de tokens por minuto (TPM) y peticiones por minuto (RPM) **por usuario**, según el tamaño del equipo. Baja al crecer el equipo porque en equipos grandes no todos usan a la vez. Son límites a nivel de organización, no por persona: cualquiera puede consumir más de su parte si los demás no están activos.
+
+| Tamaño del equipo | TPM por usuario | RPM por usuario |
+| ----------------- | --------------- | --------------- |
+| 1-5 usuarios      | 200.000-300.000 | 5-7             |
+| 5-20 usuarios     | 100.000-150.000 | 2,5-3,5         |
+| 20-50 usuarios    | 50.000-75.000   | 1,25-1,75       |
+| 50-100 usuarios   | 25.000-35.000   | 0,62-0,87       |
+| 100-500 usuarios  | 15.000-20.000   | 0,37-0,47       |
+| Más de 500        | 10.000-15.000   | 0,25-0,35       |
+
+_Fuente: [documentación de costes de Claude Code](https://code.claude.com/docs/en/costs), sección «Rate limit recommendations». Verificado el 19 de octubre de 2026._
+
+<Callout tipo="medicion" titulo="Medición y recomendación publicadas por Anthropic">
+
+La misma documentación de costes (consultada el 19 de octubre de 2026) indica que, en despliegues empresariales, el coste medio es de unos 13 dólares por desarrollador y día activo y de 150 a 250 dólares por desarrollador y mes, con menos de 30 dólares por día activo para el 90 % de los usuarios. Son datos del proveedor sobre su base de clientes y pueden variar con el modelo y los hábitos de uso: sirven como orden de magnitud, no como presupuesto. Anthropic aconseja estimar el gasto de tu equipo con un grupo piloto pequeño y la analítica, antes de ampliar. Si esperas picos (por ejemplo, formación con muchas personas a la vez), puedes necesitar más tokens por usuario.
+
+</Callout>
+
+## 2. Analítica: qué mirar y qué no
+
+Hay tres niveles de visibilidad. Elige el que corresponda a tu plan.
+
+**Paneles de uso.** En Claude for Teams y Enterprise, el panel de analíticas de Claude Code (accesible a administradores y propietarios) muestra líneas de código aceptadas, tasa de aceptación de sugerencias, usuarios y sesiones activos al día. Las _métricas de contribución_ (PR y líneas escritas con ayuda de Claude Code, con integración de GitHub) están en beta pública para Teams y Enterprise; **no están disponibles en organizaciones con retención cero**. En la Console, el panel de Claude Code muestra uso y gasto, y exige el permiso `UsageView`.
+
+**APIs.** En el plan Enterprise, una API de analíticas devuelve uso y coste por persona en todas las superficies de Claude. Para clientes de la API, la Claude Code Analytics API devuelve las mismas métricas diarias por usuario con una clave de administración. Distintas de las anteriores, la Compliance API devuelve **registros por evento** para seguridad y cumplimiento; la documentación la describe para organizaciones Enterprise y Console, y cubre desde el registro de actividad hasta las transcripciones de sesiones de Claude Code y Cowork.
+
+**OpenTelemetry.** Es la única opción que envía métricas por usuario de tokens y coste a tu propia plataforma de observabilidad casi en tiempo real, y funciona con todos los accesos, incluidas las nubes de terceros. Además de métricas, la documentación de plugins indica que registra eventos de instalación y carga de plugins. Ver [medir](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/medir/).
+
+<Callout tipo="cuidado">
+
+Las cifras de gasto de los paneles son estimaciones: la propia documentación remite a la página de facturación para el coste real. Las métricas de contribución son, según Anthropic, deliberadamente conservadoras y subestiman el impacto real, y solo cuentan las líneas que se atribuyen con mucha confianza a Claude Code. La atribución además depende de una ventana de 21 días antes y 2 días después de la fecha de fusión del PR.
+
+</Callout>
+
+<Callout tipo="recomendacion">
+
+Usa las métricas para **detectar fricción y adopción** (quién no avanza, qué equipos necesitan ayuda), no para clasificar a las personas por líneas aceptadas o por sesiones. Por qué: son indicadores de actividad, no de valor; una persona que evita un cambio innecesario aporta más que una que genera mil líneas, y medir líneas incentiva producirlas. Es una recomendación de la guía, no una conclusión de la documentación del proveedor. Para medir valor, combínalas con las métricas de ingeniería o de negocio que ya usabas.
+
+</Callout>
+
+## 3. Configuración gestionada: lo que el usuario no puede cambiar
+
+La _configuración gestionada_ (_managed settings_) es la que tu organización despliega en todos los equipos de desarrollo. Claude Code la aplica por encima de cualquier otro nivel: ni ajustes de usuario, de proyecto, locales ni opciones de línea de comandos la anulan, salvo unas pocas excepciones de seguridad en las que un valor más estricto de un nivel inferior sigue valiendo.
+
+Hay tres formas de entregarla:
+
+1. **Ajustes gestionados por el servidor**, desde la consola de administración de claude.ai (requiere rol de propietario). Se descargan al arrancar y se consultan cada hora. La documentación señala una limitación actual: la consola **no puede dirigir ajustes a un grupo concreto**; todos los usuarios de la organización reciben lo mismo.
+2. **Políticas MDM** (gestión de dispositivos): un perfil en macOS o un valor de registro en Windows.
+3. **Un fichero `managed-settings.json`** en la carpeta del sistema: `/Library/Application Support/ClaudeCode/` en macOS, `/etc/claude-code/` en Linux y WSL, y `C:\Program Files\ClaudeCode\` en Windows (rutas de la [página de configuración gestionada](https://code.claude.com/docs/en/managed-settings), verificadas el 19 de octubre de 2026).
+
+Un ejemplo mínimo, el de esa misma página con el formato ajustado: bloquea la lectura de `.env` y de la carpeta de secretos, desactiva el modo `bypassPermissions` y hace que Claude Code ignore las reglas de permisos de usuario, proyecto y local.
+
+```json
+{
+  "permissions": {
+    "deny": ["Read(./.env)", "Read(./secrets/**)"],
+    "disableBypassPermissionsMode": "disable"
+  },
+  "allowManagedPermissionRulesOnly": true
+}
+```
+
+Qué más se puede imponer, según la documentación de Claude Code: restringir qué servidores MCP se permiten (`allowedMcpServers`), imponer que solo se ejecuten hooks gestionados (`allowManagedHooksOnly`), exigir que el inicio de sesión sea con la organización (`forceLoginMethod` y `forceLoginOrgUUID`, importante para que la retención cero cubra a todos), desactivar el modo `auto` o declarar tus tarifas contratadas para que `/usage` muestre el coste a tus precios (`modelPricing`; cambia lo que se muestra, no lo que se cobra).
+
+Cuatro advertencias para no llevarse sorpresas:
+
+- **Prueba en pequeño.** Despliega primero a un grupo y comprueba con `/status` que la fuente gestionada aparece cargada.
+- **Un solo origen por equipo, por defecto.** Si el servidor entrega aunque sea una clave de política, Claude Code puede ignorar la que llegue por MDM o por fichero. Hay un ajuste para combinar todas las fuentes; léelo antes de mezclar.
+- **Las restricciones tienen efectos secundarios.** Por ejemplo, `/goal` no está disponible si `allowManagedHooksOnly` está activado, porque el evaluador forma parte del sistema de hooks. Avisa a tu equipo cuando restrinjas algo que usaban.
+- **Windows.** El fichero va en `C:\Program Files\ClaudeCode\managed-settings.json`; la ruta antigua `C:\ProgramData\ClaudeCode\` ya no se lee.
+
+Los **modos de permiso** también se gobiernan aquí: tu organización puede desactivar el modo `auto` y el modo `bypassPermissions`. Qué hace cada modo: [primeros pasos](/AI-Optimized_Usage_Web/m7-claude-code/primeros-pasos/).
+
+## 4. Marketplaces privados de plugins
+
+Un _plugin_ empaqueta skills, subagentes, hooks y servidores MCP. Un _marketplace_ es un catálogo de plugins: un repositorio git con un fichero `.claude-plugin/marketplace.json`. Puede ser privado, listar tantos plugins como quieras, y un administrador puede **exigirlo en todos los equipos**. Lo normal es combinar dos controles:
+
+- **Registrar y activar el catálogo propio** con `extraKnownMarketplaces` y `enabledPlugins` en la configuración gestionada: al siguiente inicio de sesión, los equipos tienen el catálogo y los plugins instalados, y el usuario no puede desactivarlos.
+- **Restringir de dónde se puede instalar** con la lista de permitidos `strictKnownMarketplaces`: lo que no esté en la lista falla con el mensaje «blocked by enterprise policy». La lista no registra nada por sí sola ni restringe qué plugins hay dentro de un catálogo permitido (para bloquear uno concreto se pone a `false` en `enabledPlugins`). Para impedir que se carguen plugins desde carpetas locales o URL, existe `disableSideloadFlags`.
+
+Un ejemplo adaptado de la [página de plugins para la organización](https://code.claude.com/docs/en/plugins/org) (los nombres son de relleno; sustitúyelos). Permite el catálogo oficial y los repositorios de tu organización, registra tu catálogo, activa dos plugins y rechaza cargas desde carpetas locales o URL:
+
+```json
+{
+  "strictKnownMarketplaces": [
+    { "source": "github", "repo": "anthropics/claude-plugins-official" },
+    { "source": "github", "repo": "tu-organizacion/*" },
+    { "source": "skills-dir" }
+  ],
+  "extraKnownMarketplaces": {
+    "tu-catalogo": {
+      "source": { "source": "github", "repo": "tu-organizacion/tu-catalogo" }
+    }
+  },
+  "enabledPlugins": {
+    "plugin-a@tu-catalogo": true,
+    "plugin-b@tu-catalogo": true
+  },
+  "disableSideloadFlags": true
+}
+```
+
+<Callout tipo="cuidado">
+
+Un plugin ejecuta código y prompts con los permisos de quien lo usa. Un catálogo privado solo es más seguro que uno público si alguien **revisa** cada plugin antes de publicarlo, igual que revisarías código de un compañero. La documentación dedica una página a la seguridad de los plugins: léela antes de aprobar un catálogo. Para claude.ai y Cowork, las notas de versión de Anthropic anotan desde febrero de 2026 un marketplace de plugins con controles de administrador para Team y Enterprise; no hemos verificado sus detalles, que son un sistema distinto del de Claude Code.
+
+</Callout>
+
+## 5. Auditoría y registro
+
+Si tu sector exige trazabilidad, tienes tres piezas, que se complementan:
+
+- La **Compliance API** (Enterprise) para consultar a posteriori actividad, chats, ficheros y transcripciones de sesiones.
+- **OpenTelemetry** para enviar eventos a tu SIEM (el sistema donde tu equipo de seguridad centraliza los registros) o a tu plataforma de observabilidad conforme ocurren.
+- Los **hooks de configuración** (`ConfigChange`) para auditar o bloquear cambios de ajustes durante una sesión.
+
+Qué se guarda de los prompts y durante cuánto depende de tu plan y de la retención cero: ver [privacidad y seguridad](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/privacidad-y-seguridad/). Cuidado con una tensión conocida: la retención cero reduce lo que se conserva, y las métricas de contribución dejan de estar disponibles con ella.
+
+## 6. Un plan de adopción por fases
+
+Este plan es **una recomendación de la guía**, no un procedimiento del proveedor. El porqué de ir por fases: cada una produce el dato que necesita la siguiente (qué se usa, cuánto cuesta, qué falla), y un error de configuración cuesta menos con diez personas que con quinientas.
+
+| Fase | Qué se hace                                                                                                                                  | Criterio para pasar a la siguiente                                             |
+| ---- | -------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| 0    | Política de uso en una página: datos permitidos, herramientas aprobadas, revisión humana y responsables                                      | La aprueban dirección y protección de datos                                    |
+| 1    | Piloto con un grupo pequeño y variado; configuración gestionada mínima; límite de gasto conservador                                          | Hay una línea base de uso y coste por persona y por tarea                      |
+| 2    | Elegir dos o tres tareas repetidas, montar [evals mínimas](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/evals-minimas/) y comparar modelos | Se sabe qué modelo y esfuerzo usar en cada tarea, con números                  |
+| 3    | Convertir lo que funciona en plantillas, skills y plugins compartidos, en un catálogo privado revisado                                       | Las personas del piloto usan lo compartido en lugar de lo propio               |
+| 4    | Despliegue por oleadas con formación breve; revisar gasto y fricciones cada mes                                                              | El gasto real está dentro del previsto y los fallos se corrigen en el catálogo |
+| 5    | Revisión trimestral: modelos nuevos, precios, políticas de datos, retirada de lo que no se usa                                               | Se repite la eval con los modelos vigentes                                     |
+
+Dos advertencias sobre el calendario: los modelos, los precios y los planes cambian con frecuencia (las páginas de datos de esta guía llevan fecha de verificación), así que la fase 5 no es opcional. Y no saltes la fase 2: es la única que te permite decir «este modelo basta» con evidencia en lugar de intuición.
+
+### Qué debe decir la política de la fase 0
+
+- Para qué tareas se puede usar IA y para cuáles no (por ejemplo, decisiones sobre personas sin supervisión).
+- Qué datos se pueden enviar, a qué herramientas, y cuáles se anonimizan.
+- Qué entregables exigen revisión humana y de quién (ver [verificar siempre](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/verificar-siempre/)).
+- Quién aprueba nuevas herramientas, conectores y plugins.
+- Qué hacer ante un incidente: una clave pegada por error, una respuesta que se envió sin revisar, un comportamiento extraño.
+- Con qué frecuencia se revisa la política.
+
+Si hay datos personales o tu actividad está regulada, la política la valida tu responsable de protección de datos o tu asesoría. Esta guía no sustituye ese asesoramiento.
+
+## Ejemplo: el departamento de administración
+
+Un departamento de administración de unas quince personas quiere usar un asistente para actas, informes mensuales y revisión de facturas. Es un ejemplo ilustrativo de la guía, sin cifras medidas.
+
+1. **Política (fase 0).** La responsable de administración y el responsable de protección de datos acuerdan: se pueden usar actas internas y facturas anonimizadas; no se pegan datos de nóminas ni contratos de clientes con confidencialidad; todo lo que salga del departamento lo revisa una persona.
+2. **Piloto (fase 1).** Cuatro personas, durante un mes, con un límite de gasto prudente y la configuración gestionada mínima (nada de `bypassPermissions`, ficheros de secretos bloqueados). Al final, miran el informe de gasto y preguntan qué tareas se repetían.
+3. **Evals (fase 2).** Eligen dos tareas repetidas, «acta a tareas» e «informe mensual de ventas», reúnen 25 casos reales anonimizados de cada una y comparan un modelo ligero con uno intermedio con el script de [evals mínimas](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/evals-minimas/).
+4. **Compartir (fase 3).** Lo que funcionó pasa a plantillas comunes. Alguien las revisa antes de publicarlas en el catálogo del departamento.
+5. **Oleada y revisión (fases 4 y 5).** Se incorpora al resto del equipo con una sesión de una hora y, tres meses después, se repiten las evals con los modelos vigentes.
+
+Lo importante del ejemplo: ninguna decisión se toma a ciegas. Cada fase deja un dato (qué se usa, qué cuesta, qué acierta) que justifica la siguiente.
+
+## Errores frecuentes
+
+- **Empezar por la herramienta y no por la política.** Sin política, los controles técnicos aplican lo que cada administrador piense.
+- **Desplegar a todos de golpe.** Sin piloto no hay línea base, y descubres el gasto con la factura.
+- **Convertir las métricas de actividad en una clasificación.** Incentiva producir líneas, no resolver problemas.
+- **Restringir sin avisar.** Una restricción que rompe un hábito (como `/goal` con hooks gestionados) genera tickets y soluciones por fuera.
+- **Dejar plugins sin revisión.** Un catálogo privado sin revisión es un riesgo con apariencia de control.
+- **Olvidar que cada acceso tiene sus propios controles.** Lo que configuras en la consola de Claude no cubre el uso a través de Bedrock, Vertex o Foundry.
+- **No revisar tras el piloto.** Los precios y los modelos cambian: lo que era óptimo en octubre puede no serlo en enero.
+
+<Checklist
+  id="m9-gobernanza"
+  titulo="Antes de desplegar a un equipo"
+  items={[
+    'Hay una política de uso escrita y aprobada por quien corresponde.',
+    'Sé por qué canal accede mi organización (Teams, Enterprise, API, nube) y qué controles me da cada uno.',
+    'Hay límites de gasto fijados y alguien que mira el informe cada mes.',
+    'La configuración gestionada bloquea lo sensible (secretos, bypassPermissions) y la he probado con un grupo.',
+    'Los plugins se publican desde un catálogo privado y alguien los revisa.',
+    'Las métricas se usan para detectar fricción, no para clasificar personas.',
+    'Hay un piloto con línea base y evals mínimas de las tareas principales.',
+    'Hay una fecha de revisión de modelos, precios y políticas.',
+  ]}
+/>
+
+## Para profundizar
+
+Medir el gasto con informes y OpenTelemetry: [Medir](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/medir/). Hooks y plugins en detalle: [Extender Claude Code](/AI-Optimized_Usage_Web/m7-claude-code/extender-claude-code/). Las páginas oficiales en las que se apoya esta, consultadas el 19 de octubre de 2026: [costes](https://code.claude.com/docs/en/costs), [analíticas](https://code.claude.com/docs/en/analytics), [configuración gestionada](https://code.claude.com/docs/en/managed-settings), [plugins para la organización](https://code.claude.com/docs/en/plugins/org) y [crear un marketplace](https://code.claude.com/docs/en/plugin-marketplaces).

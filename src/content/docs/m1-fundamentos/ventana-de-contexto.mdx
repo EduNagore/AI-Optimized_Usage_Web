@@ -4,12 +4,162 @@ description: 'Qué cabe en la ventana, por qué el rendimiento baja al llenarla 
 sidebar:
   order: 3
 level: basico
-tracks: [profesional, tecnica]
-readingTime: 8
-status: en-preparacion
-sources: []
+tracks: [esencial, profesional, tecnica]
+readingTime: 9
+lastReviewed: 2026-10-19
+sources:
+  [
+    platform-claude-com-docs-en-build-with-claude-context-windows,
+    anthropic-com-engineering-effective-context-engineering-for-ai-agents,
+    anthropic-compactacion,
+    anthropic-context-editing,
+    anthropic-prompt-caching,
+    anthropic-modelos,
+    openai-ultimo-modelo-y-migracion,
+    openai-precios,
+    google-ultimo-modelo,
+    claude-code-comandos,
+  ]
 ---
 
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Fact from '@components/Fact.astro';
+import ModelTable from '@components/ModelTable.astro';
+import ProviderTabs from '@components/ProviderTabs.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
 import VentanaContexto from '@components/diagrams/VentanaContexto.astro';
 
+<KeyTakeaways>
+
+- La [ventana de contexto](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#ventana-de-contexto) es todo lo que el modelo ve de una vez: instrucciones, herramientas, historial, documentos, resultados y su propia respuesta. Es su memoria de trabajo.
+- En cada turno se reenvía todo lo anterior. Por eso el mensaje número treinta de una conversación cuesta más que el primero, aunque sea igual de corto.
+- Que algo quepa no significa que se use bien: según Anthropic, a medida que crece el contexto la precisión y el recuerdo del modelo se degradan.
+- Una parte de la ventana es estable (la misma en todos los turnos) y otra crece. Lo estable va primero para que la caché lo aproveche.
+- Cuando se llena, hay que hacer sitio: abrir una conversación nueva o compactar. Compactar pierde detalle.
+
+</KeyTakeaways>
+
+## La idea
+
+Imagina la mesa de trabajo de un colaborador: tiene un tamaño. Todo lo que quieres que tenga en cuenta (las normas de la casa, tus documentos, lo que habéis hablado hasta ahora, lo que acaba de buscar) tiene que estar encima de la mesa en el momento de contestar. Esa mesa es la ventana de contexto, y se mide en [tokens](/AI-Optimized_Usage_Web/m1-fundamentos/tokens/).
+
+La documentación de Anthropic precisa qué cuenta como contenido de la ventana: el prompt de sistema, cada mensaje (incluidos los resultados de herramientas, las imágenes y los documentos), las definiciones de las herramientas y también lo que el modelo genera en el turno, razonamiento incluido. Y precisa algo más: la caché de prompts cambia lo que pagas por esos tokens, no si cuentan para la ventana.
+
+## Cuánto cabe
+
+La mayoría de los modelos actuales de las tres familias ronda el millón de tokens. Los valores salen de los datos de la guía:
+
+<ModelTable
+  ids={['fable-5-1', 'opus-5-5', 'sonnet-5-5', 'haiku-5-5', 'gpt-6-1-sol', 'gemini-4-argon']}
+  etiqueta="Ventana de contexto por modelo"
+/>
+
+Sonnet 5.5, por ejemplo, tiene una ventana de <Fact id="sonnet-5-5.contextWindow" corto />. Un modelo heredado como Haiku 4.5 se queda en <Fact id="haiku-4-5.contextWindow" corto />. Fíjate también en las notas bajo la tabla: en algunos modelos el precio por token cambia por encima de cierto tamaño de petición.
+
+<ProviderTabs>
+<div slot="claude">
+
+Según la documentación de Anthropic, Fable 5.1, Opus 5.5, Sonnet 5.5, Haiku 5.5 y otros modelos recientes tienen <Fact id="opus-5-5.contextWindow" corto /> de tokens por defecto, sin cabecera especial, y una petición puede generar hasta <Fact id="opus-5-5.maxOutput" /> de salida. Las peticiones largas se facturan a precio estándar, salvo en Haiku 5.5, donde los prompts largos cuestan más (el umbral está en la nota de la tabla).
+
+</div>
+<div slot="openai">
+
+En los modelos GPT-6, la ventana incluye la salida: la entrada máxima es algo menor que la ventana total, y por encima de cierto tamaño de entrada se cobra más toda la petición. Las cifras exactas están en las notas de la tabla (datos de OpenAI, verificados el 16 de octubre de 2026).
+
+</div>
+<div slot="google">
+
+En Gemini 4 Argon, la documentación de Google indica una ventana única que se reparte entre entrada, razonamiento y salida.
+
+</div>
+</ProviderTabs>
+
+## Cada turno lo reenvía todo
+
+El modelo no guarda tu conversación entre mensajes. Según la documentación de Anthropic, en cada turno la entrada contiene todo el historial anterior más tu mensaje nuevo, y la respuesta se convierte en parte de la entrada del siguiente. Las apps de chat te lo ocultan; en la API y en Claude Code es literalmente así, y en los planes de suscripción se nota en que el uso del plan se agota antes.
+
+Un ejemplo con números inventados para ver la forma, no el importe. Supón que cada turno (tu mensaje y la respuesta) añade unos 2.000 tokens a la conversación:
+
+- Cifras aproximadas. En el turno 1 el modelo procesa unos 2.000 tokens de entrada; en el 5, unos 10.000; en el 10, unos 20.000.
+- Sumados los 10 turnos, el modelo ha procesado unos 110.000 tokens de entrada, aunque tú solo hayas escrito una fracción.
+- Con 20 turnos son unos 420.000: el doble de turnos, casi cuatro veces el volumen.
+
+Es aritmética, no una medición: sin caché, el coste de una conversación larga crece aproximadamente con el cuadrado del número de turnos. Con caché la parte repetida cuesta una fracción, pero no cero (ver [prompt caching](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/prompt-caching/)).
+
+## Más contexto no es mejor contexto
+
+<Callout tipo="verificado" fecha="2026-10-19">
+
+La documentación de Anthropic sobre ventanas de contexto afirma que más contexto no es automáticamente mejor: a medida que crece el número de tokens, la precisión y el recuerdo se degradan, un fenómeno que llama _context rot_. Su guía de ingeniería de contexto plantea el objetivo como encontrar el conjunto más pequeño de tokens de alta señal que maximice la probabilidad del resultado que buscas.
+
+</Callout>
+
+<Callout tipo="cuidado">
+
+Las fuentes de esta guía no dan una cifra de cuánto se degrada un modelo ni a partir de qué tamaño. No hemos verificado una afirmación equivalente en la documentación de OpenAI ni de Google. Trata la degradación como un riesgo que crece con el tamaño y compruébala con tu tarea: una pregunta sencilla sobre un documento corto no se comporta como una búsqueda de un detalle en medio de cien páginas.
+
+</Callout>
+
+## La parte estable y la que crece
+
+No todo lo que hay en la ventana se comporta igual. Una parte es idéntica turno tras turno, y otra crece con cada mensaje, cada fichero abierto y cada resultado de herramienta:
+
 <VentanaContexto />
+
+El espacio libre del diagrama no es solo para tu siguiente mensaje: la respuesta del modelo y su razonamiento en ese turno también se escriben ahí.
+
+La parte estable (instrucciones del sistema, herramientas, ficheros de instrucciones) conviene que vaya primero y que no cambie: la caché solo reutiliza un comienzo idéntico, y cualquier cambio al principio invalida lo que viene detrás ([regla 8](/AI-Optimized_Usage_Web/m0-empieza-aqui/las-10-reglas/)). La parte que crece es donde está el margen para ahorrar y para ensuciar: documentos que ya no usas, resultados voluminosos, temas mezclados.
+
+## Qué pasa cuando se llena
+
+Depende de dónde trabajes:
+
+- **En la API de Claude**, si solo la entrada ya supera la ventana, la petición falla con un error. En los modelos desde Claude 4.5, si la entrada más el máximo de salida supera la ventana, la petición se acepta y la generación se detiene al llegar al límite con un motivo de parada específico.
+- **En las apps de chat**, la documentación de Anthropic señala que interfaces como claude.ai pueden gestionar la ventana de forma rodante, primero en entrar y primero en salir: lo más antiguo deja de estar.
+- **En agentes y herramientas de código**, el remedio habitual es la [compactación](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#compactacion): sustituir el historial por un resumen. Anthropic la ofrece en el servidor (en beta) y Claude Code la tiene como `/compact`. Pierde detalle e invalida la caché, así que conviene decirle qué conservar. El _context editing_ es otra vía: limpia resultados antiguos de herramientas.
+
+La higiene del contexto en agentes está en [higiene del bucle](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/higiene-del-bucle/).
+
+## En la práctica
+
+<Steps>
+
+1. Una tarea, una conversación. Cuando cambies de tema, abre una nueva ([regla 7](/AI-Optimized_Usage_Web/m0-empieza-aqui/las-10-reglas/)).
+2. Mira cuánto llevas. En Claude Code, `/context` muestra el uso de la ventana. En una app de chat, cuenta los documentos adjuntos y los mensajes.
+3. Antes de llegar al límite, haz un resumen de lo decidido y lo pendiente, y empieza una conversación nueva con él. Es más controlable que dejar que el sistema compacte.
+4. Si compactas, di qué conservar: `/compact` admite instrucciones sobre qué mantener.
+5. Con documentos largos, colócalos al principio del encargo y la pregunta al final (lo desarrolla [contexto largo](/AI-Optimized_Usage_Web/m3-prompting/contexto-largo/)).
+
+</Steps>
+
+## Ejemplo de oficina: el hilo de tres semanas
+
+Una responsable de proyectos usa la misma conversación durante tres semanas para el acta del comité, el borrador de un presupuesto y varios correos. Cada mensaje arrastra los documentos y las respuestas de todas las semanas anteriores: pagas por ese historial en cada turno y, según Anthropic, un contexto largo puede reducir la precisión y el recuerdo del modelo.
+
+Lo que funciona mejor: una conversación por tarea y, al cerrar cada una, un resumen de media página con lo decidido. El lunes siguiente empieza con ese resumen y los documentos que hagan falta, nada más. Es una recomendación de la guía; su porqué es doble: pagas menos en cada turno y el modelo trabaja con material relevante, sin ruido de otros temas.
+
+## Errores frecuentes
+
+- **Pensar que «cabe» es «rinde».** Una ventana de un millón de tokens no garantiza que el modelo use bien un millón de tokens.
+- **Confundir la ventana con la memoria entre conversaciones.** La ventana se vacía al abrir una conversación nueva; lo que persiste es una función aparte ([qué es un LLM](/AI-Optimized_Usage_Web/m1-fundamentos/que-es-un-llm/)).
+- **Adjuntar todo «por si acaso».** Cada documento se reenvía en cada turno aunque ya no lo uses.
+- **Compactar sin decir qué conservar.** El resumen decide por ti qué detalles sobreviven.
+- **Creer que la caché libera espacio.** Abarata los tokens repetidos; siguen ocupando ventana.
+
+<Checklist
+  id="m1-ventana"
+  titulo="Higiene de la ventana"
+  items={[
+    'Esta conversación trata de un solo tema.',
+    'Sé qué documentos y herramientas hay cargados y los uso.',
+    'Lo estable (instrucciones, formato) va al principio y no lo cambio sin necesidad.',
+    'Tengo un resumen de lo decidido por si debo empezar de cero.',
+    'Si compacto, indico qué detalles hay que conservar.',
+  ]}
+/>
+
+## Para profundizar
+
+El coste del reenvío y cómo reducirlo: [por qué se dispara el gasto](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/por-que-se-dispara-el-gasto/) y [el orden de las palancas](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/orden-de-las-palancas/). Qué se carga cada vez y qué no, en [higiene de entrada](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/higiene-de-entrada/).

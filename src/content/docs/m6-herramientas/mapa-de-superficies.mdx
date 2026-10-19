@@ -5,7 +5,180 @@ sidebar:
   order: 1
 level: basico
 tracks: [profesional, tecnica]
-readingTime: 7
-status: en-preparacion
-sources: []
+readingTime: 9
+lastReviewed: 2026-10-19
+sources:
+  [
+    support-claude-com-en-articles-9517075-what-are-projects,
+    support-claude-com-en-articles-11817273-use-claude-s-chat-search-and-memory-to-b,
+    support-claude-com-en-articles-11175166-get-started-with-custom-connectors-using,
+    support-claude-com-en-articles-12512180-use-skills-in-claude,
+    support-claude-com-en-articles-17153992-what-are-artifacts-and-how-do-i-use-them,
+    support-claude-com-en-articles-11088861-use-research-on-claude,
+    support-claude-com-en-articles-13455879-use-claude-cowork-on-team-and-enterprise,
+    support-claude-com-en-articles-12012173-get-started-with-claude-in-chrome,
+    claude-com-docs-office-agents-excel,
+    claude-code-vision-general,
+    chatgpt-proyectos,
+    chatgpt-tareas-programadas,
+    chatgpt-personalizar,
+    gemini-app-planes-y-funciones,
+    openai-codex-y-chatgpt-work,
+    learn-chatgpt-com-docs-whats-new,
+    developers-openai-com-api-docs-changelog,
+    developers-googleblog-com-an-important-update-transitioning-gemini-cli-to-antigr,
+    antigravity-migracion-gemini-cli,
+    google-changelog-de-la-api,
+    code-claude-com-docs-en-agent-sdk,
+    anthropic-managed-agents,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import ProviderTabs from '@components/ProviderTabs.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Una [superficie](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#superficie) es el sitio desde el que usas el modelo. Hay tres familias: apps de chat, agentes (de código o de trabajo con ficheros) y API.
+- Lo que cambia entre ellas no es el modelo, sino quién ejecuta las acciones, qué puede tocar, qué recuerda y cómo se paga.
+- Los nombres y los planes de cada función cambian con frecuencia. Esta página dice de dónde sale cada dato y marca lo que no hemos podido verificar.
+- Si no sabes por dónde empezar, ve a [Cuál usar para qué](/AI-Optimized_Usage_Web/m6-herramientas/cual-usar-para-que/).
+
+</KeyTakeaways>
+
+## La idea
+
+Un mismo modelo se comporta distinto según desde dónde lo uses. En una app de chat responde y espera. En un agente abre ficheros, ejecuta pasos y decide cuándo parar. Por la API lo integras tú en otro sistema y pagas por token. [Elegir superficie](/AI-Optimized_Usage_Web/m2-metodo/elegir-superficie/) explica cuándo subir de escalón; esta página es el mapa de lo que existe en cada uno. Los escalones de M2 (proyecto, flujo, agente, automatización) viven dentro de estas familias.
+
+| Familia                     | Quién ejecuta las acciones                       | Qué puede tocar                                         | Cómo se paga                                     |
+| --------------------------- | ------------------------------------------------ | ------------------------------------------------------- | ------------------------------------------------ |
+| Apps de chat                | La app, en los servidores del proveedor          | Lo que subes o conectas                                 | Suscripción con límites de uso                   |
+| Agentes de código y trabajo | Tu ordenador o un entorno en la nube             | Ficheros, comandos y servicios a los que le des permiso | Suscripción o clave de API, según la herramienta |
+| API y plataformas           | Tu programa, o un entorno que aloja el proveedor | Lo que tu código o tu configuración permitan            | Por token consumido                              |
+
+Esta tabla es una síntesis de la guía a partir de las fuentes de abajo, no un dato de un proveedor. Cada celda es una regla general y tiene excepciones.
+
+<Callout tipo="varia">
+
+Cada proveedor llama distinto a cosas parecidas, y cambia los planes y las funciones con frecuencia. Todo lo que sigue sobre planes es lo que decían las páginas oficiales en las fechas indicadas. Antes de planificar nada en torno a un plan, compruébalo en la ayuda del producto.
+
+</Callout>
+
+## Apps de chat
+
+<ProviderTabs>
+  <div slot="claude">
+
+Las funciones de las apps de Claude, con los planes que indican las páginas de ayuda oficiales (revisadas el 16 de octubre de 2026, salvo que se indique otra fecha):
+
+| Función                                                                                                                          | Qué es                                                                                       | Planes según la ayuda oficial                                                                                                                     |
+| -------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Proyectos](https://support.claude.com/en/articles/9517075-what-are-projects)                                                    | Espacios con sus propias conversaciones, documentos e instrucciones                          | Todos los planes (Free: hasta 5 proyectos). La recuperación ampliada (RAG) solo en planes de pago. Compartir, solo en Team y Enterprise           |
+| [Memoria](https://support.claude.com/en/articles/11817273-use-claude-s-chat-search-and-memory-to-build-on-previous-context)      | Contexto que Claude conserva entre conversaciones                                            | Activada por defecto en Free, Pro y Max; en Team y Enterprise la controla el propietario. La búsqueda en chats anteriores, solo en planes de pago |
+| [Conectores personalizados](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp) | Conexión con servicios externos mediante MCP remoto                                          | Todos los planes; Free permite un conector personalizado                                                                                          |
+| [Skills](https://support.claude.com/en/articles/12512180-use-skills-in-claude)                                                   | Procedimientos reutilizables (ver [Skills](/AI-Optimized_Usage_Web/m6-herramientas/skills/)) | Todos los planes; requieren tener activada la ejecución de código                                                                                 |
+| [Artifacts](https://support.claude.com/en/articles/17153992-what-are-artifacts-and-how-do-i-use-them)                            | Contenido que Claude crea aparte de la conversación (documentos, presentaciones, diseños)    | Todos los planes. Algunas plantillas y conectar apps o almacenar datos, solo en planes de pago                                                    |
+| [Research](https://support.claude.com/en/articles/11088861-use-research-on-claude)                                               | Investigación con búsqueda web                                                               | Pro, Max, Team y Enterprise; no Free. Necesita la búsqueda web activada                                                                           |
+| [Cowork](https://support.claude.com/en/articles/13455879-use-claude-cowork-on-team-and-enterprise-plans)                         | Modo de trabajo por tareas, en escritorio (macOS y Windows) y, en beta, en web y móvil       | Pro, Max, Team y Enterprise; no Free                                                                                                              |
+| [Claude en Excel](https://claude.com/docs/office-agents/excel)                                                                   | Complemento que trabaja dentro de tus libros de Excel                                        | Pro, Max, Team y Enterprise (disponibilidad general); no Free                                                                                     |
+| [Claude en Chrome](https://support.claude.com/en/articles/12012173-get-started-with-claude-in-chrome)                            | Claude dentro del navegador                                                                  | Pro, Max, Team y Enterprise; solo Google Chrome; no en móvil                                                                                      |
+
+<Callout tipo="novedad">
+
+Según las notas de versión de Claude, desde el 16 de septiembre de 2026 las capacidades de Cowork están disponibles desde cualquier conversación, y la ayuda de Cowork dice que, en Pro y Max, el chat y Cowork se están unificando («Claude Cowork and chat are now one Claude»). En Team, y en Enterprise si el administrador no lo activa, siguen separados. Si no ves Cowork donde esperas, mira primero el plan y los ajustes de tu organización.
+
+</Callout>
+
+No publicamos límites numéricos de Research ni de proyectos de planes de pago, ni precios de planes: la ayuda de Research solo dice que usa los mismos límites que una conversación normal y los consume más rápido, y la de proyectos no da un tope para planes de pago.
+
+  </div>
+  <div slot="openai">
+
+En ChatGPT, lo que hemos podido verificar en la documentación de OpenAI (`learn.chatgpt.com`, consultada el 19 de octubre de 2026):
+
+- **Proyectos.** Sirven para «organizar chats relacionados y dar a ChatGPT el contexto que necesita»: tienen una sección de chats, otra de fuentes (ficheros y contexto conectado) e instrucciones compartidas. Hay dos tipos: el proyecto de ChatGPT, que no accede a carpetas de tu ordenador, y el proyecto local, que da a los chats acceso a una o varias carpetas. La página no dice qué planes los incluyen.
+- **Tareas programadas.** Ejecutan tareas recurrentes en segundo plano. Se gestionan desde la app de escritorio de ChatGPT, la web y el móvil; las que trabajan sobre un proyecto local exigen que el ordenador esté encendido y la app abierta. Los disparadores por eventos de otras apps dependen del plan y de los ajustes del espacio de trabajo. Fuente: [Scheduled tasks](https://learn.chatgpt.com/docs/automations).
+- **Codex** está en la app de escritorio de ChatGPT, la app móvil y la web, además de la CLI, la extensión de IDE y Codex Cloud. Lo tratamos en el apartado de agentes.
+- **Memoria y personalización.** Hay memorias y un apartado de personalización (estilo base y tono, instrucciones). Más en [Ficheros de instrucciones y memoria](/AI-Optimized_Usage_Web/m6-herramientas/ficheros-de-instrucciones-y-memoria/).
+
+**Sin verificar.** La nota de versión de ChatGPT sobre GPT-6 con «interfaz inteligente» y el reparto de modelos por plan solo se ha visto en un resumen de búsqueda, porque `help.openai.com` devuelve un error 403 a nuestra herramienta de lectura. No damos por confirmado qué plan usa qué modelo en ChatGPT. Tampoco verificamos los límites de uso ni los precios de los planes.
+
+  </div>
+  <div slot="google">
+
+En la app de Gemini, según la [ayuda de Google](https://support.google.com/gemini/answer/16275805?hl=en) (consultada el 19 de octubre de 2026):
+
+- Según la tabla de funciones de esa ayuda, Canvas, Skills, Deep Research y «Connected apps» figuran en todos los planes, incluido el que no requiere suscripción (tabla leída por columnas: confírmalo en tu cuenta). Deep Research consume más uso.
+- «Tasks in Gemini» figura solo en Google AI Pro y Google AI Ultra.
+- La ventana de contexto en la app depende del plan. Según la tabla «Context windows» de esa ayuda: 32k tokens sin plan, 128k con AI Plus y 1 millón con AI Pro y AI Ultra.
+
+**Sin verificar.** No hemos encontrado en la ayuda leída las «Gems», ni cómo se conectan servidores MCP a la app de Gemini. Los precios de los planes difieren según el país y no los publicamos.
+
+  </div>
+</ProviderTabs>
+
+## Agentes de código y agentes de trabajo
+
+Un agente planifica pasos, usa herramientas y actúa. En código es lo habitual; en oficina empieza a serlo con Cowork o con un proyecto local de ChatGPT.
+
+**Claude Code.** Según la documentación, funciona en el terminal, en extensiones de IDE (VS Code y JetBrains), en una app de escritorio, en la web y en la app móvil de Claude, y todas las superficies usan el mismo motor: los `CLAUDE.md`, los ajustes y los servidores MCP del repositorio valen en todas. Ver el [módulo 7](/AI-Optimized_Usage_Web/m7-claude-code/). Fuente: [visión general de Claude Code](https://code.claude.com/docs/en/overview.md), 19 de octubre de 2026.
+
+**Codex.** Disponible en la app de escritorio de ChatGPT, la app móvil, ChatGPT en la web, la CLI, la extensión de IDE y Codex Cloud (datos de funciones, verificados el 16 de octubre de 2026). Sus equivalencias con Claude Code están en [Equivalencias en Codex y Gemini CLI](/AI-Optimized_Usage_Web/m7-claude-code/equivalencias-codex-gemini/).
+
+**Gemini CLI y Antigravity CLI.** Según el anuncio de Google, desde el 18 de junio de 2026 Gemini CLI deja de atender las cuentas Google AI Pro, Ultra y el nivel individual de Code Assist; las sustituye Antigravity CLI (`agy`). Gemini CLI sigue con licencias Code Assist Standard o Enterprise y con claves de API de pago. Qué corresponde a tu cuenta depende de tu licencia: la documentación de Gemini CLI no recoge la sustitución en todas sus páginas, así que comprueba en la tuya.
+
+<Callout tipo="cuidado">
+
+Un agente con permisos amplios puede hacer más daño que un chat. Antes de darle acceso a una carpeta o a un servicio, trabaja sobre una copia y revisa qué acciones te pide confirmar. Ver [Conectores y MCP](/AI-Optimized_Usage_Web/m6-herramientas/conectores-y-mcp/).
+
+</Callout>
+
+## API y plataformas
+
+Para integrar el modelo en tu propio sistema o automatizar a volumen:
+
+- **Claude:** la API de Messages (con las bibliotecas cliente); el [Agent SDK](https://code.claude.com/docs/en/agent-sdk), una biblioteca para Python y TypeScript que da las herramientas y el bucle de agente de Claude Code; y Managed Agents, un agente alojado por Anthropic, que figura **en beta**.
+- **OpenAI:** la Responses API, y la Agents API, que según el registro de cambios de OpenAI entró en beta pública el 10 de septiembre de 2026 (agentes gestionados sobre el arnés de Codex).
+- **Google:** la API de Gemini, con su [registro de cambios](https://ai.google.dev/gemini-api/docs/changelog).
+
+Precios, modelos y límites de cada API están en el [módulo 4](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/) y el [módulo 5](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/); no se repiten aquí porque cambian.
+
+## En la práctica
+
+<Steps>
+
+1. Haz un inventario de lo que tienes: qué apps, con qué plan y qué agentes de código o de trabajo tienes disponibles en tu organización. Por qué: la mitad de los problemas son «esa función no está en mi plan» o «mi administrador la tiene desactivada».
+2. Para cada herramienta anota tres cosas: qué puede tocar, quién ejecuta las acciones y cómo se paga el uso.
+3. Elige por tarea, no por herramienta. Ve a [Cuál usar para qué](/AI-Optimized_Usage_Web/m6-herramientas/cual-usar-para-que/).
+4. Si cambias de proveedor, no traduzcas nombres a ciegas: busca la función por lo que hace.
+
+</Steps>
+
+## Ejemplo de oficina: el equipo de finanzas
+
+Un equipo de finanzas usa Claude, ChatGPT y Gemini a la vez sin criterio. Hace el inventario y descubre que: el complemento de Excel de Claude les sirve para explicar y depurar los libros de cierre (con la advertencia oficial de usarlo solo con hojas de confianza); un proyecto de Claude con la política de gastos responde las dudas de empleados; y la conciliación de 400 tickets cada día no necesita ningún agente, sino un flujo fijo por API con revisión humana. Ninguna de las tres decisiones depende de cuál modelo es «mejor», sino de dónde vive el dato y quién ejecuta la acción.
+
+## Errores frecuentes
+
+- **Dar por hecho que un plan incluye una función.** Las funciones cambian por plan y por organización. Comprueba antes.
+- **Confundir la app con el agente.** Que Cowork o Codex aparezcan dentro de una app de chat no los convierte en un chat: pueden actuar sobre ficheros.
+- **Fiarte de tutoriales para planes y nombres.** Caducan en semanas. La fuente es la ayuda oficial.
+- **Usar una API para algo que un proyecto resuelve.** Más piezas, más mantenimiento.
+
+<Checklist
+  id="m6-mapa"
+  titulo="Mi mapa de herramientas"
+  items={[
+    'Sé qué apps, agentes y APIs tengo disponibles y con qué plan.',
+    'Sé en cuáles el modelo puede actuar sobre mis ficheros o servicios.',
+    'He comprobado en la ayuda oficial las funciones de las que depende mi trabajo.',
+    'Tengo claro qué uso se paga con suscripción y cuál por token.',
+  ]}
+/>
+
+## Para profundizar
+
+Cómo elegir según la tarea: [Cuál usar para qué](/AI-Optimized_Usage_Web/m6-herramientas/cual-usar-para-que/). Cómo ampliar cada superficie: [Conectores y MCP](/AI-Optimized_Usage_Web/m6-herramientas/conectores-y-mcp/), [Skills](/AI-Optimized_Usage_Web/m6-herramientas/skills/) y [Ficheros de instrucciones y memoria](/AI-Optimized_Usage_Web/m6-herramientas/ficheros-de-instrucciones-y-memoria/).

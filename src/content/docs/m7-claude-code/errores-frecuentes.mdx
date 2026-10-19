@@ -1,11 +1,140 @@
 ---
 title: 'Errores frecuentes en Claude Code'
-description: 'La sesión cajón de sastre, un CLAUDE.md sobrecargado, confiar sin verificar y otros.'
+description: 'La sesión cajón de sastre, un CLAUDE.md sobrecargado, confiar sin verificar, explorar sin acotar y demasiados MCP: síntomas y arreglos.'
 sidebar:
   order: 8
 level: intermedio
 tracks: [tecnica]
-readingTime: 5
-status: en-preparacion
-sources: []
+readingTime: 6
+lastReviewed: 2026-10-19
+sources:
+  [
+    claude-code-costes,
+    claude-code-memoria-y-claude-md,
+    claude-code-prompt-caching-en-claude-code,
+    claude-code-comandos,
+    claude-code-buenas-practicas,
+    claude-code-modos-de-permiso,
+    claude-code-referencia-cli,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import BeforeAfter from '@components/BeforeAfter.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Los cinco errores clásicos son: una sesión para todo, un `CLAUDE.md` sobrecargado, confiar sin verificar, explorar sin acotar y tener demasiados servidores MCP activos.
+- Casi todos se resuelven con un hábito, no con una función: `/clear`, un criterio de éxito, un encargo concreto.
+- Cuando algo va mal, mira primero `/context` y `/usage`: te dicen qué ocupa y qué cuesta.
+- Un error silencioso (un resultado plausible pero falso) cuesta más que uno ruidoso.
+
+</KeyTakeaways>
+
+## La idea
+
+Los errores de uso de Claude Code tienen una raíz común: tratarlo como una conversación cuando es un agente que reenvía todo su contexto en cada vuelta. Lo que haces mal una vez, lo pagas muchas. Esta página lista los más frecuentes, con el síntoma que los delata y el arreglo.
+
+## Los cinco clásicos
+
+### 1. La sesión cajón de sastre
+
+**Síntoma:** llevas días en la misma conversación, mezclando informes, correos y una refactorización. Claude confunde temas y todo va lento y caro.
+
+**Causa:** todo el historial se reenvía en cada turno. Eso es un hecho del funcionamiento. Lo que sigue es criterio de la guía: con el tiempo, lo viejo distrae al modelo, y por eso la guía considera `/clear` entre tareas el hábito de mayor retorno. La documentación de costes de Anthropic recomienda `/clear` entre tareas distintas, sin valorar su retorno.
+
+**Arreglo:** una tarea, una sesión. `/rename` para poner nombre a lo que quieras retomar, `/resume` para volver a ello y `/clear` al cambiar de tema. Para conservar una decisión, `/compact` con instrucciones de enfoque, no a ciegas.
+
+### 2. El `CLAUDE.md` sobrecargado
+
+**Síntoma:** Claude ignora normas que sí están escritas, o el contexto base ya es enorme al empezar.
+
+**Causa:** el fichero se carga entero en cada sesión. La documentación recomienda mantener cada `CLAUDE.md` por debajo de las 200 líneas porque los más largos consumen más contexto y se siguen peor (cifra de la documentación, sin verificar todavía en los datos del sitio).
+
+**Arreglo:** déjalo en lo que aplica siempre. Lo específico de un tipo de tarea, a una skill (ver [extender Claude Code](/AI-Optimized_Usage_Web/m7-claude-code/extender-claude-code/)); lo que no puede fallar, a un hook. `/doctor` revisa también los problemas de `CLAUDE.md`.
+
+### 3. Confiar sin verificar
+
+**Síntoma:** el resumen de Claude dice «hecho» y lo das por bueno. Semanas después aparece el error.
+
+**Causa:** un resultado plausible no es un resultado correcto, y un agente que cuenta lo que ha hecho no siempre ha comprobado que funciona.
+
+**Arreglo:** fija el criterio de éxito antes de empezar y comprueba con algo que no sea el resumen: `/verify`, `/run`, un hook de parada, o una muestra revisada a mano. Ver [el flujo recomendado](/AI-Optimized_Usage_Web/m7-claude-code/flujo-recomendado/) y [verificar siempre](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/verificar-siempre/).
+
+### 4. La exploración sin acotar
+
+**Síntoma:** pides «revisa la carpeta» y Claude lee cientos de ficheros; el contexto se llena antes de empezar la tarea.
+
+**Causa:** un encargo vago obliga a explorar para averiguar qué querías. La documentación de costes lo resume así: un prompt específico dispara menos lectura de ficheros que uno vago.
+
+**Arreglo:** acota la ruta, el objetivo y la salida. Menciona los ficheros relevantes con `@`. Si hay que explorar de verdad, delégalo en un subagente con un modelo menor, que devuelve un resumen y deja limpio tu hilo.
+
+<BeforeAfter
+  antes="Revisa los contratos de la carpeta y dime qué ves."
+  despues="Lee solo Contratos/Proveedores-2026/ y devuélveme una tabla con los contratos que vencen antes de diciembre: proveedor, fecha de vencimiento e importe anual. No abras otras carpetas."
+>
+
+Qué cambió y por qué: se limita el alcance (una carpeta), se define la salida (tabla con tres campos) y se evita la exploración abierta, que es lo que llenaba el contexto.
+
+</BeforeAfter>
+
+### 5. Demasiados servidores MCP activos
+
+**Síntoma:** el contexto está lleno de herramientas que no usas; cada petición tarda más.
+
+**Causa:** cada servidor conectado suma sus definiciones. En Claude Code van diferidas por defecto (solo entran nombres hasta que se usa una), lo que ayuda, pero el listado y las instrucciones del servidor siguen ocupando sitio, y añadir o quitar servidores con herramientas cargadas de entrada invalida la caché.
+
+**Arreglo:** `/context` para ver qué pesa, `/mcp` para desactivar lo que no uses, y una herramienta de línea de comandos (`gh`, `aws`, `gcloud`) en lugar de un servidor cuando exista.
+
+## Otros errores que se repiten
+
+| Error                                             | Por qué duele                                                       | Arreglo                                                                                                                           |
+| ------------------------------------------------- | ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Cambiar de modelo a mitad de sesión «por probar»  | La siguiente petición lee todo el historial sin aciertos de caché   | Decide el modelo al empezar. Ver [estrategia de selección](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/estrategia-de-seleccion/) |
+| `/compact` sin instrucciones                      | El resumen decide por ti qué importa                                | Indica qué conservar                                                                                                              |
+| Seguir un camino fallido en lugar de volver atrás | Cada turno extra arrastra el error                                  | `/rewind`, que según la documentación de caché no la invalida                                                                     |
+| `bypassPermissions` fuera de un entorno aislado   | No se comprueba ninguna acción                                      | Reglas `allow` concretas y `/fewer-permission-prompts`                                                                            |
+| Seguir tutoriales con comandos retirados          | `/ultraplan`, `/vim`, `/pr-comments` y `/extra-usage` ya no existen | Consulta [la lista de retirados](/AI-Optimized_Usage_Web/m7-claude-code/comandos/)                                                |
+| Lanzar muchos agentes sin medir con pocos         | El coste real aparece al final                                      | Prueba con tres. Ver [trabajo en paralelo](/AI-Optimized_Usage_Web/m7-claude-code/trabajo-en-paralelo/)                           |
+| Automatizar con permisos amplios                  | Nadie ve el error a tiempo                                          | `--allowedTools`, `--max-turns` y presupuesto. Ver [automatización](/AI-Optimized_Usage_Web/m7-claude-code/automatizacion/)       |
+
+## En la práctica
+
+Si no sabes por dónde empezar, haz este diagnóstico de cinco minutos en tu sesión actual:
+
+1. `/context`: ¿qué ocupa más sitio? ¿Hay servidores MCP o skills que no usas?
+2. `/usage`: ¿cómo está la línea de caché y cuánto has gastado?
+3. Mira tu `CLAUDE.md`: ¿lo recortarías a la mitad?
+4. Pregúntate: ¿esta sesión es de una sola tarea? Si no, `/clear`.
+5. Pregúntate: ¿cómo he comprobado el último resultado?
+
+## Ejemplo de oficina: la sesión de la semana
+
+Una responsable de proyectos lleva una semana en la misma sesión: actas del lunes, un presupuesto el martes, un correo difícil el miércoles. El viernes, Claude mezcla clientes y las respuestas tardan. Diagnóstico con `/context`: el historial ocupa casi todo y hay tres servidores MCP conectados que no ha usado. Corrección: guarda lo que importa en un fichero, hace `/clear`, desactiva los servidores con `/mcp` y abre una sesión por tarea a partir de ahora, con `/rename` para poder retomar cada una.
+
+Por qué funciona: cada tarea carga solo su contexto, y el coste de la semana deja de arrastrar el del lunes.
+
+<Callout tipo="recomendacion">
+
+Pon nombre a las sesiones que quieras retomar (`/rename`) y borra el resto con `/clear`. Por qué: una sesión con nombre es un punto de partida limpio al que volver; una sesión sin nombre y sin fin es el origen de los cinco errores anteriores.
+
+</Callout>
+
+<Checklist
+  id="m7-errores"
+  titulo="Mi revisión de hábitos"
+  items={[
+    'Una tarea, una sesión: hago /clear al cambiar de tema.',
+    'Mi CLAUDE.md contiene solo lo que aplica siempre.',
+    'Defino cómo comprobaré el resultado antes de empezar.',
+    'Mis encargos acotan ruta, objetivo y salida.',
+    'Tengo conectados solo los servidores MCP que uso.',
+    'Decido el modelo al empezar y no lo cambio a mitad.',
+  ]}
+/>
+
+## Para profundizar
+
+Los errores de método en general, en [errores de método](/AI-Optimized_Usage_Web/m2-metodo/errores-de-metodo/) (módulo 2). El detalle de gasto de cada hábito, en [el día a día en Claude Code](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/dia-a-dia-en-claude-code/).

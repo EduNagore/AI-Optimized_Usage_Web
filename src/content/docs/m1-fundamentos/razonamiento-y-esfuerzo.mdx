@@ -5,7 +5,163 @@ sidebar:
   order: 4
 level: intermedio
 tracks: [profesional, tecnica]
-readingTime: 7
-status: en-preparacion
-sources: []
+readingTime: 8
+lastReviewed: 2026-10-19
+sources:
+  [
+    anthropic-esfuerzo,
+    anthropic-razonamiento-adaptativo,
+    platform-claude-com-docs-en-build-with-claude-thinking,
+    anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas,
+    anthropic-prompting-opus-5-5,
+    claude-code-modelo-y-esfuerzo,
+    openai-ultimo-modelo-y-migracion,
+    google-ultimo-modelo,
+    anthropic-razonamiento-y-coste,
+    openai-guia-de-razonamiento,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Fact from '@components/Fact.astro';
+import ProviderTabs from '@components/ProviderTabs.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- El [razonamiento](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#razonamiento) es texto interno que el modelo genera antes de responder para planificar y comprobar. Se factura como salida y ocupa ventana.
+- En los modelos recientes de Claude el razonamiento es adaptativo: el modelo decide, petición a petición, si piensa y cuánto. Ya no se fija un presupuesto de tokens a mano.
+- El [esfuerzo](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#esfuerzo) (`effort`) es el mando: una orientación sobre cuánto razonar y cuánto trabajo desplegar, no un límite estricto.
+- Más esfuerzo no siempre es mejor: cuesta más, tarda más y a veces apenas mejora el resultado. Se baja midiendo y se sube si falla.
+- Los tres proveedores tienen este mando con nombres y niveles distintos.
+
+</KeyTakeaways>
+
+## La idea
+
+Hay dos maneras de contestar a «¿cuánto nos cuesta este pedido con el descuento por volumen?». Una es responder de memoria, rápido. La otra es coger papel, plantear las cuentas, revisarlas y responder. Las dos pueden acertar en una pregunta fácil; en una con varios pasos y excepciones, la segunda falla menos, pero tarda más y consume más.
+
+Los modelos actuales pueden hacer lo segundo: generan un razonamiento interno antes de la respuesta. Ese razonamiento son tokens, y se factura como salida (lo vimos en [tokens](/AI-Optimized_Usage_Web/m1-fundamentos/tokens/)). El esfuerzo es el mando con el que decides cuánto de eso permites.
+
+## Del presupuesto al razonamiento adaptativo
+
+Antes, quien usaba la API fijaba cuántos tokens podía gastar el modelo razonando. En los modelos recientes de Claude ese presupuesto manual ha desaparecido: el parámetro antiguo (`budget_tokens`) da error en los modelos nuevos, y el razonamiento es adaptativo.
+
+La documentación de Anthropic lo describe así: el modelo evalúa cada petición y decide si pensar y cuánto. Una pregunta factual sencilla puede recibir una respuesta directa, sin razonamiento; un problema de varios pasos o una depuración difícil activa un razonamiento más profundo. La decisión se toma por petición, así que en una misma conversación puede haber turnos con razonamiento y turnos sin él.
+
+<Callout tipo="verificado" fecha="2026-10-19">
+
+Según Anthropic, el esfuerzo es la orientación principal sobre esa decisión. No es un presupuesto estricto de tokens: es una señal de comportamiento. Con niveles bajos, el modelo sigue razonando en problemas suficientemente difíciles, pero menos que con niveles altos. Y el esfuerzo afecta a todos los tokens de la respuesta: el texto, los razonamientos y también las llamadas a herramientas. Con esfuerzo bajo hay menos llamadas a herramientas y más escuetas; con esfuerzo alto, más llamadas y explicaciones más detalladas.
+
+</Callout>
+
+## Los mandos en cada proveedor
+
+<ProviderTabs>
+<div slot="claude">
+
+El parámetro es `output_config.effort`. Va de `low` (razona lo mínimo y puede omitirlo en tareas simples) a `max` (piensa más y con más profundidad). Para activar el razonamiento adaptativo se indica `thinking: {type: "adaptive"}`. En Claude Code, `/effort` cambia el nivel sin tocar código. El valor por defecto depende del modelo y de la superficie (más abajo).
+
+</div>
+<div slot="openai">
+
+El parámetro es `reasoning.effort`. Los valores admitidos dependen del modelo. En la familia GPT-6 el valor por defecto es `medium`, salvo en GPT-6 Astra, cuyo defecto no figura en la documentación. OpenAI describe el mando como un compromiso: el esfuerzo bajo favorece la velocidad y un menor uso de tokens, y el alto un razonamiento más completo.
+
+</div>
+<div slot="google">
+
+El parámetro es `thinking_level`; el valor por defecto es `medium` en Gemini 4 Argon y en Gemini 3.8 Flash. Google recomienda ejecutar tus evaluaciones en los tres niveles y quedarte con el más bajo que cumpla tu listón de calidad.
+
+</div>
+</ProviderTabs>
+
+<Callout tipo="varia">
+
+El mismo mando se llama `output_config.effort` en Anthropic, `reasoning.effort` en OpenAI y `thinking_level` en Google. OpenAI avisa de que el nombre de un nivel no equivale al mismo grado de razonamiento en otro proveedor. Los niveles de cada modelo, sus excepciones y la tabla de equivalencias están en [esfuerzo y razonamiento](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/esfuerzo-y-razonamiento/).
+
+</Callout>
+
+El valor por defecto no es el mismo en todas partes: Opus 5.5 arranca en <Fact id="opus-5-5.effort.default.api" />, y el defecto también cambia según dónde uses el modelo: Sonnet 5.5 arranca en <Fact id="sonnet-5-5.effort.default.api" /> en la API y en <Fact id="sonnet-5-5.effort.default.claude-code" /> en Claude Code.
+
+## El razonamiento no siempre se puede apagar
+
+En varios modelos recientes no hay interruptor de «sin razonamiento». En Opus 5.5 el razonamiento no se puede desactivar y la API devuelve un error si lo intentas; en Fable 5.1 está siempre activo. Allí, el esfuerzo es el único mando. Otros modelos tienen reglas propias (por ejemplo, Sonnet 5.5 admite un ajuste que quita el razonamiento previo a la respuesta, pero solo en los niveles `low`, `medium` y `high`). Los detalles por modelo están en [esfuerzo y razonamiento](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/esfuerzo-y-razonamiento/).
+
+<Callout tipo="verificado" fecha="2026-10-19">
+
+La guía de Anthropic para Opus 5.5 recomienda, en aplicaciones de chat, plantearse quitar del prompt de sistema las instrucciones del tipo «piensa con cuidado antes de responder», porque el modelo ya decide cuánto pensar y el esfuerzo es el mando principal. Anthropic también indica que pedir en el prompt que Sonnet 5.5 piense menos no reduce su razonamiento de forma fiable: para pensar menos, baja el nivel de esfuerzo. Esto está documentado para Claude; no hemos verificado una recomendación equivalente en OpenAI ni en Google.
+
+</Callout>
+
+## Más esfuerzo no siempre es mejor
+
+Subir el esfuerzo es un compromiso, no un seguro gratuito. Hay tres tipos de afirmación que conviene no mezclar: lo verificado, lo medido por el proveedor y lo que recomienda la guía.
+
+<Callout tipo="verificado" fecha="2026-10-19">
+
+El razonamiento se factura como salida, y en Haiku 5.5, Sonnet 5.5, Opus 5.5 y Fable 5.1 los tokens de salida cuestan cinco veces los de entrada, según la guía de optimización de Anthropic. Más razonamiento significa más coste y más latencia. En la guía de Opus 4.7, Anthropic añade que en la mayoría de las cargas `max` aporta ganancias de calidad relativamente pequeñas a un coste significativo, y que en algunas tareas de salida estructurada puede llevar a pensar de más. Y OpenAI indica que `xhigh` solo se use cuando tus evaluaciones muestren un beneficio claro que justifique la latencia y el coste extra.
+
+</Callout>
+
+<Callout tipo="medicion" titulo="Medición publicada por Anthropic" fecha="2026-10-16">
+
+En un subconjunto de SWE-bench Pro (tareas de programación; dos ejecuciones por celda), Sonnet 5.5 en `medium` quedó unos 7 puntos por debajo de `high` con aproximadamente el 59 % del coste por tarea. En otra prueba, ejecutar todo en `low` y repetir solo los fallos en `high` costó alrededor de un 40 % menos que todo en `high`, con la misma tasa de acierto. Son cifras del proveedor sobre sus propias tareas: orientan, no se trasladan sin más a las tuyas. El propio texto añade que esa política sirve para ahorrar, no para mejorar el resultado.
+
+</Callout>
+
+<Callout tipo="recomendacion">
+
+Empieza con un modelo capaz y su esfuerzo por defecto; baja un nivel midiendo en una muestra con casos difíciles; sube solo si falla, y solo si el fallo es de razonamiento (errores lógicos, pasos saltados), no del encargo (formato, tono, datos que faltan). Es la regla 3 de la guía. Su porqué: el esfuerzo por defecto es el que el proveedor ha calibrado para ese modelo; bajar ahorra, pero puede costar calidad, y subir cuesta más sin arreglar un encargo ambiguo.
+
+</Callout>
+
+## En la práctica
+
+<Steps>
+
+1. Empieza con el modelo capaz y el esfuerzo por defecto, sin tocar nada.
+2. Si la tarea es repetitiva y funciona bien, prueba un nivel inferior con cinco casos reales, incluidos los difíciles, como prueba rápida (20–30 casos antes de fijarlo como norma). Fija antes de mirar qué consideras una respuesta aceptable.
+3. Si el resultado falla, pregúntate qué ha fallado: ¿el razonamiento o el encargo?
+4. Solo si es el razonamiento, sube un nivel y repite la prueba.
+5. Anota modelo, nivel y fecha. Los valores por defecto cambian entre versiones.
+
+</Steps>
+
+El procedimiento completo, con ejemplos, está en [estrategia de selección](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/estrategia-de-seleccion/).
+
+## Ejemplo de oficina: tres tareas, tres niveles
+
+Un equipo de administración usa el mismo asistente para tres cosas. Son hipótesis de partida para probar, no resultados medidos:
+
+- **Pasar una lista de pedidos a tabla.** Es mecánica y se comprueba de un vistazo. Candidata a probar un nivel por debajo del defecto.
+- **Conciliar facturas con pedidos cuando hay excepciones.** Tiene varios pasos que interactúan. Mejor empezar en el nivel por defecto y comprobar los totales.
+- **Detectar contradicciones entre cláusulas de un contrato.** Aquí un fallo puede salir caro y pasar desapercibido. Defecto como mínimo; si omite contradicciones que tú sabes que existen, sube un nivel y compara.
+
+La diferencia no la marca el prestigio de la tarea, sino cuánto cuesta equivocarse y si el error se ve.
+
+## Errores frecuentes
+
+- **Subir el esfuerzo para arreglar un mal encargo.** Si falta contexto o el formato está mal pedido, más razonamiento solo encarece el error.
+- **Fijar `max` «por si acaso».** Es el nivel de mayor coste y latencia; úsalo cuando hayas comprobado que `high` o `xhigh` no bastan.
+- **Dar por hecho que el defecto es el mismo en todas partes.** Cambia con el modelo y con la superficie.
+- **Copiar un nivel de un proveedor a otro.** Los nombres se parecen; el grado no.
+- **Pedir «piensa paso a paso» en lugar de ajustar el esfuerzo.** En los modelos Claude recientes, el mando es el esfuerzo.
+- **Cambiar el esfuerzo en mitad de una conversación larga con caché.** En la API de Anthropic puede invalidar parte de la caché.
+
+<Checklist
+  id="m1-razonamiento"
+  titulo="Antes de tocar el esfuerzo"
+  items={[
+    'Sé qué esfuerzo usa por defecto mi modelo en mi superficie.',
+    'Sé que el razonamiento se factura como salida.',
+    'Antes de subir, he comprobado que el fallo es de razonamiento y no del encargo.',
+    'Antes de bajar, he probado el nivel inferior con casos difíciles.',
+    'He anotado nivel, modelo y fecha del ajuste.',
+  ]}
+/>
+
+## Para profundizar
+
+La tabla de equivalencias y las reglas por modelo, en [esfuerzo y razonamiento](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/esfuerzo-y-razonamiento/). Cómo se traduce en coste, en [coste por tarea completada](/AI-Optimized_Usage_Web/m2-metodo/coste-por-tarea/) y en [la economía de un LLM](/AI-Optimized_Usage_Web/m1-fundamentos/economia-de-un-llm/).

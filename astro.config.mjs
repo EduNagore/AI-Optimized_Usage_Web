@@ -34,6 +34,14 @@ export default defineConfig({
         Footer: './src/components/overrides/Footer.astro',
       },
       pagination: true,
+      // Los bloques de código con desplazamiento horizontal deben poder enfocarse con el teclado (axe: scrollable-region-focusable).
+      head: [
+        {
+          tag: 'script',
+          content:
+            "document.addEventListener('DOMContentLoaded',()=>document.querySelectorAll('.expressive-code pre').forEach((p)=>{if(p.scrollWidth>p.clientWidth)p.tabIndex=0;}));",
+        },
+      ],
       tableOfContents: { minHeadingLevel: 2, maxHeadingLevel: 3 },
       sidebar: modules.map((m) => ({
         label: m.label,

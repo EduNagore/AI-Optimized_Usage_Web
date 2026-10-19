@@ -6,6 +6,150 @@ sidebar:
 level: intermedio
 tracks: [profesional]
 readingTime: 8
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-19
+sources:
+  [
+    anthropic-esfuerzo,
+    claude-com-docs-office-agents-excel,
+    anthropic-precios,
+    platform-claude-com-docs-en-agents-and-tools-tool-use-code-execution-tool,
+    anthropic-reduce-hallucinations,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Fact from '@components/Fact.astro';
+import PromptTemplate from '@components/PromptTemplate.astro';
+import CostExample from '@components/CostExample.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Las cifras deben salir de código ejecutado, no de la estimación del modelo: exige que calcule y te enseñe el método.
+- Revisa la calidad de los datos antes de preguntar; casi todos los resultados raros nacen ahí.
+- Describe qué es una fila y qué significa cada columna; sin eso, el modelo adivina.
+- Recalcula tú dos o tres cifras clave con una fórmula propia: es la verificación más barata.
+- No subas datos personales de clientes o empleados sin autorización; anonimiza o agrega antes.
+
+</KeyTakeaways>
+
+## La tarea
+
+Tienes `ventas-2026.csv` con 40.000 líneas de pedidos. Tu jefe pregunta: «¿qué regiones han caído más en el tercer trimestre frente al segundo y por qué?». Tienes una tarde.
+
+## Configuración recomendada
+
+- **Superficie.** Un chat con ejecución de código (para que calcule de verdad) o, si trabajas en el libro, el complemento Claude en Excel. Según la ayuda oficial, Claude en Excel está disponible en Pro, Max, Team y Enterprise; úsalo solo con libros de confianza ([mapa de superficies](/AI-Optimized_Usage_Web/m6-herramientas/mapa-de-superficies/)).
+- **Modelo.** Sonnet 5.5; Opus 5.5 si el razonamiento sobre los datos es complejo.
+- **Esfuerzo.** `medium`. Para Sonnet 5.5, el valor por defecto es <Fact id="sonnet-5-5.effort.default.api" /> en la API y <Fact id="sonnet-5-5.effort.default.claude-code" /> en Claude Code; para Opus 5.5, <Fact id="opus-5-5.effort.default.api" />. Si tu chat o Excel no te deja fijarlo, usa el que ofrezca.
+- **Equivalente en otros proveedores** (fila de la matriz): <Fact id="gpt-6-1-sol.name" /> en OpenAI y <Fact id="gemini-4-argon.name" /> en Google.
+
+<Callout tipo="recomendacion">
+
+Es la fila «Análisis de datos en hojas de cálculo o CSV» de la [matriz por tarea](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/matriz-por-tarea/). Por qué: el análisis mezcla comprender el problema y calcular, y la matriz señala que las cifras deben salir de código ejecutado, lo que pesa más que subir el esfuerzo. Empieza en medio y sube solo si falla el razonamiento sobre los datos.
+
+</Callout>
+
+## Preparación del contexto
+
+1. **Limpia lo evidente.** Una fila de totales dentro de los datos, celdas combinadas o varias hojas con la misma estructura confunden. Deja una tabla plana: una fila por pedido, una columna por campo.
+2. **Describe los datos.** Qué representa una fila, qué significa cada columna, en qué unidades está el importe, qué formato tienen las fechas y si el separador decimal es la coma.
+3. **Escribe la pregunta de negocio**, no solo «analiza esto»: qué decisión apoyará.
+4. **Quita lo que no hace falta.** Si el CSV incluye nombre, correo o teléfono de clientes y no los necesitas, elimina esas columnas antes de subirlo. Por qué: lo que no subes no puede filtrarse ni quedar retenido ([privacidad y seguridad](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/privacidad-y-seguridad/)).
+5. **Empieza con una muestra.** Sube las primeras mil filas para fijar la pregunta y el método; después, el fichero completo.
+
+## El encargo
+
+<PromptTemplate
+  titulo="Análisis de un CSV o Excel"
+  archivo="analisis-csv-excel-caso"
+  texto={`Adjunto {{nombre del fichero}}. Cada fila es {{qué representa una fila}}. Las columnas son: {{lista de columnas y qué significan, con unidades y formato de fecha}}.
+
+Pregunta de negocio: {{qué quiero saber y para qué decisión}}.
+
+Antes de analizar, revisa la calidad de los datos (vacíos, duplicados, fechas fuera de rango, importes negativos o valores raros) y cuéntame qué has encontrado y qué has hecho con ello.
+
+Después responde a la pregunta calculando con código, no de cabeza, y enséñame el método en una frase y el código que has ejecutado. No redondees hasta el final.
+
+Entrega: la respuesta en dos frases, una tabla con las cifras que la sostienen (incluidos los totales por periodo para que pueda cuadrarlos con el fichero) y las limitaciones del análisis. Si la pregunta no se puede responder con estos datos, dilo. Distingue lo que sale de los datos de las hipótesis que se te ocurran para explicarlo.`}
+/>
+
+La última frase importa: «por qué» ha caído una región no se calcula, se interpreta. Si el modelo propone causas, tienen que llegar marcadas como hipótesis, no como hallazgos.
+
+## Verificación
+
+1. **Cuadra los totales.** La suma de ventas de la tabla del modelo debe coincidir con la suma del fichero original. Si no cuadra, para ahí.
+2. **Recalcula tú dos o tres cifras.** En Excel, con `SUMAR.SI.CONJUNTO` o una tabla dinámica. En PowerShell, para un CSV con separador punto y coma y coma decimal (ajusta los nombres de las columnas). Este ejemplo suma el importe total, descarta las filas vacías y quita el símbolo «€» y los espacios si las celdas lo llevan:
+
+```powershell
+$es = [cultureinfo]'es-ES'
+$filas = Import-Csv .\ventas-2026.csv -Delimiter ';' |
+  Where-Object { $_.importe } |
+  ForEach-Object {
+    $texto = ($_.importe -replace '[€\s]', '')
+    [pscustomobject]@{ region = $_.region; importe = [decimal]::Parse($texto, $es) }
+  }
+
+# Total del fichero
+($filas | Measure-Object importe -Sum).Sum
+
+# Total por región, para cuadrar con la tabla del modelo
+$filas | Group-Object region | ForEach-Object {
+  [pscustomobject]@{ region = $_.Name; total = ($_.Group | Measure-Object importe -Sum).Sum }
+}
+```
+
+Si `Parse` falla en alguna fila, es una buena noticia: has encontrado un importe con un formato raro que el modelo también habría tenido que interpretar.
+
+3. **Lee el código.** No hace falta saber programar a fondo: ¿filtra por las fechas que pediste? ¿excluye devoluciones si debía? Pide que lo explique línea a línea.
+4. **Mira la calidad.** Si el modelo informó de filas descartadas, comprueba que el número tiene sentido.
+5. **Separa hecho de hipótesis** antes de llevar la conclusión a nadie.
+
+Más niveles de verificación en [verificar siempre](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/verificar-siempre/).
+
+## Coste estimado
+
+Supuesto de la guía, no una medición: el análisis se hace en varios turnos y cada turno reenvía los datos de la muestra y el código previo, así que suponemos 60.000 tokens de entrada acumulada y 5.000 de salida (código, tablas y razonamiento). Volumen: 30 análisis al mes. Esto no incluye posibles cargos de la herramienta de ejecución de código, que no están en los datos del sitio.
+
+<CostExample
+  ids={['haiku-5-5', 'sonnet-5-5', 'opus-5-5']}
+  entrada={60000}
+  salida={5000}
+  volumen={30}
+  batch={false}
+  etiqueta="Análisis de un CSV (supuesto de la guía)"
+/>
+
+En un chat con suscripción no pagas por token, pero el consumo se descuenta de tu límite de uso; la tabla sirve para comparar modelos, no como factura. Cambia los tamaños en la [calculadora de coste](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/calculadora-de-coste/); el razonamiento de [coste por tarea completada](/AI-Optimized_Usage_Web/m2-metodo/coste-por-tarea/) explica por qué cuenta también tu tiempo de revisión.
+
+## Versión económica frente a premium
+
+- **Económica (a probar midiendo):** Sonnet 5.5 a `low`, o Haiku 5.5 en preguntas de agregación sencillas (totales por mes). Prueba con tres preguntas cuya respuesta ya conozcas. Si cuadra siempre, ahorras; si falla una, vuelve a `medium`.
+- **Estándar:** Sonnet 5.5 a `medium`.
+- **Premium:** Opus 5.5 cuando hay que cruzar varios ficheros, detectar anomalías o razonar sobre estacionalidad. Sube si el fallo es de razonamiento (conclusiones mal planteadas), no si es de cálculo: un fallo de cálculo se arregla pidiendo que lo haga con código.
+
+## Errores típicos
+
+- **Subir el fichero sin explicar las columnas.** El modelo interpreta «fecha» como fecha de pedido cuando era de factura.
+- **Aceptar una cifra sin código.** Si no hay código ejecutado, la cifra puede ser una estimación.
+- **Coma decimal.** Un importe «1.234,56» puede leerse mal si no avisas del formato; dilo en la descripción de las columnas.
+- **Preguntar «por qué» y tomar la respuesta como dato.** Es una hipótesis.
+- **Subir datos personales por comodidad.** Quítalos o agrégalos antes.
+
+<Checklist
+  id="m10-analizar-excel"
+  titulo="Antes de llevar el análisis a nadie"
+  items={[
+    'He descrito filas, columnas, unidades y formato decimal.',
+    'La cifra viene de código ejecutado y he visto el código.',
+    'Los totales cuadran con el fichero original.',
+    'He recalculado dos o tres cifras clave con otra herramienta.',
+    'Las causas están marcadas como hipótesis.',
+    'No he subido datos personales innecesarios.',
+  ]}
+/>
+
+## Para profundizar
+
+[Cuál usar para qué](/AI-Optimized_Usage_Web/m6-herramientas/cual-usar-para-que/) para decidir entre chat, Excel y API, y [alucinaciones](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/alucinaciones/) para entender por qué las cifras no deben salir del texto del modelo.

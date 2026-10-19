@@ -1,11 +1,213 @@
 ---
 title: 'Verificar siempre'
-description: 'Pedir evidencias y cerrar el bucle en el propio encargo, con un hook o con un revisor en contexto limpio.'
+description: 'Pedir evidencias y cerrar el bucle en el propio encargo, con /goal, con un hook de parada o con un revisor en contexto limpio.'
 sidebar:
   order: 1
 level: basico
 tracks: [esencial, profesional, tecnica]
-readingTime: 7
-status: en-preparacion
-sources: []
+readingTime: 9
+lastReviewed: 2026-10-19
+sources:
+  [
+    code-claude-com-docs-en-goal,
+    code-claude-com-docs-en-hooks,
+    claude-code-costes,
+    claude-code-buenas-practicas,
+    claude-code-comandos,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Steps from '@components/Steps.astro';
+import CommandCard from '@components/CommandCard.astro';
+import PromptTemplate from '@components/PromptTemplate.astro';
+import BeforeAfter from '@components/BeforeAfter.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- «Parece correcto» no es «está comprobado»: un modelo escribe con la misma seguridad lo cierto y lo inventado.
+- Fija el criterio de éxito antes de pedir el trabajo y exige **evidencia visible**: la salida de los tests, el comando ejecutado, la cita literal, la captura.
+- Cierra el bucle con el nivel que la tarea merezca: una frase en el encargo, `/goal`, un hook de parada o un revisor en contexto nuevo.
+- Al revisor pídele solo los fallos que afectan a la corrección; si no, te devuelve veinte observaciones de estilo y ninguna prioridad.
+- Si el resultado puede costar dinero, dañar a alguien o comprometer a la empresa, lo revisa una persona. Siempre.
+
+</KeyTakeaways>
+
+## La idea
+
+Un modelo de lenguaje produce texto plausible. Cuando acierta y cuando falla, el texto suena igual. Por eso la fiabilidad no sale de confiar más en el modelo, sino de **comprobar con algo que no sea el propio modelo**: un resultado que se pueda ejecutar, contar, buscar o leer en la fuente.
+
+Es el paso 6 del [ciclo de siete pasos](/AI-Optimized_Usage_Web/m2-metodo/ciclo-de-7-pasos/), y es el que más se omite. La documentación de costes de Claude Code lo trata como un hábito que ahorra tokens, no solo errores: incluir casos de prueba, pegar capturas o definir la salida esperada hace que el modelo detecte sus fallos antes de que tengas que pedirle correcciones.
+
+<Callout tipo="verificado" fecha="2026-10-19">
+
+Anthropic recomienda en su documentación de costes de Claude Code «dar objetivos de verificación»: «Include test cases, paste screenshots, or define expected output in your prompt. When Claude can verify its own work, it catches issues before you need to request fixes».
+
+</Callout>
+
+Lo que sigue es una escalera. Sube solo hasta el peldaño que justifique lo que está en juego.
+
+| Nivel | Cómo se cierra el bucle                                   | Quién comprueba                 | Cuándo                                  |
+| ----- | --------------------------------------------------------- | ------------------------------- | --------------------------------------- |
+| 1     | Evidencia exigida en el propio encargo                    | Tú, leyendo la evidencia        | Casi siempre; es gratis                 |
+| 2     | `/goal`: condición que el agente debe demostrar           | Un modelo evaluador y tú        | Trabajo largo con un final medible      |
+| 3     | Hook de parada: un script que bloquea el cierre del turno | Un script determinista          | Reglas que no pueden saltarse           |
+| 4     | Revisor en contexto nuevo                                 | Otra conversación u otro agente | Entregables importantes                 |
+| 5     | Revisión humana obligatoria                               | Una persona responsable         | Contratos, dinero, personas, decisiones |
+
+## Nivel 1: pide evidencias, no confirmaciones
+
+«¿Está bien?» obtiene siempre un «sí, he comprobado que…». Pide el artefacto, no la afirmación. Según el tipo de trabajo, la evidencia es distinta:
+
+| Trabajo                       | Evidencia que debes exigir                                                                |
+| ----------------------------- | ----------------------------------------------------------------------------------------- |
+| Hoja de cálculo o informe     | La suma de control: el total que sale de tus cálculos y el total del fichero original     |
+| Acta de reunión a tareas      | Cada tarea con la frase literal del acta de la que sale, y «sin responsable» si no consta |
+| Revisión de un contrato       | La cláusula citada literalmente, con su número                                            |
+| Resumen de un documento largo | Cada afirmación con la página o el apartado de origen                                     |
+| Código o automatización       | La salida real de los tests o del comando, pegada tal cual                                |
+| Interfaz o documento visual   | Una captura del resultado                                                                 |
+
+<BeforeAfter
+  antes="Calcula las ventas netas por región del Excel adjunto y dime si cuadra."
+  despues="Calcula las ventas netas por región (ventas menos devoluciones). Muestra la tabla y, debajo, dos cifras: la suma de las regiones y el total del fichero de ventas menos el total de devoluciones. Si no coinciden, dime en qué región está la diferencia en lugar de ajustar números para que cuadren."
+>
+
+Qué cambió y por qué: «si cuadra» invita a un sí. Pedir las dos cifras obliga a mostrarlas, y tú las comparas en diez segundos. La última frase evita el fallo clásico de «cuadrar» el resultado a la fuerza.
+
+</BeforeAfter>
+
+## En la práctica
+
+<Steps>
+
+1. **Escribe el criterio de éxito antes del encargo.** Una frase comprobable: «las tareas del acta tienen responsable y fecha, y cada una cita su frase de origen».
+2. **Inclúyelo en el encargo** junto con la evidencia que quieres ver. Es el nivel 1 y lo usarás siempre.
+3. **Elige el peldaño de cierre.** Para un trabajo largo con un final medible, `/goal`. Para una regla innegociable, un hook. Para un entregable importante, un revisor aparte.
+4. **Comprueba tú una muestra.** Tres citas al azar contra el original, dos cifras contra la fuente. Si falla una, desconfía del resto.
+5. **Si falla, mejora el criterio, no solo el resultado.** Un error que se repite se convierte en una línea del encargo o en un caso de tus [evals mínimas](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/evals-minimas/).
+
+</Steps>
+
+## Nivel 2: `/goal`, una condición que se demuestra
+
+<CommandCard comando="/goal" />
+
+`/goal` fija una condición de finalización y Claude Code sigue trabajando, turno tras turno, hasta que se cumple. Tras cada turno, un modelo pequeño evalúa la condición. La documentación es explícita en el detalle que más importa: **el evaluador no ejecuta comandos ni lee ficheros por su cuenta; juzga a partir de lo que Claude ha mostrado en la conversación**.
+
+La consecuencia práctica es que la condición debe pedir **evidencia que aparezca en la conversación**. «Los tests pasan» funciona porque Claude ejecuta los tests y el resultado queda en la transcripción. «El informe es correcto» no funciona: nada en la conversación puede demostrarlo.
+
+La documentación describe una buena condición con tres ingredientes: un estado final medible, una comprobación declarada y las restricciones que no se pueden romper. Admite hasta 4.000 caracteres e incluir una cláusula de parada («o para tras 20 turnos»). Cifras y descripción de la [documentación de `/goal`](https://code.claude.com/docs/en/goal), consultada el 19 de octubre de 2026.
+
+Un ejemplo de oficina, sin una línea de código. Cada parte de la condición es algo que Claude puede **mostrar** en la conversación:
+
+```text
+/goal Claude ha creado Informe-septiembre.xlsx y ha mostrado en la
+conversación el listado de la carpeta de salida donde aparece ese fichero;
+ha mostrado la suma de ventas netas por región y el total de ventas menos
+devoluciones del fichero original, y ambas cifras coinciden; y ha mostrado
+el listado de la carpeta Originales con las fechas de modificación sin
+cambios; o para tras 15 turnos
+```
+
+Fíjate en lo que **no** hay: «no se ha modificado ningún fichero de Originales» como afirmación. El evaluador no puede comprobarlo; solo puede creer lo que Claude muestre. Esa restricción («no tocar Originales») se impone con una regla `deny` o un hook que impida escribir en esa carpeta, y la condición de `/goal` pide la **evidencia** (el listado) para que tú la veas. Restricción y evidencia son cosas distintas: la primera la garantiza el sistema; la segunda, la lees tú.
+
+<Callout tipo="cuidado">
+
+Cada turno adicional gasta tokens (el evaluador usa un modelo pequeño y su coste es poco relevante frente al del trabajo principal, según la documentación). Una condición vaga o que depende de algo que Claude no muestra hace que el bucle dé vueltas hasta la cláusula de parada. Y como el evaluador solo ve la conversación, **tampoco sustituye tu comprobación de las cifras**: la condición te obliga a que estén a la vista para que las leas tú. El detalle del flujo completo, en [el flujo recomendado](/AI-Optimized_Usage_Web/m7-claude-code/flujo-recomendado/).
+
+</Callout>
+
+## Nivel 3: un hook de parada, la garantía que no se negocia
+
+Un [hook](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#hook) es una regla que el sistema ejecuta en un momento concreto, sin pedirle permiso al modelo. El evento `Stop` salta cuando Claude va a dar por terminado el turno. Un hook de tipo `command` puede ejecutar un script; si sale con **código 2**, la acción se bloquea y Claude tiene que seguir trabajando. A diferencia de `/goal`, el script comprueba de verdad (ejecuta los tests, busca marcas «PENDIENTE» en el documento, valida que existe el fichero de salida).
+
+Según la documentación, `/goal` es en realidad una envoltura de un hook de parada basado en un prompt, limitada a la sesión. Usa un hook propio cuando la regla deba aplicarse a todas las sesiones de un proyecto, o cuando la comprobación sea determinista y no deba depender del juicio de un modelo.
+
+Para configurarlo sin escribir JSON a mano, describe la regla y deja que `/update-config` edite el `settings.json`; `/hooks` muestra los hooks activos. Revisa siempre el cambio antes de aceptarlo. El detalle de configuración está en [Extender Claude Code](/AI-Optimized_Usage_Web/m7-claude-code/extender-claude-code/).
+
+<Callout tipo="recomendacion">
+
+Pasa de una instrucción en el encargo a un hook cuando una regla se haya incumplido dos veces. El porqué: una instrucción es una petición que el modelo puede olvidar o interpretar; un hook es un control que se ejecuta siempre. Es la misma regla que ya aplica la guía para `CLAUDE.md`.
+
+</Callout>
+
+## Nivel 4: un revisor en contexto nuevo
+
+Quien revisa con el mismo contexto que quien escribió suele dar por buenas las mismas suposiciones. Un revisor en una conversación nueva (o un subagente) recibe solo el entregable y los criterios, y por eso discrepa con más facilidad. Es el patrón de [encadenar y autocorregir](/AI-Optimized_Usage_Web/m3-prompting/encadenar-y-autocorregir/) llevado a los entregables importantes.
+
+Hay una trampa: si le dices «revisa y mejora», encontrará siempre algo. Con veinte observaciones mezcladas no sabes cuál importa. Pídele **solo los fallos que afectan a la corrección** (una cifra mal, una cláusula omitida, una afirmación sin respaldo) y deja el estilo para otra pasada.
+
+<PromptTemplate
+  titulo="Revisor de corrección en contexto nuevo"
+  archivo="revisor-de-correccion"
+  texto={`<entregable>
+{{pega aquí el texto, la tabla o el resumen a revisar}}
+</entregable>
+
+<fuente>
+{{pega aquí el documento original o los datos de partida}}
+</fuente>
+
+<criterios>
+1. {{criterio comprobable 1: por ejemplo, cada cifra del entregable aparece en la fuente}}
+2. {{criterio comprobable 2: por ejemplo, ninguna tarea carece de responsable}}
+3. {{criterio comprobable 3}}
+</criterios>
+
+Contrasta el entregable con la fuente y los criterios. Informa SOLO de fallos que afecten a la corrección: datos erróneos, omisiones relevantes, afirmaciones sin respaldo en la fuente o incumplimiento de un criterio. Para cada fallo, cita la frase del entregable y el pasaje de la fuente que lo contradice (o di que no existe). No reescribas nada, no comentes el estilo y no añadas sugerencias opcionales. Si no encuentras fallos de este tipo, responde «Sin fallos de corrección» y explica qué has comprobado.`}
+
+>
+
+Variante de la plantilla «Revisión contra criterios» de la biblioteca: añade la fuente y limita el informe a los fallos de corrección. Úsala en una conversación o un subagente **sin** el historial de cómo se escribió el entregable.
+
+</PromptTemplate>
+
+<Callout tipo="recomendacion">
+
+Pide al revisor que cite el pasaje de la fuente que contradice cada fallo. El porqué: un revisor también puede alucinar un error. Si no puede señalar el pasaje, es una sospecha, no un hallazgo, y tú lo compruebas en la fuente en segundos.
+
+</Callout>
+
+En Claude Code existen revisiones ya montadas: `/code-review` busca errores de corrección en un cambio y `/security-review` analiza los cambios de la rama buscando vulnerabilidades. Ninguna sustituye tu lectura del `/diff` cuando el cambio importa (ver [el flujo recomendado](/AI-Optimized_Usage_Web/m7-claude-code/flujo-recomendado/)). Para repartir la revisión entre varios modelos o agentes, mira [los patrones de orquestación](/AI-Optimized_Usage_Web/m8-agentes/patrones/).
+
+## Nivel 5: cuándo la revisión humana es obligatoria
+
+Ninguno de los niveles anteriores es una firma. Esta es la regla de la guía, y su porqué está en que el modelo no asume responsabilidad ni conoce el contexto que tú sí conoces:
+
+- **Contratos y documentos con efecto legal.** Una persona cualificada (tu asesoría jurídica, por ejemplo) lee el documento final. La IA sirve para preparar la lectura, no para sustituirla. Ver el caso [revisión de un contrato](/AI-Optimized_Usage_Web/m10-casos-practicos/revision-de-un-contrato/).
+- **Dinero:** pagos, facturas, presupuestos, previsiones que alguien usará para decidir.
+- **Personas:** evaluaciones, despidos, selección, comunicaciones delicadas.
+- **Cualquier salida hacia fuera:** un correo a un cliente, una nota de prensa, una publicación.
+- **Acciones irreversibles:** borrar, enviar, publicar, desplegar. Ver [privacidad y seguridad](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/privacidad-y-seguridad/).
+
+Una forma práctica de no engañarte: la persona que aprueba debe poder ver **la evidencia**, no solo el resultado. Si solo ve el resumen del modelo, está firmando la confianza en el modelo.
+
+## Errores frecuentes
+
+- **Preguntar «¿has comprobado que está bien?».** La respuesta casi siempre es «sí». Pide la evidencia, no la confirmación.
+- **Una condición de `/goal` que nadie puede demostrar en la conversación.** El evaluador no ejecuta comandos: si la prueba no aparece a la vista, no existe para él.
+- **Revisor sin criterios.** Obtienes retoques de estilo y la falsa tranquilidad de que alguien lo ha mirado.
+- **Revisor con el mismo contexto que el autor.** Hereda sus suposiciones. Mejor conversación nueva, con el entregable y la fuente.
+- **Verificar contra otro resumen.** Las cifras se contrastan con el original, no con otro texto generado.
+- **Subir de peldaño por costumbre.** Un hook para un correo interno es desproporcionado; revisar a mano un contrato antes de firmarlo, no.
+
+<Checklist
+  id="m9-verificar"
+  titulo="Antes de dar un trabajo por bueno"
+  items={[
+    'Escribí el criterio de éxito antes de pedir el trabajo.',
+    'Exigí evidencia (salida, cita, cifra de control, captura), no una confirmación.',
+    'He comprobado yo una muestra contra la fuente original.',
+    'Si usé /goal, la condición exige evidencia visible en la conversación y lleva cláusula de parada.',
+    'Si hay una regla que no puede fallar, está en un hook y no solo en una instrucción.',
+    'El revisor tenía contexto limpio y solo informó de fallos de corrección.',
+    'Si hay dinero, personas, un contrato o una acción irreversible, lo ha revisado una persona.',
+  ]}
+/>
+
+## Para profundizar
+
+Cómo se encadena el borrador, la revisión y la versión final: [Encadenar y autocorregir](/AI-Optimized_Usage_Web/m3-prompting/encadenar-y-autocorregir/). Cuando quieras medir de forma sistemática si un cambio de modelo o de prompt mejora el acierto: [Evals mínimas](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/evals-minimas/). Para reducir los datos inventados en origen: [Alucinaciones](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/alucinaciones/).

@@ -1,11 +1,129 @@
 ---
 title: 'La escalera de complejidad'
-description: 'De la llamada única al multiagente: cada escalón añade coste y debe ganarse su sitio.'
+description: 'De la llamada única al multiagente: cada escalón añade coste y debe ganarse su sitio. Cuatro preguntas para decidir hasta dónde subir.'
 sidebar:
   order: 1
 level: intermedio
 tracks: [profesional, tecnica]
-readingTime: 6
-status: en-preparacion
-sources: []
+readingTime: 7
+lastReviewed: 2026-10-19
+sources:
+  [
+    platform-claude-com-docs-en-managed-agents-multiagent-orchestration-2,
+    claude-code-agentes-en-paralelo,
+    claude-code-costes,
+    anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas,
+    codex-subagents,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+import FlujoAgentes from '@components/diagrams/FlujoAgentes.astro';
+
+<KeyTakeaways>
+
+- Hay cuatro escalones: llamada única, flujo programado, agente y multiagente. Cada uno resuelve tareas más abiertas y cuesta más en tokens, en latencia y en cosas que revisar.
+- Sube solo cuando el escalón de abajo ha fallado de verdad en tu tarea, no porque el de arriba suene más potente.
+- Cuatro preguntas deciden el escalón: ¿se puede especificar del todo de antemano?, ¿el valor justifica el coste?, ¿el modelo es capaz? y ¿el error se detecta y se recupera?
+- Si la tarea se puede escribir como una receta fija, es un flujo, no un agente.
+- Multiagente es el último recurso: reparte sobre todo el tiempo; el coste solo baja en casos concretos y medidos.
+
+</KeyTakeaways>
+
+## La idea
+
+Un [agente](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#agente) es un sistema en el que el modelo decide los pasos, usa herramientas y actúa en bucle hasta terminar o parar. Esa autonomía es útil cuando no puedes predecir los pasos, pero tiene un precio: cada vuelta del bucle reenvía contexto, y cada decisión del modelo es una ocasión de equivocarse. Por eso conviene pensar en una **escalera**: empiezas por el escalón más bajo que resuelva la tarea y subes solo si falla.
+
+| Escalón                 | Qué es                                                                       | Ejemplo de oficina                                                                       | Qué añade respecto al anterior                                                          |
+| ----------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| **1. Llamada única**    | Un encargo bien escrito, una respuesta                                       | Resumir un acta para el comité                                                           | Nada: es la base                                                                        |
+| **2. Flujo programado** | Pasos fijados de antemano, cada uno con su llamada (o con código sin modelo) | Para cada ticket: extraer campos, clasificar, redactar la respuesta                      | Orquestación en código y varias llamadas; el recorrido es siempre el mismo              |
+| **3. Agente**           | El modelo elige los pasos y las herramientas en bucle                        | Investigar un tema consultando fuentes que no conoces de antemano                        | Un bucle que reenvía contexto en cada vuelta, menos previsibilidad y más que verificar  |
+| **4. Multiagente**      | Varios agentes con su propio contexto, coordinados                           | Verificar cruzando un informe de mercado con tres líneas de investigación independientes | Un contexto por agente, plan, reparto y fusión de resultados, y más salidas que revisar |
+
+El orden importa por una razón práctica: **cada escalón conserva lo del anterior y le suma coste**. Un flujo es varias llamadas únicas. Un agente es un bucle de llamadas. Un equipo multiagente es varios bucles más la coordinación.
+
+Ojo con la palabra «flujo», que en esta guía tiene dos sentidos. Un [flujo](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#flujo) (escalón 2) son pasos fijados de antemano por ti. Un **flujo dinámico** (Claude Code, Managed Agents) es otra cosa: un programa que escribe el agente para repartir el trabajo entre muchos subagentes, y por tanto pertenece al escalón 4.
+
+<FlujoAgentes patron="escalera" />
+
+<Callout tipo="verificado" fecha="2026-10-19">
+
+La documentación de Anthropic para Managed Agents dice (traducción nuestra) que la coordinación multiagente encaja mejor en tareas complejas que exigen trabajo en una variedad de superficies, o en las que varias tareas bien delimitadas contribuyen a un objetivo global. La documentación de subagentes de Codex, de OpenAI, avisa de que los flujos con subagentes consumen más tokens que ejecuciones comparables de un solo agente.
+
+</Callout>
+
+## Las cuatro preguntas
+
+Antes de subir un escalón, pasa la tarea por estos cuatro criterios. Si alguno falla, quédate un escalón más abajo.
+
+1. **Complejidad: ¿se puede especificar del todo de antemano?** Si sabes los pasos, escríbelos: es un flujo (escalón 2) y es más barato y más predecible que un agente. Un agente se justifica cuando los pasos dependen de lo que va apareciendo.
+2. **Valor: ¿justifica más coste y más latencia?** Un agente que tarda veinte minutos y cuesta más de lo que vale su resultado por una tarea que una persona hace en cinco no compensa, aunque funcione.
+3. **Viabilidad: ¿el modelo es capaz de hacer cada parte?** Pruébalo con un caso real antes de montar nada. Si el modelo falla en una pieza aislada, tres agentes no lo arreglan.
+4. **Coste del error: ¿se detecta y se recupera?** Si un fallo se ve en seguida (una cifra que no cuadra, un test que falla) puedes dar más autonomía. Si un fallo pasa desapercibido o es irreversible (enviar, borrar, pagar), reduce autonomía y añade revisión humana.
+
+Estas cuatro preguntas son criterio de la guía. Su porqué: cada una corresponde a un modo distinto de perder dinero, el de montar un agente donde bastaba una receta, el de pagar por un resultado que no valía tanto, el de montar algo que el modelo no sabe hacer y el de no enterarse de que algo salió mal.
+
+## En la práctica
+
+<Steps>
+
+1. **Empieza por el escalón 1.** Escribe el encargo con la [plantilla universal](/AI-Optimized_Usage_Web/m2-metodo/plantilla-de-encargo/) y comprueba el resultado en uno o dos casos reales para depurar el encargo.
+2. **Si falla, mira por qué antes de subir.** Un encargo ambiguo o un contexto desordenado se arreglan en el escalón 1. Sube solo si el fallo es de estructura: la tarea tiene varias fases o los pasos dependen de lo que aparece.
+3. **Si los pasos se pueden listar, usa un flujo.** Cada paso con su propio encargo corto y su propio formato de salida; mira [encadenar y autocorregir](/AI-Optimized_Usage_Web/m3-prompting/encadenar-y-autocorregir/).
+4. **Si los pasos dependen del camino, usa un agente** con un criterio de terminado verificable. El encargo se parece más a una especificación que a una pregunta: [encargos para tareas largas y agentes](/AI-Optimized_Usage_Web/m3-prompting/tareas-largas-y-agentes/).
+5. **Sube a multiagente solo con una razón concreta.** Hay tres que la justifican: hay muchas piezas independientes que repartir, el trabajo no cabe en una ventana de contexto o quieres una revisión con contexto limpio. Los [patrones](/AI-Optimized_Usage_Web/m8-agentes/patrones/) dicen cuál usar.
+6. **Mide el coste real con un lote pequeño** antes de escalar. Con la [calculadora](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/calculadora-de-coste/) estimas, y `/usage` en Claude Code te da lo que realmente gastó.
+
+</Steps>
+
+<Callout tipo="recomendacion" titulo="Recomendación: tres tamaños de prueba, tres funciones">
+
+En todo el módulo se usan tres tamaños de muestra, cada uno para una cosa distinta. **Uno o dos casos** sirven para depurar el encargo: ver que se entiende y que el formato de salida sale bien. **Tres elementos** sirven para estimar el coste y el tiempo por elemento antes de escalar a muchos; no bastan para decidir un modelo. **Cinco casos reales, con los más difíciles incluidos, o entre 20 y 30 si vas a fijar una política,** sirven para decidir modelo y esfuerzo, como pide [estrategia de selección](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/estrategia-de-seleccion/). Es una recomendación de la guía; su porqué: con tres casos fáciles cualquier modelo parece suficiente.
+
+</Callout>
+
+## Ejemplo de oficina: tickets de soporte
+
+Un equipo recibe 400 tickets a la semana y quiere que cada uno llegue clasificado, con los datos del cliente extraídos y un borrador de respuesta.
+
+- **Escalón 1** falla de una forma útil: el modelo clasifica bien pero el borrador mezcla políticas de producto y tono. Son dos trabajos distintos en un solo encargo.
+- **Escalón 2 resuelve el caso.** Un flujo con tres pasos fijos: clasificar (categoría y urgencia, salida estructurada), extraer datos y redactar el borrador con la política de esa categoría. Los pasos se conocen de antemano, así que no hace falta que un modelo los decida.
+- **No hace falta subir más.** No hay exploración abierta, y el error se detecta: un humano revisa el borrador antes de enviarlo.
+- **Cuándo sí subiría al escalón 3:** si algunos tickets exigieran consultar el historial del cliente, decidir qué buscar según lo que aparece y volver a preguntar. Ahí los pasos ya no son fijos.
+
+Si el volumen creciera a decenas de miles, la respuesta tampoco sería un equipo de agentes sino un flujo en lotes, como el de [clasificar 50.000 tickets](/AI-Optimized_Usage_Web/m10-casos-practicos/clasificar-50000-tickets/).
+
+<Callout tipo="recomendacion">
+
+Quédate en el escalón más bajo que resuelva la tarea y súbelo solo cuando hayas visto fallar el anterior en un caso real. Es una recomendación de la guía. Su porqué: la complejidad no se devuelve. Un agente que ya has montado, con sus permisos, sus herramientas y su revisión, hay que mantenerlo, y cada pieza añadida es un punto más que puede fallar.
+
+</Callout>
+
+## Errores frecuentes
+
+- **Montar un agente para una receta.** Si puedes escribir los pasos, escríbelos: será más barato y reproducible.
+- **Subir de escalón para compensar un encargo flojo.** El multiagente no arregla un objetivo ambiguo; lo reparte entre más agentes.
+- **Confundir «más agentes» con «más calidad».** Repartir acorta el tiempo si las piezas son independientes; la calidad depende de cada pieza y de cómo verifiques.
+- **No medir el escalón de abajo.** Sin una línea base, no sabes si el escalón nuevo mejora algo.
+- **Dar autonomía donde el error no se ve.** Cuanto más difícil es detectar un fallo, más revisión pide.
+
+<Checklist
+  id="m8-escalera"
+  titulo="Antes de subir un escalón"
+  items={[
+    'He probado el escalón inferior con casos reales y sé en qué falla.',
+    'El fallo es de estructura, no de un encargo ambiguo ni de un contexto desordenado.',
+    'No puedo escribir los pasos de antemano (si puedo, es un flujo).',
+    'El valor de la tarea justifica el coste y la latencia extra.',
+    'El error se detecta y se recupera; si no, he añadido revisión humana.',
+    'Sé cómo voy a medir el coste del escalón nuevo.',
+  ]}
+/>
+
+## Para profundizar
+
+Los [patrones de orquestación](/AI-Optimized_Usage_Web/m8-agentes/patrones/) detallan qué forma tomar al llegar al escalón 4, y [cuándo no orquestar](/AI-Optimized_Usage_Web/m8-agentes/cuando-no-orquestar/) recoge los casos en que repartir sale peor. Para elegir superficie antes de nada, [elegir superficie](/AI-Optimized_Usage_Web/m2-metodo/elegir-superficie/).

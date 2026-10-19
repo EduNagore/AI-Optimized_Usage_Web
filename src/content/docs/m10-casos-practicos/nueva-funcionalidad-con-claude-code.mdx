@@ -6,6 +6,179 @@ sidebar:
 level: avanzado
 tracks: [tecnica]
 readingTime: 10
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-19
+sources:
+  [
+    claude-code-buenas-practicas,
+    claude-code-comandos,
+    claude-code-modelo-y-esfuerzo,
+    claude-code-modos-de-permiso,
+    code-claude-com-docs-en-goal,
+    claude-code-costes,
+    claude-code-prompt-caching-en-claude-code,
+    anthropic-precios,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Fact from '@components/Fact.astro';
+import CommandCard from '@components/CommandCard.astro';
+import Steps from '@components/Steps.astro';
+import PromptTemplate from '@components/PromptTemplate.astro';
+import CostExample from '@components/CostExample.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Sigue el flujo recomendado: entrevista, especificación (`SPEC.md`), plan, implementación, verificación, `/code-review` y PR.
+- El plan es el punto más barato para corregir; la especificación, el más barato para no equivocarse.
+- Fija el criterio de éxito antes de implementar y exige evidencia visible: el evaluador de `/goal` no ejecuta comandos.
+- `opusplan` usa Opus para planificar y Sonnet para ejecutar: capacidad donde se piensa y tarifa menor donde se teclea.
+- Una tarea, una sesión: `/clear` al cerrar el PR.
+
+</KeyTakeaways>
+
+## La tarea
+
+El equipo de producto pide: «los clientes deben poder exportar su historial de pedidos a CSV desde su área privada, filtrando por fechas». Es un cambio que toca la interfaz, un endpoint y un permiso, y hay una decisión de diseño abierta (¿se exporta en el momento o en segundo plano si el historial es grande?).
+
+## Configuración recomendada
+
+- **Superficie.** Claude Code en el terminal, en el IDE o en la app de escritorio, dentro del repositorio ([primeros pasos](/AI-Optimized_Usage_Web/m7-claude-code/primeros-pasos/)).
+- **Modelo.** `opusplan`: Opus 5.5 en modo plan y Sonnet 5.5 al ejecutar. Si el cambio es pequeño y claro, Sonnet 5.5 en todo.
+- **Esfuerzo.** `medium`, que es el valor por defecto en Claude Code de Sonnet 5.5 (<Fact id="sonnet-5-5.effort.default.claude-code" />) y de Opus 5.5 (<Fact id="opus-5-5.effort.default.claude-code" />); no hay que cambiar nada para empezar. Sube a `high` en el plan solo si el diseño tiene varias restricciones que interactúan.
+
+<Callout tipo="recomendacion">
+
+Combina las filas «Programación diaria» y «Arquitectura y depuración compleja» de la [matriz por tarea](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/matriz-por-tarea/). Por qué `opusplan`: el plan es donde un modelo flojo malgasta más iteraciones de las que ahorra, y la ejecución de un plan aprobado es trabajo más mecánico. Es una hipótesis de la guía; la medición de Anthropic sobre un subconjunto de SWE-bench Pro (Sonnet 5.5 en `medium` unos 7 puntos por debajo de `high` con alrededor del 59 % del coste por tarea) es una referencia del proveedor sobre sus tareas, no sobre tu código.
+
+</Callout>
+
+## Preparación del contexto
+
+1. **Que `CLAUDE.md` diga lo básico**: cómo se ejecutan los tests, cómo se arranca la aplicación y las convenciones que no se deducen del código. Por qué: se carga en cada sesión; mantenlo corto ([ficheros de instrucciones](/AI-Optimized_Usage_Web/m6-herramientas/ficheros-de-instrucciones-y-memoria/)).
+2. **Rama limpia y tests en verde.** Si ya hay fallos, el criterio de éxito deja de significar algo.
+3. **Permisos.** Empieza en modo `plan` y pasa a `acceptEdits` o `auto` al implementar. Con claves o datos reales en el proyecto, una regla `deny` sobre `.env` y la carpeta de secretos vale más que una frase en `CLAUDE.md` ([privacidad y seguridad](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/privacidad-y-seguridad/)). En Windows nativo, el sandbox no se aplica a los comandos: si trabajas con código sensible, usa WSL2 o un contenedor.
+4. **Datos de prueba sin datos reales de clientes.** Un CSV de pedidos de ejemplo, anonimizado.
+
+## El encargo, por fases
+
+<Steps>
+
+1. **Entrevista y especificación.** En modo plan, deja que Claude te pregunte lo que es difícil de decidir (la técnica está en [que la IA te entreviste](/AI-Optimized_Usage_Web/m3-prompting/que-la-ia-te-entreviste/)).
+2. **Plan.** Con `SPEC.md` aprobado, pide el plan y cómo se comprobará. Edítalo con `Ctrl+G` antes de aprobarlo.
+3. **Implementación.** Aprueba y pasa a ejecutar.
+4. **Verificación.** Tests y una condición `/goal` con evidencia visible.
+5. **Revisión y PR.** `/code-review`, revisión del `/diff`, commit y PR.
+
+</Steps>
+
+### Fase 1: entrevista y especificación
+
+<PromptTemplate
+  titulo="Entrevista y especificación de la funcionalidad"
+  archivo="especificacion-funcionalidad-caso"
+  texto={`Idea: {{descripción en pocas frases}}.
+Usuarios y problema que resuelve: {{quién la usa y qué no puede hacer hoy}}.
+
+Antes de tocar código, lee las partes del repositorio afectadas. Después entrevístame con preguntas concretas sobre lo que sea difícil de decidir (casos límite, permisos, errores, rendimiento, qué queda fuera). Hazlas de una en una o en bloques pequeños.
+
+Cuando hayamos terminado, escribe una especificación con: objetivo, alcance y exclusiones, comportamiento esperado con ejemplos, casos límite, criterios de aceptación comprobables y preguntas abiertas. Guárdala como SPEC.md.`}
+/>
+
+### Fase 2 y 3: plan e implementación
+
+<PromptTemplate
+  titulo="Encargo de implementación a un agente de código"
+  archivo="encargo-agente-codigo-caso"
+  texto={`Objetivo: implementar lo descrito en SPEC.md. Al terminar, {{qué debe poder hacerse, en términos de comportamiento}}.
+
+Contexto: {{por qué se necesita, qué módulos intervienen y cuáles no se deben tocar}}.
+
+Restricciones: {{por ejemplo, no cambiar la API pública; motivo: hay clientes que dependen de ella}}.
+
+Propón primero un plan en pasos y cómo comprobaremos que cada uno está bien. No edites nada hasta que lo apruebe.
+
+Cómo comprobar que está hecho: {{comando de tests o de comprobación}}. No des la tarea por terminada hasta que pase. Si un test falla, arregla el código y no el test, salvo que el test esté mal; en ese caso, explícalo.
+
+Antes de editar, lee los ficheros afectados; no supongas cómo funciona algo que no hayas abierto. Si una acción es irreversible o afecta a algo fuera del repositorio, pregunta antes.
+
+Al terminar, resume qué cambiaste, qué probaste y qué dudas te quedan.`}
+/>
+
+<CommandCard comando="/plan" />
+
+## Verificación
+
+La verificación se diseña antes de implementar. Hay tres niveles, de menor a mayor garantía ([verificar siempre](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/verificar-siempre/)):
+
+1. **Los tests del proyecto**, más los nuevos que Claude haya escrito. Léelos: un test que no falla nunca no comprueba nada.
+2. **`/goal` con evidencia en la conversación.** El evaluador no ejecuta comandos ni lee ficheros: juzga lo que Claude haya mostrado. Una condición válida, por ejemplo:
+
+```text
+/goal Claude ha ejecutado la suite de tests completa y ha mostrado su salida con 0 fallos; ha ejecutado la exportación con el CSV de ejemplo y ha mostrado las tres primeras líneas del fichero generado; ha mostrado la salida de git diff --stat sin ningún fichero fuera de src/exportacion y sus tests; o para tras 25 turnos.
+```
+
+3. **Revisión con contexto limpio.** `/code-review` revisa el diff buscando errores de corrección (con `--fix` aplica los hallazgos y con `--comment` los publica en el PR) y `/security-review` revisa vulnerabilidades. Ninguna sustituye a leer el `/diff`: en una funcionalidad que exporta datos de clientes, comprueba tú el permiso (¿puede un cliente exportar el historial de otro?).
+
+<CommandCard comando="/goal" />
+
+<CommandCard comando="/code-review" />
+
+Para cerrar: commit, PR, revisión de un compañero y `/clear` antes de la siguiente tarea.
+
+<Callout tipo="cuidado">
+
+`/goal` y los hooks de parada alargan la sesión, y cada turno reenvía el contexto. Define una condición alcanzable y con cláusula de parada (turnos). En una exportación de datos de clientes, la revisión humana del permiso y del tratamiento de datos personales es obligatoria, no opcional.
+
+</Callout>
+
+## Coste estimado
+
+Supuesto de la guía, no una medición: una funcionalidad como esta se resuelve en una sesión de varias decenas de turnos; el historial reenviado acumula unos 400.000 tokens de entrada, de los que 350.000 se leen de la caché, y la salida (código, tests y razonamiento) es de unos 40.000. Volumen: 10 funcionalidades al mes. No se muestra la columna de Batch porque el descuento por lotes es de la API y no aplica a Claude Code.
+
+<CostExample
+  ids={['sonnet-5-5', 'opus-5-5']}
+  entrada={400000}
+  salida={40000}
+  volumen={10}
+  cacheados={350000}
+  batch={false}
+  etiqueta="Una funcionalidad con Claude Code (supuesto de la guía)"
+/>
+
+La columna de caché supone la caché caliente en todos los turnos. En Claude Code el TTL depende de cómo te autentiques: 1 hora con suscripción dentro del uso incluido y 5 minutos con clave de API o créditos de uso ([prompt caching en Claude Code](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/prompt-caching/)). Con suscripción no pagas por token, pero consumes tu límite; con clave de API, esta tabla se parece a la factura. La documentación de costes de Claude Code publica medias por desarrollador y día activo; consúltalas allí, porque no están en los datos del sitio. Para cambiar las cifras, usa la [calculadora de coste](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/calculadora-de-coste/) y lee [coste por tarea completada](/AI-Optimized_Usage_Web/m2-metodo/coste-por-tarea/).
+
+## Versión económica frente a premium
+
+- **Económica (a probar midiendo):** Sonnet 5.5 en todas las fases, con el plan en `medium`. Pruébalo en tres funcionalidades pequeñas: ¿el plan omite casos límite que `opusplan` habría visto? Si ya los ve, ahorras.
+- **Estándar:** `opusplan` con `medium`.
+- **Premium:** Opus 5.5 con `high` en el plan y revisión con `/code-review` a un nivel alto, para diseños con muchas restricciones o código crítico. Sube de nivel cuando el plan falle, no por defecto.
+
+## Errores típicos
+
+- **Implementar sin plan** una tarea que toca varios ficheros: se rehace el trabajo y se reenvía lo equivocado en cada turno.
+- **Criterio de éxito vago** («que funcione»). Sin comprobación observable, `/goal` no sabe parar.
+- **No leer los tests nuevos.** Un test escrito por el mismo agente puede validar su propio error.
+- **Aprobar el plan sin leerlo.**
+- **Reutilizar la sesión** para la tarea siguiente.
+- **Dar por buena la revisión automática.** Falta la lectura humana del permiso y de los datos.
+
+<Checklist
+  id="m10-nueva-funcionalidad"
+  titulo="Antes de abrir el PR"
+  items={[
+    'La especificación (SPEC.md) refleja lo decidido en la entrevista.',
+    'He leído y editado el plan antes de aprobarlo.',
+    'Los tests pasan y he leído los nuevos.',
+    'La condición de /goal exigía evidencia visible, y la he visto.',
+    'He pasado /code-review y /security-review y he leído el /diff.',
+    'He comprobado a mano el permiso y el tratamiento de datos personales.',
+    'Hago /clear antes de la siguiente tarea.',
+  ]}
+/>
+
+## Para profundizar
+
+[El flujo recomendado](/AI-Optimized_Usage_Web/m7-claude-code/flujo-recomendado/) detalla cada fase, [el día a día en Claude Code](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/dia-a-dia-en-claude-code/) los hábitos de gasto y [modelo y esfuerzo por rol](/AI-Optimized_Usage_Web/m8-agentes/modelo-y-esfuerzo-por-rol/) cuando repartas fases entre agentes.

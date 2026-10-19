@@ -3,16 +3,16 @@
 > Memoria entre sesiones. Actualízalo al cerrar cada tarea: qué se hizo, qué falta, decisiones con su motivo y coste de la fase.
 
 ## Estado actual
-- **Fase en curso:** 3 (contenido núcleo) **terminada**: M2, M3, M4, M5 y M0 redactados, revisados por `revisor-editorial` y corregidos. Fases 0–2 cerradas. Puntos de control 1 y 2 siguen pendientes de confirmación del usuario.
+- **Fase en curso:** 4 (contenido avanzado) **terminada**: M7, M8, M6, M9, M10, M1 y M12 redactados, revisados por `revisor-editorial` y corregidos. Siguiente: Fase 5 (interactivos). Puntos de control 1 y 2 siguen pendientes de confirmación del usuario.
 - **Rama:** `feat/web`
-- **Última actualización:** 2026-10-16 (Fase 2 completada, pendiente de confirmación del usuario: capturas, nombre del sitio y decisiones de diseño)
+- **Última actualización:** 2026-10-19 (Fase 4: `npm run build`, `npm run check` y `npm run test:e2e` (70 pruebas) pasan; capturas revisadas)
 
 ## Fases
 - [x] 0. Preparación (2026-10-15: `npm run build`, `npm run check` y `npm run test:e2e` pasan)
 - [x] 1. Investigación y verificación (2026-10-16; punto de control 1 pendiente de confirmación del usuario)
 - [x] 2. Diseño y arquitectura (2026-10-16; punto de control 2 pendiente de confirmación del usuario)
 - [x] 3. Contenido núcleo: M2, M3, M4, M5, M0 (2026-10-16)
-- [ ] 4. Contenido avanzado: M7, M8, M6, M9, M10, M1, M12
+- [x] 4. Contenido avanzado: M7, M8, M6 + M9, M10, M1 + M12 (2026-10-19)
 - [ ] 5. Interactivos
 - [ ] 6. Calidad final (punto de control 3)
 - [ ] 7. Publicación y mantenimiento
@@ -57,6 +57,17 @@
 | 2026-10-16 | `tool_choice` e imágenes invalidan solo los mensajes de la caché (no sistema); corregido en `research/anthropic-api.json` | Revisión de M5 contra la documentación oficial |
 | 2026-10-16 | e2e: axe en claro/oscuro y 360 px sobre una lección de M0, M2, M3, M4 y M5 (43 pruebas); espera a hidratar la isla del quiz | La prueba del quiz era una carrera de hidratación con `client:visible` |
 | 2026-10-16 | `e2e/smoke.spec.ts` reescrito: axe en claro y oscuro sobre cinco páginas, sin desbordamiento horizontal a 360 px, tooltip de `<Fact>`, lista de comprobación y quiz | La página de prueba `prueba/hola` ya no existe |
+
+| 2026-10-19 | Fase 4: circuito por módulo = redactor (Sonnet) → revisor-editorial (Opus) → corrección por el mismo redactor → integración (fuentes en `sources.json`, prettier, cspell, build, check) | Es el mismo de la Fase 3; los subagentes no tenían Bash, así que la sesión principal validó cada entrega |
+| 2026-10-19 | Cifras volátiles sin registro en `src/data` (límites, líneas de `CLAUDE.md`, TPM/RPM, retención, modos de permiso, atajos, opciones de `claude -p`, multiplicadores de caché) se quedan en prosa con fuente enlazada y fecha visibles | `<Fact>` solo lee `models.json`. Deuda reconocida: faltan `<Rule>` / `FeatureMatrix` (ver «Pendientes tras la Fase 4») |
+| 2026-10-19 | Componentes nuevos: `CommandList` (comandos por categoría, estático; lo sustituye el explorador de la Fase 5), `diagrams/FlujoAgentes` (9 diagramas de M8 y la escalera), `PlantillasList`, `NovedadesList` (filtro por proveedor), `SourcesIndex`; `CostExample` acepta `unidad` | Las páginas de M7, M8 y M12 los necesitaban. `ModuleIndex` ya no lista páginas con `sidebar.hidden` |
+| 2026-10-19 | Endpoint `src/pages/plantillas/[slug].md.ts` publica los 25 `.md` de `src/content/plantillas/`; `tests/templates.test.ts` exige que cada `<PromptTemplate archivo="x">` coincida con `x.md` | El revisor halló dos versiones distintas de «Encargo universal» con el mismo nombre de fichero. Texto canónico: el de M2 (material primero) |
+| 2026-10-19 | `astro.config.mjs`: script que da `tabindex=0` a los bloques de código con desplazamiento | axe `scrollable-region-focusable` en M9, M10 y la chuleta |
+| 2026-10-19 | Sonnet 5.5 no tiene el razonamiento «siempre activo»: `thinking: {type: "between_tools"}` en low/medium/high (400 en xhigh/max); Haiku 5.5, `disabled` hasta high; Opus 5.5 no se puede apagar; Fable 5.1 siempre activo. Corregidos el temario, `effort.json` y M4 | El temario y la línea base discrepaban; ganan `models.json` y la documentación |
+| 2026-10-19 | Tokenizador: «aproximadamente +30 %» (documentación actual) en lugar de «1×–1,35×» del temario; 1280×720 ≈ 1.196 tokens (fórmula de la documentación) | Corregido en `plan/01_TEMARIO.md` |
+| 2026-10-19 | Chuleta: una hoja a doble cara (temario corregido: antes «una página»); fechas sin escribir a mano | Cabe en ≈2 A4 sin lista de comprobación ni columna de enlaces |
+| 2026-10-19 | Retiradas del changelog «Plan Pro 500 USD» (precio de plan sin fuente oficial) y notas de proceso en dos `summary`; añadidas 30 fuentes a `sources.json` (Codex, Antigravity, Gemini CLI, Claude Code, API) y títulos legibles | La lista de novedades publica el `summary` completo |
+| 2026-10-19 | `M1`: `que-es-un-llm` y `ventana-de-contexto` pasan a la ruta Esencial | El índice de M1 lo promete para quien tiene diez minutos |
 
 ## Conflictos entre fuentes y datos pendientes
 | Dato | Fuentes | Estado |
@@ -106,6 +117,17 @@
 - `ultrathink` verificado (model-config); entrada de «pendiente» en `research/claude-code.json` por retirar.
 - M2 `elegir-superficie` no muestra planes de Cowork/Proyectos desde datos (falta `FeatureMatrix`).
 - Plantillas descargables: los 25 `.md` de `src/content/plantillas/` se publicarán en M12 (Fase 4).
+
+## Pendientes tras la Fase 4
+- **Deuda de datos (regla del proyecto):** pasar a `src/data` y mostrar con componente (`<Rule>`, `FeatureMatrix`): reglas de `pricing-rules.json` (multiplicadores, imagen, +30 % del tokenizador), planes y funciones de las apps (Claude, ChatGPT, Gemini), TPM/RPM, retención y ZDR, rutas de `managed-settings.json`, modos de permiso y atajos, opciones de `claude -p`, límites de `/loop`, `/goal` y MCP, 200 líneas de `CLAUDE.md`, rutas de skills de Codex. Candidatos con cita en `research/m1…m12-propuesta.json`.
+- **Sin verificar con fuente literal (marcado en las páginas):** modelo de los trabajadores de `/batch` y `/deep-research`; `CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL`; guía de orquestación multiagente de la Responses API; structured outputs dentro de un lote; esfuerzo configurable en apps de chat y en rutinas; reglas `Bash(...)` frente a la herramienta PowerShell; mensajes de sistema a mitad de conversación en Opus 5.5/Sonnet 5.5/Fable 5.1; `task_budget` y despliegues programados de Managed Agents; Cowork en la nube (6-oct); GPT-6 por plan de ChatGPT; funciones de la app de Gemini por plan (tabla leída por columnas); retención de las apps de chat de los tres proveedores.
+- **Hueco aceptado del temario:** novedades sin lección propia (mensajes de sistema a mitad de conversación, llamadas asíncronas de OpenAI, ejecución en segundo plano de Gemini); cuatro de los 12 playbooks de M10 dependen de superficies sin esfuerzo configurable.
+- `sources.json`: quedan 8 pares de fuentes con título repetido (se distinguen por ruta en el índice); conviene deduplicar por URL en la Fase 6. `changelog.json`: los 212 `impact` siguen «Pendiente de redactar»; repasar todos los `summary` (se publican enteros).
+- `/skill-doctor`, `/design`: versiones sin publicar (conflicto abierto entre páginas oficiales).
+- `catalogo-de-componentes` (M12) sigue publicado aunque oculto de la barra lateral: retirarlo o dejarlo con `noindex` antes de publicar (Fase 6).
+- Quizzes de cierre de módulo, `esencial` en más páginas de M1 y recalibrar rutas: Fase 5/6. Los costes de M10 usan `<CostExample>` con supuestos de tamaño marcados como «supuesto de la guía».
+- Canal para avisar de errores en la guía: «pendiente de definir» en la metodología.
+- Coste de la fase: 12 redactores/revisores de Sonnet y Opus (≈ 6,5 M de tokens de subagente en total; la sesión principal se interrumpió dos veces por límite de uso). Anotar `/usage` del usuario.
 
 ## Pendientes y siguientes pasos
 - Tras el punto de control 2: elegir el nombre del sitio (cambiar `title` en `astro.config.mjs` y en `index.mdx`), confirmar o ajustar la dirección visual y empezar la Fase 3 (M2 → M3 → M4 → M5 → M0).

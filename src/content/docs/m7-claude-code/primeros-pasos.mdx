@@ -1,11 +1,166 @@
 ---
 title: 'Primeros pasos y configuración'
-description: 'Instalación, /init, modos de permiso, sandbox y los comandos para configurar bien desde el principio.'
+description: 'Instalación, /init, modos de permiso, sandbox y los comandos para configurar Claude Code bien desde el principio.'
 sidebar:
   order: 1
 level: basico
 tracks: [tecnica]
-readingTime: 8
-status: en-preparacion
-sources: []
+readingTime: 9
+lastReviewed: 2026-10-19
+sources:
+  [
+    claude-code-inicio-rapido,
+    claude-code-indice-completo,
+    claude-code-comandos,
+    claude-code-modos-de-permiso,
+    claude-code-memoria-y-claude-md,
+    claude-code-modelo-y-esfuerzo,
+    claude-code-buenas-practicas,
+    claude-code-referencia-cli,
+    claude-code-modo-interactivo,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import CommandCard from '@components/CommandCard.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Instala, entra en la carpeta de trabajo y arranca con `claude`: no hace falta más para empezar.
+- `/init` crea un `CLAUDE.md` inicial. Es un borrador: léelo y recórtalo.
+- El modo de permisos decide cuántas veces te pregunta Claude. `Shift+Tab` lo cambia sobre la marcha.
+- Tras unos días de uso, `/fewer-permission-prompts` propone permisos de solo lectura para reducir avisos; `/sandbox` aísla los comandos de shell (no en Windows nativo).
+- Si algo falla, `/doctor`. Si vienes de Codex, Gemini CLI o Cursor, `/import`.
+
+</KeyTakeaways>
+
+## La idea
+
+Dedicar un rato a la configuración al principio evita interrupciones y tokens desperdiciados después. Claude Code se configura en cuatro capas que conviene tener claras antes de tocar nada:
+
+1. **Instrucciones permanentes** (`CLAUDE.md`): lo que Claude debe saber de tu proyecto en cada sesión.
+2. **Permisos**: qué puede hacer sin preguntarte.
+3. **Modelo y esfuerzo**: cuánta capacidad y cuánto razonamiento aplica.
+4. **Extensiones**: [skills](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#skill), subagentes, [hooks](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#hook) y servidores MCP (ver [Extender Claude Code](/AI-Optimized_Usage_Web/m7-claude-code/extender-claude-code/)).
+
+Las tres primeras se resuelven en esta página. Cada una afecta al gasto: lo que escribas en `CLAUDE.md` se reenvía en cada turno, y un permiso mal ajustado te obliga a aprobar cien veces lo mismo o, peor, a no mirar nada.
+
+## Instalar y arrancar
+
+<Callout tipo="verificado" fecha="2026-10-19">
+
+Comandos de la guía de inicio rápido de Anthropic. Son datos volátiles: si el instalador cambia, manda la fuente.
+
+</Callout>
+
+En macOS, Linux y WSL:
+
+```bash
+curl -fsSL https://claude.ai/install.sh | bash
+```
+
+En Windows (PowerShell):
+
+```powershell
+irm https://claude.ai/install.ps1 | iex
+```
+
+Abre una terminal nueva y comprueba la instalación con `claude --version`. En Windows nativo, la guía de inicio recomienda tener Git for Windows para que Claude Code pueda usar la herramienta Bash; sin él usa PowerShell.
+
+Después, entra en la carpeta del proyecto (o de los documentos) y ejecuta `claude`. La primera vez te pide iniciar sesión con una cuenta de Claude (Pro, Max, Team o Enterprise), una cuenta de Claude Console (acceso por API) o un proveedor en la nube compatible. Más tarde, `/login` y `/logout` cambian de cuenta, y `/status` muestra versión, modelo, cuenta y conectividad.
+
+## En la práctica
+
+<Steps>
+
+1. Crea el fichero de instrucciones con `/init` y recórtalo (detalle justo debajo).
+2. Elige un modo de permisos (tabla siguiente) y aprende a cambiarlo con `Shift+Tab`.
+3. Fija modelo y esfuerzo con `/model` y `/effort`. Cómo elegir, en la [estrategia de selección](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/estrategia-de-seleccion/) del módulo 4.
+4. Si algo falla, `/doctor`. Si vienes de otra herramienta, `/import`.
+5. Tras unos días de uso, `/fewer-permission-prompts` (explicado más abajo) y, si tu plataforma lo admite, `/sandbox`.
+
+</Steps>
+
+<CommandCard comando="/init" />
+
+Revisa lo que genera y quita todo lo que Claude podría deducir leyendo los ficheros. Por qué: la documentación de memoria recomienda mantener cada `CLAUDE.md` por debajo de las 200 líneas, porque los ficheros más largos consumen más contexto y se siguen peor (cifra de la documentación, sin verificar todavía en los datos del sitio). Qué va dentro y qué va fuera, en [Ficheros de instrucciones y memoria](/AI-Optimized_Usage_Web/m6-herramientas/ficheros-de-instrucciones-y-memoria/).
+
+<CommandCard comando="/doctor" />
+
+`/import` trae la configuración de OpenAI Codex, Gemini CLI o Cursor (con `--dry-run` ves qué traería sin aplicar nada).
+
+## Los modos de permiso
+
+Un modo de permisos fija qué acciones puede hacer Claude en la sesión sin preguntarte antes. Estos son los seis modos que documenta Anthropic:
+
+| Modo                            | Qué permite sin preguntar                                                            | Cuándo encaja (recomendación de la guía)                 |
+| ------------------------------- | ------------------------------------------------------------------------------------ | -------------------------------------------------------- |
+| `default` (etiquetado «Manual») | Solo lectura                                                                         | Los primeros días con un proyecto nuevo                  |
+| `acceptEdits`                   | Ediciones y órdenes habituales del sistema de ficheros                               | Tareas acotadas en las que ya confías en el plan         |
+| `plan`                          | Exploración de solo lectura                                                          | Antes de tocar nada, cuando planificar es lo difícil     |
+| `auto`                          | Un clasificador revisa cada acción en lugar de ti                                    | Trabajo diario con un proyecto que conoces               |
+| `dontAsk`                       | Deniega lo que habría pedido confirmación; sigue ejecutando lo que ya está permitido | Ejecuciones desatendidas con una lista de permisos corta |
+| `bypassPermissions`             | Nada se comprueba                                                                    | Solo en un entorno aislado y desechable                  |
+
+`Shift+Tab` recorre los modos durante la sesión en este orden: `default`, `acceptEdits`, `plan`, después `bypassPermissions` (solo si has arrancado la sesión de forma que esté disponible) y por último `auto`. Desde `auto`, la primera pulsación vuelve a `default`. `dontAsk` nunca entra en el ciclo: se fija al arrancar con `--permission-mode dontAsk`. `/plan` entra en modo plan directamente, con una tarea opcional.
+
+<Callout tipo="novedad" fecha="2026-10-19">
+
+Según la documentación de modos de permiso, con la versión 2.1.283 o posterior `auto` es el modo con el que arrancan las sesiones interactivas en terminal y en VS Code. En versiones anteriores lo era solo en los planes Pro, Max y Team (las novedades de la semana 32 fijan el 14 de agosto de 2026 para ese cambio). Además, `auto` exige un modelo compatible y tu organización puede desactivarlo. Es un dato volátil: compruébalo en tu terminal con `/status` y en la fuente.
+
+</Callout>
+
+<Callout tipo="recomendacion">
+
+Usa `bypassPermissions` solo dentro de un contenedor o máquina desechable. Por qué: en ese modo no se comprueba ninguna acción, de modo que un error o una instrucción maliciosa escondida en un documento (ver [privacidad y seguridad](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/privacidad-y-seguridad/)) se ejecuta sin freno.
+
+</Callout>
+
+## Reducir avisos y aislar
+
+<CommandCard comando="/fewer-permission-prompts" />
+
+Úsalo **tras unos días de trabajo**, no el primer día. Por qué: el comando revisa tus transcripciones en busca de llamadas de solo lectura frecuentes (Bash y MCP) para proponerlas como permitidas; sin historial no tiene nada que proponer.
+
+`/permissions` gestiona las reglas `allow`, `ask` y `deny` y los directorios accesibles; `/add-dir` suma una carpeta a la sesión. `/auto-mode-setup` redacta entradas de `autoMode.environment` a partir de tu proyecto y tus sesiones recientes, para que el clasificador entienda tu entorno.
+
+`/sandbox` activa un aislamiento que impone el sistema operativo sobre los comandos de shell que ejecuta Claude: limita a qué ficheros y a qué dominios de red llegan. Según la documentación funciona en macOS, Linux y WSL2; en Windows nativo, los comandos se ejecutan sin aislamiento. Solo cubre comandos de shell: las herramientas de ficheros de Claude, los servidores MCP y los hooks quedan fuera.
+
+## Ejemplo de oficina: la carpeta de facturas
+
+Una persona de administración quiere que Claude Code ordene y renombre las facturas de proveedores de 2026.
+
+1. Abre la terminal en `Facturas-2026/` y ejecuta `claude`.
+2. Lanza `/init`. En el `CLAUDE.md` resultante deja solo la nomenclatura: cómo se nombran los ficheros (`AAAA-MM-DD_proveedor_importe.pdf`) y qué hacer con las duplicadas.
+3. Impide los borrados con una regla, no con una frase en el `CLAUDE.md`: en `/permissions`, una regla `deny` para `Bash(rm *)`. Por qué: una instrucción es una petición que el modelo puede olvidar; una regla de denegación la aplica el sistema. La documentación avisa de que una regla de `Bash` solo deniega las llamadas que coinciden tal como están escritas, así que no cubre todas las formas de borrar.
+4. Empieza en modo `plan`: «Lista cómo propones renombrar y qué facturas parecen duplicadas. No cambies nada».
+5. Revisa el plan. Cuando te convence, `Shift+Tab` hasta `acceptEdits` y le dices que lo ejecute.
+
+Por qué así: la parte arriesgada (renombrar y mover) solo ocurre después de que hayas leído el plan, y las normas de nomenclatura se escriben una vez en lugar de repetirlas en cada conversación.
+
+## Errores frecuentes
+
+- **Aceptar el `CLAUDE.md` que genera `/init` sin leerlo.** Incluye cosas obvias que se reenvían en cada turno. Recórtalo.
+- **Poner `bypassPermissions` para no ver avisos.** Resuelve el síntoma y quita la red de seguridad. Usa `/fewer-permission-prompts` y reglas `allow` concretas.
+- **Editar `CLAUDE.md` a mitad de sesión y esperar efecto inmediato.** Según la documentación de memoria, no se aplica hasta `/clear`, `/compact` o reiniciar.
+- **Seguir una guía antigua con comandos que ya no existen** (por ejemplo `/vim`). Mira el cuadro de comandos retirados en la [referencia de comandos](/AI-Optimized_Usage_Web/m7-claude-code/comandos/).
+
+<Checklist
+  id="m7-primeros-pasos"
+  titulo="Mi configuración inicial"
+  items={[
+    'Claude Code instalado y `claude --version` responde.',
+    'He ejecutado /init y he recortado el CLAUDE.md resultante.',
+    'Sé en qué modo de permisos estoy y cómo cambiarlo con Shift+Tab.',
+    'He elegido modelo y esfuerzo con /model y /effort.',
+    'Sé usar /doctor si algo no funciona.',
+    'Tras unos días de uso, he ejecutado /fewer-permission-prompts.',
+  ]}
+/>
+
+## Para profundizar
+
+Siguiente paso: [el flujo recomendado](/AI-Optimized_Usage_Web/m7-claude-code/flujo-recomendado/). Para decidir si Claude Code es la superficie adecuada para tu tarea, [elegir superficie](/AI-Optimized_Usage_Web/m2-metodo/elegir-superficie/) (módulo 2).

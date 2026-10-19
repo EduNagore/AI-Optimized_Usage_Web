@@ -6,6 +6,128 @@ sidebar:
 level: basico
 tracks: [profesional]
 readingTime: 7
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-19
+sources:
+  [anthropic-esfuerzo, anthropic-buenas-practicas-de-prompting, anthropic-precios, claude-code-data-usage]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Fact from '@components/Fact.astro';
+import PromptTemplate from '@components/PromptTemplate.astro';
+import CostExample from '@components/CostExample.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Un correo difícil se escribe bien con tres cosas: los hechos reales, quién es el destinatario y qué quieres conseguir.
+- El modelo redacta; tú decides qué se promete. Prohíbe expresamente inventar datos y compromisos.
+- No pegues datos personales de terceros: usa roles («el cliente», «la compañera de contabilidad»).
+- Enviar un correo es irreversible: la lectura completa y el envío son siempre tuyos.
+- Subir de modelo rara vez arregla un correo flojo; mejorar el encargo, casi siempre.
+
+</KeyTakeaways>
+
+## La tarea
+
+Has retrasado la entrega a un cliente importante dos semanas por un fallo de un proveedor. Tienes que decírselo hoy, asumir lo que toca, proponer una nueva fecha y pedirle que la confirme. No quieres un correo servil ni uno frío.
+
+## Configuración recomendada
+
+- **Superficie.** Un chat normal. No necesitas herramientas ni ficheros.
+- **Modelo.** Sonnet 5.5.
+- **Esfuerzo.** `low` como punto de partida, que queda **por debajo del valor por defecto** de Sonnet 5.5 (<Fact id="sonnet-5-5.effort.default.api" /> en la API y <Fact id="sonnet-5-5.effort.default.claude-code" /> en Claude Code); `medium` si tras mejorar el encargo el tono no encaja. Si tu chat no deja fijar el esfuerzo, no pasa nada: aquí pesa más el encargo que el esfuerzo.
+- **Equivalente en otros proveedores** (fila de la matriz): <Fact id="gpt-6-1-sol.name" /> en OpenAI y <Fact id="gemini-3-8-flash.name" /> en Google.
+
+<Callout tipo="recomendacion">
+
+Es la fila «Correo, reformulación y texto breve» de la [matriz por tarea](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/matriz-por-tarea/). Por qué esfuerzo bajo: hay poco que razonar y los tokens de razonamiento se facturan como salida. Por qué el modelo equilibrado y no uno pequeño: el tono es lo delicado, y ahí la diferencia entre modelos suele notarse. Esto último es una hipótesis de la guía: pruébalo con dos correos tuyos.
+
+</Callout>
+
+## Preparación del contexto
+
+Antes de abrir el chat, escribe en cuatro líneas lo que el modelo no puede saber:
+
+1. **Los hechos, con fechas y cifras reales.** Qué pasó, cuándo y cuánto se retrasa.
+2. **El destinatario.** Qué relación tienes, qué sabe ya, qué le preocupa.
+3. **Lo que ofreces y lo que pides**, con una fecha concreta.
+4. **Lo que no se puede decir** (una cifra confidencial, el nombre del proveedor).
+
+**Datos personales.** Si el correo trata de una persona (una queja sobre un empleado, una evaluación, una baja), no pegues su nombre ni sus datos: sustitúyelos por el rol. Por qué: lo que envías sale de tu equipo y su tratamiento depende de tu plan y de tu contrato ([privacidad y seguridad](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/privacidad-y-seguridad/)). Si es una comunicación sobre personas (despido, sanción), además de lo anterior, que la apruebe quien corresponda en tu organización.
+
+## El encargo
+
+<PromptTemplate
+  titulo="Correo delicado"
+  archivo="correo-delicado-caso"
+  texto={`<situacion>
+{{qué ha pasado, con fechas y cifras reales}}
+</situacion>
+
+<destinatario>
+{{quién es, qué relación tienes con esa persona y qué sabe ya}}
+</destinatario>
+
+Redacta un correo para {{nombre o cargo}}. El objetivo es {{qué quieres conseguir: por ejemplo, acordar una nueva fecha}}. Tono: {{por ejemplo, cercano y profesional, sin disculpas excesivas}}.
+
+Incluye: lo ocurrido en una o dos frases, lo que ofrecemos como solución y lo que necesitamos de la otra persona, con una fecha concreta.
+
+No inventes datos ni compromisos que no aparezcan en la situación. Si falta algo para redactarlo bien, hazme las preguntas antes de escribir el correo.`}
+/>
+
+Dos mejoras que valen más que cualquier ajuste de modelo: dile **qué tono sí** (en vez de solo «no seas frío») y pide **dos versiones** de la frase de apertura, que es la parte más difícil. Si el borrador sale demasiado largo, di cuántas líneas quieres; el motivo está en [formato y longitud](/AI-Optimized_Usage_Web/m3-prompting/formato-y-longitud/).
+
+## Verificación
+
+1. **Lectura completa, en voz alta si es importante.** Lo que suena bien en pantalla puede sonar mal dicho.
+2. **Hechos contra tu fuente.** Cada fecha, cifra y nombre del correo coincide con lo que tú sabes.
+3. **Compromisos.** Subraya todo lo que el correo promete. ¿Puedes cumplirlo? El modelo tiende a ofrecer soluciones generosas.
+4. **Prueba del destinatario.** Pregunta en una conversación nueva: pega la descripción del destinatario y el correo y escribe: «Eres el destinatario descrito. ¿Cómo te sienta este correo y qué dudas te deja?». Es una comprobación barata, no una garantía.
+5. **El envío es tuyo.** Es una acción irreversible: no lo envíes desde una herramienta automática ni sin releerlo.
+
+## Coste estimado
+
+Supuesto de la guía, no una medición: 2.000 tokens de entrada (situación, destinatario y una ronda de revisión) y 600 de salida. Volumen: cinco correos delicados.
+
+<CostExample
+  ids={['haiku-5-5', 'sonnet-5-5', 'opus-5-5']}
+  entrada={2000}
+  salida={600}
+  volumen={5}
+  batch={false}
+  etiqueta="Correo delicado (supuesto de la guía)"
+/>
+
+Con cualquiera de los tres modelos son, como mucho, unos pocos céntimos de dólar. El coste real es el de un mal correo: una relación comercial tensa. Por eso aquí la tarifa no debe decidir nada. Para cambiar las cifras por las tuyas, usa la [calculadora de coste](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/calculadora-de-coste/) y lee [coste por tarea completada](/AI-Optimized_Usage_Web/m2-metodo/coste-por-tarea/).
+
+## Versión económica frente a premium
+
+- **Económica (a probar midiendo):** Haiku 5.5. Redacta tres correos que ya hayas enviado y compara con el que escribiría Sonnet 5.5 a ciegas. Si el tono es peor, el ahorro (céntimos) no compensa.
+- **Estándar:** Sonnet 5.5 a `low`.
+- **Premium:** Opus 5.5 a `medium` solo para casos de mucho riesgo (una comunicación a toda la plantilla, una disculpa pública). Aun así, la revisión humana es la misma: un modelo más capaz no sustituye tu lectura.
+
+## Errores típicos
+
+- **Contar la situación a medias.** El modelo rellena los huecos con suposiciones; dale hechos o pídele que pregunte.
+- **Pedir «hazlo más profesional» a ciegas.** Describe el tono que quieres.
+- **Aceptar disculpas o compromisos que no has decidido.** El correo promete, tú respondes.
+- **Pegar el hilo completo con nombres y datos de terceros.** Resume los hechos tú.
+- **Enviarlo sin releer porque «está bien escrito».** La fluidez no es exactitud.
+
+<Checklist
+  id="m10-comunicacion-delicada"
+  titulo="Antes de enviar"
+  items={[
+    'Los hechos, fechas y cifras coinciden con mi fuente.',
+    'Todo lo que el correo promete lo puedo cumplir.',
+    'No he pegado datos personales de terceros en la herramienta.',
+    'He leído el correo completo, no solo el principio.',
+    'Si trata de una persona, lo ha visto quien debe verlo.',
+    'El envío lo hago yo.',
+  ]}
+/>
+
+## Para profundizar
+
+[Principios de prompting](/AI-Optimized_Usage_Web/m3-prompting/principios/) para entender por qué el contexto pesa más que las palabras mágicas, y [verificar siempre](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/verificar-siempre/) para saber cuándo la revisión humana es obligatoria.

@@ -20,6 +20,8 @@ interface Props {
   cacheados?: number;
   /** Muestra la columna «Con Batch». Por defecto, sí. */
   batch?: boolean;
+  /** Unidad del volumen en el encabezado de la columna (por defecto, «documentos»). */
+  unidad?: string;
 }
 
 const {
@@ -30,6 +32,7 @@ const {
   etiqueta = 'Coste de un intento y de un volumen',
   cacheados,
   batch: mostrarBatch = true,
+  unidad = 'documentos',
 } = Astro.props;
 const models = (await getCollection('models')).map((e) => e.data);
 const rule = await getEntry('pricing-rules', 'anthropic-batch-discount');
@@ -78,7 +81,7 @@ const tiers = rows.flatMap((r) =>
             Un intento
           </th>
           <th scope="col" class="num">
-            {num(volumen)} documentos
+            {num(volumen)} {unidad}
           </th>
           {cacheados !== undefined && (
             <th scope="col" class="num">

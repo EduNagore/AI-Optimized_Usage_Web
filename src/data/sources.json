@@ -129,7 +129,7 @@
   },
   {
     "id": "anthropic-skills",
-    "title": "Skills",
+    "title": "Skills (API de Claude)",
     "url": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview.md",
     "publisher": "Anthropic",
     "official": true,
@@ -249,7 +249,7 @@
   },
   {
     "id": "claude-code-skills",
-    "title": "Skills",
+    "title": "Skills (Claude Code)",
     "url": "https://code.claude.com/docs/en/skills.md",
     "publisher": "Anthropic",
     "official": true,
@@ -297,7 +297,7 @@
   },
   {
     "id": "claude-code-changelog",
-    "title": "Changelog",
+    "title": "Claude Code: registro de cambios",
     "url": "https://code.claude.com/docs/en/changelog.md",
     "publisher": "Anthropic",
     "official": true,
@@ -369,7 +369,7 @@
   },
   {
     "id": "code-claude-com-docs-en-goal",
-    "title": "goal.md",
+    "title": "Claude Code: /goal",
     "url": "https://code.claude.com/docs/en/goal.md",
     "publisher": "Anthropic",
     "official": true,
@@ -377,7 +377,7 @@
   },
   {
     "id": "code-claude-com-docs-en-scheduled-tasks",
-    "title": "scheduled-tasks.md",
+    "title": "Claude Code: tareas programadas",
     "url": "https://code.claude.com/docs/en/scheduled-tasks.md",
     "publisher": "Anthropic",
     "official": true,
@@ -401,7 +401,7 @@
   },
   {
     "id": "support-claude-com-en-articles-11817273-use-claude-s-chat-search-and-memory-to-b",
-    "title": "Use claude s chat search and memory to build on previous context",
+    "title": "Claude: búsqueda en chats anteriores y memoria",
     "url": "https://support.claude.com/en/articles/11817273-use-claude-s-chat-search-and-memory-to-build-on-previous-context",
     "publisher": "Anthropic",
     "official": true,
@@ -465,7 +465,7 @@
   },
   {
     "id": "code-claude-com-docs-en-hooks",
-    "title": "hooks.md",
+    "title": "Claude Code: hooks",
     "url": "https://code.claude.com/docs/en/hooks.md",
     "publisher": "Anthropic",
     "official": true,
@@ -529,7 +529,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-about-claude-model-deprecations",
-    "title": "model-deprecations.md",
+    "title": "Claude: deprecación de modelos",
     "url": "https://platform.claude.com/docs/en/about-claude/model-deprecations.md",
     "publisher": "Anthropic",
     "official": true,
@@ -953,7 +953,7 @@
   },
   {
     "id": "code-claude-com-docs-en-whats-new-2026-w30",
-    "title": "2026-w30.md",
+    "title": "Claude Code: novedades de la semana 30 de 2026",
     "url": "https://code.claude.com/docs/en/whats-new/2026-w30.md",
     "publisher": "Anthropic",
     "official": true,
@@ -961,7 +961,7 @@
   },
   {
     "id": "code-claude-com-docs-en-whats-new-2026-w32",
-    "title": "2026-w32.md",
+    "title": "Claude Code: novedades de la semana 32 de 2026",
     "url": "https://code.claude.com/docs/en/whats-new/2026-w32.md",
     "publisher": "Anthropic",
     "official": true,
@@ -969,7 +969,7 @@
   },
   {
     "id": "code-claude-com-docs-en-whats-new-2026-w33",
-    "title": "2026-w33.md",
+    "title": "Claude Code: novedades de la semana 33 de 2026",
     "url": "https://code.claude.com/docs/en/whats-new/2026-w33.md",
     "publisher": "Anthropic",
     "official": true,
@@ -977,7 +977,7 @@
   },
   {
     "id": "code-claude-com-docs-en-whats-new-2026-w34",
-    "title": "2026-w34.md",
+    "title": "Claude Code: novedades de la semana 34 de 2026",
     "url": "https://code.claude.com/docs/en/whats-new/2026-w34.md",
     "publisher": "Anthropic",
     "official": true,
@@ -1094,5 +1094,405 @@
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-16"
+  },
+  {
+    "id": "claude-code-referencia-cli",
+    "title": "Referencia de la CLI",
+    "url": "https://code.claude.com/docs/en/cli-reference.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "claude-code-modo-interactivo",
+    "title": "Modo interactivo",
+    "url": "https://code.claude.com/docs/en/interactive-mode.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "claude-code-inicio-rapido",
+    "title": "Inicio rápido",
+    "url": "https://code.claude.com/docs/en/quickstart.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "code-claude-com-docs-en-agent-sdk",
+    "title": "Agent SDK overview",
+    "url": "https://code.claude.com/docs/en/agent-sdk",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "platform-claude-com-docs-en-agents-and-tools-tool-use-tool-runner",
+    "title": "Tool runner (SDK)",
+    "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-runner",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "codex-agents-md",
+    "title": "Codex: instrucciones personalizadas con AGENTS.md",
+    "url": "https://learn.chatgpt.com/docs/agent-configuration/agents-md",
+    "publisher": "OpenAI",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "codex-subagents",
+    "title": "Codex: subagentes",
+    "url": "https://learn.chatgpt.com/docs/agent-configuration/subagents",
+    "publisher": "OpenAI",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "codex-hooks",
+    "title": "Codex: hooks",
+    "url": "https://learn.chatgpt.com/docs/hooks",
+    "publisher": "OpenAI",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "codex-permissions",
+    "title": "Codex: permisos",
+    "url": "https://learn.chatgpt.com/docs/permissions",
+    "publisher": "OpenAI",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "codex-slash-commands",
+    "title": "Codex CLI: comandos y opciones (superficie CLI)",
+    "url": "https://learn.chatgpt.com/docs/developer-commands.md?surface=cli",
+    "publisher": "OpenAI",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "codex-non-interactive",
+    "title": "Codex: modo no interactivo (codex exec)",
+    "url": "https://learn.chatgpt.com/docs/non-interactive-mode.md",
+    "publisher": "OpenAI",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "antigravity-migracion-gemini-cli",
+    "title": "Antigravity CLI: migración desde Gemini CLI",
+    "url": "https://antigravity.google/docs/cli/gcli-migration/",
+    "publisher": "Google",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "gemini-cli-headless",
+    "title": "Gemini CLI: modo headless",
+    "url": "http://geminicli.com/docs/cli/headless",
+    "publisher": "Google",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "gemini-cli-gemini-md",
+    "title": "Gemini CLI: contexto del proyecto (GEMINI.md)",
+    "url": "http://geminicli.com/docs/cli/gemini-md",
+    "publisher": "Google",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "anthropic-managed-agents-outcomes",
+    "title": "Managed Agents: definir outcomes",
+    "url": "https://platform.claude.com/docs/en/managed-agents/define-outcomes.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "claude-code-github-actions",
+    "title": "Claude Code GitHub Actions",
+    "url": "https://code.claude.com/docs/en/github-actions.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "claude-code-tareas-programadas-escritorio",
+    "title": "Tareas programadas de la app de escritorio",
+    "url": "https://code.claude.com/docs/en/desktop-scheduled-tasks.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "claude-code-modo-headless",
+    "title": "Ejecutar Claude Code por programa (claude -p, --bare)",
+    "url": "https://code.claude.com/docs/en/headless.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "claude-code-plugins-descubrir",
+    "title": "Instalar y gestionar plugins; marketplaces",
+    "url": "https://code.claude.com/docs/en/discover-plugins.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "claude-code-sandbox",
+    "title": "Sandbox de Bash",
+    "url": "https://code.claude.com/docs/en/sandboxing.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "claude-code-security",
+    "title": "Seguridad de Claude Code",
+    "url": "https://code.claude.com/docs/en/security",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "claude-code-sandboxing",
+    "title": "Sandbox de Bash en Claude Code",
+    "url": "https://code.claude.com/docs/en/sandboxing",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "claude-code-data-usage",
+    "title": "Uso de datos de Claude Code",
+    "url": "https://code.claude.com/docs/en/data-usage",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "claude-code-zero-data-retention",
+    "title": "Retención cero (ZDR) en Claude Code",
+    "url": "https://code.claude.com/docs/en/zero-data-retention",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "claude-code-managed-settings",
+    "title": "Desplegar configuración gestionada",
+    "url": "https://code.claude.com/docs/en/managed-settings",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "claude-code-plugins-org",
+    "title": "Gestionar plugins de Claude Code para la organización",
+    "url": "https://code.claude.com/docs/en/plugins/org",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "claude-code-plugin-marketplaces",
+    "title": "Crear un marketplace de plugins",
+    "url": "https://code.claude.com/docs/en/plugin-marketplaces",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "claude-code-analytics",
+    "title": "Analíticas de equipo de Claude Code",
+    "url": "https://code.claude.com/docs/en/analytics",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "anthropic-reduce-hallucinations",
+    "title": "Reduce hallucinations",
+    "url": "https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/reduce-hallucinations",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "anthropic-mitigate-jailbreaks",
+    "title": "Mitigate jailbreaks and prompt injections",
+    "url": "https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/mitigate-jailbreaks",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "anthropic-develop-tests",
+    "title": "Define success criteria and build evaluations",
+    "url": "https://platform.claude.com/docs/en/test-and-evaluate/develop-tests",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "gemini-api-terms",
+    "title": "Términos adicionales de la API de Gemini",
+    "url": "https://ai.google.dev/gemini-api/terms",
+    "publisher": "Google",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "claude-code-mcp",
+    "title": "Claude Code: conectar herramientas con MCP",
+    "url": "https://code.claude.com/docs/en/mcp.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "claude-code-vision-general",
+    "title": "Claude Code: visión general (superficies)",
+    "url": "https://code.claude.com/docs/en/overview.md",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "codex-skills",
+    "title": "Codex: crear skills (rutas y carga)",
+    "url": "https://learn.chatgpt.com/docs/build-skills",
+    "publisher": "OpenAI",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "codex-mcp",
+    "title": "Codex y ChatGPT: MCP",
+    "url": "https://learn.chatgpt.com/docs/extend/mcp",
+    "publisher": "OpenAI",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "chatgpt-personalizar",
+    "title": "Personalizar ChatGPT y Codex (instrucciones, memorias)",
+    "url": "https://learn.chatgpt.com/docs/personalize",
+    "publisher": "OpenAI",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "chatgpt-proyectos",
+    "title": "ChatGPT: proyectos y chats",
+    "url": "https://learn.chatgpt.com/docs/projects",
+    "publisher": "OpenAI",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "chatgpt-tareas-programadas",
+    "title": "ChatGPT: tareas programadas (Scheduled tasks)",
+    "url": "https://learn.chatgpt.com/docs/automations",
+    "publisher": "OpenAI",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "gemini-app-planes-y-funciones",
+    "title": "Ayuda de Gemini: planes y funciones de la app",
+    "url": "https://support.google.com/gemini/answer/16275805?hl=en",
+    "publisher": "Google",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "anthropic-claude-citations",
+    "title": "Citations (API de Claude)",
+    "url": "https://platform.claude.com/docs/en/build-with-claude/citations",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "anthropic-handling-stop-reasons",
+    "title": "Handling stop reasons",
+    "url": "https://platform.claude.com/docs/en/build-with-claude/handling-stop-reasons",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "openai-web-search",
+    "title": "Web search (Responses API)",
+    "url": "https://developers.openai.com/api/docs/guides/tools-web-search",
+    "publisher": "OpenAI",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "google-grounding-search",
+    "title": "Grounding with Google Search",
+    "url": "https://ai.google.dev/gemini-api/docs/google-search",
+    "publisher": "Google",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "anthropic-glosario",
+    "title": "Glosario",
+    "url": "https://platform.claude.com/docs/en/about-claude/glossary",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "anthropic-tool-use-vision-general",
+    "title": "Tool use con Claude: visión general",
+    "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "anthropic-razonamiento-y-coste",
+    "title": "Dirigir el razonamiento (thinking-steering-and-cost)",
+    "url": "https://platform.claude.com/docs/en/build-with-claude/thinking-steering-and-cost",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "mcp-introduccion",
+    "title": "¿Qué es el Model Context Protocol (MCP)?",
+    "url": "https://modelcontextprotocol.io/introduction",
+    "publisher": "Model Context Protocol",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "openai-guia-de-razonamiento",
+    "title": "Guía de razonamiento (reasoning)",
+    "url": "https://developers.openai.com/api/docs/guides/reasoning",
+    "publisher": "OpenAI",
+    "official": true,
+    "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "google-thinking",
+    "title": "Gemini: thinking",
+    "url": "https://ai.google.dev/gemini-api/docs/thinking",
+    "publisher": "Google",
+    "official": true,
+    "lastChecked": "2026-10-19"
   }
 ]

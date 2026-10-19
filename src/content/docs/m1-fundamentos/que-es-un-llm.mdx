@@ -4,8 +4,144 @@ description: 'Qué hace un modelo de lenguaje, qué no recuerda y por qué decid
 sidebar:
   order: 1
 level: basico
-tracks: [profesional, tecnica]
-readingTime: 6
-status: en-preparacion
-sources: []
+tracks: [esencial, profesional, tecnica]
+readingTime: 8
+lastReviewed: 2026-10-19
+sources:
+  [
+    platform-claude-com-docs-en-build-with-claude-context-windows,
+    anthropic-reduce-hallucinations,
+    support-claude-com-en-articles-11817273-use-claude-s-chat-search-and-memory-to-b,
+    platform-claude-com-docs-en-agents-and-tools-tool-use-web-search-tool,
+    claude-code-memoria-y-claude-md,
+    anthropic-razonamiento-adaptativo,
+    chatgpt-personalizar,
+    anthropic-glosario,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import ProviderTabs from '@components/ProviderTabs.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Un modelo de lenguaje genera texto plausible a partir de lo que tiene delante. No consulta una base de hechos ni «sabe» como lo hace una persona.
+- Entre una conversación y otra no recuerda nada, salvo lo que la aplicación o tú le vuelves a dar: memoria, proyectos, ficheros de instrucciones.
+- Puede inventar con total aplomo. Se reduce dándole el material, permitiéndole decir «no lo sé» y verificando; no se elimina.
+- Hoy los modelos razonan antes de responder y pueden usar herramientas (buscar, leer ficheros). Eso amplía lo que pueden hacer, y también lo que cuesta y lo que tienes que revisar.
+- La consecuencia práctica: tú decides qué sabe el modelo en cada momento.
+
+</KeyTakeaways>
+
+## La idea
+
+Un modelo de lenguaje (_large language model_, LLM) es un programa que, dado un texto, escribe una continuación verosímil, pieza a pieza. La documentación de Anthropic lo describe así para Claude: los modelos se preentrenan para predecir la siguiente palabra a partir del texto anterior y después se refinan, con ajuste fino y aprendizaje con retroalimentación humana (RLHF), para que sigan instrucciones y se comporten como un asistente.
+
+Piensa en un colaborador brillante que cada mañana llega sin recuerdo de ayer. Sabe mucho en general, pero de tu empresa, de tu cliente y de esta semana solo sabe lo que le dejes sobre la mesa (o lo que la aplicación le entregue en forma de notas). Esa mesa es la [ventana de contexto](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#ventana-de-contexto): Anthropic la llama la «memoria de trabajo» del modelo y la distingue del gran corpus de texto con el que se entrenó.
+
+De ahí salen las dos ideas que ordenan el resto de la guía:
+
+**Lo que tiene delante manda.** Si el contrato está en la conversación, el modelo se apoya en él. Si no está, rellena con lo más verosímil, que puede coincidir con la realidad o no.
+
+**Lo que aprendió tiene fecha de corte.** Su conocimiento general viene del entrenamiento y no incluye tus documentos ni lo ocurrido después. Para lo reciente necesita que le des el material o que lo busque con una herramienta: la documentación de Anthropic presenta su herramienta de búsqueda web precisamente para consultar información posterior a esa fecha de corte, con fuentes citadas.
+
+## No recuerda entre conversaciones
+
+En la API de Claude, la documentación describe cada turno como el historial anterior completo más tu mensaje nuevo. Lo que parece memoria es que la aplicación vuelve a enviar la conversación entera cada vez; la mecánica está en [la ventana de contexto](/AI-Optimized_Usage_Web/m1-fundamentos/ventana-de-contexto/).
+
+Las aplicaciones añaden capas por encima. Conviene saber cuáles tienes activas, porque cambian lo que el modelo «sabe» de ti sin que lo escribas:
+
+<ProviderTabs>
+<div slot="claude">
+
+En las apps de Claude, la ayuda oficial (consultada el 19 de octubre de 2026) describe dos funciones: la búsqueda en chats anteriores, disponible en planes de pago, y la memoria, que guarda temas de tus conversaciones para usarlos en las siguientes. La memoria está activada por defecto en Free, Pro y Max (web, escritorio y móvil); en Team y Enterprise la controla el propietario. Se puede desactivar, pausar o restablecer, y existen chats de incógnito.
+
+Los proyectos de Claude añaden instrucciones y conocimiento compartidos por todas las conversaciones del proyecto (ver [qué son los proyectos](https://support.claude.com/en/articles/9517075-what-are-projects) y [ficheros de instrucciones y memoria](/AI-Optimized_Usage_Web/m6-herramientas/ficheros-de-instrucciones-y-memoria/)).
+
+En Claude Code, los ficheros `CLAUDE.md` y la memoria automática se cargan al empezar cada sesión. En la API, lo que no envías no existe, salvo que montes tú una herramienta de memoria. El detalle está en [ficheros de instrucciones y memoria](/AI-Optimized_Usage_Web/m6-herramientas/ficheros-de-instrucciones-y-memoria/).
+
+</div>
+<div slot="openai">
+
+Según la documentación de OpenAI (consultada el 19 de octubre de 2026), ChatGPT tiene un apartado de personalización con instrucciones personalizadas y memorias que llevan contexto de chats anteriores a los futuros; los proyectos tienen instrucciones compartidas para todos sus chats. En Codex, las instrucciones personales se guardan en tu `AGENTS.md` global. No hemos verificado cómo se gestiona el estado en la API de OpenAI.
+
+</div>
+<div slot="google">
+
+No hemos verificado en la documentación oficial de Google cómo funciona la memoria en la app de Gemini ni el estado entre peticiones en su API. Para Gemini CLI, el fichero de contexto del proyecto es `GEMINI.md`. Lo añadiremos cuando lo comprobemos.
+
+</div>
+</ProviderTabs>
+
+<Callout tipo="recomendacion">
+
+Parte de la base de que el modelo no sabe nada de tu caso y dale lo que necesita en la conversación, aunque creas que «ya lo sabe de otras veces». Por qué: si la memoria de la app falla, no existe o recoge algo distinto de lo que importa hoy, el resultado depende de un recuerdo que no controlas. Lo que escribes tú, lo controlas.
+
+</Callout>
+
+## Por qué inventa
+
+Un modelo no tiene un modo «comprobar» aparte del modo «escribir»: produce el texto más verosímil dadas las palabras que tiene delante. Cuando el dato está en el material, lo más verosímil suele ser copiarlo bien. Cuando no está, lo más verosímil es algo con aspecto de dato: una cifra redonda, una cita con formato correcto, una cláusula que «suena a contrato». Esa explicación es una lectura de la guía, no una cita oficial; lo que sí dice la documentación es el fenómeno.
+
+<Callout tipo="verificado" fecha="2026-10-19">
+
+Anthropic reconoce que incluso los modelos más avanzados pueden generar texto incorrecto o incoherente con el contexto dado, lo que llama «alucinación» (glosario: [alucinación](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#alucinacion)). Su guía para reducirlas propone tres técnicas básicas: permitir expresamente al modelo decir «no lo sé», pedirle citas literales del documento antes de analizarlo cuando es largo (más de 20.000 tokens) y hacer que respalde cada afirmación con una cita, retirando las que no encuentre apoyo. Y advierte de que reducen las alucinaciones, no las eliminan: hay que validar la información crítica.
+
+</Callout>
+
+Por eso en la guía la verificación es un paso del método y no un extra. Está desarrollada en [verificar siempre](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/verificar-siempre/) y en [alucinaciones](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/alucinaciones/).
+
+## Qué cambia con el razonamiento y las herramientas
+
+Los modelos actuales añaden dos capacidades que cambian lo que puedes pedirles.
+
+**Razonamiento.** Antes de responder pueden generar texto interno para planificar y comprobar. En los modelos de Claude recientes lo decide el propio modelo en cada petición (razonamiento adaptativo). Mejora las tareas con varios pasos, pero ese texto se factura y ocupa ventana. Es el tema de [razonamiento y esfuerzo](/AI-Optimized_Usage_Web/m1-fundamentos/razonamiento-y-esfuerzo/).
+
+**Herramientas.** El modelo puede pedir que se busque en la web, se lea un fichero o se consulte tu calendario; la aplicación lo ejecuta y le devuelve el resultado. Así accede a información reciente o privada. Pero lo que vuelve es más texto que el modelo lee, y puede estar equivocado, desactualizado o contener órdenes ocultas. Está explicado en [herramientas, MCP y agentes](/AI-Optimized_Usage_Web/m1-fundamentos/herramientas-mcp-y-agentes/).
+
+Ninguna de las dos convierte al modelo en una fuente fiable por sí misma. Razonar no es verificar, y buscar no es leer bien lo encontrado.
+
+## En la práctica
+
+<Steps>
+
+1. Antes de pedir, escribe qué necesita saber el modelo que no puede saber: tus datos, el documento, las normas internas, lo ocurrido esta semana.
+2. Dáselo en la conversación (pega o adjunta) o conecta la fuente. No confíes en que lo recuerda.
+3. Pídele que se apoye solo en ese material y que diga «no lo sé» si algo no aparece.
+4. Para hechos recientes, usa la búsqueda de la herramienta, pide las fuentes y abre una para comprobarla.
+5. Si repites la misma explicación de contexto cada vez, conviértela en instrucciones de proyecto o en un fichero de instrucciones ([regla 9](/AI-Optimized_Usage_Web/m0-empieza-aqui/las-10-reglas/)).
+
+</Steps>
+
+## Ejemplo de oficina: la cláusula de penalización
+
+Una responsable de compras pregunta: «¿Qué penalización prevé nuestro contrato con el proveedor X si se retrasa la entrega?». Sin adjuntar el contrato, el modelo puede contestar con una cláusula perfectamente redactada y un porcentaje verosímil, que no tiene por qué ser la del contrato real.
+
+Con el contrato adjunto y este encargo, la situación cambia: «Con el contrato adjunto, cita literalmente la cláusula de penalización por retraso y su porcentaje. Si no hay ninguna, di "no aparece" y no deduzcas nada». Ahora el modelo tiene el material, tiene permiso para no encontrar nada y devuelve algo que ella puede contrastar en un minuto con el documento. El modelo y el esfuerzo son los mismos; lo que ha cambiado es lo que hay en la ventana.
+
+## Errores frecuentes
+
+- **Dar por hecho que «ya sabe» lo de ayer o lo de tu empresa.** Solo sabe lo que está en la conversación o lo que la aplicación le entregó.
+- **Preguntar por datos concretos sin material.** Cifras, fechas, citas y normas inventadas son el caso típico de alucinación.
+- **Confundir fluidez con exactitud.** Un texto bien escrito no es un texto verificado.
+- **Preguntar por lo reciente sin búsqueda.** El conocimiento del entrenamiento tiene fecha de corte.
+- **Pensar que razonar o usar herramientas elimina los errores.** Los cambia de sitio: ahora también hay que comprobar lo que leyó y lo que hizo.
+
+<Checklist
+  id="m1-que-es-un-llm"
+  titulo="Antes de dar por buena una respuesta"
+  items={[
+    'Sé qué material tenía el modelo delante cuando respondió.',
+    'Le he dado permiso para decir «no lo sé».',
+    'Los datos que importan (cifras, fechas, citas) los he comprobado contra la fuente.',
+    'Sé qué memoria o instrucciones permanentes tiene activas mi aplicación.',
+    'Para lo reciente, he usado búsqueda y he abierto al menos una fuente.',
+  ]}
+/>
+
+## Para profundizar
+
+Lo que ocupa el modelo en cada turno, en [tokens](/AI-Optimized_Usage_Web/m1-fundamentos/tokens/) y [la ventana de contexto](/AI-Optimized_Usage_Web/m1-fundamentos/ventana-de-contexto/). Cómo escribir el encargo para que el modelo tenga lo que necesita, en [la plantilla de encargo](/AI-Optimized_Usage_Web/m2-metodo/plantilla-de-encargo/) y en [los principios del prompting](/AI-Optimized_Usage_Web/m3-prompting/principios/).

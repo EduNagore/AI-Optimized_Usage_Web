@@ -1,11 +1,233 @@
 ---
 title: 'Automatización'
-description: 'Modo no interactivo, bucles, integración con CI, rutinas y tareas programadas.'
+description: 'Claude Code sin estar delante: claude -p, bucles de reparto, /loop, rutinas en la nube, /goal e integración con GitHub.'
 sidebar:
   order: 6
 level: avanzado
 tracks: [tecnica]
-readingTime: 8
-status: en-preparacion
-sources: []
+readingTime: 10
+lastReviewed: 2026-10-19
+sources:
+  [
+    claude-code-referencia-cli,
+    claude-code-indice-completo,
+    claude-code-comandos,
+    claude-code-rutinas,
+    code-claude-com-docs-en-scheduled-tasks,
+    code-claude-com-docs-en-goal,
+    claude-code-modos-de-permiso,
+    claude-code-prompt-caching-en-claude-code,
+    claude-code-costes,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import CommandCard from '@components/CommandCard.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- `claude -p "…"` ejecuta una consulta sin sesión interactiva, imprime el resultado y termina: es la pieza base de cualquier automatización.
+- Al automatizar, limita herramientas, turnos y presupuesto: nadie está delante para frenar un error.
+- Hay seis formas: `claude -p` desde un script, `/loop` (sesión abierta), `/goal` (hasta cumplir una condición), tareas programadas de la app de escritorio (en tu máquina), rutinas con `/schedule` (en la nube) e integración con GitHub.
+- Un `/loop` o una tarea periódica con un intervalo mayor que la vida de la caché paga una escritura nueva cada vez.
+- Empieza con una ejecución supervisada. Automatiza cuando el resultado ya sea fiable.
+
+</KeyTakeaways>
+
+## La idea
+
+Automatizar es quitarte de en medio: Claude hace una tarea repetida sin que tú escribas el prompt cada vez. Es lo que más ahorra a largo plazo (regla 9 de la guía: lo que repitas, conviértelo en plantilla, skill o automatización) y lo que más riesgo añade, porque ya no hay una persona que vea el error a tiempo.
+
+La regla de diseño es siempre la misma: **cuanto menos supervisión, menos permisos**. Una tarea desatendida debe poder hacer solo lo que necesita, durante un número de turnos acotado y con un presupuesto máximo.
+
+## Modo no interactivo: `claude -p`
+
+Con `-p` (o `--print`) Claude Code responde a una consulta, imprime el resultado y sale. Acepta contenido por tubería:
+
+```bash
+cat ventas-semana.csv | claude -p "Resume las ventas de la semana por región y señala las tres mayores caídas"
+```
+
+Las opciones que importan para automatizar, según la referencia de la CLI:
+
+| Opción                      | Para qué sirve                                                                                                                                                                                                             |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--output-format`           | Formato de salida: `text`, `json` o `stream-json`. Usa `json` si otro programa va a leer el resultado                                                                                                                      |
+| `--allowedTools`            | Herramientas que se ejecutan sin pedir permiso (por ejemplo `"Read"`)                                                                                                                                                      |
+| `--permission-mode`         | Modo de permisos con el que arranca (`plan`, `dontAsk`, `acceptEdits`…)                                                                                                                                                    |
+| `--max-turns`               | Limita los turnos del agente; al alcanzarlo, termina con error                                                                                                                                                             |
+| `--max-budget-usd`          | Para la ejecución al llegar a un gasto estimado. Es una estimación del cliente, puede diferir de tu factura y se puede sobrepasar                                                                                          |
+| `--json-schema`             | Fuerza una salida JSON que cumpla un esquema                                                                                                                                                                               |
+| `--bare`                    | Arranque mínimo: no descubre hooks, skills, plugins, `CLAUDE.md` ni servidores MCP (solo conecta los que pases con `--mcp-config`). No usa tu login de suscripción: necesita `ANTHROPIC_API_KEY` o un proveedor en la nube |
+| `--permission-prompts none` | Si nadie puede responder a los avisos de permiso, se deniegan en lugar de esperar                                                                                                                                          |
+| `-c` / `-r`                 | Continuar o reanudar una conversación                                                                                                                                                                                      |
+| `--no-session-persistence`  | No guarda la sesión en disco                                                                                                                                                                                               |
+
+Una llamada desatendida razonable combina varias:
+
+```bash
+claude -p "Resume el fichero y devuelve solo una tabla" \
+  --allowedTools "Read" \
+  --permission-mode dontAsk \
+  --max-turns 8 \
+  --max-budget-usd 1 \
+  --output-format json < informe.md > resumen.json
+```
+
+Por qué cada pieza: `--allowedTools "Read"` solo permite leer; `dontAsk` deniega todo lo que no esté permitido en lugar de esperar una respuesta que nunca llegará; `--max-turns` y `--max-budget-usd` ponen techo al bucle. Los valores (8 turnos, 1 dólar) son un ejemplo de la guía: ajústalos a tu tarea. Si lo que pasas por la tubería supera los 10 MB, Claude Code termina con error; para entradas mayores, guarda el contenido en un fichero y cita su ruta en el prompt.
+
+Los ejemplos de shell de esta página valen en macOS, Linux y WSL. En PowerShell no existe el operador `<`, así que se pasa el contenido por tubería:
+
+```powershell
+Get-Content .\informe.md -Raw | claude -p "Resume el fichero y devuelve solo una tabla" --allowedTools "Read" --permission-mode dontAsk --max-turns 8 --max-budget-usd 1 --output-format json | Set-Content -Encoding utf8 resumen.json
+```
+
+<Callout tipo="verificado" fecha="2026-10-19">
+
+Las opciones de la tabla están comprobadas en la referencia de la CLI de Claude Code; todavía no están en los datos del sitio. Las opciones y su disponibilidad cambian entre versiones: `claude --help` no las lista todas, así que ante la duda consulta la fuente.
+
+</Callout>
+
+## Repartir sobre muchos ficheros
+
+Un bucle de shell que llama a `claude -p` una vez por fichero es la forma más sencilla de repartir trabajo, y cada llamada empieza con contexto limpio:
+
+```bash
+mkdir -p resumenes
+for f in actas/*.md; do
+  claude -p "Extrae acuerdos, responsables y fechas de esta acta en una tabla" \
+    --allowedTools "Read" --permission-mode dontAsk --max-turns 5 \
+    < "$f" > "resumenes/$(basename "$f" .md).md"
+done
+```
+
+Antes de lanzarlo sobre todos los ficheros, ejecútalo sobre tres y revisa. Si las piezas son homogéneas y quieres que Claude las reparta y las vigile, un [flujo dinámico](/AI-Optimized_Usage_Web/m7-claude-code/trabajo-en-paralelo/) es la alternativa.
+
+Para tandas grandes que no necesitan respuesta inmediata, la API ofrece además [procesamiento por lotes](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/batch/) con descuento, aunque ese camino ya no es Claude Code.
+
+## Las seis formas de que corra sin ti
+
+| Forma                                        | Dónde corre           | Dura                                               | Cuándo                                                                  |
+| -------------------------------------------- | --------------------- | -------------------------------------------------- | ----------------------------------------------------------------------- |
+| `claude -p` en un script o tarea del sistema | Tu máquina o servidor | Una ejecución                                      | Cualquier tarea acotada, integrable con cron o el programador de tareas |
+| `/loop`                                      | Tu sesión abierta     | Mientras la sesión siga abierta                    | Vigilar algo mientras trabajas                                          |
+| `/goal`                                      | Tu sesión             | Hasta cumplir la condición                         | Una tarea larga con un final comprobable                                |
+| Tarea programada de la app de escritorio     | Tu máquina            | Mientras la app esté abierta y el equipo despierto | Tareas periódicas que necesitan tus ficheros locales                    |
+| Rutinas (`/schedule`)                        | La nube               | Programadas, por API o por evento de GitHub        | Tareas periódicas con tu ordenador apagado                              |
+| GitHub                                       | La nube               | Por evento                                         | Revisiones y arreglos de PR                                             |
+
+**`/loop`** repite un prompt mientras la sesión esté abierta, con un intervalo fijo o elegido por Claude. Según la documentación, las tareas recurrentes caducan a los 7 días, hay un máximo por sesión y el intervalo mínimo es de 1 minuto (valores de la fuente, sin verificar todavía en los datos del sitio).
+
+<CommandCard comando="/loop" />
+
+**`/goal`** mantiene a Claude trabajando entre turnos hasta cumplir una condición que un modelo evaluador comprueba tras cada turno. El evaluador no ejecuta comandos ni lee ficheros: juzga lo que Claude haya mostrado en la conversación, así que la condición debe pedir que muestre la evidencia. Una meta activa por sesión. También funciona con `-p`, por ejemplo `claude -p "/goal …"`, y el bucle corre hasta terminar en una sola invocación.
+
+<CommandCard comando="/goal" />
+
+**Tarea programada de la app de escritorio.** Se crea desde la pestaña Code de la app (Routines, «New routine», opción Local). Corre en tu máquina con acceso directo a tus ficheros y herramientas, pero solo se ejecuta mientras la app esté abierta y el ordenador despierto: si duerme a la hora prevista, esa ejecución se salta (al volver hace una de recuperación). Es la opción para «cada lunes, con los Excel de mi carpeta».
+
+**Rutinas.** Una rutina es una configuración guardada (prompt, repositorios, conectores) que se ejecuta en la nube con un disparador de horario, de API o de GitHub. Está en vista previa de investigación y disponible en los planes Pro, Max, Team y Enterprise; consume el uso de tu suscripción igual que una sesión, tiene límites horarios de ejecuciones y el intervalo mínimo de horario es de una hora.
+
+<CommandCard comando="/schedule" />
+
+**Una rutina no ve tu ordenador.** En cada ejecución se clona de nuevo cada repositorio de GitHub que le hayas dado, y fuera de eso solo llega a lo que le des mediante conectores y al entorno en la nube que elijas. No puede leer un `Informes/ventas.csv` que solo exista en tu disco. Los datos le llegan de tres maneras: los ficheros del repositorio, lo que lea de un conector (correo, hoja de cálculo, gestor de incidencias) o un texto que le envíes al lanzarla (un campo `text` en la llamada de API o el texto de «Run now»). Además, los eventos de GitHub (PR, releases) pueden dispararla. Todo lo que haga con un conector aparece a tu nombre.
+
+**GitHub.** `/install-github-app` instala la app de Claude en un repositorio, y `/autofix-pr` abre una sesión en la nube que vigila el PR de la rama y sube arreglos si falla la integración continua o llegan comentarios. Desde el terminal, `claude ultrareview` ejecuta la revisión profunda sin interacción y devuelve un código de salida (0 si termina bien, 1 si falla), apto para scripts y CI.
+
+### CI con GitHub Actions
+
+Para ejecutar Claude en el flujo de integración continua de un repositorio existe la acción `anthropics/claude-code-action`. Configuración rápida: `/install-github-app` instala la app, guarda un secreto de autenticación (`ANTHROPIC_API_KEY` o `CLAUDE_CODE_OAUTH_TOKEN`) y prepara un PR con el workflow; hace falta ser administrador del repositorio y tener la CLI de GitHub (`gh`) autenticada. Con una entrada `prompt`, la acción funciona en modo automatización y se ejecuta sin esperar una mención. Adaptado de la documentación, un informe diario programado tiene esta forma:
+
+```yaml
+name: Informe diario
+on:
+  schedule:
+    - cron: '0 9 * * *'
+jobs:
+  informe:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: read
+      id-token: write
+    steps:
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: 'Resume las incidencias abiertas de ayer'
+          claude_args: '--max-turns 5'
+```
+
+Con un `prompt` de texto, Claude no tiene acceso a shell ni a la API de GitHub hasta que le concedas las herramientas con `--allowedTools` en `claude_args`; sin ellas no podrá leer las incidencias, por lo que este esqueleto es un punto de partida y no un informe completo. Por defecto, el resultado se ve en el registro de la ejecución, no en un comentario. Cada ejecución consume minutos de GitHub Actions y tokens; `--max-turns` en `claude_args` acota las vueltas.
+
+<Callout tipo="cuidado">
+
+Un proceso desatendido que lee documentos externos es un blanco de la inyección de instrucciones: un correo o una web pueden contener órdenes que el modelo obedezca. Limita las herramientas permitidas, no le des acceso de escritura fuera de la carpeta de salida y revisa el resultado antes de usarlo. Ver [privacidad y seguridad](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/privacidad-y-seguridad/).
+
+</Callout>
+
+<Callout tipo="recomendacion">
+
+Elige el intervalo de un `/loop` o una tarea periódica teniendo en cuenta la caché: si es mayor que su vida útil, cada ejecución paga una escritura nueva del contexto. En la conversación principal esa vida es de 1 hora con una suscripción dentro del uso incluido y de 5 minutos con clave de API o créditos de uso (cifra de la documentación, explicada en [prompt caching](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/prompt-caching/)). Es una consecuencia directa de que la caché caduca, no una medición. Para tareas que comparten un prefijo largo, ejecutarlas seguidas o dentro de ese tiempo es más barato.
+
+</Callout>
+
+## En la práctica
+
+<Steps>
+
+1. Haz la tarea a mano una vez en una sesión normal y anota el prompt que funcionó.
+2. Conviértelo en una llamada `claude -p` y ejecútala en tu terminal con una carpeta de pruebas o con `--permission-mode plan`, que hace que Claude solo lea y proponga un plan sin modificar nada.
+3. Añade límites: herramientas permitidas, `--max-turns`, `--max-budget-usd`.
+4. Ejecuta sobre un conjunto pequeño y revisa el resultado a mano.
+5. Programa la ejecución (cron, programador de tareas o `/schedule`) y vigila las primeras veces.
+6. Mide con `/usage` y revisa el coste al cabo de una semana.
+
+</Steps>
+
+## Ejemplo de oficina: el informe semanal
+
+Un responsable de operaciones quiere un informe de incidencias cada lunes.
+
+1. Ejecuta a mano: «Lee el export de incidencias de la semana y escribe un informe de una página: totales por categoría, las tres incidencias más graves y lo que ha cambiado respecto a la semana anterior».
+2. Lo pasa a un script:
+
+   ```bash
+   claude -p "Escribe el informe semanal de incidencias de una página" \
+     --allowedTools "Read" --permission-mode dontAsk --max-turns 6 --max-budget-usd 1 \
+     < incidencias-semana.csv > informe.md
+   ```
+
+3. Lo programa para el lunes a las 8:00 con el programador de tareas de su sistema. Un humano revisa `informe.md` antes de enviarlo.
+
+En PowerShell, la línea del paso 2 sería `Get-Content .\incidencias-semana.csv -Raw | claude -p "…" --allowedTools "Read" --permission-mode dontAsk --max-turns 6 --max-budget-usd 1 | Set-Content -Encoding utf8 informe.md`. Si prefieres que corra con el ordenador apagado, usa una rutina: tendrías que dejar el CSV en un repositorio o leerlo desde un conector, porque la rutina no ve tu disco.
+
+Por qué así: el script solo puede leer el CSV de entrada, acaba solo y tiene un techo de gasto. Para un caso completo con estos pasos, ver [informe semanal automático](/AI-Optimized_Usage_Web/m10-casos-practicos/informe-semanal-automatico/).
+
+## Errores frecuentes
+
+- **Automatizar antes de que funcione a mano.** Multiplicas un resultado inestable.
+- **Dar permisos amplios porque «así no se para».** Si algo va mal, nadie lo ve. Mejor `dontAsk` con una lista corta de permitidos.
+- **No poner techo de turnos ni de gasto.** Un bucle sin condición de parada es un cargo sin tope.
+- **No revisar la primera semana.** Los fallos silenciosos (un fichero vacío, un formato que cambia) se detectan mirando.
+- **Usar `/loop` para algo que debe correr con el ordenador apagado.** Requiere la sesión abierta; para eso están las rutinas.
+
+<Checklist
+  id="m7-automatizacion"
+  titulo="Antes de automatizar"
+  items={[
+    'La tarea funciona bien a mano.',
+    'Limito herramientas, turnos y presupuesto.',
+    'He probado con un conjunto pequeño.',
+    'Una persona revisa el resultado antes de usarlo.',
+    'Sé qué forma elegir: claude -p, /loop, /goal, rutina o GitHub.',
+    'Tengo un plan para medir el coste a la semana.',
+  ]}
+/>
+
+## Para profundizar
+
+Las herramientas que ya conoces, en [referencia de comandos](/AI-Optimized_Usage_Web/m7-claude-code/comandos/). El método de encargos largos y agentes, en [tareas largas y agentes](/AI-Optimized_Usage_Web/m3-prompting/tareas-largas-y-agentes/) (módulo 3).

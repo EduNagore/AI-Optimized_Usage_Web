@@ -5,7 +5,121 @@ sidebar:
   order: 5
 level: basico
 tracks: [profesional, tecnica]
-readingTime: 4
-status: en-preparacion
-sources: []
+readingTime: 6
+lastReviewed: 2026-10-19
+sources: [claude-code-changelog, claude-code-comandos]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+import Fact from '@components/Fact.astro';
+
+<KeyTakeaways>
+
+- La investigación, la redacción y la revisión las hacen modelos de Claude distintos entre sí, cada uno con contexto limpio; una persona supervisa y decide.
+- Cada dato que caduca se lee en la fuente oficial, se guarda con su fuente y su fecha, y lo contrasta otro modelo.
+- Tres fechas distintas: «Verificado el» (un dato), «comprobada el» (una fuente) y la última revisión de cada página.
+- Como criterio operativo de la guía, un dato con más de 45 días sin contrastar se trata como pista: abre la fuente.
+- Si una fuente oficial contradice la guía, gana la fuente; lo que no se ha podido confirmar no se publica como dato.
+
+</KeyTakeaways>
+
+## La idea
+
+Una guía sobre herramientas que cambian con frecuencia solo es útil si dice cuándo comprobó lo que cuenta y qué no ha podido comprobar. Esta página explica cómo se hace, para que sepas cuánto fiarte de cada cifra y qué hacer cuando algo no cuadra.
+
+Conviene decir quién hace el trabajo: la investigación, la redacción y la revisión las hacen modelos de Claude distintos entre sí, cada uno con contexto limpio, y una persona supervisa y decide. Por eso el contraste con la fuente oficial y la regla de no publicar lo que no se confirma son tan importantes.
+
+## Cómo se verifica un dato
+
+Un dato que puede caducar (un modelo, un precio, un nivel de esfuerzo, un comando, un límite) recorre cuatro pasos antes de aparecer en una página.
+
+<Steps>
+
+1. **Lectura de la fuente oficial.** Se abre la documentación, la página de precios o las notas de versión del proveedor. Se anotan la dirección, la fecha de consulta y un extracto literal breve que respalda el dato. Un blog o un agregador puede servir para descubrir que algo existe, pero no cuenta como fuente.
+2. **Registro con su fuente y su fecha.** El dato se guarda con dos campos obligatorios: la fuente y la fecha de verificación. Si falta cualquiera de los dos, el sitio ni siquiera se construye: así un dato sin fuente no llega a publicarse.
+3. **Contraste independiente.** Otro modelo de Claude, con contexto limpio y distinto del que recogió el dato, vuelve a abrir la fuente oficial y compara. El contraste cubre todos los precios, identificadores de modelo, ventanas de contexto y niveles de esfuerzo, y una muestra de una cuarta parte del resto. Las discrepancias se corrigen. Ejemplo real: al contrastar una muestra de comandos, la versión en que se introdujo cada uno resultó dudosa en 8 de 35; en lugar de publicar un dato incierto, se retiró ese dato.
+4. **Revisión editorial.** Un modelo de Claude distinto del que redactó, de nuevo con contexto limpio, revisa cada módulo: comprueba que las cifras salen de los datos y no de la memoria, que cada recomendación lleva su porqué y que está claro qué es dato, qué es medición y qué es consejo. Una persona supervisa y decide.
+
+</Steps>
+
+Las lecciones no escriben a mano ningún dato que caduque: lo muestran con un componente que lo lee del registro, con su fuente y su fecha. Por eso, cuando un dato cambia, se edita en un único sitio y se actualizan todas las páginas que lo usan. Por ejemplo, el precio de salida de Sonnet 5.5 es <Fact id="sonnet-5-5.pricing.output" /> por millón de tokens, y esa cifra sale del registro, no del texto de esta página.
+
+## Qué significan las fechas
+
+| Lo que ves en pantalla                | Dónde                                            | Qué significa                                                                      |
+| ------------------------------------- | ------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| «Verificado el» (campo `verifiedAt`)  | Tooltip de cada dato y avisos de dato verificado | Cuándo se contrastó ese dato concreto con su fuente oficial.                       |
+| «comprobada el» (campo `lastChecked`) | Pie de cada lección e índice de fuentes          | Cuándo se abrió por última vez la página oficial. No garantiza cada dato que cita. |
+| «Última revisión»                     | Pie de cada lección                              | Cuándo se revisó el texto de la página.                                            |
+
+Una fuente comprobada hoy no significa que todos los datos que cita se hayan contrastado hoy: cada dato lleva su propia fecha. En sentido contrario, una página revisada hace tiempo puede mostrar un dato verificado más recientemente, porque el dato se actualiza aparte del texto. La fecha de la última verificación global de los datos se muestra en la portada, en [cómo se mantiene esta guía](/AI-Optimized_Usage_Web/#mantenimiento).
+
+## Cuándo se considera que un dato está caducado
+
+Un control automático señala los datos con más de 45 días desde su última verificación y las fuentes que ya no responden.
+
+<Callout tipo="recomendacion">
+
+Si ves un dato con más de 45 días, trátalo como una pista y abre la fuente. Es un criterio operativo de la guía, no un dato de los proveedores: se eligió para tener una regla simple y revisable, y un producto concreto puede cambiar antes.
+
+</Callout>
+
+## Cuando una fuente oficial contradice la guía
+
+La regla es una sola: **gana la fuente oficial actual**. Si la guía dice una cosa y la documentación oficial otra, se corrige la guía y el cambio queda anotado. Lo mismo vale para el conocimiento previo de quien escribe, sea persona o modelo: no es una fuente.
+
+Hay un caso más delicado: que dos páginas oficiales se contradigan entre sí. Entonces se usa la más específica y reciente y se deja constancia. Si no se puede resolver, el dato dudoso no se publica. Por ejemplo, el registro de cambios de Claude Code y la página de comandos discrepan sobre la versión en que llegó `/skill-doctor`: la guía no publica esa versión.
+
+## Las tres clases de afirmación
+
+Cada afirmación relevante es dato verificado, medición publicada por un proveedor o recomendación de la guía, y el texto lo dice. La tabla de referencia está en [fuentes oficiales](/AI-Optimized_Usage_Web/m12-recursos/fuentes/) y los distintivos, en [cómo usar la guía](/AI-Optimized_Usage_Web/m0-empieza-aqui/como-usar-la-guia/).
+
+## Qué no se verifica
+
+No todo se ha podido confirmar contra una fuente oficial. Lo que no se confirma no se publica como dato; cuando aporta, aparece como «no confirmado» o «sin verificar» y con la razón. A nivel de categoría, hoy son estas:
+
+- **El reparto de modelos por plan en ChatGPT**: qué modelo recibe cada plan y desde cuándo.
+- **Los precios de los planes de suscripción** de las apps de chat (Claude y Gemini, entre otras) y los límites numéricos de algunas funciones, como investigación o proyectos.
+- **Valores por defecto que el proveedor no publica**, como el esfuerzo por defecto de algún modelo o el umbral de la compactación automática.
+- **Detalles de las herramientas de línea de comandos de OpenAI y de Google**: la lista completa de comandos de Codex CLI o los formatos de Gemini CLI y de Antigravity CLI.
+- **Citas de OpenAI y de Google tomadas de resúmenes** y no de una lectura literal de la página, que las lecciones señalan donde aparecen.
+- **Funciones en beta, en vista previa o experimentales**: se describen tal como figuran, pero pueden cambiar sin aviso.
+
+<Callout tipo="cuidado">
+
+Si una página dice «no confirmado», no es que la función no exista: es que no hemos podido leerla en la fuente oficial. No la des por hecha ni por descartada sin comprobarlo en tu instalación.
+
+</Callout>
+
+## Ejemplo de oficina: un presupuesto de IA para el departamento
+
+Elena prepara el presupuesto trimestral de herramientas de IA de su departamento. Encuentra en la guía el precio por millón de tokens de un modelo y, antes de copiarlo, pasa el ratón por la cifra: el tooltip le dice de qué página sale y la fecha de verificación. Hace menos de 45 días, así que la usa y apunta la fecha en la hoja. Para el límite de uso de un plan de suscripción, en cambio, encuentra «no confirmado»: lo pide a su proveedor por escrito. La guía le ha dicho en qué fiarse y en qué no, que es para lo que sirve.
+
+## Cómo avisar de un error
+
+Si ves una cifra que no coincide con la fuente oficial, un enlace roto o una recomendación que ya no se sostiene, lo más útil es poder señalar la página, el dato y la fuente que lo contradice. **El canal público para enviar esos avisos está pendiente de definir**, así que de momento no hay una dirección que ofrecerte. Mientras tanto, la fuente oficial manda: si discrepa de la guía, hazle caso a ella.
+
+## Errores frecuentes
+
+- **Fiarte de la fecha de revisión de la página para un dato.** El dato tiene su propia fecha; mira el tooltip.
+- **Dar por buena una cifra sin fecha.** En esta guía, toda cifra que caduca lleva fecha; si no la ves, desconfía.
+- **Leer «no confirmado» como «no existe».** Significa que falta la lectura de la fuente oficial.
+- **Tratar una recomendación como un dato oficial.** Las recomendaciones llevan su porqué para que puedas juzgarlas.
+
+<Checklist
+  id="metodologia-verificacion"
+  titulo="Cuando uses un dato de esta guía"
+  items={[
+    'He mirado su fecha de verificación y tiene menos de 45 días.',
+    'Sé si es un dato verificado, una medición del proveedor o una recomendación.',
+    'Si decide dinero o riesgo, lo he contrastado con la fuente oficial.',
+    'Si dice «no confirmado», lo compruebo antes de apoyarme en él.',
+  ]}
+/>
+
+## Para profundizar
+
+Las fuentes, una a una, en [fuentes oficiales](/AI-Optimized_Usage_Web/m12-recursos/fuentes/); lo último que ha cambiado, en [novedades del sector](/AI-Optimized_Usage_Web/m12-recursos/novedades/).

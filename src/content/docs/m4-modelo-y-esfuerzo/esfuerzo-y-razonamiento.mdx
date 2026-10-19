@@ -52,7 +52,7 @@ Eso explica por qué el mismo modelo puede ser barato o caro según cómo lo use
 
 El parámetro es `output_config.effort`. La documentación de Anthropic lista los niveles `low`, `medium`, `high`, `xhigh` y `max`; no todos los modelos admiten todos (Opus 4.6 y Sonnet 4.6, por ejemplo, no tienen `xhigh`). Con los modelos recientes el razonamiento es adaptativo: se indica con `thinking: {type: "adaptive"}`, y el antiguo parámetro `budget_tokens` da error 400 en los modelos recientes.
 
-Dos detalles prácticos. En Opus 5.5 el razonamiento no se puede desactivar. Y cambiar el nivel de esfuerzo entre peticiones invalida parte de la caché de prompt; existe una función en beta para cambiarlo por mensaje sin romperla, que requiere una cabecera concreta.
+Dos detalles prácticos. En Opus 5.5 el razonamiento no se puede desactivar (en Fable 5.1 está siempre activo); en Sonnet 5.5 se puede quitar el razonamiento previo con `thinking: {type: "between_tools"}`, solo en `low`, `medium` y `high`, y en Haiku 5.5 `disabled` funciona hasta `high`. Y cambiar el nivel de esfuerzo entre peticiones invalida parte de la caché de prompt; existe una función en beta para cambiarlo por mensaje sin romperla, que requiere una cabecera concreta.
 
 </div>
 <div slot="openai">

@@ -1,0 +1,144 @@
+---
+import { getCollection } from 'astro:content';
+import { formatDate } from '@lib/format';
+
+/**
+ * Todas las novedades de changelog.json, de la más reciente a la más antigua, con un filtro por
+ * proveedor. Sin JavaScript se ven todas; con él, los botones ocultan las de otros proveedores.
+ */
+const entries = (await getCollection('changelog'))
+  .map((e) => e.data)
+  .sort((a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id));
+const providers = [...new Set(entries.map((e) => e.provider))].sort();
+const count = (p: string) => entries.filter((e) => e.provider === p).length;
+---
+
+<div class="novedades not-content" data-novedades>
+  <div class="filters" role="group" aria-label="Filtrar por proveedor" hidden data-filters>
+    <button type="button" aria-pressed="true" data-provider="">
+      Todos ({entries.length})
+    </button>
+    {providers.map((p) => (
+      <button type="button" aria-pressed="false" data-provider={p}>
+        {p} ({count(p)})
+      </button>
+    ))}
+  </div>
+  <p class="status" aria-live="polite" data-status></p>
+  <ol>
+    {entries.map((n) => (
+      <li data-provider={n.provider}>
+        <p class="meta">
+          <time datetime={n.date}>{formatDate(n.date)}</time>
+          <span class="provider">{n.provider}</span>
+        </p>
+        <p class="title">
+          {n.link ? (
+            <a href={n.link} rel="noopener">
+              {n.title}
+            </a>
+          ) : (
+            n.title
+          )}
+        </p>
+        <p class="summary">{n.summary}</p>
+      </li>
+    ))}
+  </ol>
+</div>
+
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>('[data-novedades]')) {
+    const filters = root.querySelector<HTMLElement>('[data-filters]');
+    const status = root.querySelector<HTMLElement>('[data-status]');
+    const buttons = [...root.querySelectorAll<HTMLButtonElement>('[data-provider]')].filter(
+      (b) => b.tagName === 'BUTTON',
+    );
+    const items = [...root.querySelectorAll<HTMLElement>('li[data-provider]')];
+    if (!filters) continue;
+    filters.hidden = false;
+    for (const button of buttons) {
+      button.addEventListener('click', () => {
+        const provider = button.dataset.provider ?? '';
+        for (const b of buttons) b.setAttribute('aria-pressed', String(b === button));
+        let shown = 0;
+        for (const li of items) {
+          const show = !provider || li.dataset.provider === provider;
+          li.hidden = !show;
+          if (show) shown++;
+        }
+        if (status) status.textContent = `${shown} novedades${provider ? ` de ${provider}` : ''}.`;
+      });
+    }
+  }
+</script>
+
+<style>
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-block: var(--space-4);
+  }
+  .filters[hidden] {
+    display: none;
+  }
+  button {
+    padding: var(--space-1) var(--space-3);
+    border: var(--border-width) solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    color: var(--color-text);
+    font: inherit;
+    font-size: var(--text-sm);
+    cursor: pointer;
+  }
+  button[aria-pressed='true'] {
+    border-color: var(--color-accent);
+    background: var(--color-accent-tint);
+    color: var(--color-accent-strong);
+    font-weight: 600;
+  }
+  .status {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+  ol {
+    list-style: none;
+    margin: var(--space-4) 0;
+    padding: 0;
+  }
+  li {
+    padding-block: var(--space-3);
+    border-top: var(--border-width) solid var(--color-border);
+  }
+  li[hidden] {
+    display: none;
+  }
+  p {
+    margin: 0;
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-3);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+  .provider {
+    padding: 0 var(--space-2);
+    border: var(--border-width) solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-xs);
+  }
+  .title {
+    margin-top: var(--space-1);
+    color: var(--color-heading);
+    font-weight: 600;
+  }
+  .summary {
+    margin-top: var(--space-1);
+    font-size: var(--text-sm);
+  }
+</style>

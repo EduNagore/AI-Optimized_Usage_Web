@@ -6,6 +6,141 @@ sidebar:
 level: basico
 tracks: [profesional]
 readingTime: 8
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-19
+sources:
+  [
+    anthropic-esfuerzo,
+    anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas,
+    anthropic-precios,
+    anthropic-reduce-hallucinations,
+    support-claude-com-en-articles-9517075-what-are-projects,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Fact from '@components/Fact.astro';
+import PromptTemplate from '@components/PromptTemplate.astro';
+import CostExample from '@components/CostExample.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Pide los pasajes literales con su página antes del resumen: así cada afirmación se comprueba en segundos.
+- Un informe de 80 páginas cabe de sobra en la ventana de contexto de un modelo actual; el problema no es que quepa, sino que se lea con criterio.
+- Punto de partida: Sonnet 5.5 a esfuerzo medio. Sube de modelo solo si en una muestra falla.
+- Verifica una muestra de cinco citas contra el original y busca lo que el resumen no dice.
+- Si el informe contiene datos personales o es confidencial, comprueba antes que la herramienta está autorizada para ese tipo de documento.
+
+</KeyTakeaways>
+
+## La tarea
+
+Tu directora te pasa el informe anual de un proveedor (80 páginas) y te pide, para mañana, las **decisiones que habría que tomar** y los riesgos que menciona. No quieres un resumen genérico que repita el índice: quieres saber qué se decide, quién y con qué datos.
+
+## Configuración recomendada
+
+- **Superficie.** Un chat con el documento adjunto o, si vas a hacer preguntas durante días, un [proyecto](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#proyecto) con el informe como conocimiento. Es la superficie más simple que resuelve la tarea ([elegir superficie](/AI-Optimized_Usage_Web/m2-metodo/elegir-superficie/)).
+- **Modelo.** Sonnet 5.5, la gama equilibrada. La ventana de contexto de Sonnet 5.5 es de <Fact id="sonnet-5-5.contextWindow" corto />, así que el informe cabe entero.
+- **Esfuerzo.** `medium` como punto de partida. En la API, el valor por defecto de Sonnet 5.5 es <Fact id="sonnet-5-5.effort.default.api" /> y en Claude Code, <Fact id="sonnet-5-5.effort.default.claude-code" />: `medium` es, por tanto, un escalón por debajo del defecto en la API. Si usas un chat y no puedes fijar el esfuerzo, ignora este punto y mejora el encargo.
+- **Equivalente en otros proveedores** (filas de la matriz): <Fact id="gpt-6-1-sol.name" /> en OpenAI y <Fact id="gemini-3-8-flash.name" /> en Google.
+
+<Callout tipo="recomendacion">
+
+Esta configuración sale de la fila «Resumen de un documento largo con decisiones» de la [matriz por tarea](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/matriz-por-tarea/). Por qué `medium` y no `low`: las decisiones están repartidas por el texto y hay que sopesarlas, lo que justifica algo de razonamiento. Por qué no más: el contenido ya está en el documento, no hay que descubrirlo. Es una recomendación de la guía; si en tu muestra el resumen es correcto con `low`, usa `low`.
+
+</Callout>
+
+## Preparación del contexto
+
+1. **Comprueba el PDF.** Si es un escaneo sin texto seleccionable, conviértelo antes con reconocimiento de texto; si no, el modelo lee una imagen y los errores de cifras aumentan. Por qué: es mucho más fácil corregir la entrada que detectar un error en la salida.
+2. **Un documento, una conversación.** No mezcles el informe con otros temas: lo que no pertenece a la tarea se reenvía en cada turno y distrae ([higiene de entrada](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/higiene-de-entrada/)).
+3. **Documento primero, pregunta después.** En contextos largos conviene poner el material antes de la pregunta; los detalles, en [contexto largo](/AI-Optimized_Usage_Web/m3-prompting/contexto-largo/).
+4. **Datos sensibles.** Si el informe incluye datos personales o información bajo confidencialidad, aplica lo que dice [privacidad y seguridad](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/privacidad-y-seguridad/): ¿está autorizada esta herramienta para este tipo de documento?
+
+## El encargo
+
+Parte de la plantilla de análisis con citas y añade lo que tú necesitas: decisiones, no resumen.
+
+<PromptTemplate
+  titulo="Informe largo: decisiones con citas"
+  archivo="informe-largo-decisiones-con-citas"
+  texto={`<documento nombre="{{nombre del informe}}" fecha="{{fecha}}">
+{{adjunto o pega aquí el informe}}
+</documento>
+
+Soy {{tu cargo}} y necesito presentar mañana a {{público}} qué decisiones plantea este informe.
+
+Paso 1. Extrae los pasajes que describan decisiones pendientes, recomendaciones, riesgos y cifras clave. Cópialos literalmente con su página o apartado.
+
+Paso 2. Usando solo esos pasajes, escribe:
+
+1. Las decisiones que habría que tomar, una frase cada una, con quién debería decidir si el informe lo dice.
+2. Los tres riesgos más importantes y la cifra que los respalda.
+3. Lo que el informe no aclara y yo debería preguntar a su autor.
+
+Cada afirmación lleva entre paréntesis la página de donde sale. Si algo no está en el informe, escribe «no consta» y no lo completes con conocimiento general. Si dos partes del informe se contradicen, señálalo.`}
+/>
+
+Por qué dos pasos: obligar a copiar el pasaje antes de resumir reduce el riesgo de que el modelo escriba algo plausible que el documento no dice, y te da el lugar exacto donde comprobarlo. Es la técnica de extracción previa que recomienda la documentación de Anthropic para reducir alucinaciones ([alucinaciones](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/alucinaciones/)).
+
+## Verificación
+
+- **Cinco citas al azar.** Abre la página indicada y comprueba que el pasaje existe y dice lo que el resumen le atribuye. Si falla una, revisa todas.
+- **Cifras.** Contrasta con el original toda cifra que vayas a repetir en voz alta.
+- **Lo que falta.** Busca tú en el índice dos apartados que esperabas ver y comprueba si el resumen los omite. Un resumen fiel puede ser incompleto.
+- **Segunda pasada opcional.** En una conversación nueva, adjuntando de nuevo el informe, pregunta: «¿qué decisión del informe es la más controvertida y por qué?». Si la respuesta no encaja con tu lista, hay un hueco.
+
+Cuánto verificar depende del uso: para orientarte a ti, la muestra de cinco basta; si vas a presentarlo a dirección, lee los apartados de las decisiones completos ([verificar siempre](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/verificar-siempre/)).
+
+## Coste estimado
+
+Supuesto de la guía, no una medición: 80 páginas son unos 50.000 tokens de entrada, y la respuesta con citas, unos 3.000 de salida. El razonamiento se factura como salida y no está incluido (ver [coste por tarea](/AI-Optimized_Usage_Web/m2-metodo/coste-por-tarea/)). Volumen del ejemplo: 20 informes al mes.
+
+<CostExample
+  ids={['haiku-5-5', 'sonnet-5-5', 'opus-5-5']}
+  entrada={50000}
+  salida={3000}
+  volumen={20}
+  batch={false}
+  etiqueta="Resumen de un informe de 80 páginas (supuesto de la guía)"
+/>
+
+Con cualquiera de los tres modelos, un informe cuesta como mucho unos pocos céntimos de dólar. Lo que cuesta de verdad es tu tiempo si el resumen sale mal: por eso la elección de modelo se decide por la calidad en tu muestra y no por la tarifa. Para cambiar las cifras por las tuyas, usa la [calculadora de coste](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/calculadora-de-coste/) y lee [coste por tarea completada](/AI-Optimized_Usage_Web/m2-metodo/coste-por-tarea/).
+
+## Versión económica frente a premium
+
+- **Económica (a probar midiendo, un escalón cada vez):** primero Haiku 5.5 a `medium` (su esfuerzo por defecto) o Sonnet 5.5 a `low`, nunca los dos cambios a la vez, porque si falla no sabrás cuál lo causó. Pruébalo con cinco informes que ya conozcas bien: ¿encuentra las mismas decisiones que tú? Si pierde matices, no compensa el ahorro, que es de céntimos por informe. Solo si el primer escalón aguanta, prueba Haiku 5.5 a `low`.
+- **Estándar:** Sonnet 5.5 a `medium` (el punto de partida de este caso).
+- **Premium (si falla):** Opus 5.5 a `high`, para informes técnicos, jurídicos o donde las decisiones dependen de cómo interactúan varias secciones.
+
+<Callout tipo="medicion" titulo="Medición publicada por Anthropic">
+
+En su guía de optimización de coste e inteligencia, Anthropic mide que, en un subconjunto de SWE-bench Pro (tareas de programación), Sonnet 5.5 en `medium` quedó unos 7 puntos por debajo de `high` con aproximadamente el 59 % del coste por tarea. Sobre tareas de investigación, la misma guía advierte de que el efecto del esfuerzo varía según el modelo y la tarea. Son mediciones del proveedor sobre sus propias tareas y no se trasladan a tus informes: úsalas como razón para medir, no como resultado.
+
+</Callout>
+
+## Errores típicos
+
+- **Pedir «resúmelo» sin decir para qué.** Obtienes un resumen del índice. Di qué decisión debe apoyar.
+- **Aceptar un resumen sin páginas.** Sin cita no hay verificación posible.
+- **Dejar que complete con conocimiento general.** Si el informe no dice algo, el modelo puede rellenarlo con lo que cree saber. La instrucción «no consta» lo evita.
+- **Fiarte de las cifras de las tablas sin mirarlas.** Las tablas y los gráficos son la parte que más conviene comprobar a mano (criterio de la guía, no una medición).
+- **Reutilizar la conversación para otro informe.** El primero sigue en el contexto y se mezcla.
+
+<Checklist
+  id="m10-resumir-informe"
+  titulo="Antes de dar el resumen por bueno"
+  items={[
+    'El PDF tiene texto seleccionable y lo he subido sin mezclar otros temas.',
+    'He pedido pasajes literales con página antes del resumen.',
+    'He abierto al menos cinco citas en el original.',
+    'He contrastado las cifras que voy a repetir.',
+    'He buscado qué se omite, no solo qué se dice.',
+    'He comprobado que la herramienta está autorizada para este documento.',
+  ]}
+/>
+
+## Para profundizar
+
+[Contexto largo](/AI-Optimized_Usage_Web/m3-prompting/contexto-largo/) para ordenar documentos extensos, [alucinaciones](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/alucinaciones/) para entender por qué la cita previa funciona, y la [matriz por tarea](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/matriz-por-tarea/) si tu documento es de otro tipo.

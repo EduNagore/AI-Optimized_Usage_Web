@@ -5,7 +5,96 @@ sidebar:
   order: 4
 level: basico
 tracks: [profesional, tecnica]
-readingTime: 3
-status: en-preparacion
-sources: []
+readingTime: 4
+lastReviewed: 2026-10-19
+sources: [anthropic-modelos, anthropic-precios, openai-precios, google-precios]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Checklist from '@components/Checklist.astro';
+import Fact from '@components/Fact.astro';
+import SourcesIndex from '@components/SourcesIndex.astro';
+
+<KeyTakeaways>
+
+- Un dato de esta guía solo se publica si lo respalda una fuente oficial: la documentación, la página de precios, las notas de versión o el blog del propio proveedor.
+- Blogs de terceros, agregadores y resúmenes de buscadores sirven como pista para encontrar la fuente oficial, nunca como fuente de un dato.
+- Cada afirmación es de una de tres clases: dato verificado, medición publicada por un proveedor o recomendación de la guía.
+- «Comprobada el» indica cuándo se abrió esa página oficial por última vez; no garantiza que no haya cambiado después.
+
+</KeyTakeaways>
+
+## La idea
+
+Los modelos, los precios, los límites y los comandos cambian con frecuencia, y casi todo lo que circula en redes sobre ellos es de segunda o tercera mano. Esta guía intenta evitar ese juego del teléfono: cada cifra y cada nombre que puede caducar remite a la página del proveedor donde se puede comprobar. Esa página es la fuente. Esta es la lista completa, ordenada por editor.
+
+## Qué cuenta como fuente oficial
+
+Cuenta, porque es del propio proveedor y lo publica él:
+
+- La documentación para desarrolladores y de producto (por ejemplo, la tabla de modelos y la página de precios de Anthropic, la página de precios de OpenAI o la de Google).
+- Las notas de versión y los registros de cambios (changelog) del producto.
+- Las páginas de ayuda y los blogs del propio proveedor.
+
+No cuenta como fuente de un dato:
+
+- Blogs y vídeos de terceros, hilos de redes sociales y newsletters.
+- Agregadores y comparadores de modelos o de precios.
+- Resúmenes generados por un buscador o por un asistente.
+
+Esos materiales pueden ser útiles para descubrir que algo ha cambiado. Pero el dato se publica solo cuando alguien lo ha leído en la página oficial. Si la página oficial no se puede abrir, el dato queda como pendiente y se dice, no se rellena de memoria.
+
+<Callout tipo="recomendacion">
+
+Haz lo mismo con cualquier cifra que te llegue por el canal que sea: busca la página oficial del proveedor y comprueba la fecha. Es una recomendación de la guía, y el porqué es sencillo: un precio o un límite de hace dos meses puede seguir circulando mucho después de haber cambiado.
+
+</Callout>
+
+## Las tres clases de afirmación
+
+Cada afirmación relevante de la guía es de una de estas clases, y el texto lo dice. Esta es la tabla de referencia; las otras páginas enlazan aquí. Los distintivos de colores y su significado están en [cómo usar la guía](/AI-Optimized_Usage_Web/m0-empieza-aqui/como-usar-la-guia/).
+
+| Clase                        | Qué es                                                                   | Qué debes hacer con ella                                      |
+| ---------------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------- |
+| **Dato verificado**          | Figura en la documentación oficial y se contrastó en una fecha concreta. | Fíate de él dentro de su fecha; la fuente está enlazada.      |
+| **Medición publicada**       | Cifra que el propio proveedor publica sobre sus modelos y sus tareas.    | Úsala como orden de magnitud; repite la prueba con tus datos. |
+| **Recomendación de la guía** | Criterio de esta guía, siempre con su porqué.                            | Aplícala si el porqué se da en tu caso; si no, ignórala.      |
+
+<Callout tipo="verificado">
+
+Los datos que cambian, como un precio, se muestran con su fuente y su fecha de verificación en un tooltip. Por ejemplo, el precio de entrada de Sonnet 5.5 es <Fact id="sonnet-5-5.pricing.input" /> por millón de tokens: pasa el ratón o el foco por la cifra para ver de dónde sale.
+
+</Callout>
+
+## Ejemplo de oficina: un precio que te llega por un compañero
+
+Un compañero de administración te dice que la herramienta que usáis «ahora cuesta menos». Antes de cambiar el presupuesto del trimestre haces tres cosas. Buscas la página de precios del proveedor, que está en el índice de abajo. Comparas la fecha de la página con la de tu información. Y si el dato figura en esta guía, miras la fecha de verificación del tooltip: si es antigua, vas a la fuente. Cuesta cinco minutos y evita presupuestar con un precio que ya no existe.
+
+## Índice de fuentes
+
+Cada entrada enlaza la página oficial. La fecha es la de la última vez que se abrió, no la de publicación de la página.
+
+<SourcesIndex />
+
+## Errores frecuentes
+
+- **Tomar el índice como lista de lectura.** Es una lista de referencia: lee solo la fuente del dato que necesitas.
+- **Fiarte de una fecha de comprobación antigua.** Si la comprobación tiene más de 45 días (criterio operativo de la guía), abre la fuente: es posible que la página haya cambiado.
+- **Confundir una medición con una promesa.** Una cifra del proveedor describe sus pruebas, no tu caso.
+- **Citar la guía como si fuera la fuente.** Cita la página oficial; la guía es un mapa para llegar a ella.
+
+<Checklist
+  id="fuentes-oficiales"
+  titulo="Antes de fiarte de una cifra"
+  items={[
+    'Sé de qué proveedor es y he localizado su página oficial.',
+    'He mirado la fecha de verificación o de comprobación.',
+    'Sé si es un dato, una medición del proveedor o una recomendación.',
+    'Si decide dinero o riesgo, la he contrastado yo con la fuente.',
+  ]}
+/>
+
+## Para profundizar
+
+Cómo se verifica cada dato, cada cuánto se revisa y qué hacer cuando una fuente contradice la guía, en [metodología y mantenimiento](/AI-Optimized_Usage_Web/m12-recursos/metodologia/). Lo que ha cambiado recientemente, en [novedades del sector](/AI-Optimized_Usage_Web/m12-recursos/novedades/).

@@ -1,11 +1,163 @@
 ---
 title: 'Equivalencias en Codex y Gemini CLI'
-description: 'Qué comando o fichero de Claude Code corresponde a cada uno en Codex y en Gemini CLI.'
+description: 'Qué fichero o comando de Claude Code corresponde a cada uno en Codex, Gemini CLI y Antigravity CLI, y qué no está confirmado.'
 sidebar:
   order: 7
 level: intermedio
 tracks: [tecnica]
-readingTime: 6
-status: en-preparacion
-sources: []
+readingTime: 8
+lastReviewed: 2026-10-19
+sources:
+  [
+    claude-code-comandos,
+    claude-code-modos-de-permiso,
+    claude-code-referencia-cli,
+    openai-codex-y-chatgpt-work,
+    openai-guia-de-prompts,
+    codex-agents-md,
+    codex-subagents,
+    codex-hooks,
+    codex-permissions,
+    codex-slash-commands,
+    codex-non-interactive,
+    antigravity-migracion-gemini-cli,
+    developers-googleblog-com-an-important-update-transitioning-gemini-cli-to-antigr,
+    geminicli-com-llms-txt,
+    gemini-cli-headless,
+    gemini-cli-gemini-md,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import ProviderTabs from '@components/ProviderTabs.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Las tres herramientas comparten la idea (agente en terminal con ficheros de instrucciones, skills, subagentes y hooks) pero no los nombres ni los formatos.
+- Codex usa `AGENTS.md` y tiene `/plan`, `/review`, `/goal`, `/model` o `/compact`; en su CLI el esfuerzo de razonamiento se elige desde `/model`.
+- Gemini CLI ya no atiende a las cuentas de consumo (AI Pro, AI Ultra y Code Assist individual): las sustituye Antigravity CLI (`agy`).
+- Donde la documentación oficial que hemos podido leer no lo confirma, esta tabla dice «no confirmado» en lugar de suponerlo.
+- `/import` de Claude Code trae la configuración de Codex, Gemini CLI o Cursor; Codex tiene un `/import` equivalente para traer la de Claude Code.
+
+</KeyTakeaways>
+
+## La idea
+
+Cambiar de herramienta de agente de código no es empezar de cero: el modelo mental es el mismo. Lo que cambia es cómo se llama cada pieza y dónde vive. Esta página es una tabla de traducción para quien trabaja con más de una herramienta o está migrando.
+
+<Callout tipo="varia">
+
+Estas herramientas cambian de nombre, de comandos y de planes con frecuencia, y cada proveedor documenta de forma distinta. Todo lo que sigue sobre Codex, Gemini CLI y Antigravity CLI «varía según el proveedor» y puede haber cambiado desde la última revisión. Donde no pudimos confirmar un dato en la documentación oficial, aparece como **no confirmado**: no lo des por hecho sin comprobarlo en tu instalación.
+
+</Callout>
+
+## Tabla de equivalencias
+
+Las columnas de Codex y de Gemini CLI se refieren a sus CLI. Un comando de la columna de Codex figura en la página oficial de comandos de su CLI; la app de escritorio de ChatGPT tiene una lista distinta (por ejemplo, allí existe `/reasoning`).
+
+| Función                                    | Claude Code                                                                                                | Codex (CLI)                                                                                                                                                        | Gemini CLI                                                         | Antigravity CLI (`agy`)                                                                                  |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------- |
+| Fichero de instrucciones                   | `CLAUDE.md` (lee también `AGENTS.md` si no hay `CLAUDE.md` en el directorio)                               | `AGENTS.md` (con `AGENTS.override.md` opcional); hay un límite de tamaño combinado configurable                                                                    | `GEMINI.md`, global en `~/.gemini/` y en el espacio de trabajo     | No confirmado                                                                                            |
+| Crear el fichero inicial                   | `/init`                                                                                                    | `/init` (genera un esqueleto de `AGENTS.md`)                                                                                                                       | No confirmado (la página de `GEMINI.md` no menciona `/init`)       | No confirmado                                                                                            |
+| Skills                                     | Carpeta con `SKILL.md` en `.claude/skills/`                                                                | `/skills` las lista; en `.agents/skills/` (y `$HOME/.agents/skills`), con `SKILL.md` que lleva `name` y `description`                                              | Agent Skills                                                       | Conserva las Agent Skills; las del espacio de trabajo van en `.agents/skills/` (antes `.gemini/skills/`) |
+| Subagentes                                 | Ficheros `.claude/agents/*.md`                                                                             | Ficheros TOML en `.codex/agents/` o `~/.codex/agents/`; `/subagents` cambia de hilo                                                                                | Existen (página propia en la documentación); formato no confirmado | Los conserva; formato no confirmado                                                                      |
+| Plan mode                                  | `/plan`, `Shift+Tab`                                                                                       | `/plan`                                                                                                                                                            | Existe un modo plan; comando no confirmado                         | No confirmado                                                                                            |
+| Revisión de código                         | `/code-review` (alias `/review`)                                                                           | `/review`                                                                                                                                                          | No confirmado                                                      | No confirmado                                                                                            |
+| Objetivo persistente                       | `/goal`                                                                                                    | `/goal`                                                                                                                                                            | No confirmado                                                      | No confirmado                                                                                            |
+| Compactar contexto                         | `/compact`                                                                                                 | `/compact`                                                                                                                                                         | No confirmado                                                      | No confirmado                                                                                            |
+| Cambiar de modelo                          | `/model`                                                                                                   | `/model`                                                                                                                                                           | No confirmado                                                      | No confirmado                                                                                            |
+| Esfuerzo de razonamiento                   | `/effort`                                                                                                  | Desde `/model`                                                                                                                                                     | No confirmado (en la API, `thinking_level`)                        | No confirmado                                                                                            |
+| Modo rápido                                | `/fast`                                                                                                    | `/fast`                                                                                                                                                            | No confirmado                                                      | No confirmado                                                                                            |
+| Uso y estado                               | `/usage`, `/status`                                                                                        | `/usage`, `/status`                                                                                                                                                | No confirmado                                                      | No confirmado                                                                                            |
+| Bifurcar conversación                      | `/fork`, `/branch`                                                                                         | `/fork`                                                                                                                                                            | No confirmado                                                      | No confirmado                                                                                            |
+| Worktrees                                  | `claude --worktree`, `/batch`                                                                              | `/worktree`                                                                                                                                                        | No confirmado                                                      | No confirmado                                                                                            |
+| Servidores MCP                             | `/mcp`                                                                                                     | `/mcp`                                                                                                                                                             | No confirmado                                                      | `.agents/mcp_config.json`                                                                                |
+| Hooks                                      | Más de treinta eventos; `/hooks`                                                                           | `/hooks`; eventos como `PreToolUse`, `PostToolUse`, `Stop`, `SessionStart`; configuración en `hooks.json` o `config.toml`                                          | Existen (página propia)                                            | Los conserva; detalle no confirmado                                                                      |
+| Plugins                                    | `/plugin`                                                                                                  | `/plugins`                                                                                                                                                         | Extensiones                                                        | `agy plugin import gemini` convierte las extensiones de Gemini en plugins                                |
+| Permisos y sandbox                         | Modos `default`, `acceptEdits`, `plan`, `auto`, `dontAsk`, `bypassPermissions`; `/permissions`, `/sandbox` | Perfiles `:read-only`, `:workspace` y `:danger-full-access` (red desactivada por defecto); `/permissions`. El perfil por defecto de cada superficie: no confirmado | No confirmado                                                      | No confirmado                                                                                            |
+| Reintentar una acción denegada             | Edita las reglas con `/permissions`                                                                        | `/approve` reintenta una acción reciente que el revisor automático denegó                                                                                          | No confirmado                                                      | No confirmado                                                                                            |
+| Modo no interactivo                        | `claude -p`                                                                                                | `codex exec "tarea"` (por defecto, en un sandbox de solo lectura)                                                                                                  | `-p` o `--prompt`                                                  | No confirmado                                                                                            |
+| Traer la configuración de otra herramienta | `/import codex`, `/import gemini`, `/import cursor`                                                        | `/import` (trae la de Claude Code o Cursor)                                                                                                                        | No confirmado                                                      | `agy plugin import gemini` (extensiones de Gemini)                                                       |
+
+<Callout tipo="verificado" fecha="2026-10-19">
+
+Solo la columna de Claude Code es dato verificado: sale del catálogo de comandos y de la documentación de Anthropic. Las demás columnas son lo que dicen las páginas oficiales de OpenAI y de Google que se consultaron el 19 de octubre de 2026 (comandos y modo no interactivo de Codex CLI, `GEMINI.md` y modo headless de Gemini CLI, anuncio de Google sobre Antigravity). «No confirmado» significa que no encontramos el dato en esas páginas, no que no exista.
+
+</Callout>
+
+## Codex
+
+Codex está disponible en varias superficies: la app de escritorio de ChatGPT, la app móvil, ChatGPT en la web, la CLI, la extensión de IDE y Codex Cloud. Sus instrucciones permanentes viven en `AGENTS.md`: se cargan desde `~/.codex` y desde la raíz del proyecto hasta el directorio actual, y los ficheros más cercanos al directorio de trabajo prevalecen.
+
+Tres diferencias que conviene recordar al migrar:
+
+- **El esfuerzo se elige desde `/model`.** Lo que en Claude Code es `/effort`, en la CLI de Codex forma parte de `/model`, y los niveles dependen del modelo. Ver [esfuerzo y razonamiento](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/esfuerzo-y-razonamiento/).
+- **Los permisos son perfiles, no modos.** Un perfil define qué puede escribir y si hay red; los perfiles no se combinan con las opciones antiguas de sandbox: usa uno u otro. Si el revisor automático deniega una acción, `/approve` permite reintentarla una vez.
+- **`codex exec` parte de un sandbox de solo lectura.** Para permitir ediciones hay que pedirlo explícitamente (`--sandbox workspace-write`), mientras que en `claude -p` el equivalente lo decides con `--permission-mode` y `--allowedTools`.
+
+## Gemini CLI y Antigravity CLI
+
+<Callout tipo="novedad" fecha="2026-10-19">
+
+Desde el 18 de junio de 2026, Gemini CLI y las extensiones de IDE de Gemini Code Assist dejan de atender las solicitudes de las cuentas Google AI Pro y Ultra y del nivel individual de Code Assist, según el anuncio de Google. Las sustituye **Antigravity CLI**, cuyo comando es `agy`. Gemini CLI sigue disponible con licencias Code Assist Standard o Enterprise y con claves de API de pago. La página de modo headless de la propia documentación de Gemini CLI ya recoge la sustitución. **Qué hacer:** si tu organización tiene licencias Standard o Enterprise, o usas una clave de API de pago, sigue con Gemini CLI. Si no (cuenta personal AI Pro o Ultra), pasa a `agy`.
+
+</Callout>
+
+Antigravity CLI conserva Agent Skills, hooks, subagentes y extensiones (ahora plugins), pero **no hay paridad uno a uno** en el lanzamiento. De Gemini CLI hemos confirmado que su fichero de contexto es `GEMINI.md`, que el modo no interactivo se activa con `-p` y que la documentación tiene páginas de modo plan, skills, subagentes, hooks y extensiones; no hemos podido contrastar la lista completa de sus comandos `/`. Por eso las columnas de Gemini y Antigravity tienen tantos «no confirmado»: preferimos decirlo antes que inventar equivalencias.
+
+## En la práctica
+
+Empezar un proyecto nuevo en cada herramienta:
+
+<ProviderTabs>
+  <div slot="claude">
+
+Abre la carpeta, ejecuta `claude`, y luego `/init` para crear `CLAUDE.md`. Si vienes de otra herramienta, prueba antes `/import codex --dry-run` (o `gemini`, `cursor`) para ver qué traería sin aplicarlo.
+
+  </div>
+  <div slot="openai">
+
+Abre la carpeta en Codex y ejecuta `/init` para crear el esqueleto de `AGENTS.md`. Revisa el límite de tamaño combinado de los ficheros de instrucciones y mantenlos cortos. Si vienes de Claude Code, `/import` trae su configuración.
+
+  </div>
+  <div slot="google">
+
+Si usas una cuenta de consumo (AI Pro o Ultra), tu herramienta es Antigravity CLI (`agy`). Para convertir extensiones de Gemini, `agy plugin import gemini`. Las skills del espacio de trabajo van en `.agents/skills/`. Si usas Gemini CLI, tu fichero de contexto es `GEMINI.md`.
+
+  </div>
+</ProviderTabs>
+
+## Ejemplo de oficina: un equipo con dos herramientas
+
+Un equipo de análisis usa Claude Code, pero una persona nueva viene de Codex. Reglas del equipo para convivir:
+
+1. Un único fichero de instrucciones por proyecto. Claude Code lee `AGENTS.md` si no hay `CLAUDE.md` en el directorio, así que mantener solo `AGENTS.md` evita duplicados.
+2. Las skills y los subagentes se documentan en el repositorio con su nombre y para qué sirven, para poder portarlos a mano si se cambia de herramienta.
+3. La persona nueva ejecuta `/import codex --dry-run` y revisa antes de aplicar.
+
+Por qué: mantener un solo fichero de instrucciones evita que dos copias se desincronicen y el equipo pague contexto por reglas contradictorias.
+
+## Errores frecuentes
+
+- **Asumir que un comando equivale en otra herramienta.** `/effort` no existe en la CLI de Codex: allí el esfuerzo se elige desde `/model`.
+- **Seguir usando Gemini CLI con una cuenta de consumo.** Ya no atiende esas cuentas; pasa a `agy`.
+- **Copiar `CLAUDE.md` a otra herramienta sin revisarlo.** Puede mencionar comandos, skills o hooks que allí no existen.
+- **Fiarse de tutoriales de terceros sobre listas de comandos.** Cambian cada semana. Comprueba con `/help` en tu instalación.
+
+<Checklist
+  id="m7-equivalencias"
+  titulo="Si trabajo con más de una herramienta"
+  items={[
+    'Tengo un solo fichero de instrucciones por proyecto.',
+    'Sé cómo se elige el esfuerzo en cada herramienta.',
+    'He comprobado con /help los comandos de mi versión.',
+    'Si uso Gemini con cuenta de consumo, ya estoy en Antigravity CLI.',
+    'Tengo documentadas mis skills y subagentes para poder portarlos.',
+  ]}
+/>
+
+## Para profundizar
+
+Cómo elegir entre herramientas según la tarea, en [mapa de superficies](/AI-Optimized_Usage_Web/m6-herramientas/mapa-de-superficies/) y [elegir superficie](/AI-Optimized_Usage_Web/m2-metodo/elegir-superficie/). Los comandos de Claude Code, en la [referencia](/AI-Optimized_Usage_Web/m7-claude-code/comandos/).

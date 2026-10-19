@@ -1,11 +1,149 @@
 ---
 title: 'Modelo y esfuerzo por rol'
-description: 'Qué modelo y qué esfuerzo asignar a orquestador, trabajador, lector, verificador y paso determinista.'
+description: 'Modelo y esfuerzo para orquestador, trabajador, lector, verificador y paso determinista, con la regla de partida y cómo bajar midiendo.'
 sidebar:
   order: 3
 level: avanzado
 tracks: [tecnica]
-readingTime: 6
-status: en-preparacion
-sources: []
+readingTime: 8
+lastReviewed: 2026-10-19
+sources:
+  [
+    anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas,
+    anthropic-esfuerzo,
+    anthropic-precios,
+    anthropic-prompt-caching,
+    claude-code-modelo-y-esfuerzo,
+    claude-code-changelog,
+    claude-code-subagentes,
+    platform-claude-com-docs-en-agents-and-tools-tool-use-advisor-tool,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Fact from '@components/Fact.astro';
+import ModelTable from '@components/ModelTable.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- La regla de partida del sitio vale también en un equipo de agentes: modelo capaz y su esfuerzo por defecto; bajar solo midiendo; subir si falla.
+- Cada rol tiene un riesgo distinto: al planificador le pesa el error de plan; al trabajador, el volumen; al lector, el coste por elemento; al verificador, la independencia.
+- Si la entrada determina la salida, no pongas un modelo: pon código.
+- Cada modelo tiene su propia caché, así que una cascada de modelos pierde reutilización.
+- La tabla de esta página es orientación de la guía, no un dato: compruébala con una muestra tuya.
+
+</KeyTakeaways>
+
+## La idea
+
+En un equipo de agentes no todos los puestos piden lo mismo. Algunos deciden (el plan), otros ejecutan en volumen (leer, extraer, transformar) y otros comprueban. Asignar el mismo modelo y el mismo esfuerzo a todos es cómodo, pero suele ser la forma más cara de equivocarse, por exceso en los puestos sencillos o por defecto en los críticos.
+
+La regla de partida no cambia al orquestar. Es la de [estrategia de selección](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/estrategia-de-seleccion/): **empieza con un modelo capaz (gama equilibrada o superior) y su esfuerzo por defecto, baja un escalón cada vez midiendo en una muestra con casos difíciles, y sube cuando falle.** Lo que añade un equipo es que ahora hay varios puestos donde aplicarla, y cada uno puede bajar a un ritmo distinto.
+
+<Callout tipo="recomendacion">
+
+Esta página se aparta a propósito de los niveles fijos con que se solía presentar este tipo de tabla (orquestador en `high`, trabajador general en `medium`, lectura masiva en `low` o `medium`). Es una recomendación de la guía. Su porqué: esos niveles son una hipótesis razonable, no una medición, y chocan con la regla de partida del sitio; además, el esfuerzo por defecto ya varía según el modelo y la superficie (ver datos más abajo). Por eso aquí el primer día todos los puestos arrancan en su esfuerzo por defecto y los niveles más bajos son una hipótesis que se mide.
+
+</Callout>
+
+### Lo que dicen los datos de esfuerzo por defecto
+
+<Callout tipo="verificado" fecha="2026-10-16">
+
+El esfuerzo por defecto depende del modelo y, en Sonnet 5.5, de la superficie. Opus 5.5 arranca en <Fact id="opus-5-5.effort.default.api" /> (API) y en <Fact id="opus-5-5.effort.default.claude-code" /> (Claude Code). Sonnet 5.5 arranca en <Fact id="sonnet-5-5.effort.default.api" /> en la API y en <Fact id="sonnet-5-5.effort.default.claude-code" /> en Claude Code. Haiku 5.5 arranca en <Fact id="haiku-5-5.effort.default.api" /> en ambas, y Fable 5.1 en <Fact id="fable-5-1.effort.default.api" />. En Claude Code, el esfuerzo de un subagente se puede fijar en su definición (campo `effort`) y, desde la versión 2.1.292, también al invocar la herramienta Agent.
+
+</Callout>
+
+<ModelTable
+  ids={['fable-5-1', 'opus-5-5', 'sonnet-5-5', 'haiku-5-5']}
+  etiqueta="Modelos de Claude candidatos para un equipo de agentes"
+  detalle
+/>
+
+Fable 5.1 tiene condiciones propias (por ejemplo, exige retención de datos de 30 días y puede rechazar peticiones por clasificadores de seguridad): léelas en [modelos de frontera](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/modelos-de-frontera/) antes de ponerlo en un equipo.
+
+## La tabla por rol
+
+Esta tabla es una **recomendación de la guía**, no un dato oficial. Respeta la regla de partida: la columna «Punto de partida» es lo que pones el primer día, y «Siguiente ajuste» es lo que pruebas después, midiendo.
+
+| Rol                                             | Punto de partida                                                                                                                           | Siguiente ajuste (solo midiendo)                                                                                                                                             | Por qué                                                                                                                                  |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| **Orquestador o planificador**                  | <Fact id="opus-5-5.name" /> con su esfuerzo por defecto                                                                                    | Pocas veces conviene bajar. Si la tarea es de las más difíciles, sube el esfuerzo antes que el modelo; <Fact id="fable-5-1.name" /> solo si falla y el error de plan es caro | Una mala decisión de plan se paga en todo lo que viene después: todos los trabajadores heredan el error                                  |
+| **Trabajador general**                          | <Fact id="sonnet-5-5.name" /> con su esfuerzo por defecto                                                                                  | Bajar el esfuerzo (un escalón) y comprobar el acierto                                                                                                                        | Es el puesto que más tokens consume, y es donde bajar de escalón ahorra más                                                              |
+| **Lectura, extracción o clasificación masivas** | <Fact id="sonnet-5-5.name" /> con su esfuerzo por defecto                                                                                  | <Fact id="haiku-5-5.name" />, a su esfuerzo por defecto y luego más bajo                                                                                                     | Volumen alto y salida comprobable contra un esquema o una muestra: es el sitio donde un modelo rápido tiene más probabilidades de bastar |
+| **Verificador o revisor**                       | Un contexto nuevo y, a ser posible, un modelo distinto del que produjo el trabajo; <Fact id="opus-5-5.name" /> con su esfuerzo por defecto | Bajar el esfuerzo solo si la lista de comprobación es mecánica                                                                                                               | No debe corregir quien hizo el trabajo: comparte sus premisas y sus sesgos                                                               |
+| **Paso determinista**                           | Código                                                                                                                                     | No aplica                                                                                                                                                                    | Si la entrada determina la salida (sumar, ordenar, validar un formato, comparar ficheros), un modelo solo añade coste y variabilidad     |
+
+**Ojo con el trabajador en Claude Code.** Allí Sonnet 5.5 ya arranca en <Fact id="sonnet-5-5.effort.default.claude-code" />, y en la medición de Anthropic que sigue, `medium` quedó unos 7 puntos por debajo de `high`. Si el acierto del trabajador flojea, prueba a subir el esfuerzo antes de bajarlo más o de cambiar de modelo.
+
+El orden de los siguientes ajustes importa: primero se baja el **esfuerzo** del trabajador, que es la palanca más fina, y después, si hace falta, el **modelo**. La documentación de Anthropic apunta en esa dirección: tocar el esfuerzo suele rendir más que cambiar de modelo, y además un solo modelo mantiene una sola caché.
+
+<Callout tipo="medicion" titulo="Medición publicada por Anthropic">
+
+En una medición de Anthropic sobre un subconjunto de tareas de programación (SWE-bench Pro), Opus 5.5 en `low` resolvió el 87,4 % de las tareas a 0,12 $ por tarea, y Sonnet 5.5 en su esfuerzo por defecto (`high` en la API) el 87,6 % a 0,11 $. En esa misma prueba, Sonnet 5.5 en `medium` quedó unos 7 puntos por debajo de su esfuerzo por defecto, con alrededor del 59 % del coste por tarea. Y ejecutar todo en `low` y repetir solo los fallos en `high` costó en torno a un 40 % menos que ejecutarlo todo en `high`, con la misma tasa de acierto; la propia página precisa que sirve para ahorrar, no para mejorar. Son cifras del proveedor sobre programación: tus tareas pueden salir distintas, y por eso se miden.
+
+</Callout>
+
+### Los precios cambian el cálculo
+
+El coste de un puesto es tokens por precio. Con los precios de la tabla de arriba, el mismo volumen de lectura cuesta mucho menos en un modelo rápido que en uno de frontera, y la salida cuesta más que la entrada. Por eso el puesto que más tokens consume es el candidato natural a bajar de escalón, y por eso un revisor que escribe informes largos de salida sale caro: se le pide solo lo que afecta a la corrección.
+
+<Callout tipo="cuidado">
+
+Cada modelo tiene su propia caché. Si el orquestador y los trabajadores son modelos distintos, el prefijo común (instrucciones, herramientas, documentos de referencia) se escribe una vez por modelo y no se comparte. Es una consecuencia de que la caché es por modelo, verificada en la documentación de prompt caching. Antes de diversificar modelos, comprueba que el ahorro por token compensa esa pérdida. Más en [prompt caching](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/prompt-caching/).
+
+</Callout>
+
+## En la práctica
+
+<Steps>
+
+1. **Lista los puestos** de tu equipo: quién planifica, quién ejecuta, quién lee en volumen, quién verifica y qué pasos son deterministas.
+2. **Pon el punto de partida de la tabla** en cada uno. No optimices todavía.
+3. **Mide con una muestra** de 5 casos reales (20–30 si vas a fijar una política), incluidos los más difíciles. Anota acierto, coste y tiempo.
+4. **Baja un puesto cada vez, y un escalón cada vez.** Si cambias dos a la vez, no sabrás qué empeoró el resultado. Empieza por el trabajador de más volumen.
+5. **Saca del modelo todo lo determinista.** Sumas, comparaciones de ficheros, validaciones de formato: a código.
+6. **Fija modelo y esfuerzo en la definición del puesto** y anota qué mediste. En Claude Code, `model` y `effort` van en la cabecera del subagente; los detalles, en [implementación por superficie](/AI-Optimized_Usage_Web/m8-agentes/implementacion-por-superficie/).
+
+</Steps>
+
+## Ejemplo de oficina: informe de mercado
+
+Un equipo prepara un informe de mercado con cuatro líneas de investigación y una verificación cruzada.
+
+- **Orquestador:** <Fact id="opus-5-5.name" />, esfuerzo por defecto. Reparte las cuatro líneas y fija el formato de cada resultado.
+- **Trabajadores (4):** <Fact id="sonnet-5-5.name" />, esfuerzo por defecto. Cada uno investiga una línea y devuelve cifras con fuente.
+- **Lectura masiva:** si las fuentes son cientos de páginas, se empieza con <Fact id="sonnet-5-5.name" /> y <Fact id="haiku-5-5.name" /> es el candidato a probar tras medir en 5 casos, incluidos los difíciles, para extraer los pasajes relevantes a una tabla.
+- **Verificador:** otro agente, contexto limpio y <Fact id="opus-5-5.name" />, que comprueba cada cifra contra su fuente.
+- **Pasos deterministas:** unir tablas, comprobar que cada cifra tiene fuente y que las sumas cuadran, con un script.
+
+Por qué así: el error de plan afecta a todo (puesto caro), el volumen está en la lectura (puesto barato si se mide), la verificación necesita independencia (contexto limpio) y lo que se puede calcular se calcula. El primer día todo parte de la regla; los siguientes ajustes que se prueban son el esfuerzo de los trabajadores y la lectura masiva con un modelo rápido.
+
+## Errores frecuentes
+
+- **Usar el modelo de frontera en todos los puestos.** Pagas el precio máximo por tareas que no lo piden.
+- **Bajar el modelo del orquestador para ahorrar.** Es el puesto donde un error se multiplica; si hay que bajar, que sea en el volumen.
+- **Verificar con el mismo modelo y el mismo contexto que produjo el trabajo.** Es leerse a uno mismo.
+- **Poner un modelo donde bastaba código.** Más caro, más lento y menos fiable que una comparación exacta.
+- **Cambiar de modelo y de esfuerzo a la vez.** No sabrás cuál explica el resultado.
+- **Dar por buena la tabla sin medirla.** La tabla de la guía es un punto de partida, no una medición de tu tarea.
+
+<Checklist
+  id="m8-modelo-rol"
+  titulo="Antes de fijar el equipo"
+  items={[
+    'Cada puesto parte de un modelo capaz y su esfuerzo por defecto.',
+    'He medido en una muestra con casos difíciles antes de bajar nada.',
+    'Bajo un puesto y un escalón cada vez.',
+    'El verificador tiene contexto limpio o un modelo distinto.',
+    'Lo determinista está en código, no en un modelo.',
+    'He anotado qué medí y cuándo, para repetirlo con el siguiente modelo.',
+  ]}
+/>
+
+## Para profundizar
+
+La matriz de modelo y esfuerzo por tipo de tarea, en [matriz por tarea](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/matriz-por-tarea/); cómo funcionan los niveles, en [esfuerzo y razonamiento](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/esfuerzo-y-razonamiento/). Cuándo la delegación no compensa, en [cuándo no orquestar](/AI-Optimized_Usage_Web/m8-agentes/cuando-no-orquestar/).

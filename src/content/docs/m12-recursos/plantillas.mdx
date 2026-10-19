@@ -5,7 +5,88 @@ sidebar:
   order: 2
 level: basico
 tracks: [profesional, tecnica]
-readingTime: 3
-status: en-preparacion
-sources: []
+readingTime: 4
+lastReviewed: 2026-10-19
+sources:
+  [anthropic-buenas-practicas-de-prompting, anthropic-skills-buenas-practicas, anthropic-structured-outputs]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+import PlantillasList from '@components/PlantillasList.astro';
+
+<KeyTakeaways>
+
+- Aquí descargas todas las plantillas de la guía como ficheros `.md`: texto plano que se abre con cualquier editor.
+- Las partes entre dobles llaves, como `{{esto}}`, son variables: sustitúyelas por tus datos antes de enviar.
+- Una plantilla es un encargo ya pensado una vez; borrar lo que no aplica es mejor que rellenarlo con relleno.
+- Si una plantilla funciona y se repite, guárdala donde la use todo el equipo: un proyecto, un fichero de instrucciones o una skill.
+
+</KeyTakeaways>
+
+## La idea
+
+Una plantilla no es un hechizo: es el encargo que ya escribiste bien una vez, con los huecos marcados. Lo que ahorra no es teclear, sino acordarte de lo que suele faltar: para quién es el resultado, qué decide, qué hacer si faltan datos y cómo lo vas a comprobar. Es la regla 9 de [las 10 reglas](/AI-Optimized_Usage_Web/m0-empieza-aqui/las-10-reglas/): lo que repites, se sistematiza.
+
+Esta página es el almacén de descargas. Para ver cada plantilla con el botón de copiar, su explicación y la configuración recomendada de superficie, modelo y esfuerzo, usa la [biblioteca de plantillas](/AI-Optimized_Usage_Web/m3-prompting/biblioteca-de-plantillas/). La plantilla de uso más general, la del encargo universal, está explicada en [la plantilla de encargo](/AI-Optimized_Usage_Web/m2-metodo/plantilla-de-encargo/).
+
+## Las plantillas
+
+<PlantillasList />
+
+La lista incluye plantillas de oficina (correos, informes, actas, contratos, datos), de agentes de código y de piezas reutilizables. La mayoría (20) están explicadas en la biblioteca; las otras cinco, en la lección de M3 donde se usan: el esqueleto de encargo, en [principios](/AI-Optimized_Usage_Web/m3-prompting/principios/); preguntar a varios documentos, en [contexto largo](/AI-Optimized_Usage_Web/m3-prompting/contexto-largo/); el encargo de tarea larga, en [tareas largas y agentes](/AI-Optimized_Usage_Web/m3-prompting/tareas-largas-y-agentes/); la entrevista y especificación, en [que la IA te entreviste](/AI-Optimized_Usage_Web/m3-prompting/que-la-ia-te-entreviste/); y la revisión contra criterios, en [encadenar y autocorregir](/AI-Optimized_Usage_Web/m3-prompting/encadenar-y-autocorregir/). El fichero de una skill y el encargo a un subagente se explican en [skills](/AI-Optimized_Usage_Web/m6-herramientas/skills/) y en [el encargo a subagentes](/AI-Optimized_Usage_Web/m8-agentes/encargo-a-subagentes/).
+
+## Cómo usarlas
+
+<Steps>
+
+1. Elige la plantilla que más se parezca a tu tarea y descárgala, o ábrela en la biblioteca y cópiala.
+2. Sustituye cada variable `{{así}}` por tus datos. Si una variable no tiene sentido en tu caso, borra la línea entera.
+3. Pega el material (documentos, datos) donde indique la plantilla; las que lo piden usan etiquetas para separar el material de las instrucciones.
+4. Envíala y verifica el resultado con el criterio de éxito que la propia plantilla te pide escribir.
+5. Si el resultado no es el esperado, corrige la plantilla, no solo la respuesta: así mejora la próxima vez.
+
+</Steps>
+
+<Callout tipo="cuidado">
+
+Las plantillas de revisión de contratos ayudan a preparar la revisión profesional; no la sustituyen. Qué datos no pegar en una herramienta no aprobada, en la [biblioteca de plantillas](/AI-Optimized_Usage_Web/m3-prompting/biblioteca-de-plantillas/) y en [privacidad y seguridad](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/privacidad-y-seguridad/).
+
+</Callout>
+
+<Callout tipo="recomendacion">
+
+Guarda las plantillas que uses a menudo en un único sitio compartido (un proyecto de tu herramienta de chat o un fichero de instrucciones del equipo) y actualízalas cuando aprendas algo. Es una recomendación de la guía, y su porqué es práctico: un encargo que ya funcionó es la mejor base del siguiente, y tenerlo en un solo lugar evita que cada persona lo reinvente a su manera.
+
+</Callout>
+
+## Ejemplo de oficina: del acta de la reunión a la lista de tareas
+
+Una responsable de proyectos sale de la reunión semanal con la transcripción en el portapapeles. Descarga la plantilla del acta, sustituye `{{pega aquí la transcripción o tus notas}}` por el texto y rellena participantes y fecha. La plantilla ya pide decisiones, tareas con responsable y fecha límite, temas abiertos y una instrucción clave: si una tarea no tiene responsable o fecha dicha en voz alta, escribir «sin asignar» en lugar de deducirla. Ella no habría pensado en esa última línea con prisa; está en la plantilla porque alguien la pensó una vez.
+
+El caso completo, con antes y después, está en [del acta de reunión a la lista de tareas](/AI-Optimized_Usage_Web/m10-casos-practicos/acta-a-tareas/). Otros casos del módulo de casos prácticos aplican plantillas parecidas a un trabajo entero, como la [revisión de un contrato](/AI-Optimized_Usage_Web/m10-casos-practicos/revision-de-un-contrato/) o el [asistente interno](/AI-Optimized_Usage_Web/m10-casos-practicos/asistente-interno/), que usa un prompt de sistema y una skill.
+
+## Errores frecuentes
+
+- **Dejar variables sin sustituir.** Un `{{hueco}}` que llega al modelo se interpreta como texto y estropea el resultado. Busca las llaves antes de enviar.
+- **Rellenar apartados que no aplican.** El relleno añade ruido y gasta contexto; borra lo que no necesitas.
+- **Usar la plantilla sin el criterio de éxito.** Es la pieza que te dice qué comprobar; si la omites, no sabes cuándo has terminado.
+- **Copiar una configuración de modelo de otra persona.** La configuración recomendada en la biblioteca es general; mide con tus tareas antes de fijarla.
+
+<Checklist
+  id="plantillas-descargables"
+  titulo="Antes de enviar una plantilla rellenada"
+  items={[
+    'No queda ninguna variable con llaves dobles sin sustituir.',
+    'He borrado los apartados que no aplican a mi caso.',
+    'El criterio de éxito está escrito y sé cómo lo voy a comprobar.',
+    'No incluye datos que mi organización no haya autorizado.',
+    'Si la voy a reutilizar, la he guardado en un sitio compartido.',
+  ]}
+/>
+
+## Para profundizar
+
+Los principios que comparten todas las plantillas (contexto con su motivo, material separado, formato claro y verificación) están en [qué ha cambiado en el prompting](/AI-Optimized_Usage_Web/m3-prompting/que-ha-cambiado/) y en [los principios de un buen encargo](/AI-Optimized_Usage_Web/m3-prompting/principios/).

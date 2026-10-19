@@ -6,6 +6,145 @@ sidebar:
 level: intermedio
 tracks: [profesional, tecnica]
 readingTime: 8
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-19
+sources:
+  [
+    anthropic-esfuerzo,
+    anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas,
+    support-claude-com-en-articles-11088861-use-research-on-claude,
+    claude-code-comandos,
+    claude-code-flujos-dinamicos,
+    anthropic-reduce-hallucinations,
+    anthropic-precios,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Fact from '@components/Fact.astro';
+import PromptTemplate from '@components/PromptTemplate.astro';
+import CostExample from '@components/CostExample.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Una buena investigación se pide acotada, con la decisión que alimenta y el tipo de fuente que aceptas.
+- Pide cada dato con su enlace y su fecha, y que separe lo que dice la fuente de lo que interpreta el modelo.
+- La verificación que no se delega: abrir tú las tres o cuatro fuentes que sostienen la conclusión.
+- La matriz propone esfuerzo `high`, un escalón por encima del defecto de Opus 5.5 (`medium`). Anthropic mide resultados muy distintos según el modelo en tareas de investigación: pruébalo en tu caso.
+- Un blog o un agregador sirve para encontrar la fuente, no como fuente.
+
+</KeyTakeaways>
+
+## La tarea
+
+Tu empresa se plantea cambiar de proveedor de facturación electrónica y necesitas un informe de una página: qué obligaciones normativas hay, qué plazos aplican y qué opciones del mercado las cumplen. Tienes que citar las fuentes en la propuesta a dirección.
+
+## Configuración recomendada
+
+- **Superficie.** Un modo de investigación con búsqueda web. En las apps de Claude, Research está disponible en Pro, Max, Team y Enterprise y necesita la búsqueda web activada, según la ayuda oficial. En Claude Code existe `/deep-research`, que es un **flujo dinámico**: lanza varios agentes en segundo plano que buscan desde distintos ángulos, contrastan las fuentes y devuelven un informe citado. Por eso consume más que una búsqueda en un chat: la documentación de flujos avisa de que una ejecución puede usar bastantes más tokens que la misma tarea en conversación y cuenta contra los límites de tu plan. Esa cifra no está en la tabla de coste de abajo (ver más adelante) y se mide con `/workflows` en una pregunta pequeña.
+- **Modelo.** Opus 5.5.
+- **Esfuerzo.** `high`, según la matriz. Ojo: el defecto de Opus 5.5 es <Fact id="opus-5-5.effort.default.api" /> (API) y <Fact id="opus-5-5.effort.default.claude-code" /> (Claude Code), así que `high` es **un escalón por encima** del defecto. Por qué: investigar exige contrastar y detectar contradicciones, y ahí el razonamiento adicional puede rendir; pero no está probado para tu tema, y `medium` es el punto de comparación.
+- **Equivalente en otros proveedores** (fila de la matriz): <Fact id="gpt-6-astra.name" /> en OpenAI y <Fact id="gemini-4-argon.name" /> en Google.
+
+<Callout tipo="recomendacion">
+
+Es la fila «Investigación con fuentes» de la [matriz por tarea](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/matriz-por-tarea/). Por qué: hay que planificar la búsqueda, contrastar fuentes y detectar contradicciones. Escala a la gama de frontera solo si el coste de equivocarse es alto. Si usas un chat sin selector de esfuerzo, el punto de partida es el modelo y un buen encargo.
+
+</Callout>
+
+## Preparación del contexto
+
+1. **Acota el tema.** «Facturación electrónica en España para pymes» da un informe útil; «facturación» da un catálogo.
+2. **Di para qué lo necesitas.** La decisión o el documento que alimentará cambia qué es relevante.
+3. **Define qué fuentes aceptas.** Normativa publicada en el boletín oficial, organismos públicos, documentación del proveedor. Descarta blogs y agregadores salvo como pista.
+4. **Aporta lo que ya sabes.** Si tienes una lista de proveedores o un borrador, adjúntalo: evita que descubra lo que ya tienes.
+5. **Nada confidencial en la consulta.** Una búsqueda web se envía fuera: no incluyas precios de contratos vigentes ni datos de clientes.
+
+## El encargo
+
+<PromptTemplate
+  titulo="Investigación con fuentes"
+  archivo="investigacion-con-fuentes-caso"
+  texto={`Tema: {{tema acotado}}.
+Para qué lo necesito: {{decisión o documento que alimentará}}.
+Fuentes que prefiero: {{por ejemplo, organismos oficiales, normativa, publicaciones del proveedor}}. Descarta blogs y agregadores salvo como pista para llegar a la fuente original.
+Ya sé: {{lo que ya tienes o has descartado}}.
+
+Busca, lee y contrasta. Entrega:
+
+1. Respuesta breve.
+2. Datos clave, cada uno con su fuente (enlace) y la fecha de la fuente.
+3. Puntos en los que las fuentes discrepan.
+4. Lo que no has podido confirmar.
+
+Separa con claridad lo que dice la fuente de lo que es tu interpretación. No des por verificado un dato que solo aparece en una fuente secundaria: márcalo como «no confirmado en fuente oficial».`}
+/>
+
+## Verificación
+
+La regla es la del protocolo de este sitio: **solo las fuentes oficiales sostienen un dato publicado.** Aplícala a tu informe.
+
+1. **Abre las fuentes que sostienen la conclusión.** Tres o cuatro: comprueba que el enlace funciona, que la fecha es la indicada y que la frase del informe está en la página.
+2. **Verificación cruzada de las cifras.** Cada plazo, importe o porcentaje que vaya a la propuesta debe aparecer en dos sitios, o en uno oficial y vigente.
+3. **Fechas.** Una norma puede haber cambiado. Mira la fecha de la fuente y si hay una versión posterior.
+4. **Lo «no confirmado».** Cada ítem de esa lista se resuelve o se deja fuera del informe.
+5. **Contradicciones.** Si dos fuentes oficiales discrepan, usa la más específica y reciente y dilo en el informe.
+
+<Callout tipo="cuidado">
+
+Un modelo con búsqueda web lee páginas de terceros, y una página puede contener órdenes escritas para engañarlo (inyección de instrucciones). No le des herramientas de escritura ni acceso a tus ficheros mientras investiga, y revisa las conclusiones que cambien de forma sospechosa. Ver [privacidad y seguridad](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/privacidad-y-seguridad/).
+
+</Callout>
+
+## Coste estimado
+
+Supuesto de la guía, no una medición: una investigación con varias búsquedas y lecturas acumula unos 300.000 tokens de entrada (cada vuelta reenvía lo leído) y 15.000 de salida. Volumen: 10 investigaciones al mes. No incluye cargos de la herramienta de búsqueda web, que no están en los datos del sitio (pendiente), ni el sobrecoste de `/deep-research`, que lanza varios agentes. Haiku 5.5 queda fuera de la tabla porque el tramo de más de 100.000 tokens de entrada se aplica **por petición** (no al acumulado): si cada vuelta del bucle supera ese tamaño, la petición paga las tarifas superiores; si no, las normales. Además de la tarifa, hay que valorar su calidad en esta tarea antes de usarlo.
+
+<CostExample
+  ids={['sonnet-5-5', 'opus-5-5', 'fable-5-1']}
+  entrada={300000}
+  salida={15000}
+  volumen={10}
+  batch={false}
+  etiqueta="Investigación con fuentes (supuesto de la guía)"
+/>
+
+Cambia los tamaños en la [calculadora de coste](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/calculadora-de-coste/) y lee [coste por tarea completada](/AI-Optimized_Usage_Web/m2-metodo/coste-por-tarea/). Con el gasto a la vista, la pregunta útil es si un intento fallido (una cifra equivocada en una propuesta) cuesta más que la diferencia entre modelos. En una propuesta que firma dirección, normalmente sí.
+
+## Versión económica frente a premium
+
+- **Económica (a probar midiendo):** Opus 5.5 a `medium`, que es su valor por defecto (un solo cambio respecto a la matriz), y después, si aguanta, Sonnet 5.5. Anthropic publica resultados que no permiten decidirlo: en un benchmark de investigación, Fable 5.1 puntuó casi igual de `low` a `high`; en otro, Opus 5.5 puntuó 13,3 puntos menos en `low` que en `medium`. Dependen del modelo y del benchmark, así que la respuesta para tu tema es medirla.
+- **Estándar (matriz):** Opus 5.5 a `high`.
+- **Premium:** un modelo de frontera como Fable 5.1, solo si el coste de equivocarse es alto. Ten en cuenta que, según la documentación, Fable 5.1 exige retención de datos de 30 días y puede no estar disponible en una organización con retención cero.
+
+<Callout tipo="medicion" titulo="Medición publicada por Anthropic">
+
+Las dos cifras (Fable 5.1 en DeepResearch Bench II y Opus 5.5 en DRACO) están en la guía de optimización de coste e inteligencia de Anthropic, que concluye que muestran que la respuesta varía, no por qué. Es una razón para medir, no un resultado transferible: haz tu prueba con una investigación cuya respuesta ya conozcas.
+
+</Callout>
+
+## Errores típicos
+
+- **Pedir «investiga X» sin acotar.** Obtienes amplitud sin profundidad.
+- **Aceptar el enlace sin abrirlo.** Un enlace plausible puede no contener la cifra.
+- **Mezclar datos y opinión.** Exige la separación entre lo que dice la fuente y lo que interpreta el modelo.
+- **Usar fuentes secundarias como si fueran oficiales.** Un blog que cita un decreto no es el decreto.
+- **Olvidar las fechas.** Un dato válido hace dos años puede no serlo hoy.
+
+<Checklist
+  id="m10-investigacion"
+  titulo="Antes de citar la investigación"
+  items={[
+    'El tema está acotado y sé qué decisión alimenta.',
+    'He indicado qué fuentes acepto y cuáles descarto.',
+    'He abierto las fuentes que sostienen la conclusión.',
+    'Cada cifra importante está en dos sitios o en uno oficial y vigente.',
+    'Lo «no confirmado» está resuelto o fuera del informe.',
+    'No he incluido datos confidenciales en la consulta.',
+  ]}
+/>
+
+## Para profundizar
+
+[Alucinaciones](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/alucinaciones/) para el método de citas y comprobación cruzada, [esfuerzo y razonamiento](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/esfuerzo-y-razonamiento/) para entender cuándo sube el rendimiento, y [trabajo en paralelo](/AI-Optimized_Usage_Web/m7-claude-code/trabajo-en-paralelo/) si usas `/deep-research`.

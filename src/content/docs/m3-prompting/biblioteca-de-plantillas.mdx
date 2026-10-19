@@ -633,19 +633,24 @@ La plantilla general, para cuando ninguna otra encaja.
 <PromptTemplate
   titulo="Encargo universal"
   archivo="encargo-universal"
-  texto={`Objetivo: {{qué quiero conseguir, en una frase}}.
+  texto={`<material>
+{{pega aquí los documentos o datos; si son varios, uno por etiqueta con su nombre}}
+</material>
 
-Contexto y porqué: {{para qué se usará el resultado y quién lo leerá}}.
+Objetivo: {{qué quieres obtener, en una frase}}.
 
-Material: {{documentos, datos o enlaces, cada uno con su nombre}}.
+Contexto: esto es para {{quién lo va a leer o usar}}, que debe {{decisión o uso}}. Lo digo para que priorices {{qué importa más}}.
 
-Restricciones: {{lo que debe cumplirse, con el motivo de cada una}}.
+Restricciones:
 
-Formato de salida: {{cómo quiero el resultado; un ejemplo breve vale más que una descripción}}.
+- {{restricción 1}}, porque {{motivo}}.
+- {{restricción 2}}, porque {{motivo}}.
 
-Criterio de éxito: {{cómo sabré que está bien y cómo se comprobará}}.
+Formato de salida: {{tabla / lista / correo / otro}}. Por ejemplo: {{ejemplo breve de una línea del resultado}}.
 
-Si falta información para hacerlo bien, pregúntame antes de empezar y no la supongas.`}
+Criterio de éxito: el resultado es bueno si {{criterio}}. Lo comprobaré {{cómo}}, así que indica de dónde sale cada dato.
+
+Si te falta información para hacerlo bien, dímelo en lugar de suponerla.`}
 
 >
 

@@ -4,8 +4,33 @@ description: 'Doce playbooks de trabajo real. Cada uno indica configuración rec
 sidebar:
   order: 0
   label: 'Visión general'
+lastReviewed: 2026-10-19
 ---
 
 import ModuleIndex from '@components/ModuleIndex.astro';
+
+Este módulo junta lo anterior en doce casos completos. Cada uno sigue la misma ficha para que puedas comparar: la tarea, la configuración recomendada (superficie, modelo y esfuerzo), cómo preparar el contexto, el encargo listo para copiar, cómo verificar el resultado, el coste estimado, la versión económica frente a la premium y los errores típicos.
+
+Tres avisos sobre cómo leerlos:
+
+- **La configuración es un punto de partida, no una verdad.** Sigue la regla de [la matriz por tarea](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/matriz-por-tarea/): un modelo capaz con su esfuerzo por defecto, bajar solo cuando una muestra tuya demuestre que la calidad se mantiene y subir si falla. Por eso la «versión económica» de cada caso es lo que **conviene probar midiendo**, no lo que damos por bueno.
+- **El esfuerzo de cada caso es el primero que conviene probar, tomado de la matriz, y se indica cuándo queda por debajo o por encima del valor por defecto del modelo.** Los defectos no son iguales: Sonnet 5.5 arranca en `high` en la API y en `medium` en Claude Code, y Opus 5.5 y Haiku 5.5 arrancan en `medium`. Así, `low` en Sonnet (casos 2, 5, 9 y 10) y en Haiku (caso 6) es bajar de lo que el modelo hace por sí solo, y `high` en Opus 5.5 (casos 4 y 11) es subir un escalón. Cada caso explica el porqué y cómo comprobarlo antes de adoptarlo.
+- **En las apps de chat no hemos verificado que el esfuerzo se pueda configurar.** La recomendación de esfuerzo se aplica con seguridad en la API y en Claude Code (parámetro `output_config.effort` y `/effort`). En un chat, elige el modelo y usa lo que ofrezca tu interfaz; si no puedes fijar el esfuerzo, mejora el encargo antes de cambiar de modelo.
+- **Los tamaños de los costes son supuestos de la guía.** Cada caso indica cuántos tokens de entrada y salida supone; no son mediciones. Cámbialos por los tuyos en la [calculadora de coste](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/calculadora-de-coste/). Los precios salen de los datos del sitio y llevan su fecha.
+- **Ningún caso sustituye a la revisión humana** cuando el resultado sale de tu mesa hacia un cliente, un contrato, una persona o dinero. Ver [verificar siempre](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/verificar-siempre/).
+
+## Qué casos te tocan según tu perfil
+
+**Profesional de oficina.** [Resumir un informe de 80 páginas](/AI-Optimized_Usage_Web/m10-casos-practicos/resumir-informe-80-paginas/), [comunicación delicada](/AI-Optimized_Usage_Web/m10-casos-practicos/comunicacion-delicada/), [del acta a las tareas](/AI-Optimized_Usage_Web/m10-casos-practicos/acta-a-tareas/) y [preparar una presentación](/AI-Optimized_Usage_Web/m10-casos-practicos/preparar-una-presentacion/).
+
+**Análisis y operaciones.** [Analizar un Excel o un CSV](/AI-Optimized_Usage_Web/m10-casos-practicos/analizar-excel-o-csv/), [investigación con fuentes](/AI-Optimized_Usage_Web/m10-casos-practicos/investigacion-con-fuentes/) e [informe semanal automático](/AI-Optimized_Usage_Web/m10-casos-practicos/informe-semanal-automatico/).
+
+**Legal, compras y gestión.** [Revisión de un contrato](/AI-Optimized_Usage_Web/m10-casos-practicos/revision-de-un-contrato/) y [comunicación delicada](/AI-Optimized_Usage_Web/m10-casos-practicos/comunicacion-delicada/).
+
+**Producto y soporte.** [Clasificar 50.000 tickets](/AI-Optimized_Usage_Web/m10-casos-practicos/clasificar-50000-tickets/) y [asistente interno](/AI-Optimized_Usage_Web/m10-casos-practicos/asistente-interno/).
+
+**Desarrollo.** [Nueva funcionalidad con Claude Code](/AI-Optimized_Usage_Web/m10-casos-practicos/nueva-funcionalidad-con-claude-code/), [migración masiva de código](/AI-Optimized_Usage_Web/m10-casos-practicos/migracion-masiva-de-codigo/) y [clasificar 50.000 tickets](/AI-Optimized_Usage_Web/m10-casos-practicos/clasificar-50000-tickets/).
+
+Si dudas por dónde empezar, [resumir un informe de 80 páginas](/AI-Optimized_Usage_Web/m10-casos-practicos/resumir-informe-80-paginas/) recorre todos los pasos de la ficha con el menor riesgo.
 
 <ModuleIndex dir="m10-casos-practicos" />

@@ -33,7 +33,7 @@
       "sonnet-5-5 (API)": "high",
       "sonnet-5-5 (Claude Code)": "medium"
     },
-    "notes": "thinking {type: \"adaptive\"} sustituye a budget_tokens (error 400 en los modelos recientes). Opus 5.5: el razonamiento no se puede desactivar.",
+    "notes": "thinking {type: \"adaptive\"} sustituye a budget_tokens (error 400 en los modelos recientes). Opus 5.5: el razonamiento no se puede desactivar; Fable 5.1: siempre activo. Sonnet 5.5: `thinking: {type: \"between_tools\"}` quita el razonamiento previo, solo en low, medium y high (400 en xhigh y max). Haiku 5.5: `disabled` hasta high.",
     "verifiedAt": "2026-10-16"
   },
   {

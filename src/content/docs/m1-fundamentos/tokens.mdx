@@ -5,7 +5,149 @@ sidebar:
   order: 2
 level: basico
 tracks: [profesional, tecnica]
-readingTime: 7
-status: en-preparacion
-sources: []
+readingTime: 8
+lastReviewed: 2026-10-19
+sources:
+  [
+    anthropic-conteo-de-tokens,
+    anthropic-vision,
+    anthropic-precios,
+    platform-claude-com-docs-en-build-with-claude-thinking,
+    openai-precios,
+    google-precios,
+    claude-code-comandos,
+    anthropic-glosario,
+    anthropic-razonamiento-y-coste,
+    openai-guia-de-razonamiento,
+    google-thinking,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Fact from '@components/Fact.astro';
+import ProviderTabs from '@components/ProviderTabs.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Un [token](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#token) es la unidad con la que el modelo lee y escribe: a veces una palabra, a veces un trozo de palabra o un signo. Lo que entra, lo que sale y lo que el modelo razona se mide y se factura en tokens.
+- Se pagan tres cosas: la entrada (todo lo que envías), la salida (lo que escribe) y el razonamiento, que se factura como salida aunque no lo veas entero.
+- El mismo texto no da el mismo número de tokens en todos los modelos. Según Anthropic, desde Claude 4.7 el tokenizador produce aproximadamente un 30 % más.
+- Una imagen cuesta tokens según su tamaño, con una fórmula pública en la documentación de Claude.
+- Para saber cuánto pesa tu texto, cuéntalo: no hay una equivalencia fiable entre palabras y tokens que sirva para todos los modelos e idiomas.
+
+</KeyTakeaways>
+
+## La idea
+
+El modelo no lee letras ni palabras enteras: trocea el texto en unidades llamadas tokens. La documentación de Anthropic las define como las unidades más pequeñas con las que trabaja un modelo de lenguaje, que pueden corresponder a palabras, partes de palabra, caracteres o incluso bytes. Según esa misma documentación, los trozos grandes hacen más eficiente el proceso y los pequeños permiten manejar palabras poco habituales o nuevas. Las unidades las define el proveedor, y no coinciden con «palabras» ni con «páginas».
+
+Lo importante para ti es que **todo lo que se mide, se mide en tokens**: cuánto cabe en la [ventana de contexto](/AI-Optimized_Usage_Web/m1-fundamentos/ventana-de-contexto/), cuánto cuesta una petición y cuánto consume tu cupo en una app de chat.
+
+<Callout tipo="verificado" fecha="2026-10-19">
+
+Según el glosario de Anthropic, el número de caracteres que representa un token depende del modelo y del idioma. Para los modelos anteriores a Claude 4.7 indica aproximadamente 3,5 caracteres ingleses por token. No publica una cifra para el español, así que esta guía no afirma que el español gaste más o menos tokens que el inglés: puede variar, y lo único fiable es contar tu propio texto con el modelo que vas a usar.
+
+</Callout>
+
+## Tres clases de tokens
+
+**Entrada.** Todo lo que el modelo recibe en cada petición: tus instrucciones, el historial de la conversación, los documentos adjuntos, las imágenes y las definiciones de las herramientas disponibles. Se reenvía en cada turno, por eso pesa más de lo que parece (lo explica [la ventana de contexto](/AI-Optimized_Usage_Web/m1-fundamentos/ventana-de-contexto/)).
+
+**Salida.** Lo que el modelo escribe. Casi siempre cuesta más por token que la entrada: en Sonnet 5.5, <Fact id="sonnet-5-5.pricing.output" /> por millón de tokens frente a <Fact id="sonnet-5-5.pricing.input" /> de la entrada.
+
+**Razonamiento.** El texto interno que el modelo genera antes de responder (ver [razonamiento y esfuerzo](/AI-Optimized_Usage_Web/m1-fundamentos/razonamiento-y-esfuerzo/)). No es una tercera tarifa: se factura como salida. Tampoco es siempre visible, y eso es lo que sorprende en la factura.
+
+<ProviderTabs>
+<div slot="claude">
+
+La documentación de Anthropic indica que los tokens de razonamiento se facturan como tokens de salida y que se factura el razonamiento completo que el modelo generó, aunque la respuesta solo muestre un resumen o nada. La respuesta de la API incluye el desglose de cuántos de los tokens de salida fueron de razonamiento. Los tokens de razonamiento también cuentan para el límite de salida de la petición (`max_tokens`).
+
+</div>
+<div slot="openai">
+
+Según la guía de razonamiento de OpenAI, los tokens de razonamiento no son visibles a través de la API, ocupan espacio en la ventana de contexto y se facturan como tokens de salida.
+
+</div>
+<div slot="google">
+
+La documentación de Gemini indica que, con el razonamiento activado, el precio de la respuesta es la suma de los tokens de salida y los de razonamiento, y que se factura el razonamiento completo aunque la API solo devuelva un resumen.
+
+</div>
+</ProviderTabs>
+## El mismo texto, distinto número de tokens
+
+El tokenizador es el programa que trocea el texto, y una generación de modelos puede usar uno distinto de la anterior. Si cambia, el mismo documento da otro número de tokens.
+
+<Callout tipo="verificado" fecha="2026-10-19">
+
+Anthropic documenta que Claude 4.7 y los modelos posteriores (es decir, todos los modelos Claude actuales: <Fact id="opus-5-5.name" />, <Fact id="sonnet-5-5.name" />, <Fact id="haiku-5-5.name" /> y <Fact id="fable-5-1.name" />) usan un tokenizador nuevo que produce aproximadamente un 30 % más de tokens para el mismo texto, con un aumento exacto que depende del contenido. Su recomendación: recuenta tus prompts con el modelo que vas a usar en lugar de reutilizar recuentos medidos con otro anterior. Para los modelos de OpenAI y Google no hemos verificado una diferencia equivalente entre versiones.
+
+</Callout>
+
+Consecuencia práctica: si pasas de un modelo antiguo a uno nuevo, el mismo informe puede ocupar más ventana y costar más por entrada aunque el precio por token no haya cambiado. La cifra del 30 % es una media del proveedor; la tuya puede ser distinta.
+
+## Las imágenes también cuestan tokens
+
+Una captura de pantalla, un gráfico o un PDF escaneado como imagen entran como tokens. En Claude, la documentación de visión lo explica con una fórmula: la imagen se divide en bloques de 28×28 píxeles y cada bloque es un token visual, de modo que cuesta ⌈ancho / 28⌉ × ⌈alto / 28⌉ tokens (el símbolo ⌈ ⌉ significa «redondear hacia arriba»). Si la imagen supera el límite del modelo, se reduce antes de procesarla, y eso acota el coste.
+
+Ejemplos que da la propia documentación (consultada el 19 de octubre de 2026):
+
+- Una imagen de 1000×1000 píxeles: 1.296 tokens.
+- Una de 1920×1080: 1.560 tokens en los modelos de resolución estándar y 2.691 en los de alta resolución (Claude 4.7 y posteriores, es decir, los actuales), que admiten imágenes más grandes.
+- Una de 1280×720, aplicando la fórmula (46 × 26 bloques): 1.196 tokens.
+
+La documentación añade que, si no necesitas el detalle extra de la alta resolución, conviene reducir las imágenes antes de enviarlas para controlar el coste. Para OpenAI y Google no hemos verificado la fórmula equivalente.
+
+## Cómo contar y cómo estimar
+
+Contar es mejor que estimar. Qué hay disponible, según la documentación:
+
+- **API de Claude:** existe un punto de acceso de conteo (`count_tokens`) gratuito, sujeto a límites de peticiones por minuto. Devuelve una estimación del total de entrada, con el tokenizador del modelo que indiques; puede diferir en una pequeña cantidad de la cifra real facturada. Cada respuesta de la API informa además de lo que consumió realmente en su campo `usage`.
+- **Claude Code:** `/context` muestra la ocupación total del contexto como una cuadrícula con sugerencias. Para medir un documento, mira la ocupación, carga el documento y comprueba cuánto sube.
+- **Apps de chat:** en las fuentes de esta guía no consta un contador de tokens por mensaje. Usa la regla de abajo para estimar.
+- **OpenAI y Google:** no hemos verificado su herramienta de conteo.
+
+Si no puedes contar, calibra con tus propios documentos. Es una recomendación de la guía, con su porqué: cualquier equivalencia general entre palabras y tokens depende del modelo y del idioma, y la tuya se mide una vez y sirve mucho tiempo. Cuenta un documento representativo, apunta cuántos tokens da y cuántas páginas o caracteres tiene, y escala para otros del mismo tipo. Repite la medida si cambias de modelo.
+
+## En la práctica: mini-ejercicio
+
+<Steps>
+
+1. Elige tres cosas que usas de verdad: un correo largo, un informe de unas 20 páginas y una captura de pantalla.
+2. Para la captura, mira sus píxeles (propiedades del fichero) y aplica la fórmula. Ya tienes su coste en tokens.
+3. Para el correo y el informe, cuéntalos con el método que tengas a mano: el punto de conteo de la API o `/context` de Claude Code (cuánto sube la ocupación al cargar el documento). Apunta tokens, páginas y caracteres de cada uno. Si no tienes ninguno, haz una estimación derivada de lo publicado: en los modelos anteriores a Claude 4.7, unos 3,5 caracteres ingleses por token, y aproximadamente un 30 % más de tokens en los actuales. Para el español no hay cifra publicada, así que será solo una orientación en inglés; la [calculadora de coste](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/calculadora-de-coste/) te deja trabajar con tus propias cifras.
+4. Calcula la entrada de un envío: tokens del documento × precio de entrada del modelo ÷ 1.000.000. En Sonnet 5.5, el precio de entrada es <Fact id="sonnet-5-5.pricing.input" /> por millón de tokens.
+5. Anota el resultado junto al modelo y la fecha: si cambias de modelo, vuelve a contar.
+
+</Steps>
+
+## Ejemplo de oficina: capturas frente a celdas
+
+Una analista financiera pega cada semana tres capturas de tablas de un informe para que el modelo comente las desviaciones. Cada captura de 1920×1080 pesa, en un modelo de alta resolución, 2.691 tokens por la fórmula, y además el modelo tiene que leer números en una imagen, donde la documentación advierte de que puede equivocarse si la imagen es de baja calidad o muy pequeña. Pegar las celdas como texto es una hipótesis que conviene comprobar: puede ocupar menos tokens y evita que el modelo tenga que leer cifras dentro de una imagen. Cuenta ambas versiones antes de decidir; con tus tablas la diferencia puede ser grande o pequeña.
+
+## Errores frecuentes
+
+- **Contar palabras como si fueran tokens.** No hay una equivalencia universal; mide.
+- **Reutilizar un recuento de otro modelo.** La propia documentación lo desaconseja al cambiar de tokenizador.
+- **Olvidar el razonamiento al estimar la salida.** Se factura como salida y puede superar a la respuesta visible.
+- **Subir imágenes a máxima resolución «por si acaso».** Más píxeles, más tokens, y solo ayuda si el detalle importa.
+- **Medir una vez y no volver a mirar.** Un cambio de modelo o de versión cambia el recuento.
+
+<Checklist
+  id="m1-tokens"
+  titulo="Antes de estimar un coste"
+  items={[
+    'He contado mi texto con el modelo que voy a usar.',
+    'Sé que el razonamiento se factura como salida.',
+    'He calculado las imágenes con la fórmula o las he reducido.',
+    'No estoy reutilizando un recuento de un modelo anterior.',
+    'He anotado modelo y fecha de la medida.',
+  ]}
+/>
+
+## Para profundizar
+
+Qué hacer con este consumo: [por qué se dispara el gasto](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/por-que-se-dispara-el-gasto/) y [medir](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/medir/). Cuánto cuesta cada token, en [la economía de un LLM](/AI-Optimized_Usage_Web/m1-fundamentos/economia-de-un-llm/). Definiciones oficiales: [glosario de Anthropic](https://platform.claude.com/docs/en/about-claude/glossary).

@@ -6,6 +6,129 @@ sidebar:
 level: basico
 tracks: [profesional]
 readingTime: 6
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-19
+sources:
+  [
+    anthropic-esfuerzo,
+    anthropic-precios,
+    anthropic-buenas-practicas-de-prompting,
+    anthropic-reduce-hallucinations,
+    claude-code-data-usage,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Fact from '@components/Fact.astro';
+import PromptTemplate from '@components/PromptTemplate.astro';
+import CostExample from '@components/CostExample.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Convierte las notas en decisiones, tareas y temas abiertos, con la frase de la reunión que respalda cada tarea.
+- Si nadie dijo un responsable o una fecha, la tabla dice «sin asignar»: el modelo no debe deducirlos.
+- Es una tarea acotada: un modelo equilibrado a esfuerzo bajo o medio basta.
+- Antes de dar la tabla por definitiva, los participantes la confirman: tú no repartes trabajo por inferencia.
+- Una transcripción contiene voces y nombres de personas: comprueba si tu organización permite procesarla con esta herramienta.
+
+</KeyTakeaways>
+
+## La tarea
+
+Acabas de salir de una reunión de comité de 60 minutos. Tienes la transcripción automática y tus notas. Necesitas enviar esta tarde las tareas con responsable y fecha, y que nadie pueda decir «yo no dije eso».
+
+## Configuración recomendada
+
+- **Superficie.** Un chat. Si la transcripción llega por un conector, mejor aún, pero no es necesario.
+- **Modelo.** Sonnet 5.5.
+- **Esfuerzo.** `low` o `medium`: la tarea es de extracción fiel, no de razonamiento largo. `low` queda **por debajo del valor por defecto** de Sonnet 5.5 (<Fact id="sonnet-5-5.effort.default.api" /> en la API y <Fact id="sonnet-5-5.effort.default.claude-code" /> en Claude Code), así que suele bastar, pero hay que medirlo con tus actas. Si tu chat no deja fijar el esfuerzo, usa el que ofrezca.
+- **Equivalente en otros proveedores** (filas de resumen y extracción de la matriz): <Fact id="gpt-6-1-sol.name" /> en OpenAI y <Fact id="gemini-3-8-flash.name" /> en Google.
+
+<Callout tipo="recomendacion">
+
+La guía no tiene una fila exclusiva para actas; el criterio sale de «Resumen de un documento largo» y de «Extracción» en la [matriz por tarea](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/matriz-por-tarea/). Por qué `low` puede bastar: hay poco que razonar y mucho que copiar con fidelidad; por qué `medium` si la transcripción es desordenada: cuando varias personas hablan a la vez, atribuir bien exige más trabajo. Ambos son puntos de partida a medir con tres actas pasadas.
+
+</Callout>
+
+## Preparación del contexto
+
+1. **Limpia lo que sobra.** Quita saludos, el chat de la videollamada y los avisos del sistema. Por qué: cada línea se factura y distrae.
+2. **Pon la lista de participantes con su cargo.** La transcripción dice «Marta» pero no cuál de las dos.
+3. **Añade la fecha de la reunión.** «El viernes» solo significa algo con el calendario delante.
+4. **Datos y consentimiento.** Una transcripción identifica a personas y a veces trata asuntos de personal. Comprueba que tu organización autoriza esa herramienta para ese tipo de reunión y, si hay asuntos delicados (evaluaciones, bajas), déjalos fuera o anonimiza ([privacidad y seguridad](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/privacidad-y-seguridad/)).
+
+## El encargo
+
+<PromptTemplate
+  titulo="Acta de reunión a tareas"
+  archivo="acta-a-tareas-caso"
+  texto={`<transcripcion>
+{{pega aquí la transcripción o tus notas}}
+</transcripcion>
+
+Participantes: {{nombres y cargos}}. Fecha de la reunión: {{fecha}}.
+
+A partir de la transcripción, prepara:
+
+1. Decisiones tomadas, una frase cada una.
+2. Tareas, en una tabla con tarea, responsable, fecha límite y la frase de la transcripción que la respalda.
+3. Temas abiertos que quedaron sin decidir.
+
+Si una tarea no tiene responsable o fecha dicha en voz alta, escribe «sin asignar» y no la deduzcas. Convierte las fechas relativas («el viernes») en fecha completa usando la fecha de la reunión. No añadas nada que no se haya dicho. Si dos personas parecen discrepar sobre quién hace algo, no elijas: ponlo en temas abiertos.`}
+/>
+
+Por qué la frase de respaldo: convierte la revisión en una lectura de segundos y es lo que te protege si alguien discute su tarea. Por qué prohibir deducir: un modelo tiende a completar huecos con lo más probable, y un responsable «probable» es una tarea asignada a quien no la aceptó.
+
+## Verificación
+
+1. **Cada tarea, contra su frase.** Lee la frase de respaldo: ¿dice lo que la tabla afirma?
+2. **Cuenta.** ¿Hay tantas tareas como compromisos recuerdas? Si falta una, pregunta: «¿hay algún compromiso en la transcripción que no hayas incluido?».
+3. **Fechas relativas.** Comprueba cada conversión con el calendario.
+4. **Los «sin asignar».** Cada uno es una pregunta para la próxima reunión, no un fallo del modelo.
+5. **Confirma con los participantes** antes de dar la tabla por definitiva. Pega la tabla en el correo de seguimiento, pero envíalo tú.
+
+## Coste estimado
+
+Supuesto de la guía, no una medición: una reunión de una hora genera unos 15.000 tokens de transcripción limpia; la salida con tabla y decisiones, unos 1.500. Volumen: 40 actas al mes. Como no hay urgencia, el procesamiento por lotes también se calcula.
+
+<CostExample
+  ids={['haiku-5-5', 'sonnet-5-5', 'opus-5-5']}
+  entrada={15000}
+  salida={1500}
+  volumen={40}
+  etiqueta="Acta de reunión (supuesto de la guía)"
+/>
+
+El lote solo tiene sentido si automatizas el flujo por la API; para una acta puntual en un chat no existe esa opción ([batch](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/batch/)). Para cambiar las cifras, usa la [calculadora de coste](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/calculadora-de-coste/); el razonamiento de fondo está en [coste por tarea completada](/AI-Optimized_Usage_Web/m2-metodo/coste-por-tarea/).
+
+## Versión económica frente a premium
+
+- **Económica (a probar midiendo):** Haiku 5.5. Pruébalo con tres actas ya resueltas y compara las tablas: ¿encuentra las mismas tareas? ¿asigna bien a los «Marta» ambiguos? Si inventa responsables, descártalo.
+- **Estándar:** Sonnet 5.5 a `low`.
+- **Premium:** Opus 5.5 a `medium` solo para reuniones largas con muchas voces cruzadas, donde atribuir es difícil. La diferencia de coste en una acta es de céntimos; la decisión debe depender de la calidad que veas.
+
+## Errores típicos
+
+- **Dejar que asigne responsables «lógicos».** Si no se dijo, es «sin asignar».
+- **No dar la fecha de la reunión.** Las fechas relativas salen equivocadas.
+- **Pegar la transcripción con asuntos de personal.** Anonimiza o deja fuera esa parte.
+- **Enviar la tabla sin revisar.** Un compromiso mal atribuido sale a tu nombre.
+- **Perder las decisiones.** Si solo pides tareas, las decisiones que no generan acción desaparecen.
+
+<Checklist
+  id="m10-acta-a-tareas"
+  titulo="Antes de enviar la tabla"
+  items={[
+    'He pasado la fecha de la reunión y los cargos de los participantes.',
+    'Cada tarea tiene su frase de respaldo y la he leído.',
+    'Lo no dicho aparece como «sin asignar».',
+    'He comprobado las fechas con el calendario.',
+    'La transcripción no contiene asuntos que no deba procesar con esta herramienta.',
+    'Los participantes han confirmado antes del envío definitivo.',
+  ]}
+/>
+
+## Para profundizar
+
+[Biblioteca de plantillas](/AI-Optimized_Usage_Web/m3-prompting/biblioteca-de-plantillas/) con otras plantillas de oficina, y [automatización](/AI-Optimized_Usage_Web/m7-claude-code/automatizacion/) si quieres procesar muchas actas con un script.

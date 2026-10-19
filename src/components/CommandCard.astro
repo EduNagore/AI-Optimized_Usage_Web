@@ -69,6 +69,7 @@ const statusLabel = { activo: 'Activo', alias: 'Alias', eliminado: 'Retirado' } 
   .name {
     margin: 0;
     font-size: var(--text-lg);
+    overflow-wrap: anywhere;
   }
   .name code {
     padding: 0;
@@ -77,6 +78,9 @@ const statusLabel = { activo: 'Activo', alias: 'Alias', eliminado: 'Retirado' } 
     font-weight: 500;
   }
   .name .args {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    white-space: normal;
     color: var(--color-text-muted);
     font-size: var(--text-sm);
   }

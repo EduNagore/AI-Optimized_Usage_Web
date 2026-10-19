@@ -1,0 +1,124 @@
+{
+  "modulo": "M8 Agentes y orquestación",
+  "consultado": "2026-10-19",
+  "nota": "Propuesta de datos y fuentes nuevas para src/data, extraídas de documentación oficial consultada con WebFetch el 2026-10-19. Nada de esto se ha escrito en src/data: lo decide la sesión principal.",
+  "datos": [
+    {
+      "id": "anthropic-advisor-tool",
+      "afirmacion": "Herramienta asesor de la API de Claude: tipo, cabecera beta, emparejamientos válidos y facturación",
+      "valor": "tipo advisor_20260301, name advisor; cabecera anthropic-beta: advisor-tool-2026-03-01 (beta); el asesor debe ser Sonnet 4.6 o superior y al menos tan capaz como el ejecutor; ejecutores Fable 5.1 y Mythos 5.1 solo con asesores Fable 5.1 o Mythos 5.1; max_tokens de la herramienta mínimo 1024 (recomendado empezar en 2048); la caché viene desactivada por defecto",
+      "fuenteUrl": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/advisor-tool.md",
+      "cita": "Advisor calls run as a separate sub-inference billed at the advisor model's rates.",
+      "confianza": "alta",
+      "notas": "Resumen de WebFetch; la tabla completa de pares compatibles está en la página. Los últimos 2.076 caracteres de la página no se leyeron."
+    },
+    {
+      "id": "anthropic-advisor-measurement",
+      "afirmacion": "Medición de Anthropic sobre el asesor: sobrecoste de la definición de la herramienta",
+      "valor": "la definición de la herramienta añade unos 1.000 tokens de entrada por petición aunque el ejecutor nunca consulte; en la prueba de cartografía el emparejamiento quedó 7 puntos por debajo del ejecutor solo",
+      "fuenteUrl": "https://platform.claude.com/docs/en/about-claude/models/optimizing-for-cost-and-intelligence.md",
+      "cita": "The advisor tool's definition, about 1,000 prompt tokens per request, adds cost even when the executor never consults.",
+      "confianza": "media",
+      "notas": "La cifra 1,7 puntos a ~2,1× ya está en research/anthropic-api.json (optimizing.advisor-and-orchestrator)."
+    },
+    {
+      "id": "anthropic-orchestrator-measurement",
+      "afirmacion": "Medición de Anthropic sobre orquestador y trabajadores: cifras de la búsqueda interna de defectos",
+      "valor": "Fable 5.1 solo: 468 a 552 USD por ejecución según el esfuerzo y 15 a 20 horas; con trabajadores de generación anterior (Sonnet 5), el orquestador cuesta aproximadamente la mitad y puntúa 10 a 12 puntos menos; la delegación ahorró solo en trabajo rutinario con cola larga de coste y en trabajo mayor que una ventana de contexto",
+      "fuenteUrl": "https://platform.claude.com/docs/en/about-claude/models/optimizing-for-cost-and-intelligence.md",
+      "cita": "Delegation saved money in only two situations, in measurements with workers on Claude Sonnet 5, an earlier model: Routine work with a long cost tail ... Work larger than one context window",
+      "confianza": "media",
+      "notas": "Medición del proveedor con modelos de una generación anterior. La página también dice que antes de usar Haiku 5.5 como trabajador hay que medirlo en tu carga."
+    },
+    {
+      "id": "anthropic-long-tail",
+      "afirmacion": "Medición de Anthropic: concentración del gasto en la cola",
+      "valor": "en una ejecución de 20 problemas de WideSearch, dos problemas concentraron el 43 % del gasto (la mitad más barata, el 10 %)",
+      "fuenteUrl": "https://platform.claude.com/docs/en/about-claude/models/optimizing-for-cost-and-intelligence.md",
+      "cita": "On a 20-problem WideSearch run, two problems carried 43% of the spend.",
+      "confianza": "media",
+      "notas": "Cierra el punto 'no confirmado' de research/anthropic-api.json (cifra del 43 %). Es una medición sobre una prueba concreta."
+    },
+    {
+      "id": "managed-agents-multiagent-limits",
+      "afirmacion": "Managed Agents, multiagente: límites y bloque de configuración",
+      "valor": "beta (cabecera managed-agents-2026-04-01); bloque multiagent tipo multiagent_20261001 con subagents, workflows y asesor; subagents y workflows habilitados por defecto; delegación a un solo nivel de profundidad; máximo 25 hilos hijos a la vez (inactivos incluidos; los hilos de asesor y de flujos no cuentan); los flujos dinámicos recomiendan un presupuesto de sesión",
+      "fuenteUrl": "https://platform.claude.com/docs/en/managed-agents/multiagent-orchestration.md",
+      "cita": "Delegation is one level deep, and a session can have at most 25 child threads at a time, idle ones included.",
+      "confianza": "alta",
+      "notas": "Cierra parcialmente el punto 'Multiagente: límites' de noConfirmado en research/anthropic-api.json. Los límites de agentes dentro de un flujo no se extrajeron."
+    },
+    {
+      "id": "claude-code-subagent-model-order",
+      "afirmacion": "Orden de resolución del modelo de un subagente en Claude Code",
+      "valor": "1) parámetro model de la invocación; 2) campo model de la definición (inherit = modelo de la conversación); 3) CLAUDE_CODE_SUBAGENT_MODEL; 4) modelo de la conversación principal. CLAUDE_CODE_SUBAGENT_MODEL es un valor por defecto; CLAUDE_CODE_SUBAGENT_MODEL_FORCE=1 (v2.1.257+) lo impone a todos. Subagentes anidables hasta 3 niveles (CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH; 1 desactiva el anidamiento)",
+      "fuenteUrl": "https://code.claude.com/docs/en/sub-agents.md",
+      "cita": "CLAUDE_CODE_SUBAGENT_MODEL is a default, so a subagent's definition or a model Claude passes still takes precedence over it.",
+      "confianza": "alta",
+      "notas": "Confirma el matiz de research/claude-code.json (cambio desde v2.1.251). El agente de flujo sigue el mismo orden según workflows.md."
+    },
+    {
+      "id": "claude-code-agent-teams-model-order",
+      "afirmacion": "Modelo y esfuerzo de los compañeros de agent teams",
+      "valor": "orden: modelo nombrado en el prompt; model de la definición del subagente; CLAUDE_CODE_SUBAGENT_MODEL (si no es inherit); modelo del líder. Por defecto heredan el esfuerzo del líder. Activar agent teams hace que un subagente nombrado por Claude se lance como compañero; con la variable en 0 vuelve a subagente",
+      "fuenteUrl": "https://code.claude.com/docs/en/agent-teams.md",
+      "cita": "By default, teammates inherit the lead's effort level.",
+      "confianza": "alta",
+      "notas": "El 'líder fijo', 'un equipo por sesión' y 'sin equipos anidados' ya constan en claude-code.json."
+    },
+    {
+      "id": "claude-code-workflows-save-and-model",
+      "afirmacion": "Flujos dinámicos: guardado como comando y modelo de los agentes",
+      "valor": "se guardan con la tecla s desde /workflows en .claude/workflows/ (proyecto) o ~/.claude/workflows/ (personal) y se ejecutan como /<nombre>; el modelo de cada agente de flujo se elige por el mismo orden que el de un subagente; con ultracode activado no se muestra el aviso Large workflow",
+      "fuenteUrl": "https://code.claude.com/docs/en/workflows.md",
+      "cita": "Claude Code picks each workflow agent's model in the same order it uses for subagents.",
+      "confianza": "alta",
+      "notas": "La página no menciona CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL (ver pendientes)."
+    },
+    {
+      "id": "agent-sdk-and-tool-runner",
+      "afirmacion": "Agent SDK y Tool Runner",
+      "valor": "Agent SDK: Claude Code como biblioteca en Python y TypeScript (herramientas, bucle, permisos, hooks, sesiones, MCP, subagentes). Tool Runner: ayuda de los SDK que ejecuta el bucle de herramientas; en beta en los SDK de Python, TypeScript, C#, Go, Java, PHP y Ruby",
+      "fuenteUrl": "https://code.claude.com/docs/en/agent-sdk",
+      "cita": "The Agent SDK gives you the same tools, agent loop, and context management that power Claude Code, programmable in Python and TypeScript.",
+      "confianza": "alta",
+      "notas": "Tool Runner: https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-runner (\"The tool runner is in beta\")."
+    },
+    {
+      "id": "codex-subagents-details",
+      "afirmacion": "Subagentes de Codex: invocación, agentes integrados y coste",
+      "valor": "agentes integrados default, worker y explorer; se piden directamente en lenguaje natural; max_concurrent_threads_per_session sin valor por defecto publicado (Codex lo elige); no consta un ajuste de profundidad máxima; sandbox y aprobaciones no se definen en el fichero del agente",
+      "fuenteUrl": "https://learn.chatgpt.com/docs/agent-configuration/subagents",
+      "cita": "Because each subagent does its own model and tool work, subagent workflows consume more tokens than comparable single-agent runs.",
+      "confianza": "alta",
+      "notas": "Complementa codex.subagents de research/openai.json."
+    },
+    {
+      "id": "openai-responses-multi-agent",
+      "afirmacion": "Orquestación multiagente en la Responses API (OpenAI)",
+      "valor": "la guía del último modelo enlaza una guía de orquestación multiagente (developers.openai.com/api/docs/guides/responses-multi-agent); el changelog de la API menciona delegación multiagente en beta con GPT-6.1 Sol (2026-09-29). Estado, activación y límites SIN VERIFICAR: la guía enlazada no se ha leído",
+      "fuenteUrl": "https://developers.openai.com/api/docs/guides/latest-model",
+      "cita": "GPT-6 Astra is trained to be able to divide and delegate work to subagents that work in parallel.",
+      "confianza": "baja",
+      "notas": "Pendiente: leer https://developers.openai.com/api/docs/guides/responses-multi-agent."
+    }
+  ],
+  "fuentesNuevas": [
+    { "id": "code-claude-com-docs-en-agent-sdk", "title": "Agent SDK overview", "url": "https://code.claude.com/docs/en/agent-sdk", "publisher": "Anthropic" },
+    { "id": "platform-claude-com-docs-en-agents-and-tools-tool-use-tool-runner", "title": "Tool runner (SDK)", "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-runner", "publisher": "Anthropic" },
+    { "id": "learn-chatgpt-com-docs-agent-configuration-subagents", "title": "Subagents (Codex)", "url": "https://learn.chatgpt.com/docs/agent-configuration/subagents", "publisher": "OpenAI" },
+    { "id": "developers-openai-com-api-docs-guides-responses-multi-agent", "title": "Multi-agent orchestration (Responses API)", "url": "https://developers.openai.com/api/docs/guides/responses-multi-agent", "publisher": "OpenAI", "nota": "No leída; añadir solo tras verificarla" }
+  ],
+  "pendientes": [
+    "CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL: solo consta en el changelog resumido (v2.1.296); no aparece en workflows.md ni en model-config según lo leído. Verificar la entrada literal del changelog.",
+    "Responses API multiagente de OpenAI: estado (beta o GA), activación y límites.",
+    "Gemini: no hay función de subagentes u orquestación documentada en las fuentes del sitio; buscar en ai.google.dev.",
+    "Managed Agents: 'despliegues programados' (temario 8.6) no verificado; no se menciona en la página de multiagente.",
+    "Límites de agentes por flujo en Managed Agents (profundidad dentro de un flujo, número de agentes).",
+    "TODO: la tabla de estados de implementacion-por-superficie.mdx repite a mano estados de features.json (subagentes, flujos dinámicos, /batch, agent teams, Tool Runner, Agent SDK, asesor, Managed Agents, Codex, Responses API, Gemini). Pasarla a features.json/FeatureMatrix (añadir entradas para Tool Runner, Agent SDK, asesor, /batch, subagentes de Codex y Gemini CLI) y sustituir la tabla por el componente.",
+    "Modelo de los trabajadores de /batch y de /deep-research: la documentación (commands.md) no lo indica. Verificar si respetan CLAUDE_CODE_SUBAGENT_MODEL.",
+    "Fork de subagentes activo por defecto en sesiones interactivas: confirmado en sub-agents.md; la versión (2.1.232) y CLAUDE_CODE_FORK_SUBAGENT=0 proceden del resumen semanal 2026-w33 (research/claude-code.json), no leídos en la sección de fork de sub-agents.md (truncada).",
+    "Aviso 'Large workflow' con la palabra clave ultracode: workflows.md solo exime del aviso a /effort ultracode (ajuste de sesión); el comportamiento con la palabra clave es una deducción.",
+    "Gemini CLI/Antigravity: confirmar el formato de los subagentes (M7 equivalencias lo marca no confirmado)."
+  ]
+}

@@ -1,11 +1,246 @@
 ---
 title: 'Referencia de comandos'
-description: 'Todos los comandos / de Claude Code: buscables, filtrables por fase y con su impacto en tokens.'
+description: 'Los comandos / de Claude Code: lista completa por categoría, 23 comandos clave explicados, alias, retirados y atajos de teclado.'
 sidebar:
   order: 3
 level: intermedio
 tracks: [tecnica]
-readingTime: 10
-status: en-preparacion
-sources: []
+readingTime: 14
+lastReviewed: 2026-10-19
+sources:
+  [
+    claude-code-modo-interactivo,
+    claude-code-referencia-cli,
+    claude-code-comandos,
+    claude-code-costes,
+    claude-code-modos-de-permiso,
+    claude-code-prompt-caching-en-claude-code,
+    code-claude-com-docs-en-goal,
+    code-claude-com-docs-en-scheduled-tasks,
+    claude-code-flujos-dinamicos,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import CommandCard from '@components/CommandCard.astro';
+import CommandList from '@components/CommandList.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Los comandos `/` se pueden agrupar por fase: preparar, trabajar, revisar y medir.
+- Con unos veinte tienes cubierto el trabajo diario; abajo van explicados, con cuándo usarlos y su impacto en tokens.
+- Varios comandos tienen alias y otros se han retirado: no copies tutoriales antiguos sin mirar el cuadro.
+- `/` en el prompt muestra los comandos y skills disponibles en tu instalación; `/help` los lista.
+- Los atajos de teclado importan tanto como los comandos: `Shift+Tab`, `Esc Esc`, `Ctrl+G`.
+
+</KeyTakeaways>
+
+## La idea
+
+Un comando `/` es una orden a Claude Code, no al modelo: unos cambian la configuración, otros gestionan la sesión y otros lanzan flujos que sí gastan tokens. Algunos (`/batch`, `/code-review`, `/verify`, `/simplify`) son **skills integradas**: instrucciones empaquetadas que Claude ejecuta como si las hubieras escrito tú. Para ti, la diferencia práctica es que unos son gratis y otros no.
+
+<Callout tipo="recomendacion">
+
+En esta página, las columnas **Cuándo usarlo**, **Impacto en tokens** y los ejemplos son **recomendaciones de la guía**, no datos oficiales. Anthropic documenta qué hace cada comando (eso sale de los datos verificados, con su fuente); la valoración de «ahorra / neutro / gasta» es nuestra y se apoya en cómo funciona la caché y el contexto (ver [prompt caching](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/prompt-caching/)). Cuando hay una medición de Anthropic, se indica aparte.
+
+</Callout>
+
+## Lista completa
+
+Todos los comandos del catálogo, agrupados por categoría, con la fase en que suelen usarse. Pulsa en una categoría para desplegarla.
+
+<CommandList />
+
+## Los 23 comandos clave
+
+Agrupados por el momento del trabajo en que los usas (la columna «Fase» de la lista completa puede asignar alguno a otra fase). Para cada uno: la ficha oficial (qué hace) y, debajo, nuestra recomendación.
+
+<Callout tipo="cuidado">
+
+Solo estos 23 llevan «cuándo usarlo», impacto en tokens y ejemplo. El resto de comandos de la lista completa aparece únicamente con su descripción oficial; está previsto que el explorador de comandos del sitio los cubra, sin fecha comprometida. Y varios comandos de trabajo en paralelo y automatización (`/subtask`, `/background`, `/workflows`, `/autofix-pr`…) se explican en [trabajo en paralelo](/AI-Optimized_Usage_Web/m7-claude-code/trabajo-en-paralelo/) y [automatización](/AI-Optimized_Usage_Web/m7-claude-code/automatizacion/), igual que los comandos que se escriben en la terminal fuera de la sesión (`claude -p`, `claude agents`, `claude --worktree`).
+
+</Callout>
+
+### Al empezar
+
+<CommandCard comando="/init" />
+
+**Cuándo (recomendación):** una vez por proyecto, al empezar. **Impacto:** gasta una vez (explora el proyecto) y compensa si recortas el resultado. **Ejemplo:** `/init` en la carpeta de contratos y después borrar lo que Claude deduciría solo.
+
+<CommandCard comando="/plan" />
+
+**Cuándo:** antes de cualquier cambio que toque varios ficheros o documentos. **Impacto:** ahorra de forma indirecta: evita rehacer trabajo si el enfoque inicial era malo. **Ejemplo:** `/plan unificar el formato de las cuarenta actas de 2026`.
+
+<CommandCard comando="/model" />
+
+**Cuándo:** al empezar la sesión, no a mitad. **Impacto:** gasta si cambias a mitad de sesión: la documentación de caché de Claude Code lista el cambio de modelo entre las acciones que invalidan la caché. **Ejemplo:** `/model` y elige según [la estrategia de selección](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/estrategia-de-seleccion/).
+
+<CommandCard comando="/effort" />
+
+**Cuándo:** sube el esfuerzo solo si el resultado falla en el nivel actual; baja para tareas mecánicas. **Impacto:** ahorra al bajar, gasta al subir; cambiarlo puede invalidar la caché según el modelo. **Ejemplo:** `/effort low` para renombrar ficheros; ver [esfuerzo y razonamiento](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/esfuerzo-y-razonamiento/).
+
+<CommandCard comando="/fewer-permission-prompts" />
+
+**Cuándo:** tras unos días de uso, cuando ya tienes transcripciones con avisos repetidos. **Impacto:** neutro en tokens; ahorra interrupciones. **Ejemplo:** ejecutarlo una vez por semana en cada proyecto activo.
+
+<CommandCard comando="/mcp" />
+
+**Cuándo:** para conectar un servicio y, sobre todo, para desactivar los que no uses. **Impacto:** ahorra al desactivar servidores que no necesitas. **Ejemplo:** `/mcp disable calendario` (si tu servidor de calendario se llama así) durante una tarea de redacción. Ver [conectores y MCP](/AI-Optimized_Usage_Web/m6-herramientas/conectores-y-mcp/).
+
+### Durante el trabajo
+
+<CommandCard comando="/clear" />
+
+**Cuándo:** cada vez que cambias de tarea. **Impacto:** ahorra: lo anterior deja de reenviarse. **Ejemplo:** `/clear` al terminar el informe de marzo y antes de empezar el de abril. Conserva la memoria del proyecto y, según la documentación de `/goal`, también elimina un objetivo activo.
+
+<CommandCard comando="/compact" />
+
+**Cuándo:** en un punto de corte natural, con instrucciones de enfoque. **Impacto:** ahorra a medio plazo, pero la propia compactación cuesta (con la caché fría es lo más caro). **Ejemplo:** `/compact conserva los acuerdos y la lista de pendientes; descarta las pruebas de formato`.
+
+<CommandCard comando="/btw" />
+
+**Cuándo:** para una duda lateral que no debe quedarse en el hilo. **Impacto:** ahorra frente a preguntarlo en la conversación principal. **Ejemplo:** `/btw ¿qué significa IVA intracomunitario en esta factura?`.
+
+<CommandCard comando="/rewind" />
+
+**Cuándo:** cuando has tomado un camino que quieres abandonar. **Impacto:** ahorra frente a compactar: según la documentación de caché, no la invalida. **Ejemplo:** volver al mensaje anterior a «reformula todo el informe».
+
+<CommandCard comando="/resume" />
+
+**Cuándo:** para retomar una conversación por nombre. **Impacto:** gasta si ha pasado mucho tiempo: con la caché caducada se relee todo el historial. **Ejemplo:** `/rename informe-abril` al cerrar y `/resume informe-abril` mañana.
+
+<CommandCard comando="/goal" />
+
+**Cuándo:** cuando puedes escribir una condición de fin que Claude pueda demostrar en la conversación (el evaluador no ejecuta comandos: juzga lo que ve en ella). **Impacto:** gasta: cada turno extra y cada evaluación consumen tokens. **Ejemplo:** `/goal Claude ha mostrado las sumas de las tres tablas y coinciden con el total del fichero de origen; o para tras 15 turnos`.
+
+<CommandCard comando="/loop" />
+
+**Cuándo:** para vigilar algo mientras la sesión está abierta. **Impacto:** gasta; un intervalo mayor que la vida de la caché paga una escritura nueva en cada pasada. **Ejemplo:** `/loop 30m revisa si ha llegado el fichero de ventas`.
+
+<CommandCard comando="/schedule" />
+
+**Cuándo:** para tareas periódicas que no dependen de tu ordenador encendido. **Impacto:** gasta: las rutinas consumen el uso de tu suscripción igual que una sesión. **Ejemplo:** `/schedule cada lunes a las 8:00 resume los pedidos pendientes`.
+
+<CommandCard comando="/batch" />
+
+**Cuándo:** un cambio grande que se parte en piezas independientes. **Impacto:** gasta mucho: cada unidad (entre 5 y 30, según el catálogo) corre en su propio subagente y worktree. **Ejemplo:** actualizar el pie legal en todas las plantillas de un repositorio; mide primero con un lote pequeño.
+
+<CommandCard comando="/tasks" />
+
+**Cuándo:** para ver y gestionar el trabajo en segundo plano. **Impacto:** neutro. **Ejemplo:** comprobar qué subagentes siguen activos antes de cerrar.
+
+### Antes de cerrar
+
+<CommandCard comando="/diff" />
+
+**Cuándo:** siempre, antes de un commit. **Impacto:** neutro. **Ejemplo:** repasar qué ficheros ha tocado Claude en la tarea.
+
+<CommandCard comando="/verify" />
+
+**Cuándo:** tras un cambio en una aplicación con la que se puede comprobar el resultado. **Impacto:** gasta: construye y ejecuta. **Ejemplo:** `/verify` tras cambiar un formulario.
+
+<CommandCard comando="/code-review" />
+
+**Cuándo:** antes de fusionar un PR o cerrar una rama. **Impacto:** gasta: es trabajo del modelo en segundo plano, y es razonable esperar que los niveles altos cuesten más. **Ejemplo:** `/code-review medium --comment 42` para revisar el PR 42.
+
+### Para medir y diagnosticar
+
+<CommandCard comando="/usage" />
+
+**Cuándo:** al empezar el día y cuando algo parezca caro. **Impacto:** neutro. **Ejemplo:** mirar la línea de caché y el desglose por skills, subagentes y servidores MCP (detalle en [el día a día](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/dia-a-dia-en-claude-code/)).
+
+<CommandCard comando="/context" />
+
+**Cuándo:** cuando la sesión se note lenta o cara. **Impacto:** neutro, y orienta qué recortar. **Ejemplo:** `/context` antes de decidir entre `/compact` y `/clear`.
+
+<CommandCard comando="/skill-doctor" />
+
+**Cuándo:** una vez por semana. **Impacto:** ahorra: señala skills caras en contexto o poco usadas. **Ejemplo:** desactivar una skill que no has usado en un mes.
+
+<CommandCard comando="/doctor" />
+
+**Cuándo:** cuando algo no funciona o tras cambiar la configuración. **Impacto:** neutro. **Ejemplo:** `/doctor` si Claude ignora tu `CLAUDE.md`.
+
+## Alias
+
+Un alias es otro nombre para el mismo comando. Todos aparecen en el catálogo con la etiqueta «alias»; estos son los que más verás:
+
+| Alias                  | Equivale a           |
+| ---------------------- | -------------------- |
+| `/cost`, `/stats`      | `/usage`             |
+| `/reset`, `/new`       | `/clear`             |
+| `/checkpoint`, `/undo` | `/rewind`            |
+| `/review`              | `/code-review`       |
+| `/ultrareview`         | `/code-review ultra` |
+| `/continue`            | `/resume`            |
+| `/settings`            | `/config`            |
+| `/allowed-tools`       | `/permissions`       |
+| `/checkup`             | `/doctor`            |
+| `/quit`                | `/exit`              |
+| `/bg`                  | `/background`        |
+| `/bashes`              | `/tasks`             |
+| `/routines`            | `/schedule`          |
+| `/proactive`           | `/loop`              |
+| `/rc`                  | `/remote-control`    |
+| `/tp`                  | `/teleport`          |
+| `/peers`               | `/list-agents`       |
+| `/app`                 | `/desktop`           |
+| `/ios`, `/android`     | `/mobile`            |
+| `/share`               | `/bug`               |
+
+## Comandos retirados
+
+Si sigues un tutorial anterior, es posible que mencione comandos que ya no existen.
+
+| Comando retirado | Qué hacer ahora                                            |
+| ---------------- | ---------------------------------------------------------- |
+| `/ultraplan`     | Usa el modo plan (`/plan` o `Shift+Tab`)                   |
+| `/pr-comments`   | Pide a Claude que vea los comentarios del PR               |
+| `/vim`           | Alterna los modos de edición desde `/config` (Editor mode) |
+| `/extra-usage`   | Renombrado a `/usage-credits`                              |
+
+## Atajos y palabras clave
+
+<Callout tipo="verificado" fecha="2026-10-19">
+
+Las filas marcadas con \* se comprobaron en la página oficial de modo interactivo de Claude Code; `ultrathink` y el ciclo de `Shift+Tab` se comprobaron en las páginas oficiales de configuración de modelos y de modos de permiso. Ninguno está todavía en los datos del sitio. Para la lista completa y personalizable de tu instalación, usa `/keybindings`.
+
+</Callout>
+
+| Atajo          | Qué hace                                                                                                                                          |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Shift+Tab`    | Recorre los modos de permiso: `default`, `acceptEdits`, `plan`, `bypassPermissions` (si está disponible) y `auto`; `dontAsk` no entra en el ciclo |
+| `Esc` \*       | Interrumpe la respuesta o la herramienta en curso; Claude conserva el trabajo hecho                                                               |
+| `Esc` `Esc` \* | Con texto en el prompt, lo borra y lo guarda en el historial; con el prompt vacío, abre el menú de rebobinado (como `/rewind`)                    |
+| `Ctrl+G` \*    | Abre tu prompt en el editor de texto predeterminado                                                                                               |
+| `Ctrl+B` \*    | Pasa a segundo plano comandos y agentes en ejecución                                                                                              |
+| `@` \*         | Autocompleta rutas de ficheros para mencionarlos en el prompt                                                                                     |
+| `Shift+Enter`  | Salto de línea; `/terminal-setup` lo instala en varios terminales                                                                                 |
+| `ultracode`    | Palabra clave en el prompt que activa un flujo dinámico, según la documentación de flujos                                                         |
+
+**`ultrathink`.** Si incluyes esta palabra en cualquier parte de tu prompt, Claude Code pide un razonamiento más profundo en ese turno sin cambiar el esfuerzo de la sesión (dato de la documentación de configuración de modelos; la explicación completa, en [esfuerzo y razonamiento](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/esfuerzo-y-razonamiento/)). Otras frases como «think hard» se pasan como texto normal. Para fijar el razonamiento de toda la sesión, usa `/effort`.
+
+## Errores frecuentes
+
+- **Dar por hecho que un comando es gratuito.** `/batch`, `/goal`, `/loop`, `/code-review` y `/verify` lanzan trabajo del modelo.
+- **Usar `/compact` sin instrucciones.** El resumen decide por ti qué importa.
+- **Copiar `/ultraplan` o `/vim` de un tutorial.** Están retirados.
+- **Confundir `/insights` con `/usage`.** El primero analiza cómo trabajas; el segundo, cuánto gastas.
+
+<Checklist
+  id="m7-comandos"
+  titulo="Mi caja de herramientas mínima"
+  items={[
+    'Conozco /clear, /compact, /context y /usage.',
+    'Sé cambiar de modo de permisos con Shift+Tab.',
+    'Uso /rewind en lugar de compactar cuando quiero abandonar un camino.',
+    'He mirado qué comandos de mis tutoriales están retirados.',
+    'Sé que /goal, /loop, /batch y /code-review gastan tokens.',
+  ]}
+/>
+
+## Para profundizar
+
+Cómo encajan estos comandos en el trabajo diario, en [el flujo recomendado](/AI-Optimized_Usage_Web/m7-claude-code/flujo-recomendado/). Equivalentes en otras herramientas, en [Equivalencias en Codex y Gemini CLI](/AI-Optimized_Usage_Web/m7-claude-code/equivalencias-codex-gemini/).

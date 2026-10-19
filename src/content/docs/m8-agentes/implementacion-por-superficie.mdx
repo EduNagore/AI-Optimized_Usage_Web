@@ -1,11 +1,199 @@
 ---
 title: 'Implementación por superficie'
-description: 'Cómo montar agentes en Claude Code, en la API de Claude y en OpenAI.'
+description: 'Cómo montar agentes y orquestación en Claude Code, en la API de Claude y en OpenAI: dónde se define cada rol y qué está en beta o es experimental.'
 sidebar:
   order: 6
 level: avanzado
 tracks: [tecnica]
-readingTime: 9
-status: en-preparacion
-sources: []
+readingTime: 10
+lastReviewed: 2026-10-19
+sources:
+  [
+    claude-code-subagentes,
+    claude-code-flujos-dinamicos,
+    claude-code-agent-teams,
+    claude-code-agentes-en-paralelo,
+    claude-code-modelo-y-esfuerzo,
+    claude-code-comandos,
+    claude-code-changelog,
+    anthropic-managed-agents,
+    platform-claude-com-docs-en-managed-agents-multiagent-orchestration-2,
+    platform-claude-com-docs-en-managed-agents-budgets,
+    platform-claude-com-docs-en-agents-and-tools-tool-use-advisor-tool,
+    anthropic-batch,
+    anthropic-precios,
+    anthropic-managed-agents-outcomes,
+    platform-claude-com-docs-en-agents-and-tools-tool-use-tool-runner,
+    code-claude-com-docs-en-agent-sdk,
+    openai-ultimo-modelo-y-migracion,
+    codex-subagents,
+    developers-openai-com-api-docs-changelog,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import CommandCard from '@components/CommandCard.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- En Claude Code, un rol es un fichero Markdown en `.claude/agents/` con su `model` y su `effort`; la orquestación a gran escala son los flujos dinámicos y `/batch`.
+- En la API de Claude tienes tres niveles: el Tool Runner (el bucle ya hecho), el Agent SDK (Claude Code como librería) y Managed Agents (agentes alojados, en beta).
+- En OpenAI, Codex define subagentes en ficheros TOML y la guía del último modelo enlaza una guía de orquestación multiagente en la Responses API (sin verificar: su estado y su activación no constan en la documentación consultada).
+- Los estados cambian con rapidez (beta, experimental, vista previa): antes de montar nada, mira la fuente de la fila correspondiente.
+- La regla de partida de modelo y esfuerzo se aplica igual en las tres superficies.
+
+</KeyTakeaways>
+
+## La idea
+
+Los patrones de la [página anterior](/AI-Optimized_Usage_Web/m8-agentes/patrones/) son independientes de la herramienta, pero cada herramienta los ofrece con un nombre, un fichero y unos límites distintos. Esta página es el mapa: dónde se define cada rol, cómo se le asigna modelo y esfuerzo, y qué te encuentras al escalar. Si lo que buscas son los comandos de Claude Code para vigilar agentes en marcha, están en [trabajo en paralelo](/AI-Optimized_Usage_Web/m7-claude-code/trabajo-en-paralelo/).
+
+| Superficie    | Pieza                                    | Estado según la documentación                                                                                  | Para qué                                       |
+| ------------- | ---------------------------------------- | -------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| Claude Code   | Subagentes (`.claude/agents/`)           | Disponible                                                                                                     | Un rol con su contexto, modelo y herramientas  |
+| Claude Code   | Flujos dinámicos                         | Disponible en los planes de pago (en Pro, se activan en `/config`)                                             | Repartir en muchas piezas, con verificación    |
+| Claude Code   | `/batch`                                 | Disponible                                                                                                     | Un cambio grande en 5 a 30 unidades            |
+| Claude Code   | Agent teams                              | Experimental, desactivado por defecto                                                                          | Agentes que se hablan entre sí                 |
+| API de Claude | Tool Runner                              | Beta en los SDK                                                                                                | El bucle de agente ya hecho                    |
+| API de Claude | Agent SDK                                | Disponible (Python y TypeScript)                                                                               | Claude Code embebido en tu aplicación          |
+| API de Claude | Herramienta asesor                       | Beta                                                                                                           | Un ejecutor que consulta a un modelo superior  |
+| API de Claude | Managed Agents                           | Beta                                                                                                           | Agentes alojados por Anthropic con multiagente |
+| OpenAI        | Subagentes de Codex                      | Disponible                                                                                                     | Roles en TOML                                  |
+| OpenAI        | Orquestación multiagente (Responses API) | Estado sin confirmar (sin verificar)                                                                           | Delegación desde la API                        |
+| Google        | Subagentes de Gemini CLI                 | Formato sin confirmar; ver [equivalencias](/AI-Optimized_Usage_Web/m7-claude-code/equivalencias-codex-gemini/) | Roles en la herramienta de terminal            |
+| Google        | Orquestación multiagente en la API       | No consta en la documentación consultada                                                                       | Montarla con tu código                         |
+
+<Callout tipo="verificado" fecha="2026-10-19">
+
+Atención: los estados de esta tabla son **cifras de la documentación oficial consultada el 19 de octubre de 2026, no del dato del sitio** (`features.json`). Se han escrito a mano en esta página y pueden quedar desfasados antes que los datos de las tablas generadas. Lo que hoy es beta o experimental puede dejar de serlo, y al revés. La columna «Para qué» es valoración de la guía.
+
+</Callout>
+
+## Claude Code
+
+### Subagentes: un rol, un fichero
+
+Un subagente es un fichero Markdown en `.claude/agents/`. Solo `name` y `description` son obligatorios; el resto es opcional. Para un trabajador general con la regla de partida del sitio:
+
+```markdown
+---
+name: investigador-de-subtema
+description: Investiga un subtema de un informe y devuelve cifras con fuente. Úsalo cuando haya varios subtemas independientes.
+tools: Read, Glob, Grep, WebFetch
+model: sonnet
+effort: medium
+---
+
+Eres un investigador. Recibes un subtema, una lista de fuentes permitidas y un formato de salida.
+Devuelve solo una tabla con la cifra, la fuente y la fecha. Si no encuentras algo, escribe «no publicado».
+```
+
+Los campos que importan para este módulo son `model` (`sonnet`, `opus`, `haiku`, `fable`, un ID completo o `inherit`), `effort` (de `low` a `max`), `tools` y `disallowedTools` (qué puede y qué no puede usar), `maxTurns` (cuántos turnos como máximo), `isolation: worktree` (copia de trabajo propia para editar sin pisar) y `background`. El ejemplo parte de `sonnet` con `medium`, el esfuerzo por defecto de Sonnet 5.5 en Claude Code; baja a `haiku` solo si lo has medido.
+
+**Cómo se elige el modelo de un subagente.** Claude Code lo resuelve por este orden: el parámetro `model` de esa invocación; el campo `model` de la definición (con `inherit` se usa el de la conversación principal); la variable de entorno `CLAUDE_CODE_SUBAGENT_MODEL`; y, si nada de lo anterior, el modelo de la conversación principal. Dos matices: `CLAUDE_CODE_SUBAGENT_MODEL` es un valor por defecto, así que la definición del subagente la gana; y para imponer un modelo a todos hay que poner además `CLAUDE_CODE_SUBAGENT_MODEL_FORCE=1` (desde la versión 2.1.257). Hasta la versión 2.1.251, la variable tenía prioridad sobre la definición: si te has encontrado con otro comportamiento, mira tu versión.
+
+**Límites y comandos.** Por defecto hay hasta 20 subagentes en ejecución a la vez (`CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS`) y un subagente puede lanzar otros hasta tres niveles por debajo de la conversación principal (`CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH`; con `1` se desactiva el anidamiento). Los subagentes integrados Explore y Plan trabajan con herramientas de solo lectura. `/subtask` lanza uno bifurcado que hereda tu conversación (el modo bifurcado está activo por defecto en sesiones interactivas); `/tasks` y `/list-agents` los vigilan.
+
+<CommandCard comando="/subtask" />
+
+### Flujos dinámicos
+
+Un flujo dinámico es un script de JavaScript que Claude escribe para tu tarea y que un entorno de ejecución lanza en segundo plano, con tu sesión libre. El plan vive en el script, no en el contexto de Claude, así que el contexto solo recibe la respuesta final. Eso permite repartir en decenas o cientos de agentes y aplicar patrones de calidad, como que agentes independientes revisen adversarialmente los hallazgos de otros antes de informar.
+
+Se activa pidiéndolo («usa un flujo»), con la palabra clave `ultracode` en tu prompt, con `/effort ultracode` para toda la sesión o con un comando guardado. Un flujo que ha salido bien se puede guardar con `s` desde `/workflows`, en `.claude/workflows/` (compartido con el repositorio) o en `~/.claude/workflows/` (personal), y se ejecuta después como un comando.
+
+Límites por defecto: 16 agentes concurrentes (se puede cambiar de 1 a 256 con `CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS`), 1.000 agentes por ejecución y 4.096 elementos en una llamada `parallel()` o `pipeline()`. Hay aviso «Large workflow» por encima de 25 agentes o 1,5 millones de tokens proyectados (no aparece con `/effort ultracode` activado, que ya te incluye en las ejecuciones grandes; la documentación solo exime de él al ajuste de sesión, no a la palabra clave), y una guía de tamaño (`small`, `medium`, `large`, `unrestricted`; `medium` por defecto y `small` en Pro). Sobre el modelo: el modelo de cada agente de flujo se elige por el mismo orden que el de un subagente, y un modelo que el script nombre para una fase cuenta como el parámetro de la invocación. El changelog resumido que hemos consultado menciona además una variable `CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL` (versión 2.1.296); no aparece en la página de flujos, así que **sin verificar**: confírmala en el changelog antes de depender de ella.
+
+<CommandCard comando="/workflows" />
+
+### `/batch` y agent teams
+
+`/batch` descompone un cambio grande en 5 a 30 unidades independientes, cada una en su worktree y su subagente, tras aprobar el plan. Necesita un repositorio git o un hook `WorktreeCreate`. El orquestador es tu propia sesión, con el modelo que ya tenga. La documentación de `/batch` y la de `/deep-research` no indican qué modelo usan sus trabajadores: **no consta**. Si necesitas fijarlo, no hay un ajuste documentado específico; lo que sí está documentado es el orden de resolución del modelo de los subagentes (arriba) y que `CLAUDE_CODE_SUBAGENT_MODEL_FORCE=1` lo impone a todos, pero que `/batch` o `/deep-research` lo respeten es una inferencia sin verificar.
+
+<CommandCard comando="/batch" />
+
+<Callout tipo="cuidado">
+
+Los agent teams son experimentales y están desactivados por defecto: se activan con `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`. Si los activas, un subagente al que Claude da nombre se lanza como compañero de equipo, aunque tú no hayas pedido un equipo. Para volver a subagentes se pone la variable a `0`. Limitaciones documentadas: sin reanudar compañeros en proceso con `/resume`, un equipo por sesión, sin equipos anidados y líder fijo. Según la documentación de costes, usan unas 7 veces más tokens que una sesión normal cuando los compañeros trabajan en plan mode.
+
+</Callout>
+
+El modelo de cada compañero se resuelve como el de un subagente (ver [cómo se elige el modelo de un subagente](#subagentes-un-rol-un-fichero)): el que nombres en el prompt; el de la definición del subagente si el compañero se crea desde una; `CLAUDE_CODE_SUBAGENT_MODEL`; y, si no hay nada fijado, el del líder. Por defecto heredan el esfuerzo del líder.
+
+## API de Claude
+
+Aquí tienes tres niveles según cuánto quieras construir tú.
+
+**Tool Runner.** Es una ayuda de los SDK que ejecuta por ti el bucle de agente: llama a las herramientas cuando Claude las pide, gestiona el ciclo de petición y respuesta y mantiene el estado de la conversación. Está en beta y disponible en los SDK de Python, TypeScript, C#, Go, Java, PHP y Ruby. Si necesitas aprobación humana a mitad de camino, registro propio o ejecución condicional, la documentación recomienda el bucle manual.
+
+**Agent SDK.** Es Claude Code como biblioteca para Python y TypeScript: las mismas herramientas, el mismo bucle de agente y la misma gestión de contexto, con permisos, hooks, sesiones, MCP y subagentes. Úsalo si quieres incrustar un agente en una aplicación tuya, en un proceso que operas tú. Detalle en la [documentación del Agent SDK](https://code.claude.com/docs/en/agent-sdk).
+
+**Herramienta asesor.** En la Messages API, una herramienta de tipo `advisor_20260301`, en beta con la cabecera `anthropic-beta: advisor-tool-2026-03-01`, permite que el ejecutor consulte a un asesor al menos tan capaz como él en la misma petición. Las consultas se facturan a la tarifa del modelo asesor; el límite `max_tokens` de la herramienta (mínimo 1.024; la página recomienda empezar en 2.048) acota la salida del asesor por consulta, y la caché viene desactivada por defecto. Los márgenes y las mediciones están en [patrones](/AI-Optimized_Usage_Web/m8-agentes/patrones/).
+
+**Managed Agents.** Es un entorno alojado por Anthropic: una definición de agente, un entorno, sesiones y eventos. Está en beta y todos sus endpoints exigen la cabecera `managed-agents-2026-04-01`. Se factura a precio de modelo por los tokens más 0,08 $ por hora de sesión en estado `running`; no es elegible para retención cero de datos ni para el acuerdo HIPAA, y el Batch no le aplica. En la definición del agente, el bloque `multiagent` (tipo `multiagent_20261001`) activa tres cosas: subagentes, flujos dinámicos y asesor. Los «despliegues programados» que menciona el plan de la guía no constan en la documentación consultada: no verificados.
+
+| Pieza de Managed Agents | Qué hace                                                                                                   | Límite o precaución documentada                                                            |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Subagentes              | El agente delega y lee lo que cada uno informa; su hilo es persistente y admite seguimientos               | Un solo nivel de profundidad; como máximo 25 hilos hijos a la vez, los inactivos incluidos |
+| Flujos dinámicos        | El agente escribe un programa que ejecuta muchos agentes por fases (en beta desde el 9 de octubre de 2026) | Cada agente gasta tokens: fija un presupuesto de sesión                                    |
+| Asesor                  | El hilo principal consulta a un modelo superior                                                            | Solo el hilo principal puede consultarlo; se factura a la tarifa del asesor                |
+| Outcomes                | Un evaluador con contexto separado puntúa el resultado contra una rúbrica                                  | 3 iteraciones por defecto, máximo 20                                                       |
+
+<Callout tipo="recomendacion">
+
+En Managed Agents, dile al agente en su prompt de sistema cuándo usar un flujo, y fija un presupuesto de sesión antes de lanzar uno grande. Es una recomendación que recoge la propia documentación. Su porqué: el agente decide cuándo repartir, y cada agente de una ejecución consume tokens; sin una indicación y un tope, el gasto lo decide el modelo.
+
+</Callout>
+
+Para el fan-out masivo sin bucle de herramientas, no hace falta un agente: el [Batch de la API](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/batch/) aplica el 50 % de descuento a cambio de esperar hasta 24 horas.
+
+## OpenAI
+
+**Subagentes de Codex.** Cada agente personalizado es un fichero TOML en `.codex/agents/` (proyecto) o `~/.codex/agents/` (personal). Tres campos son obligatorios: `name`, `description` y `developer_instructions`; `model` y `model_reasoning_effort` son opcionales. En los ajustes globales `[agents]` hay `enabled`, `max_concurrent_threads_per_session`, `default_subagent_model` y `default_subagent_reasoning_effort`. El sandbox y las aprobaciones no se pueden definir en el fichero del agente. Codex incluye tres agentes integrados: `default`, `worker` y `explorer`. Se invocan pidiéndolos en lenguaje natural o con `/subagents` en la CLI; su documentación advierte de que los flujos con subagentes consumen más tokens que ejecuciones comparables de un solo agente. El valor por defecto de la concurrencia no está publicado (Codex lo elige).
+
+**Responses API.** La guía del último modelo de OpenAI enlaza una guía de orquestación multiagente en la Responses API, y el registro de cambios de la API menciona delegación multiagente en beta para GPT-6.1 Sol (29 de septiembre de 2026; dato tomado de un resumen del registro). En la documentación consultada no se ha podido confirmar cómo se activa ni su estado definitivo: **sin verificar**. Aparte, la guía de prompting de GPT-6 Astra describe que el modelo está entrenado para dividir y delegar trabajo en subagentes en paralelo, advierte de que delega menos de lo que muchos flujos necesitan y aconseja ajustar esa delegación con el prompt cuando montas tú el sistema multiagente.
+
+## Google
+
+En las fuentes consultadas no consta una orquestación multiagente en la API de Gemini: cualquier patrón de este módulo se puede montar con tu propio código, pero no hay una pieza lista (**pendiente de verificar**). En la terminal sí hay subagentes: según la comparativa de [equivalencias](/AI-Optimized_Usage_Web/m7-claude-code/equivalencias-codex-gemini/), Gemini CLI los tiene y Antigravity CLI, que lo sustituye para los planes Google AI Pro, Ultra y Code Assist for individuals desde el 18 de junio de 2026, los conserva; el formato no está confirmado. Gemini CLI sigue con licencias Code Assist Standard y Enterprise y con claves de pago de la API.
+
+## En la práctica
+
+<Steps>
+
+1. **Empieza por la pieza más pequeña de tu superficie**: un subagente en Claude Code, un agente de Codex, el Tool Runner en la API.
+2. **Fija modelo y esfuerzo en la definición**, con la regla de partida de [modelo y esfuerzo por rol](/AI-Optimized_Usage_Web/m8-agentes/modelo-y-esfuerzo-por-rol/).
+3. **Limita herramientas y permisos** a lo que necesita el rol; un revisor no necesita escribir.
+4. **Prueba con tres elementos** y mira el gasto real (`/usage` en Claude Code, la consola o la Usage and Cost API en la plataforma).
+5. **Sube de pieza solo si la anterior no basta**: del subagente al flujo, del flujo al equipo; de Tool Runner a Managed Agents.
+6. **Comprueba el estado en la fuente** antes de depender de algo en beta o experimental.
+
+</Steps>
+
+## Errores frecuentes
+
+- **Dar por estable lo que es beta o experimental.** Los agent teams, Managed Agents y la herramienta asesor pueden cambiar.
+- **Fijar `CLAUDE_CODE_SUBAGENT_MODEL` y esperar que mande sobre la definición.** Es un valor por defecto; para imponerlo, `_FORCE`.
+- **Activar agent teams «por probar».** Pasan a lanzarse compañeros cuando Claude nombra un subagente.
+- **Lanzar un flujo grande sin guía de tamaño ni presupuesto.** El coste es proporcional al número de agentes.
+- **No dar a un revisor un modelo ni un contexto distintos.** Repite los sesgos del escritor.
+
+<Checklist
+  id="m8-superficie"
+  titulo="Antes de montar el equipo en tu superficie"
+  items={[
+    'He elegido la pieza más pequeña que resuelve la tarea.',
+    'Cada rol tiene modelo y esfuerzo fijados en su definición.',
+    'Las herramientas y permisos de cada rol son los mínimos.',
+    'Sé qué es beta o experimental y lo he comprobado en la fuente.',
+    'Tengo un tope: de agentes, de turnos o de gasto.',
+    'He medido con tres elementos antes de escalar.',
+  ]}
+/>
+
+## Para profundizar
+
+El detalle de los comandos de esta página está en [comandos de Claude Code](/AI-Optimized_Usage_Web/m7-claude-code/comandos/); cómo se extienden los agentes con skills, hooks y plugins, en [extender Claude Code](/AI-Optimized_Usage_Web/m7-claude-code/extender-claude-code/); y el equivalente de cada pieza en Codex y Gemini CLI, en [equivalencias](/AI-Optimized_Usage_Web/m7-claude-code/equivalencias-codex-gemini/).

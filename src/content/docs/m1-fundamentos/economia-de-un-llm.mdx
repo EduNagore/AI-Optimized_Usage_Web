@@ -1,11 +1,164 @@
 ---
 title: 'La economía de un LLM'
-description: 'Precio por millón de tokens, descuentos de caché y batch, y por qué unas pocas tareas difíciles concentran el gasto.'
+description: 'Qué se paga en un modelo de lenguaje, cómo ahorran la caché y los lotes, y por qué el coste por tarea importa más que el precio por token.'
 sidebar:
   order: 6
 level: intermedio
 tracks: [profesional, tecnica]
-readingTime: 8
-status: en-preparacion
-sources: []
+readingTime: 9
+lastReviewed: 2026-10-19
+sources:
+  [
+    anthropic-precios,
+    anthropic-prompt-caching,
+    anthropic-batch,
+    anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas,
+    openai-precios,
+    google-precios,
+    claude-code-costes,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Fact from '@components/Fact.astro';
+import ModelTable from '@components/ModelTable.astro';
+import CostExample from '@components/CostExample.astro';
+import ProviderTabs from '@components/ProviderTabs.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Los modelos se cobran por millón de tokens, con una tarifa para la entrada y otra, más alta, para la salida. El razonamiento se factura como salida.
+- Hay dos palancas de precio que no cuestan calidad: la caché (lo repetido se paga a una fracción) y los lotes (descuento a cambio de esperar). Y un recargo que conviene evitar: algunos modelos cobran más por encima de cierto tamaño de petición.
+- El precio por token no dice lo que cuesta una tarea. Lo que importa es el [coste por tarea completada](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#coste-por-tarea-completada): tokens de cada intento, número de intentos, tu tiempo de revisión y los errores que se escapan.
+- En conversaciones largas manda el reenvío del historial, no el último mensaje.
+- Un modelo más caro por token puede salir igual o más barato por tarea resuelta, y al revés. Se mide.
+
+</KeyTakeaways>
+
+## La idea
+
+La factura de un modelo se parece más a la de la luz que a una tarifa plana: hay un precio por unidad de consumo, conceptos distintos con precios distintos y descuentos por la forma en que consumes. La unidad es el millón de tokens (MTok) y las cifras se dan en dólares.
+
+Los precios cambian con frecuencia, por eso esta página no los copia: los lee de los datos de la guía, con su fecha de verificación. Estos son los de cinco modelos de las tres familias:
+
+<ModelTable
+  ids={['haiku-5-5', 'sonnet-5-5', 'opus-5-5', 'gpt-6-1-sol', 'gemini-4-argon']}
+  etiqueta="Precios por millón de tokens de algunos modelos"
+/>
+
+Si usas una app de chat con suscripción no ves estos importes, pero la mecánica es la misma: lo que consumes se traduce en que el uso de tu plan se agota antes o después ([en las apps de chat](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/en-apps-de-chat/)).
+
+## Qué se paga
+
+**La entrada.** Todo lo que envías en cada petición: instrucciones, historial, documentos, imágenes y definiciones de herramientas. Es lo más barato por token, pero se reenvía en cada turno (ver [la ventana de contexto](/AI-Optimized_Usage_Web/m1-fundamentos/ventana-de-contexto/)).
+
+**La salida.** Lo que el modelo escribe, y también su razonamiento (ver [razonamiento y esfuerzo](/AI-Optimized_Usage_Web/m1-fundamentos/razonamiento-y-esfuerzo/)). Cuesta más por token: Anthropic indica en su guía de optimización que en Haiku 5.5, Sonnet 5.5, Opus 5.5 y Fable 5.1 la salida cuesta cinco veces la entrada. En Sonnet 5.5 son <Fact id="sonnet-5-5.pricing.output" /> frente a <Fact id="sonnet-5-5.pricing.input" /> por millón de tokens. Eso hace que una respuesta larga o un razonamiento extenso pesen más que un documento largo de entrada, token a token.
+
+**La caché.** Si el comienzo de tu petición se repite idéntico, el proveedor puede reutilizarlo: lo leído de la caché cuesta una fracción del precio de entrada (en Sonnet 5.5, <Fact id="sonnet-5-5.pricing.cacheRead" /> por millón frente a <Fact id="sonnet-5-5.pricing.input" />). Escribirlo la primera vez cuesta algo más que la entrada normal (<Fact id="sonnet-5-5.pricing.cacheWrite5m" /> en la escritura de 5 minutos), así que compensa cuando se reutiliza. Ver [prompt caching](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/prompt-caching/).
+
+**Los lotes (batch).** Para trabajos que pueden esperar, se mandan muchas peticiones juntas y se obtiene un descuento. Ver [batch](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/batch/).
+
+**Los tramos y los modos.** Algunos modelos cobran más cuando la petición supera cierto tamaño (mira las notas bajo la tabla), y existen modos que sirven más rápido a una tarifa mayor. Son recargos que conviene conocer antes de usar contextos enormes.
+
+Los detalles de caché y lotes difieren por proveedor. Datos de la guía, verificados el 16 de octubre de 2026 en la documentación oficial de cada uno:
+
+<ProviderTabs>
+<div slot="claude">
+
+Escribir en la caché cuesta 1,25 veces la entrada con la caché de 5 minutos (la de por defecto) y 2 veces con la de 1 hora. Leer cuesta 0,1 veces la entrada en la mayoría de los modelos, y menos en Opus 5.5 y Sonnet 5.5 (0,05 veces) y en Fable 5.1 (0,025 veces). La API de lotes da un 50 % de descuento sobre todos los tokens (también los de caché), con resultados en menos de 24 horas.
+
+</div>
+<div slot="openai">
+
+La caché dura 30 minutos (el único valor admitido, en GPT-5.6 y posteriores), con un mínimo de 1.024 tokens; la lectura cuesta 0,1 veces la entrada (0,05 veces en GPT-6.1 Sol) y la escritura 1,25 veces. Batch y Flex (procesamiento más lento a menor precio) cuestan la mitad del precio estándar. El modo rápido (_fast_) cuesta el doble. Por encima de 272.000 tokens de entrada se cobra toda la petición a un precio mayor.
+
+</div>
+<div slot="google">
+
+La caché implícita está activa por defecto, con un mínimo de 4.096 tokens, y en Gemini 4 Argon da un 95 % de descuento en los aciertos; Argon no admite caché explícita. Los precios de Gemini 4 Argon y Gemini 3.8 Flash son introductorios y suben después de las fechas que indican las notas de la tabla. No hemos verificado un descuento por lotes equivalente en Google.
+
+</div>
+</ProviderTabs>
+
+<Callout tipo="medicion" titulo="Medición publicada por Anthropic" fecha="2026-10-16">
+
+Anthropic publica que, en un día de tráfico real, los bucles de agente leyeron de la caché una mediana del 84 % de su entrada, y el 10 % superior, el 94 % o más. La propia página dice que son cifras direccionales y no garantías. Sirve para entender por qué la caché es la palanca más importante en agentes, no para esperar el mismo porcentaje en tu caso.
+
+</Callout>
+
+## El precio por token no es el coste de la tarea
+
+Comparar modelos por su precio por millón de tokens es como comparar coches por el precio del litro de gasolina: el dato es real y no responde a cuánto cuesta llegar. Llegar, aquí, es tener la tarea terminada y verificada. El coste por tarea completada suma los tokens de cada intento, el número de intentos hasta que sale bien, el tiempo de una persona para revisar y los errores que se escapan. El desarrollo, con ejemplos, está en [coste por tarea completada](/AI-Optimized_Usage_Web/m2-metodo/coste-por-tarea/).
+
+<Callout tipo="medicion" titulo="Medición publicada por Anthropic" fecha="2026-10-16">
+
+En la guía de optimización de Anthropic, sobre un subconjunto de SWE-bench Pro (tareas de programación): Opus 5.5 en `low` resolvió el 87,4 % de las tareas a 0,12 $ por tarea resuelta, y en `medium` el 92,8 % a 0,22 $; Sonnet 5.5 en `high` (su defecto en la API) resolvió el 87,6 % a 0,11 $. Lectura de la guía, no del proveedor: Opus 5.5 cuesta el doble por token que Sonnet 5.5 (<Fact id="opus-5-5.pricing.input" /> frente a <Fact id="sonnet-5-5.pricing.input" /> de entrada) y, sin embargo, a esfuerzo bajo salió casi al mismo precio por tarea resuelta que Sonnet 5.5 a su esfuerzo por defecto. El precio por token no predice el coste de la tarea. Son cifras del proveedor sobre sus propias tareas: orientan, no se trasladan sin más.
+
+</Callout>
+
+## Un ejemplo con volumen
+
+Un servicio de atención responde 300 consultas de clientes con las mismas instrucciones: un manual de 8.000 tokens que va delante de cada consulta, más unos 1.000 tokens de la consulta, y unos 400 tokens de respuesta. La tabla calcula, desde los datos, lo que cuesta un intento, las 300 consultas , las 300 con el manual servido desde la caché y las 300 por lotes:
+
+<CostExample
+  ids={['haiku-5-5', 'sonnet-5-5', 'opus-5-5']}
+  entrada={9000}
+  salida={400}
+  volumen={300}
+  cacheados={8000}
+  unidad="consultas"
+  etiqueta="Coste de 300 consultas con un manual fijo de 8.000 tokens"
+/>
+
+Tres lecturas. Primero, con cualquier modelo, una consulta suelta cuesta céntimos o menos: para una tarea aislada manda tu tiempo, no los tokens. Segundo, a 300 consultas la elección de modelo y la caché ya marcan diferencias visibles, y a decenas de miles serían decisivas. Tercero, la tabla se queda corta: es una cota inferior. No incluye el razonamiento (que se factura como salida) ni la caducidad de la caché, y la columna de caché supone aciertos siempre; en la práctica la caché solo acierta si el manual va primero, no cambia y no pasa más tiempo del que dura entre consultas.
+
+## El coste de la cola
+
+Una hipótesis de trabajo, no un dato: en muchas cargas de trabajo, unas pocas tareas largas o difíciles (documentos enormes, bucles de agente que dan muchas vueltas, reintentos) pueden concentrar una parte desproporcionada del gasto, mientras la mayoría de las tareas cuestan céntimos. Las fuentes de esta guía no publican cuánto concentran, así que compruébalo con tus datos: ordena tus últimas veinte tareas por coste y mira cuántas explican la mitad del total. Si es cierto, optimizar la cola (cortar el contexto de esas tareas, usar caché, mandarlas por lotes o dividirlas) rinde más que rebajar el precio de las baratas. Y recuerda que la cola de calidad es la otra mitad del problema: si un modelo barato falla en el 5 % difícil y nadie lo detecta, el ahorro se paga en errores ([el precio de la cola](/AI-Optimized_Usage_Web/m2-metodo/coste-por-tarea/)).
+
+## En la práctica: ¿cuánto cuesta esta conversación?
+
+<Steps>
+
+1. Estima la parte fija: instrucciones, documentos y herramientas que se reenvían en cada turno (F).
+2. Estima lo que añade cada turno: tu mensaje y la respuesta (A) y cuántos turnos esperas (n).
+3. Calcula la entrada total procesada, sin caché: F × n + A × n × (n − 1) ÷ 2. Con F = 10.000, A = 1.500 y n = 20 salen 200.000 + 285.000 = 485.000 tokens, aunque la conversación final tenga unos 40.000.
+4. Calcula la salida total: lo que escribe en cada turno (razonamiento incluido) × n.
+5. Multiplica la entrada total por el precio de entrada y la salida total por el de salida, y divide entre 1.000.000. Con caché, lo que se repite desde el turno anterior se factura al precio de lectura, salvo la primera escritura (algo más cara que la entrada normal) y salvo que la caché caduque entre turnos (5 minutos por defecto en Claude). Es una aproximación.
+6. Compara con lo que marca tu herramienta ([medir](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/medir/)) y ajusta tus estimaciones. Por ahora este cálculo es manual; para hacerlo con tus cifras, la guía tiene [la calculadora de coste](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/calculadora-de-coste/).
+
+</Steps>
+
+<Callout tipo="recomendacion">
+
+Mide el coste por tarea completada, no por mensaje ([regla 10](/AI-Optimized_Usage_Web/m0-empieza-aqui/las-10-reglas/)), y aplica antes las palancas que no cuestan calidad (caché, contexto limpio, formato de salida, lotes) que bajar de modelo o de esfuerzo. Por qué: las primeras ahorran sin cambiar el resultado; las segundas pueden costar calidad y hay que comprobarlo en una muestra. El orden está en [el orden de las palancas](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/orden-de-las-palancas/).
+
+</Callout>
+
+## Errores frecuentes
+
+- **Elegir por el precio por token.** No cuentas reintentos, razonamiento ni tu tiempo de revisión.
+- **Ignorar la salida y el razonamiento.** Son lo más caro por token.
+- **Dejar que el hilo crezca sin límite.** Cada turno paga el historial entero.
+- **Dar por hecho que la caché siempre acierta.** Exige un comienzo idéntico y caduca.
+- **Copiar un precio de memoria.** Cambian; léelos de la fuente y apunta la fecha.
+
+<Checklist
+  id="m1-economia"
+  titulo="Antes de dar un coste por bueno"
+  items={[
+    'He separado entrada, salida y razonamiento.',
+    'He tenido en cuenta que el historial se reenvía en cada turno.',
+    'Sé si mi herramienta cachea y si mi comienzo es estable.',
+    'Si puedo esperar, he valorado mandarlo por lotes.',
+    'Comparo coste por tarea completada, con mi tiempo de revisión, no precio por token.',
+    'He anotado precio, modelo y fecha.',
+  ]}
+/>
+
+## Para profundizar
+
+Las mejoras de coste, de las gratuitas a las que cuestan calidad, en [Tokens y contexto](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/). Cómo elegir modelo y esfuerzo con método, en [estrategia de selección](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/estrategia-de-seleccion/).

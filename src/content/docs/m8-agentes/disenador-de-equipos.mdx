@@ -1,11 +1,162 @@
 ---
 title: 'Diseñador de equipos de agentes'
-description: 'Describe la forma de tu tarea y obtén topología, modelo y esfuerzo por rol, con un aviso si no compensa.'
+description: 'Criterios y tabla de decisión: de la forma de tu tarea a topología, roles, modelo y esfuerzo de partida, con aviso si no compensa orquestar.'
 sidebar:
   order: 7
 level: avanzado
 tracks: [tecnica]
-readingTime: 5
-status: en-preparacion
-sources: []
+readingTime: 8
+lastReviewed: 2026-10-19
+sources:
+  [
+    anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas,
+    platform-claude-com-docs-en-managed-agents-multiagent-orchestration-2,
+    claude-code-agentes-en-paralelo,
+    claude-code-flujos-dinamicos,
+    claude-code-agent-teams,
+    claude-code-costes,
+    anthropic-batch,
+    openai-precios,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Fact from '@components/Fact.astro';
+import Steps from '@components/Steps.astro';
+import PromptTemplate from '@components/PromptTemplate.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Esta página es el diseñador en su versión estática: unas preguntas sobre la forma de tu tarea y una tabla que lleva de ahí a una topología, unos roles, un modelo y esfuerzo de partida y una idea del coste.
+- La primera fila de la tabla es la que más veces te toca: «no orquestes». Si tu tarea es una sola pieza que cabe en un contexto, o una cadena, un solo modelo gana.
+- Todo modelo y esfuerzo de la tabla es un punto de partida según la regla del sitio: modelo capaz, esfuerzo por defecto, bajar midiendo, subir si falla.
+- La tabla es una recomendación de la guía construida sobre las mediciones y la documentación de los módulos anteriores; no es un resultado medido sobre tu caso.
+- Más adelante la guía incorporará una versión interactiva de esta misma lógica.
+
+</KeyTakeaways>
+
+## La idea
+
+Decidir si un equipo de agentes compensa y cómo montarlo son preguntas que casi siempre se responden con las mismas cinco o seis señales sobre la tarea. Esta página las ordena. No sustituye a medir: te da el punto de partida más razonable y te avisa de cuándo la respuesta correcta es no repartir.
+
+## Los criterios
+
+Responde a estas preguntas sobre tu tarea, en este orden.
+
+| Criterio             | Pregunta                                                                                                | Qué cambia                                                      |
+| -------------------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| **Cabe**             | ¿Todo el trabajo es una sola pieza que cabe en un contexto y el modelo puede razonar sobre ella entera? | Si sí, y no hay cola larga, no hay nada que repartir por tamaño |
+| **Dependencia**      | ¿Cada paso necesita el resultado del anterior?                                                          | Si sí, es una cadena: no se puede paralelizar                   |
+| **Volumen**          | ¿Hay muchos elementos del mismo tipo (aunque cada uno quepa de sobra)?                                  | Si sí, fan-out; si son distintos, orquestador                   |
+| **Dificultad mixta** | ¿Hay una mezcla de casos fáciles y difíciles que se pueda distinguir de antemano?                       | Si sí, enrutado                                                 |
+| **Coste del error**  | ¿Un fallo se detecta y se recupera, o pasa desapercibido?                                               | Si pasa desapercibido, añade un revisor o una persona           |
+| **Urgencia**         | ¿Puedes esperar horas?                                                                                  | Si sí, la API en lotes cuesta la mitad en Anthropic y en OpenAI |
+
+Tres de ellos (cabe, dependencia y volumen) son los que de verdad deciden si hay equipo. Los demás deciden qué piezas le añades.
+
+## La tabla de decisión
+
+Lee de arriba abajo y párate en la primera fila que describa tu tarea. Los modelos y esfuerzos siguen la regla de partida. La columna «Coste» es **cualitativa** (cómo escala), no una cifra: el coste real sale de tu prueba. Las únicas cifras son mediciones o datos del proveedor, y así se indica. La columna «Aviso» dice qué puede salir mal.
+
+| Forma de la tarea                                                | Topología                                                                 | Roles                                                      | Modelo y esfuerzo de partida                                                                                                                                                       | Coste                                                                                    | Aviso                                                                                              |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Una sola pieza de trabajo que cabe en un contexto, o una cadena  | **Ninguna: un solo agente** o llamada única                               | Uno                                                        | Modelo capaz con su esfuerzo por defecto; prueba un esfuerzo más bajo                                                                                                              | El más bajo (≈1×)                                                                        | La medición de Anthropic favoreció al modelo solo a menor esfuerzo en todos los casos de este tipo |
+| Pasos fijos y conocidos, cada uno comprobable                    | Encadenamiento (flujo)                                                    | Un paso por fase; los deterministas, en código             | Modelo capaz y esfuerzo por defecto en cada paso; baja primero el que más tokens gasta                                                                                             | Suma de varias llamadas cortas; sin coordinación de agentes                              | Un fallo temprano se arrastra: comprueba entre fases                                               |
+| Muchos elementos iguales y puedes esperar                        | Fan-out por lotes en la API                                               | El mismo trabajador, N veces                               | Modelo capaz y esfuerzo por defecto; <Fact id="haiku-5-5.name" /> como primer candidato a medir                                                                                    | N × coste por elemento; con Batch, la mitad (descuento del proveedor)                    | Un error de encargo se multiplica por N: depura con uno y estima el coste con tres                 |
+| Muchos elementos iguales y los quieres ya, en Claude Code        | `/batch` o flujo dinámico                                                 | Un trabajador por unidad; un paso final que une            | <Fact id="sonnet-5-5.name" /> en los trabajadores; el orquestador, <Fact id="opus-5-5.name" />                                                                                     | N agentes × coste por agente, más plan y unión                                           | Coste proporcional al número de agentes; avisos de flujo grande                                    |
+| Casos de dificultad mixta con una señal fiable                   | Enrutado                                                                  | Clasificador, trabajador rápido, trabajador capaz, persona | Clasificador barato medido sobre una muestra con difíciles; trabajador capaz con esfuerzo por defecto                                                                              | Bajo por caso si el clasificador es barato; cada modelo tiene su caché                   | Un clasificador flojo es peor que no enrutar; pierdes caché por modelo                             |
+| Mucho trabajo mecánico y pocas decisiones críticas               | Asesor                                                                    | Ejecutor y asesor                                          | Ejecutor de gama equilibrada; asesor al menos tan capaz como él                                                                                                                    | Ejecutor más consultas; en una medición de Anthropic, unas 2,1× con consultas frecuentes | Si el ejecutor casi no consulta, el asesor no sirve; mide la tasa de consultas                     |
+| Producir algo con un criterio de calidad escrito                 | Evaluador y optimizador                                                   | Escritor, revisor (contexto limpio o modelo distinto)      | Escritor como trabajador general; revisor con modelo capaz                                                                                                                         | Producción más una revisión por vuelta                                                   | Pon un máximo de vueltas; sin criterio escrito, no converge                                        |
+| Decisión ambigua o de alto riesgo que quieres contrastar         | Paralelización por votación                                               | N lecturas independientes y un comparador                  | La misma configuración en cada lectura, en sesiones separadas                                                                                                                      | N × una lectura                                                                          | Con el mismo contexto, las lecturas coinciden en el error                                          |
+| Trabajo mayor que una ventana, con partes independientes         | Orquestador y trabajadores                                                | Orquestador, trabajadores, verificador                     | Orquestador con modelo capaz; trabajadores de gama equilibrada; baja midiendo                                                                                                      | Plan, N trabajadores y fusión                                                            | Cuesta el plan y la fusión; solo ahorra con volumen o con trabajo que no cabe                      |
+| Muchas piezas, homogéneas o no, donde hay que contrastar fuentes | Flujo dinámico con verificación cruzada (`/deep-research` en Claude Code) | Investigadores, verificadores independientes, sintetizador | Investigadores de gama equilibrada; verificadores con modelo capaz y contexto limpio                                                                                               | Proporcional al número de agentes; difícil de predecir                                   | Limita el tamaño del flujo; mide primero sobre una parte                                           |
+| Agentes que necesitan hablarse y discutir                        | Agent teams (experimental)                                                | Líder y compañeros                                         | Como un subagente; si no hay nada fijado, el modelo del líder ([cómo se resuelve](/AI-Optimized_Usage_Web/m8-agentes/implementacion-por-superficie/#subagentes-un-rol-un-fichero)) | Alto: unas 7× una sesión normal con compañeros en plan mode (cifra de Anthropic)         | Empieza con 3 a 5 compañeros, según la documentación                                               |
+
+Dos precisiones sobre la tabla. Si tienes **muchos elementos que caben cada uno** en un contexto (300 ficheros), no te toca la primera fila sino las de volumen: cada pieza cabe, pero el conjunto no. Y el **encadenamiento y el fan-out se combinan**: un fan-out suele ser un pequeño encadenamiento (procesar, validar) repetido por elemento.
+
+<Callout tipo="recomendacion">
+
+Si dudas entre dos filas, quédate con la de arriba. Es una recomendación de la guía. Su porqué: la tabla está ordenada de menor a mayor coste de coordinación, y pasar a una fila inferior solo está justificado cuando la superior ha fallado en un caso real que has medido.
+
+</Callout>
+
+<Callout tipo="medicion" titulo="Medición publicada por Anthropic">
+
+Lo que sostiene la primera fila y el aviso de la del orquestador es una medición de Anthropic: delegar ahorró dinero solo con trabajo rutinario con cola larga de coste y con trabajo mayor que una ventana de contexto (medido con trabajadores de una generación anterior). En cadenas dependientes o trabajo que cabe en un contexto, el modelo del orquestador solo y a menor esfuerzo salió mejor en todos los casos medidos. El resto de la tabla extiende ese criterio a los demás patrones como recomendación de la guía, no como medición. Detalle en [cuándo no orquestar](/AI-Optimized_Usage_Web/m8-agentes/cuando-no-orquestar/).
+
+</Callout>
+
+## En la práctica
+
+<Steps>
+
+1. **Escribe la tarea en dos frases**: qué entra, qué sale y para qué.
+2. **Responde a los seis criterios.** Anota las respuestas; son tu justificación si alguien pregunta por qué has montado esto.
+3. **Busca tu fila en la tabla** y lee el aviso antes que la topología.
+4. **Fija la línea base**: el modelo capaz solo, a su esfuerzo por defecto y a uno más bajo, sobre cinco casos reales con los difíciles incluidos. Los [tamaños de prueba](/AI-Optimized_Usage_Web/m8-agentes/escalera-de-complejidad/) (uno para depurar, tres para estimar el coste, cinco o más para decidir modelo) se explican en la escalera.
+5. **Monta la versión mínima de la topología** y compárala con la línea base en acierto, coste y tiempo.
+6. **Pasa los roles a tu superficie**: dónde se definen y con qué límites, en [implementación por superficie](/AI-Optimized_Usage_Web/m8-agentes/implementacion-por-superficie/); el encargo de cada uno, en [encargo a subagentes](/AI-Optimized_Usage_Web/m8-agentes/encargo-a-subagentes/).
+
+</Steps>
+
+Si prefieres que un modelo te ayude a rellenar el diseño, esta plantilla le pide la ficha y le exige decirte cuándo no orquestar:
+
+<PromptTemplate
+  titulo="Ficha de diseño de un equipo de agentes"
+  archivo="ficha-equipo-agentes"
+  texto={`## Tarea
+{{qué entra, qué sale y para qué se usa el resultado}}
+
+## Datos de la tarea
+
+- Tamaño del material: {{cuántos documentos o ficheros, y cuánto ocupan aproximadamente}}
+- Elementos: {{cuántos son iguales y cuántos distintos}}
+- Dependencias: {{si cada paso necesita el resultado del anterior}}
+- Coste del error: {{si un fallo se detecta o pasa desapercibido, y qué cuesta}}
+- Urgencia: {{si puedo esperar horas o lo necesito ya}}
+- Herramienta disponible: {{Claude Code, API de Claude, Codex, otra}}
+
+## Lo que te pido
+
+Antes de proponer nada, dime si esta tarea necesita un equipo de agentes o si un solo modelo la resuelve (por ejemplo, porque cabe en un contexto o es una cadena). Si basta uno, dilo y detente ahí.
+
+Si compensa un equipo, devuélveme una tabla con una fila por rol: nombre del rol, qué hace, patrón al que pertenece, modelo y esfuerzo de partida, y qué verifica su salida. Añade el número máximo de agentes que recomiendas, cómo depurar el encargo con uno o dos elementos y estimar el coste con tres antes de escalar, y qué señal me diría que el equipo no está compensando.`}
+
+>
+
+Úsala como borrador, no como veredicto: contrasta lo que propone con la tabla de arriba y con una prueba de tres elementos.
+
+</PromptTemplate>
+
+## Dos decisiones resueltas
+
+**Clasificación de tickets: 400 a la semana.** Cada ticket cabe de sobra en un contexto, hay volumen de elementos iguales, no hay dependencia entre ellos, el error se ve (un humano revisa el borrador) y se puede esperar unas horas. Fila: fan-out por lotes, o incluso un flujo de tres pasos en código (clasificar, extraer, redactar) sin agentes. Modelos: capaz y esfuerzo por defecto para empezar; <Fact id="haiku-5-5.name" /> como primer candidato a medir en la clasificación, con una muestra de cinco tickets que incluya los más raros. Aviso: depura el encargo con uno y estima el coste con tres antes de lanzar el resto.
+
+**Migración de 300 ficheros a una plantilla nueva.** Cada fichero cabe, pero el conjunto no, y son iguales e independientes. Fila: muchos elementos iguales y los quieres ya, en Claude Code (`/batch`). Un trabajador por unidad de ficheros, un **script determinista** que valida los 300 (cabecera, orden de secciones, ausencia de patrones antiguos, que no falte ni sobre ninguno) y un **revisor con modelo, con contexto limpio, solo sobre una muestra** para lo que un script no ve. El caso completo, paso a paso, está en [casos completos](/AI-Optimized_Usage_Web/m8-agentes/casos-completos/).
+
+## Errores frecuentes
+
+- **Saltarse los criterios e ir directo a una topología.** Se elige por inercia lo que suena más potente.
+- **Tomar la tabla por una medición.** Es un punto de partida de la guía, no un resultado sobre tu caso.
+- **Diseñar el equipo sin línea base.** No sabrás si mejora al modelo solo.
+- **No ponerle tope.** Un máximo de agentes, de vueltas o de gasto es parte del diseño.
+- **Olvidar al verificador.** Un equipo que reparte sin verificar multiplica los errores.
+
+<Checklist
+  id="m8-disenador"
+  titulo="Antes de dar el diseño por bueno"
+  items={[
+    'He respondido a los seis criterios y los he anotado.',
+    'He leído el aviso de mi fila antes que la topología.',
+    'Tengo una línea base: el modelo solo, medido en cinco casos con los difíciles.',
+    'Cada rol tiene un encargo escrito, modelo y esfuerzo de partida.',
+    'Hay un tope de agentes, vueltas o gasto.',
+    'Hay un verificador independiente o una persona en el circuito.',
+  ]}
+/>
+
+## Para profundizar
+
+Los patrones que aparecen en la tabla, con su esquema, en [patrones](/AI-Optimized_Usage_Web/m8-agentes/patrones/); cómo asignar modelo y esfuerzo a cada rol, en [modelo y esfuerzo por rol](/AI-Optimized_Usage_Web/m8-agentes/modelo-y-esfuerzo-por-rol/); y para medir el equipo contra la línea base, [evals mínimas](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/evals-minimas/).

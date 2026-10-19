@@ -1,0 +1,79 @@
+---
+import { getCollection } from 'astro:content';
+import { formatDate } from '@lib/format';
+
+/** Todas las fuentes de sources.json agrupadas por editor, con su fecha de última comprobación. */
+const all = (await getCollection('sources')).map((s) => s.data);
+const groups = new Map<string, typeof all>();
+for (const s of all) groups.set(s.publisher, [...(groups.get(s.publisher) ?? []), s]);
+const publishers = [...groups.keys()].sort();
+// Si dos fuentes del mismo editor comparten título, se distinguen por el dominio y la ruta.
+const titleCount = new Map<string, number>();
+for (const s of all)
+  titleCount.set(`${s.publisher}|${s.title}`, (titleCount.get(`${s.publisher}|${s.title}`) ?? 0) + 1);
+const label = (s: (typeof all)[number]) => {
+  if ((titleCount.get(`${s.publisher}|${s.title}`) ?? 0) < 2) return s.title;
+  const u = new URL(s.url);
+  return `${s.title} (${u.hostname.replace(/^www\./, '')}${u.pathname.replace(/\.md$/, '').slice(0, 40)})`;
+};
+---
+
+<div class="sources not-content">
+  {publishers.map((p) => (
+    <details>
+      <summary>
+        {p} <span class="count">({groups.get(p)!.length})</span>
+      </summary>
+      <ul>
+        {groups
+          .get(p)!
+          .sort((a, b) => a.title.localeCompare(b.title, 'es'))
+          .map((s) => (
+            <li>
+              <a href={s.url} rel="noopener">
+                {label(s)}
+              </a>
+              <span class="date">comprobada el {formatDate(s.lastChecked)}</span>
+            </li>
+          ))}
+      </ul>
+    </details>
+  ))}
+</div>
+
+<style>
+  details {
+    margin-block-end: var(--space-2);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+  summary {
+    padding: var(--space-2) var(--space-4);
+    cursor: pointer;
+    color: var(--color-heading);
+    font-weight: 500;
+  }
+  .count {
+    color: var(--color-text-muted);
+    font-weight: 400;
+  }
+  ul {
+    margin: 0;
+    padding: 0 var(--space-4) var(--space-3);
+    list-style: none;
+  }
+  li {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-1) var(--space-4);
+    padding-block: var(--space-1);
+    font-size: var(--text-sm);
+    overflow-wrap: anywhere;
+  }
+  .date {
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+  }
+</style>

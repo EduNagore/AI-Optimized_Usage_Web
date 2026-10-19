@@ -1,0 +1,67 @@
+---
+import { url } from '@lib/paths';
+import Icon from './Icon.astro';
+
+/**
+ * Lista de las plantillas de src/content/plantillas/ con enlace de descarga a cada .md.
+ * El título sale del primer encabezado del fichero; las que empiezan por frontmatter (SKILL.md)
+ * usan el título de `titles`.
+ */
+const raw = import.meta.glob('/src/content/plantillas/*.md', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+});
+const titles: Record<string, string> = { 'fichero-skill': 'Fichero SKILL.md de una skill' };
+
+const items = Object.entries(raw)
+  .map(([path, body]) => {
+    const slug = path.split('/').pop()!.replace(/\.md$/, '');
+    const heading = (body as string).split('\n').find((l) => l.startsWith('# '));
+    const title = titles[slug] ?? heading?.replace(/^#\s+/, '') ?? slug;
+    return { slug, title };
+  })
+  .sort((a, b) => a.title.localeCompare(b.title, 'es'));
+---
+
+<ul class="plantillas not-content">
+  {items.map((p) => (
+    <li>
+      <span class="name">{p.title}</span>
+      <a href={`${url('plantillas').replace(/\/$/, '')}/${p.slug}.md`} download={`${p.slug}.md`}>
+        <Icon name="descargar" size={16} /> Descargar .md
+      </a>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .plantillas {
+    list-style: none;
+    margin: var(--space-4) 0;
+    padding: 0;
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+  li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-1) var(--space-4);
+    padding: var(--space-2) var(--space-4);
+  }
+  li + li {
+    border-top: var(--border-width) solid var(--color-border);
+  }
+  .name {
+    color: var(--color-heading);
+  }
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--text-sm);
+  }
+</style>

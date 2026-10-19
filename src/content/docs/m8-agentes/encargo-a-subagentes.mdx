@@ -1,11 +1,159 @@
 ---
 title: 'Cómo encargar trabajo a un subagente'
-description: 'Objetivo, contexto, ficheros, límites, formato de retorno y criterio de terminado.'
+description: 'Objetivo, contexto, ficheros, límites, formato de retorno y criterio de terminado: plantilla de encargo y un ejemplo malo frente a uno bueno.'
 sidebar:
   order: 5
 level: avanzado
 tracks: [tecnica]
-readingTime: 7
-status: en-preparacion
-sources: []
+readingTime: 8
+lastReviewed: 2026-10-19
+sources:
+  [
+    claude-code-subagentes,
+    claude-code-agentes-en-paralelo,
+    claude-code-buenas-practicas,
+    anthropic-buenas-practicas-de-prompting,
+    anthropic-com-engineering-effective-context-engineering-for-ai-agents,
+    codex-subagents,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Steps from '@components/Steps.astro';
+import BeforeAfter from '@components/BeforeAfter.astro';
+import PromptTemplate from '@components/PromptTemplate.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Un subagente definido en `.claude/agents/` empieza en blanco y no ha visto tu conversación (solo el bifurcado la hereda): lo que no escribes en el encargo, no lo sabe.
+- Seis elementos hacen el encargo: objetivo, contexto, ficheros o fuentes, límites, formato de retorno y criterio de terminado.
+- Pide que devuelva solo el resultado y las pruebas, no el proceso: lo que vuelve a tu hilo se queda en tu contexto y lo pagas en cada turno.
+- Un encargo que dice qué hacer cuando no puede terminar evita el «parcial» presentado como completo.
+- Prueba el encargo con un solo elemento antes de repartirlo a muchos.
+
+</KeyTakeaways>
+
+## La idea
+
+Un [subagente](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#subagente) es un agente con su propio contexto, al que le das un trabajo y que te devuelve un resumen. Esa separación es su ventaja: el trabajo voluminoso (leer treinta actas, explorar una carpeta) no ensucia tu conversación. Pero tiene una consecuencia: **el subagente no ha visto lo que tú sí**. No sabe qué decidiste hace diez mensajes, qué descartaste ni qué te preocupa. Todo lo que necesite tiene que estar en el encargo.
+
+Y lo que devuelve no se queda fuera: vuelve a tu hilo y ocupa tu ventana de contexto, que se reenvía en cada turno. Por eso el formato de retorno forma parte del encargo, no es un detalle. Un subagente que contesta con dos páginas de proceso te devuelve el problema que querías evitar.
+
+<Callout tipo="verificado" fecha="2026-10-19">
+
+En Claude Code, un subagente es un fichero Markdown en `.claude/agents/` y solo `name` y `description` son obligatorios; el resto (`tools`, `model`, `effort`, `permissionMode`, `maxTurns`…) es opcional. Los subagentes integrados Explore y Plan trabajan con herramientas de solo lectura. Hay una excepción importante: el subagente bifurcado (`fork`, que se lanza con `/subtask`) hereda toda la conversación, con su prompt de sistema, herramientas y modelo, y el modo bifurcado está activado por defecto en las sesiones interactivas (desde la v2.1.232 según el changelog; `CLAUDE_CODE_FORK_SUBAGENT=0` lo desactiva). Por tanto, Claude puede lanzar un bifurcado sin que lo pidas. Un subagente definido en `.claude/agents/`, en cambio, empieza en blanco.
+
+</Callout>
+
+## Los seis elementos
+
+| Elemento                  | Qué pones                                                    | Por qué                                                                                         |
+| ------------------------- | ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| **Objetivo**              | La tarea en una frase y la decisión que apoya                | Sin el «para qué», el subagente optimiza lo que le parece importante, no lo que necesitas       |
+| **Contexto**              | Lo imprescindible de lo que ya sabes y no hace falta repetir | No ha visto tu conversación; sin contexto, repite trabajo hecho o contradice decisiones tomadas |
+| **Ficheros o fuentes**    | Rutas, carpetas o documentos concretos donde buscar          | Un alcance cerrado evita la exploración sin acotar y su gasto                                   |
+| **Límites**               | Qué no tocar, qué no hacer, qué requiere confirmar           | Un subagente con autonomía y sin límites decide por su cuenta                                   |
+| **Formato de retorno**    | La forma exacta del resultado, su longitud y qué omitir      | Lo que devuelve entra en tu contexto: pídelo corto y estructurado                               |
+| **Criterio de terminado** | Cómo se sabe que acabó y qué prueba aporta                   | Sin criterio, el subagente para cuando le parece; con él, puede comprobarse a sí mismo          |
+
+El criterio de terminado y el formato de retorno son los dos que más se olvidan y los que más rinden. El primero te dice cuándo parar; el segundo decide cuánto te cuesta la respuesta.
+
+## La plantilla
+
+<PromptTemplate
+  titulo="Encargo completo a un subagente"
+  archivo="encargo-subagente-completo"
+  texto={`# Encargo
+
+Tarea: {{qué debe hacer, en una frase}}.
+
+Para qué se necesita: {{qué decisión depende del resultado}}.
+
+## Contexto
+
+Lo que ya sabes y no hace falta repetir: {{contexto mínimo imprescindible; no has visto la conversación}}.
+Decisiones ya tomadas: {{lo que no debe reabrir}}.
+
+## Alcance
+
+Dónde buscar o qué usar: {{ficheros, carpetas o fuentes concretas}}.
+Fuera de alcance: {{qué no tocar ni consultar}}.
+Límites: {{acciones que no debe hacer o que requieren confirmación antes}}.
+
+## Resultado
+
+Devuelve solo: {{formato exacto; por ejemplo, una tabla con columnas X, Y, Z y como máximo N líneas}}. No incluyas el proceso.
+Cada afirmación lleva su prueba: {{ruta y línea, página y cita, o comando ejecutado y su salida}}.
+
+## Terminado
+
+Has terminado cuando: {{criterio comprobable; por ejemplo, todas las filas tienen fuente y las sumas cuadran}}.
+Si no puedes completar la tarea, dime qué falta en lugar de devolver algo parcial como si fuera completo.`}
+
+>
+
+Úsala cuando delegues a un subagente un trabajo que puedas describir de antemano. Si delegas a menudo la misma clase de tarea, convierte el encargo en la definición del subagente (el cuerpo del fichero Markdown) y deja en cada invocación solo lo que cambia.
+
+</PromptTemplate>
+
+## Ejemplo malo y ejemplo bueno
+
+Un equipo de estrategia prepara un informe de mercado y encarga a un subagente la línea de precios.
+
+<BeforeAfter
+  antes="Investiga los precios del mercado de bicicletas eléctricas y dime lo importante."
+  despues="Tarea: reunir los precios de lista actuales de las 8 marcas de la hoja marcas.xlsx (columna A) en los tres segmentos que cubrimos: urbana, plegable y carga. Para qué: el comité fijará nuestro precio de entrada la semana próxima, así que importa más la precisión de los rangos que la cantidad de marcas. Contexto: ya tenemos los precios de 2025 en precios-2025.csv; no los repitas, compara con ellos. Alcance: usa solo las webs oficiales de cada marca; no uses foros ni reseñas. No modifiques ningún fichero. Devuelve solo una tabla (marca, segmento, modelo, precio, URL de la página, fecha de consulta) y, debajo, tres frases sobre variaciones respecto a 2025. Terminado: cada fila tiene URL y fecha; si una marca no publica precio, escribe «no publicado» en lugar de estimarlo. Si no puedes completar alguna marca, dime cuál y por qué."
+>
+
+Qué cambió y por qué: el **objetivo** incluye la decisión que apoya, lo que orienta qué es importante; el **contexto** evita repetir trabajo; el **alcance** y los **límites** cierran la búsqueda; el **formato** pide una tabla con prueba por fila (URL y fecha), lo que hace la verificación una lectura de segundos; y el **criterio de terminado** dice qué hacer cuando falta un dato, que es lo que más inventan los modelos. El encargo malo no dice qué es «lo importante», así que el subagente decide por ti.
+
+</BeforeAfter>
+
+<Callout tipo="recomendacion">
+
+Pide siempre que el subagente devuelva la prueba junto al resultado: una ruta y una línea, una página y una cita, un comando y su salida. Es una recomendación de la guía. Su porqué: lo que un subagente te cuenta es su resumen de lo que hizo, no el trabajo; con la prueba al lado, compruebas en segundos lo que de otro modo tendrías que creer.
+
+</Callout>
+
+## En la práctica
+
+<Steps>
+
+1. **Escribe el encargo como si el lector fuera un compañero que entra hoy.** No sabe nada del proyecto salvo lo que le pongas.
+2. **Cierra el alcance.** Nombra los ficheros, carpetas o fuentes. Un subagente sin alcance explora, y explorar cuesta tokens.
+3. **Pide el formato exacto.** Tabla, lista o JSON con campos; longitud máxima; qué omitir (el proceso, los intentos fallidos).
+4. **Escribe el criterio de terminado y qué hacer si no se cumple.** «Dime qué falta» vale más que un resultado maquillado.
+5. **Limita las herramientas** al trabajo: un subagente que solo lee no necesita poder editar. En Claude Code se hace con `tools` o `disallowedTools` en su definición.
+6. **Pruébalo con un elemento** y lee la respuesta como la leería quien la va a usar. Ajusta el encargo y entonces repártelo.
+7. **Revisa lo que devuelve** antes de dárselo a otro agente o de usarlo. El encargo mejora la salida, no sustituye la verificación.
+
+</Steps>
+
+## Errores frecuentes
+
+- **El encargo de una línea.** Funciona en una conversación, donde puedes corregir; un subagente ejecuta sin preguntar.
+- **Suponer que ha visto tu conversación.** Los de `.claude/agents/` empiezan en blanco; solo el bifurcado hereda la conversación, y no sabes cuándo se usa uno u otro si no lo pides.
+- **No pedir formato.** Devuelve un informe largo que tú pagas en cada turno.
+- **Pedir «investiga» sin alcance.** Explora todo y gasta de más.
+- **Aceptar «hecho» sin prueba.** Un resumen no es evidencia.
+- **Repartir el mismo encargo a 30 elementos sin haberlo probado en uno.** El fallo de encargo se multiplica por 30.
+
+<Checklist
+  id="m8-encargo"
+  titulo="Antes de enviar el encargo"
+  items={[
+    'Dice para qué se necesita, no solo qué hacer.',
+    'Incluye el contexto que el subagente no puede conocer.',
+    'Nombra los ficheros o fuentes donde buscar y lo que queda fuera.',
+    'Marca los límites: qué no tocar y qué requiere confirmación.',
+    'Pide un formato de retorno exacto y corto, con la prueba de cada afirmación.',
+    'Define cuándo está terminado y qué hacer si no se puede completar.',
+    'Lo he probado con un solo elemento antes de repartirlo.',
+  ]}
+/>
+
+## Para profundizar
+
+La [plantilla universal de encargo](/AI-Optimized_Usage_Web/m2-metodo/plantilla-de-encargo/) de M2 es la base de la que sale esta; para tareas largas con un solo agente, [encargos para tareas largas y agentes](/AI-Optimized_Usage_Web/m3-prompting/tareas-largas-y-agentes/). Cómo declarar el subagente en cada herramienta, en [implementación por superficie](/AI-Optimized_Usage_Web/m8-agentes/implementacion-por-superficie/).

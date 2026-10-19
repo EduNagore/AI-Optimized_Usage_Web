@@ -11,7 +11,10 @@ interface Props {
 
 const { dir } = Astro.props;
 const pages = (
-  await getCollection('docs', ({ id }) => id.startsWith(`${dir}/`) && id !== `${dir}/index`)
+  await getCollection(
+    'docs',
+    ({ id, data }) => id.startsWith(`${dir}/`) && id !== `${dir}/index` && !data.sidebar.hidden,
+  )
 ).sort((a, b) => (a.data.sidebar.order ?? 999) - (b.data.sidebar.order ?? 999));
 ---
 

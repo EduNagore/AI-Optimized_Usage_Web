@@ -1,11 +1,151 @@
 ---
 title: 'El flujo recomendado'
-description: 'Explorar, planificar, implementar, verificar y cerrar con commit y PR.'
+description: 'Explorar, planificar, implementar, verificar y cerrar con commit y PR: el orden que evita rehacer trabajo en Claude Code.'
 sidebar:
   order: 2
 level: intermedio
 tracks: [tecnica]
-readingTime: 7
-status: en-preparacion
-sources: []
+readingTime: 8
+lastReviewed: 2026-10-19
+sources:
+  [
+    claude-code-buenas-practicas,
+    claude-code-comandos,
+    claude-code-modos-de-permiso,
+    code-claude-com-docs-en-goal,
+    code-claude-com-docs-en-hooks,
+    claude-code-costes,
+    claude-code-modo-interactivo,
+    claude-code-modelo-y-esfuerzo,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import CommandCard from '@components/CommandCard.astro';
+import Steps from '@components/Steps.astro';
+import BeforeAfter from '@components/BeforeAfter.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Cuatro fases: explorar, planificar, implementar y verificar. Después, commit y PR.
+- Planifica en modo plan (`Shift+Tab` o `/plan`) cuando no puedas describir el cambio en una frase.
+- Define cómo se comprobará el resultado antes de empezar, no al final.
+- `/verify`, `/run`, un hook de parada o `/goal` convierten «parece que funciona» en «lo he comprobado».
+- Una tarea, una sesión: `/clear` al terminar.
+
+</KeyTakeaways>
+
+## La idea
+
+El error más caro con un agente es dejar que implemente la solución a un problema que no ha entendido. Rehacer cuesta más que pensar: todo el trabajo equivocado se reenvía en cada turno hasta que lo borras. El flujo recomendado separa **entender** de **hacer** para que cada fase use la cantidad justa de contexto y de permisos.
+
+Es la versión de Claude Code del [ciclo de siete pasos](/AI-Optimized_Usage_Web/m2-metodo/ciclo-de-7-pasos/) del módulo 2 (clasifica la tarea, elige superficie, elige modelo y esfuerzo, prepara el contexto, formula el encargo, verifica, sistematiza y mide). Los tres primeros pasos ya los has dado al abrir Claude Code con el modelo adecuado (ver [primeros pasos](/AI-Optimized_Usage_Web/m7-claude-code/primeros-pasos/)); _explorar_ y _planificar_ son el paso 4 (preparar el contexto) y el paso 5 (formular el encargo); _implementar_ es la ejecución; _verificar_ es el paso 6; y _cerrar_ y limpiar la sesión preparan el paso 7.
+
+| Fase        | Qué haces                                        | Herramientas                               |
+| ----------- | ------------------------------------------------ | ------------------------------------------ |
+| Explorar    | Claude lee y te cuenta lo que ve; no cambia nada | Modo plan, subagentes de exploración       |
+| Planificar  | Acordáis el enfoque y cómo se comprobará         | `/plan`, `Shift+Tab`                       |
+| Implementar | Claude ejecuta el plan aprobado                  | `acceptEdits` o `auto`                     |
+| Verificar   | Se comprueba contra el criterio fijado           | `/verify`, `/run`, hooks, `/goal`, `/diff` |
+| Cerrar      | Commit, PR y revisión                            | `/code-review`, `/security-review`         |
+
+## En la práctica
+
+<Steps>
+
+1. **Explora en modo plan.** Pulsa `Shift+Tab` hasta el modo `plan` o escribe `/plan` con la tarea. Claude lee, busca y pregunta, sin modificar nada.
+2. **Pide el plan y el criterio de éxito.** «Propón un plan en pasos y dime cómo comprobaremos que está bien hecho».
+3. **Corrige el plan antes de aprobarlo.** Con `Ctrl+G` abres el plan propuesto en tu editor de texto predeterminado y lo editas directamente antes de que Claude siga. Cambiar una línea del plan es barato; deshacer una implementación, no.
+4. **Implementa.** Cambia a `acceptEdits` o `auto` y que ejecute.
+5. **Verifica con algo que no sea tu impresión.** Ejecuta la comprobación acordada; si hay aplicación, `/verify` o `/run`.
+6. **Revisa los cambios con `/diff`, cierra con commit y PR**, y haz `/clear` antes de la siguiente tarea.
+
+</Steps>
+
+<CommandCard comando="/plan" />
+
+<Callout tipo="recomendacion">
+
+Salta el plan si puedes describir el cambio en una frase («corrige la errata del título de la portada»). Por qué: planificar tiene un coste fijo de tokens y de atención, y en un cambio trivial el plan sería más largo que el propio trabajo. Planifica cuando el cambio toca varios ficheros, cuando hay más de una forma razonable de hacerlo o cuando no estás seguro del enfoque.
+
+</Callout>
+
+Si el plan es lo difícil y la ejecución es mecánica, el alias de modelo `opusplan` usa Opus en modo plan y cambia a Sonnet para ejecutar (ver la [estrategia de selección](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/estrategia-de-seleccion/) del módulo 4). Al aprobar el plan, Claude sale del modo plan y empieza a editar según la opción de aprobación que elijas.
+
+Si no sabes cómo formular el encargo, deja que Claude te entreviste antes de planificar: [que la IA te entreviste](/AI-Optimized_Usage_Web/m3-prompting/que-la-ia-te-entreviste/) (módulo 3) explica la técnica y cómo guardar el resultado en un `SPEC.md`.
+
+## Verificar: tres niveles
+
+La fase que más se omite es la que más rinde. Hay tres formas de verificar, de menor a mayor automatización:
+
+<CommandCard comando="/verify" />
+
+`/verify` confirma un cambio construyendo y ejecutando la aplicación y observando el resultado. `/run` lanza y maneja la aplicación del proyecto para que veas el cambio funcionando, y `/run-skill-generator` escribe una skill por proyecto para que ambos sepan cómo levantarla.
+
+<CommandCard comando="/goal" />
+
+`/goal` fija una condición de finalización: Claude sigue trabajando entre turnos hasta cumplirla. Tras cada turno, un modelo evaluador decide si se cumple. **Ese evaluador no ejecuta comandos ni lee ficheros por su cuenta: juzga la condición contra lo que Claude haya mostrado en la conversación.** Por eso la condición debe exigir evidencia visible en la conversación: un estado final medible, cómo se comprueba («que Claude ejecute la comprobación y muestre el resultado») y las restricciones que no se pueden romper. Puede incluir una cláusula de parada, como «o para tras 20 turnos». La documentación admite hasta 4.000 caracteres (cifra de la fuente, sin verificar en los datos del sitio).
+
+**Hooks de parada.** Un [hook](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#hook) en el evento `Stop` se ejecuta cuando Claude va a dar por terminado el turno. Si el script sale con código 2, la acción se bloquea. Sirve para imponer una comprobación determinista que no se pueda saltar, como pasar los tests o revisar que no quedan marcas «TODO». A diferencia de `/goal`, un hook puede ejecutar un script. Cómo se configuran, en [Extender Claude Code](/AI-Optimized_Usage_Web/m7-claude-code/extender-claude-code/).
+
+<Callout tipo="cuidado">
+
+`/goal` y los hooks de parada hacen que Claude trabaje más turnos, y cada turno gasta tokens. Define una condición alcanzable y comprobable en la conversación; si es vaga («que quede bien») o depende de algo que Claude no muestra, el bucle no sabe cuándo parar. Sobre cómo diseñar la verificación en general, ver [verificar siempre](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/verificar-siempre/).
+
+</Callout>
+
+## Cerrar: commit, PR y revisión
+
+Pide a Claude que haga el commit y el PR cuando hayas revisado el `/diff`. Antes de fusionar:
+
+- `/code-review` revisa el diff, un PR, una rama o una ruta buscando errores de corrección. Admite un nivel (`low` a `ultra`), `--fix` para aplicar los hallazgos y `--comment` para publicarlos. `/review` es su alias.
+- `/security-review` analiza los cambios de la rama buscando vulnerabilidades.
+- `/simplify` busca simplificaciones en el código cambiado; no busca errores.
+- `/autofix-pr` abre una sesión en la nube que vigila el PR de la rama y sube arreglos si falla la integración continua o llegan comentarios.
+
+## Ejemplo de oficina: el informe mensual de ventas
+
+Una responsable comercial recibe cada mes tres Excel (ventas, devoluciones, objetivos) y debe entregar un informe de una página.
+
+**Explorar.** En modo plan: «Lee los tres ficheros de `mes/` y dime qué columnas tiene cada uno y si hay filas vacías o fechas fuera de mes. No cambies nada».
+
+**Planificar.** «Propón cómo calcular las ventas netas por región y la desviación contra objetivo. Indica cómo comprobaremos que los totales cuadran».
+
+**Implementar.** Con el plan aprobado, `acceptEdits`: genera la hoja de cálculo y el borrador del informe.
+
+**Verificar.** `/goal` con la condición «Claude ha calculado y mostrado en la conversación la suma de ventas netas por región y el total del fichero de ventas menos las devoluciones, ambas cifras coinciden, y el informe cita la desviación de cada región; o para tras 15 turnos». Como el evaluador solo juzga lo que aparece en la conversación, la condición obliga a Claude a mostrar las cifras, y tú puedes comprobarlas leyendo el resultado.
+
+<BeforeAfter
+  antes="Haz el informe de ventas de este mes con estos Excel."
+  despues="Lee los tres ficheros de mes/ en modo solo lectura y dime qué columnas hay y qué incoherencias ves. Después propón un plan para el informe de una página y cómo comprobaremos que las ventas netas por región cuadran con el total."
+>
+
+Qué cambió y por qué: se separa explorar de hacer, se pide el plan antes de ejecutar y se fija de antemano el criterio de verificación, que es lo que evita entregar un informe con totales que no cuadran.
+
+</BeforeAfter>
+
+## Errores frecuentes
+
+- **Implementar sin explorar.** Claude propone una solución plausible a un problema que no ha leído. Empieza siempre por leer.
+- **Plan sin criterio de éxito.** Sin saber cómo se comprueba, la verificación acaba siendo «parece bien».
+- **Aprobar el plan sin leerlo.** El plan es el punto más barato para corregir; úsalo.
+- **Reutilizar la sesión para la tarea siguiente.** Todo lo anterior se reenvía y distrae. `/clear` entre tareas, como detalla [el día a día en Claude Code](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/dia-a-dia-en-claude-code/).
+- **Dar por buena la revisión automática.** `/code-review` encuentra cosas, pero no sustituye tu lectura del `/diff` cuando el cambio importa.
+
+<Checklist
+  id="m7-flujo"
+  titulo="Antes de dar una tarea por terminada"
+  items={[
+    'Empecé leyendo (modo plan) en lugar de implementando.',
+    'Acordé cómo se comprobaría el resultado antes de implementar.',
+    'He ejecutado la comprobación, no solo leído el resumen de Claude.',
+    'He revisado el /diff antes del commit.',
+    'He hecho /clear antes de la siguiente tarea.',
+  ]}
+/>
+
+## Para profundizar
+
+Los hábitos de gasto de cada fase, en [El día a día en Claude Code](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/dia-a-dia-en-claude-code/). Cuando una fase se pueda repartir entre varios agentes, [trabajo en paralelo](/AI-Optimized_Usage_Web/m7-claude-code/trabajo-en-paralelo/).

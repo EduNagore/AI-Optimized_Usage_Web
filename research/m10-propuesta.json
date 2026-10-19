@@ -1,0 +1,67 @@
+{
+  "modulo": "M10",
+  "fecha": "2026-10-19",
+  "fuentesNuevas": [],
+  "datosNuevos": [
+    {
+      "destino": "src/data/pricing-rules.json",
+      "id": "anthropic-batch-requires-1h-cache-tip",
+      "rule": "En lotes se recomienda el TTL de caché de 1 hora (los lotes pueden tardar más de 5 minutos)",
+      "value": "ttl 1h recomendado para mejorar la tasa de aciertos",
+      "appliesTo": "Message Batches API con prompt caching",
+      "source": "anthropic-batch",
+      "verifiedAt": "2026-10-19"
+    },
+    {
+      "destino": "src/data (nuevo: structured outputs)",
+      "nota": "Parámetro output_config.format con type json_schema; sin cabecera beta; sin minimum/maximum, minLength/maxLength ni additionalProperties distinto de false; stop_reason refusal y max_tokens no cumplen el esquema; comparar enum sin distinguir mayúsculas. Compatible con claude-haiku-5-5. Fuente: anthropic-structured-outputs, 2026-10-19.",
+      "source": "anthropic-structured-outputs"
+    },
+    {
+      "destino": "src/data/pricing-rules.json",
+      "id": "anthropic-batch-resultados",
+      "rule": "Resultados de un lote disponibles 29 días; errored, canceled y expired no se facturan; los lotes pueden superar ligeramente el límite de gasto del workspace",
+      "source": "anthropic-batch",
+      "verifiedAt": "2026-10-19"
+    },
+    {
+      "destino": "src/data (nuevo: costes de Claude Code)",
+      "nota": "Las páginas de caso remiten a la página de costes de Claude Code para las medias por desarrollador y día activo (13 $ de media según plan/02 §3.6) sin escribir la cifra; si se quiere citar, añadirla a datos con su fuente claude-code-costes."
+    },
+    {
+      "destino": "src/data (nuevo: web search)",
+      "nota": "Falta el coste de las herramientas de búsqueda web y de ejecución de código del API; los casos 3 y 4 lo declaran como no incluido."
+    }
+  ],
+  "correccionesRevision": [
+    "Retirada la afirmación 'curvas de esfuerzo casi planas en investigación' (línea base): la página oficial (2026-10-19) da dos resultados contradictorios: Fable 5.1 puntuó 66 % en low y 65 % en high en DeepResearch Bench II; Opus 5.5 puntuó 13,3 puntos menos en low que en medium en DRACO.",
+    "Confirmado en effort.md: output_config.effort; defectos Opus 5.5 y Haiku 5.5 = medium, resto = high; Haiku 5.5 admite thinking disabled hasta high; Haiku 5.5 a low es más propenso a saltarse comprobaciones en prompts largos de agente.",
+    "Confirmado en workflows.md: en Pro se activan en /config; guía de tamaño por defecto medium (<10 agentes) o small (<5) en Pro con v2.1.271+; aviso Large workflow con >25 agentes o >1,5 M tokens; caché de agentes de flujo 5 min incluso con suscripción, subagentPromptCacheTtl=1h la amplía; /deep-research es un flujo.",
+    "Confirmado en routines.md: el formulario tiene selector de modelo; no consta ajuste de esfuerzo; mínimo 1 h de intervalo.",
+    "Confirmado en skills overview: skills personalizadas no se sincronizan entre superficies; en claude.ai individuales; en API, workspace y requieren la herramienta de ejecución de código; sin cobertura ZDR."
+  ],
+  "afirmacionesSinVerificar": [
+    "Si las apps de chat de Claude permiten fijar el esfuerzo: no consta; el índice y los casos lo dicen.",
+    "Modelo que usan los trabajadores de /batch: no documentado (pendiente también en M8).",
+    "Mitad no leída de optimizing-for-cost-and-intelligence.md (caracteres 100.000 a 182.798).",
+    "Compatibilidad de structured outputs dentro de un lote (la documentación de Batch no la menciona; la de structured outputs no se pudo leer entera: faltaban los últimos 3.000 caracteres).",
+    "Combinación caché + Batch: la documentación de Batch dice que todo el uso va al 50 %; los aciertos de caché en lote no están garantizados (la propia página recomienda TTL 1 h). <CostExample> no calcula la combinación.",
+    "Tamaño de petición de 5 KB de prefijo y cuenta de que 50.000 peticiones superan 256 MB: supuesto aritmético de la guía.",
+    "Qué datos conserva la API de lotes con retención cero: no leído (la página de batch remite a 'API and data retention').",
+    "Código Python de lotes escrito a partir de la documentación (dicts en lugar de Request/MessageCreateParamsNonStreaming) y no ejecutado."
+  ],
+  "supuestosDeCoste": {
+    "resumir-informe-80-paginas": "50.000 entrada, 3.000 salida, 20 al mes",
+    "comunicacion-delicada": "2.000 / 600, 5 al mes",
+    "analizar-excel-o-csv": "60.000 / 5.000, 30 al mes",
+    "investigacion-con-fuentes": "300.000 / 15.000, 10 al mes (sin Haiku por el tramo de 100K)",
+    "acta-a-tareas": "15.000 / 1.500, 40 al mes (con columna Batch)",
+    "clasificar-50000-tickets": "1.500 entrada (1.200 prefijo cacheable + 300 ticket); salida 250 sin optimizar y 60 estructurada; 50.000 tickets",
+    "nueva-funcionalidad-con-claude-code": "400.000 entrada (350.000 en caché) / 40.000, 10 al mes",
+    "migracion-masiva-de-codigo": "15.000 / 3.000 por fichero, 300 ficheros",
+    "informe-semanal-automatico": "25.000 / 2.000, 4 al mes",
+    "asistente-interno": "21.000 entrada (20.000 en caché) / 400, 3.000 preguntas al mes",
+    "revision-de-un-contrato": "40.000 / 5.000, 8 al mes",
+    "preparar-una-presentacion": "45.000 / 6.000, 6 al mes"
+  }
+}

@@ -61,13 +61,13 @@ Desde `glossary.json`, con tooltip en todo el sitio la primera vez que aparece c
 Predice texto a partir de su contexto; no recuerda entre conversaciones salvo con memoria, proyectos o ficheros de instrucciones; su conocimiento tiene fecha de corte y para lo reciente necesita búsqueda. Consecuencia práctica: tú decides qué sabe en cada momento.
 
 ### 1.2 Tokens
-Qué son y cómo se cuentan; tokens de entrada, de salida y de razonamiento (este se factura como salida). El mismo texto produce distinto número de tokens según el tokenizador: el de Opus 4.7 y posteriores usa entre 1× y 1,35× los tokens de los anteriores [verificar]. Las imágenes cuestan según su resolución (aprox. 1 token por bloque de 28×28 píxeles; 1280×720 ≈ 1.200 tokens [verificar]). Mini-ejercicio: estimar los tokens de un correo, un informe de 20 páginas y una captura de pantalla.
+Qué son y cómo se cuentan; tokens de entrada, de salida y de razonamiento (este se factura como salida). El mismo texto produce distinto número de tokens según el tokenizador: el de Claude 4.7 y posteriores (todos los modelos 5.x actuales) usa aproximadamente un 30 % más de tokens que los anteriores, según la documentación (consultada el 2026-10-19). Las imágenes cuestan según su resolución (aprox. 1 token por bloque de 28×28 píxeles; 1280×720 ≈ 1.200 tokens [verificar]). Mini-ejercicio: estimar los tokens de un correo, un informe de 20 páginas y una captura de pantalla.
 
 ### 1.3 La ventana de contexto
 Los modelos actuales tienen ventanas de alrededor de 1M de tokens, pero el rendimiento baja a medida que se llenan. Cada turno reenvía todo el historial: sin caché, el coste de una conversación larga crece aproximadamente con el cuadrado del número de turnos. Diagrama: anatomía de la ventana (instrucciones del sistema, herramientas, ficheros de instrucciones, conversación, ficheros leídos y resultados de herramientas).
 
 ### 1.4 Razonamiento y esfuerzo
-Razonamiento adaptativo: el modelo decide cuánto pensar. El parámetro de esfuerzo controla la profundidad del razonamiento, el número de llamadas a herramientas y la extensión. En varios modelos actuales el razonamiento no se puede desactivar y el esfuerzo es el único mando (Opus 5.5, Sonnet 5.5, Fable 5.1 [verificar]). Por eso «piensa paso a paso» ya no hace falta.
+Razonamiento adaptativo: el modelo decide cuánto pensar. El parámetro de esfuerzo controla la profundidad del razonamiento, el número de llamadas a herramientas y la extensión. En varios modelos actuales el razonamiento no se puede desactivar y el esfuerzo es el único mando (Opus 5.5 y Fable 5.1; en Sonnet 5.5 se puede controlar con `thinking: {type: "between_tools"}` en `low`, `medium` y `high`, según `models.json`). Por eso «piensa paso a paso» ya no hace falta.
 
 ### 1.5 Herramientas, MCP y agentes
 El bucle de un agente (pensar → usar herramienta → leer resultado → repetir) y las diferencias entre chat, flujo programado y agente. MCP como estándar para conectar herramientas y datos.
@@ -393,11 +393,11 @@ Ficha común: tarea · configuración recomendada (superficie, modelo, esfuerzo)
 Quiz por módulo (5–8 preguntas con explicación de cada respuesta), retos de reescritura de prompts con solución comentada, diagnóstico de madurez y progreso guardado en el navegador.
 
 ## M12. Recursos
-Chuleta imprimible de una página · plantillas descargables · novedades (desde `changelog.json`, con filtro por proveedor) · fuentes oficiales · metodología de verificación y fecha de la última revisión global.
+Chuleta imprimible de una hoja (a doble cara) · plantillas descargables · novedades (desde `changelog.json`, con filtro por proveedor) · fuentes oficiales · metodología de verificación y fecha de la última revisión global.
 
 ### Novedades de 2026 que deben aparecer explicadas en el sitio
 Cada una enlazada desde novedades y desde su lección [verificar todas en la Fase 1]:
-- Razonamiento adaptativo en lugar de presupuestos fijos de tokens de razonamiento; razonamiento siempre activo en Opus 5.5, Sonnet 5.5 y Fable.
+- Razonamiento adaptativo en lugar de presupuestos fijos de tokens de razonamiento; razonamiento que no se puede desactivar en Opus 5.5 y siempre activo en Fable 5.1 (en Sonnet 5.5 y Haiku 5.5 sí puede quitarse el razonamiento previo, con límites por nivel).
 - Niveles `xhigh` y `max`; esfuerzo por mensaje; presupuestos de tarea (task budgets).
 - Preserved thinking e historiales que solo crecen.
 - Mensajes de sistema a mitad de conversación.

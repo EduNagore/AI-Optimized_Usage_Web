@@ -6,6 +6,143 @@ sidebar:
 level: basico
 tracks: [profesional]
 readingTime: 7
-status: en-preparacion
-sources: []
+lastReviewed: 2026-10-19
+sources:
+  [
+    anthropic-esfuerzo,
+    anthropic-buenas-practicas-de-prompting,
+    support-claude-com-en-articles-17153992-what-are-artifacts-and-how-do-i-use-them,
+    anthropic-precios,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Fact from '@components/Fact.astro';
+import PromptTemplate from '@components/PromptTemplate.astro';
+import CostExample from '@components/CostExample.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Trabaja en dos pasos: primero un esquema que apruebas, después las diapositivas. Corregir un esquema es barato; rehacer 20 diapositivas, no.
+- El contenido lo aportas tú; la IA lo estructura. Dale el material y el público, no «haz una presentación sobre X».
+- Cada cifra de una diapositiva debe poder rastrearse hasta el documento de partida.
+- Un modelo equilibrado a `medium` suele bastar; sube solo si la estructura no convence.
+- Revisa el mensaje principal de cada diapositiva: si no puedes decirlo en una frase, sobra.
+
+</KeyTakeaways>
+
+## La tarea
+
+El jueves presentas a dirección los resultados del primer semestre del departamento: 12 minutos, ocho diapositivas como máximo. Tienes un informe de 15 páginas, una hoja de cifras y las notas de tu equipo. Necesitas una estructura convincente y un borrador de diapositivas con notas del orador.
+
+## Configuración recomendada
+
+- **Superficie.** Un chat con el material adjunto, o un proyecto si vas a iterar durante días. Las apps de Claude pueden crear contenido aparte de la conversación (documentos, presentaciones) con los artifacts, que según la ayuda oficial están en todos los planes; qué formato de salida admite tu herramienta, compruébalo antes.
+- **Modelo.** Sonnet 5.5.
+- **Esfuerzo.** `medium`, que en Sonnet 5.5 está un escalón por debajo del defecto de la API (<Fact id="sonnet-5-5.effort.default.api" />) y coincide con el de Claude Code (<Fact id="sonnet-5-5.effort.default.claude-code" />). Si tu chat no deja fijarlo, usa el que ofrezca.
+- **Equivalente en otros proveedores** (fila de la matriz): <Fact id="gpt-6-1-sol.name" /> en OpenAI y <Fact id="gemini-3-8-flash.name" /> en Google.
+
+<Callout tipo="recomendacion">
+
+Es la fila «Preparar una presentación o un borrador largo» de la [matriz por tarea](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/matriz-por-tarea/). Por qué: hay que estructurar y mantener coherencia en un texto largo, pero el contenido lo aportas tú, así que `medium` da buen equilibrio y las iteraciones sobre un esquema aprobado son más baratas que reescribir de cero. Es una recomendación de la guía, no una medición.
+
+</Callout>
+
+## Preparación del contexto
+
+1. **Define al público y la decisión.** «Dirección, que debe decidir si amplía el presupuesto» pide otra estructura que «el equipo, que quiere saber qué ha pasado».
+2. **Reúne el material con nombre y fecha:** el informe, la hoja de cifras, las notas. Cada pieza, separada y etiquetada.
+3. **Fija las restricciones:** minutos, número máximo de diapositivas, plantilla corporativa, lo que no se puede mostrar.
+4. **Quita lo confidencial que no hace falta.** Si la presentación va a dirección interna, probablemente las cifras agregadas bastan; no subas nóminas ni datos de clientes. Ver [privacidad y seguridad](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/privacidad-y-seguridad/).
+
+## El encargo, en dos pasos
+
+Esto es [encadenar](/AI-Optimized_Usage_Web/m3-prompting/encadenar-y-autocorregir/): el resultado del primer paso, corregido por ti, es la entrada del segundo.
+
+**Paso 1: el esquema.**
+
+<PromptTemplate
+  titulo="Esquema de presentación"
+  archivo="presentacion-esquema"
+  texto={`<material>
+{{pega aquí los documentos, notas o cifras, cada uno dentro de su etiqueta con nombre y fecha}}
+</material>
+
+Voy a presentar a {{público}} durante {{minutos}} minutos para que decidan {{decisión}}. Máximo {{número}} diapositivas.
+
+Propón solo el esquema. Para cada diapositiva: título que exprese el mensaje (una frase completa, no un tema), qué cifra o dato la sostiene y de qué documento del material sale. Empieza con la conclusión y la recomendación; sigue con los tres hechos que más pesan; cierra con riesgos, lo que no sabemos y los siguientes pasos con responsable y fecha.
+
+Usa solo cifras que aparezcan en el material. Si dos fuentes se contradicen, señálalo en lugar de elegir. Si falta un dato para sostener un mensaje, dímelo en lugar de inventarlo.`}
+/>
+
+Revisa el esquema como si fuera la presentación: ¿cuenta una historia?, ¿falta algo que dirección va a preguntar?, ¿sobra alguna diapositiva? Corrígelo con tus comentarios.
+
+**Paso 2: las diapositivas.** En la misma conversación, con el esquema ya aprobado:
+
+<PromptTemplate
+  titulo="Diapositivas y notas del orador"
+  archivo="presentacion-diapositivas"
+  texto={`Con el esquema aprobado, escribe cada diapositiva con: el título, un máximo de {{3}} puntos de contenido (frases cortas) y una nota del orador de unas {{80}} palabras. En cada cifra, indica entre corchetes de qué documento y apartado procede. Marca con «[por confirmar]» cualquier dato que no estés seguro de que figure en el material.
+
+No añadas datos nuevos. Al final, lista las tres preguntas más difíciles que podría hacer {{público}} y una respuesta basada solo en el material.`}
+/>
+
+Por qué dos pasos: los errores de estructura son los más caros de arreglar una vez escritas todas las diapositivas, y el esquema es una página que lees en dos minutos.
+
+## Verificación
+
+1. **Cada cifra, contra el material.** Lee cada número de cada diapositiva y búscalo en la hoja o el informe. Las etiquetas entre corchetes te dicen dónde.
+2. **Los «[por confirmar]».** Cada uno se resuelve o se elimina.
+3. **El mensaje de cada diapositiva en una frase.** Si no puedes, la diapositiva sobra o está mal.
+4. **La prueba de los 12 minutos.** Ensaya en voz alta con las notas. Si te pasas, reduce contenido, no hables más deprisa.
+5. **Las preguntas difíciles.** Compáralas con las que realmente te harían; añade las que falten.
+6. **Revisión de un compañero** si la presentación decide dinero o personas: nadie debería presentar a dirección una cifra que solo ha visto una persona.
+
+## Coste estimado
+
+Supuesto de la guía, no una medición: el material ocupa unos 15.000 tokens de entrada y, con las dos pasadas y la iteración del esquema, acumulamos 45.000 de entrada y 6.000 de salida por presentación. Volumen: 6 presentaciones al mes.
+
+<CostExample
+  ids={['haiku-5-5', 'sonnet-5-5', 'opus-5-5']}
+  entrada={45000}
+  salida={6000}
+  volumen={6}
+  batch={false}
+  etiqueta="Presentación en dos pasos (supuesto de la guía)"
+/>
+
+El coste de tokens es secundario; el de una cifra mal copiada en una sala con dirección, no. Para cambiar las cifras, usa la [calculadora de coste](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/calculadora-de-coste/) y lee [coste por tarea completada](/AI-Optimized_Usage_Web/m2-metodo/coste-por-tarea/).
+
+## Versión económica frente a premium
+
+- **Económica (a probar midiendo):** Haiku 5.5 para el paso 2 (escribir las diapositivas a partir de un esquema ya aprobado) y Sonnet 5.5 para el paso 1 (la estructura). No cambies de modelo a mitad de la conversación: abre una **conversación nueva** con Haiku 5.5 y pega en ella el esquema aprobado y el material. Así evitas arrastrar el historial del primer paso (y, en la API, la caché del modelo anterior no sirve de nada). Pruébalo con una presentación que ya hayas hecho: ¿las diapositivas mantienen el mensaje y las cifras? Si pierde matices en las notas, vuelve a Sonnet.
+- **Estándar:** Sonnet 5.5 a `medium` en los dos pasos.
+- **Premium:** Opus 5.5 solo en el esquema de presentaciones que decidan algo de mucho valor (una inversión, un cambio de estrategia), donde interesa que cuestione el argumento. Pídele también «dime qué contraargumentos tendría esta recomendación».
+
+## Errores típicos
+
+- **Pedir «haz una presentación sobre X» sin material.** Obtienes generalidades.
+- **Saltarse el esquema.** Rehacer diapositivas es lo más caro.
+- **Diapositivas con título de tema** («Resultados») en lugar de mensaje («Las ventas crecen un tercio en el segundo trimestre»).
+- **Cifras sin origen.** No sabrás cuál comprobar.
+- **Aceptar el relleno.** Una diapositiva que el modelo añade «para completar» es ruido.
+- **Subir datos de clientes por comodidad.**
+
+<Checklist
+  id="m10-presentacion"
+  titulo="Antes de presentar"
+  items={[
+    'He aprobado el esquema antes de pedir las diapositivas.',
+    'Cada diapositiva tiene un mensaje de una frase.',
+    'He comprobado cada cifra contra el material.',
+    'Resolví todos los «[por confirmar]».',
+    'He ensayado en voz alta con el tiempo real.',
+    'Un compañero ha revisado las cifras que deciden algo importante.',
+  ]}
+/>
+
+## Para profundizar
+
+[Encadenar y autocorregir](/AI-Optimized_Usage_Web/m3-prompting/encadenar-y-autocorregir/) para el patrón de dos pasos, [formato y longitud](/AI-Optimized_Usage_Web/m3-prompting/formato-y-longitud/) para controlar el tamaño del texto, y [verificar siempre](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/verificar-siempre/).

@@ -1,11 +1,185 @@
 ---
 title: 'Alucinaciones'
-description: 'Cómo reducirlas con citas, permiso para decir «no lo sé», búsqueda y comprobación cruzada.'
+description: 'Cómo reducirlas con citas literales, permiso para decir «no lo sé», búsqueda, documentos propios y comprobación cruzada.'
 sidebar:
   order: 3
 level: basico
 tracks: [profesional, tecnica]
-readingTime: 6
-status: en-preparacion
-sources: []
+readingTime: 8
+lastReviewed: 2026-10-19
+sources:
+  [
+    anthropic-reduce-hallucinations,
+    anthropic-buenas-practicas-de-prompting,
+    platform-claude-com-docs-en-agents-and-tools-tool-use-web-search-tool,
+    support-claude-com-en-articles-11088861-use-research-on-claude,
+    support-claude-com-en-articles-9517075-what-are-projects,
+    anthropic-structured-outputs,
+  ]
 ---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Steps from '@components/Steps.astro';
+import PromptTemplate from '@components/PromptTemplate.astro';
+import BeforeAfter from '@components/BeforeAfter.astro';
+import Checklist from '@components/Checklist.astro';
+
+<KeyTakeaways>
+
+- Una [alucinación](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#alucinacion) es un dato que suena bien y no es cierto: una cifra, una cita, una sentencia, una URL, un nombre.
+- No se eliminan; se **reducen y se hacen detectables**. Ninguna técnica de esta página las elimina del todo.
+- Tres palancas baratas por las que empezar (criterio de la guía: no cuestan nada y las aplicas hoy): darle el documento y pedir citas literales, darle permiso explícito para decir «no lo sé» y restringirlo a las fuentes que le das.
+- Lo que no puedes comprobar en la fuente (cifras, citas, referencias legales o bibliográficas) lo comprueba una persona antes de usarlo.
+
+</KeyTakeaways>
+
+## La idea
+
+Un modelo no consulta una base de datos de hechos: genera el texto más plausible a partir de su entrenamiento y del contexto que le das. Cuando el dato que necesita no está a la vista, rellena el hueco con algo verosímil. De ahí que los más peligrosos sean los que más se parecen a la verdad: una referencia con autor, año y número de página; un porcentaje redondo; una cláusula «típica» que el contrato no contiene.
+
+Anthropic reconoce el problema en su guía para reducirlas y propone una serie de técnicas. Hay que leer con atención su advertencia, porque marca el tono de toda esta página:
+
+<Callout tipo="verificado" fecha="2026-10-19">
+
+La guía [Reduce hallucinations](https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/reduce-hallucinations) de Anthropic dice que estas técnicas «significantly reduce hallucinations» pero «don't eliminate them entirely», y recomienda validar siempre la información crítica, sobre todo en decisiones de alto riesgo. No publica una tasa de alucinación, y esta guía tampoco: cualquier porcentaje que veas sin fuente y sin fecha, desconfía.
+
+</Callout>
+
+## Las técnicas, de la más barata a la más costosa
+
+### 1. Permiso explícito para decir «no lo sé»
+
+Por defecto, un modelo tiende a contestar. Dale una salida honesta. Según la guía de Anthropic, dar permiso explícito para admitir incertidumbre puede reducir mucho la información falsa. Basta con una frase en el encargo: «Si el documento no contiene la respuesta, di exactamente “No consta en el documento” y no la completes con conocimiento general».
+
+El porqué de decirlo literalmente: así el «no lo sé» tiene una forma fácil de detectar, incluso por un script o por una búsqueda en tu hoja de cálculo.
+
+### 2. Extractos literales primero, análisis después
+
+Con documentos largos, pide primero los pasajes relevantes copiados palabra por palabra y luego el análisis, **basado solo en esos pasajes**. La guía de Anthropic recomienda esta técnica para documentos largos (de más de 20.000 tokens, según su ejemplo) y la razón es de sentido común: el análisis queda anclado al texto real, y cada pasaje se puede buscar en el original.
+
+### 3. Citas verificables, y retirar lo que no tenga
+
+Pide que cada afirmación lleve su cita. Puedes ir un paso más allá, que también propone la guía: tras generar la respuesta, hacer que el modelo busque para cada afirmación una cita que la respalde y **retire la afirmación si no la encuentra**. Es una comprobación del modelo sobre sí mismo, útil pero no definitiva: la última palabra la tiene tu comprobación de la cita contra el original.
+
+<PromptTemplate
+  titulo="Análisis de documento con citas"
+  archivo="analisis-documento-citas"
+  texto={`<documento nombre="{{nombre}}" fecha="{{fecha}}">
+{{pega aquí el documento}}
+</documento>
+
+Primero, extrae del documento los pasajes que sean relevantes para esta pregunta y cópialos literalmente con su página o apartado: {{pregunta}}
+
+Después, responde usando solo esos pasajes. Cada afirmación debe llevar entre paréntesis el apartado de donde sale. Si el documento no responde a la pregunta, dilo y no lo completes con conocimiento general.`}
+
+>
+
+Para preguntas sobre un documento que adjuntas. Los extractos literales son lo que te permite comprobar en segundos: copia uno y búscalo en el original con Ctrl+F.
+
+</PromptTemplate>
+
+### 4. Restringir a las fuentes que tú das
+
+«Usa solo la información de los documentos adjuntos, no tu conocimiento general» es otra técnica de la guía de Anthropic. Funciona mejor combinada con el permiso de decir «no lo sé». Por qué: sin la restricción, el modelo completa los huecos del documento con lo que «sabe» del mundo, y no distingues qué viene de tu fuente y qué de su memoria.
+
+### 5. Darle los documentos: recuperación en lugar de memoria
+
+Casi todas las alucinaciones nacen de preguntar al modelo por algo que tendría que recordar. Si le pones delante el documento, ya no tiene que recordar: tiene que leer.
+
+- En las apps de chat, adjunta el fichero o crea un proyecto con tus documentos como conocimiento (en Claude, los proyectos permiten reutilizar documentos entre conversaciones).
+- En la API, pasa el documento en el contexto del mensaje.
+- Cuando la base documental es grande, hay sistemas de recuperación que traen solo los fragmentos relevantes; la idea es la misma, pero compruebas que se recuperó el fragmento correcto.
+
+### 6. Búsqueda web: más fuentes, no más certeza
+
+Para lo que no está en tus documentos, la búsqueda web trae información actual y suele aportar enlaces. Existe como herramienta en la API (la herramienta de búsqueda web) y como función de investigación en las apps (en Claude, la función Research). Ayuda mucho, con dos cautelas (recomendación de esta guía, por experiencia general de uso, no una medición): el modelo puede resumir mal lo que encuentra, y una fuente web puede ser de baja calidad. **Abre los enlaces que importan y comprueba que la afirmación está ahí.**
+
+### 7. Comprobación cruzada
+
+Para lo importante, no te fíes de una sola pasada:
+
+- **Repite la pregunta** en una conversación nueva y compara. La guía de Anthropic lo llama best-of-N: si las respuestas discrepan, es una señal de que algo se está inventando.
+- **Pide a otro modelo o a una conversación limpia** que contraste el resultado con la fuente (ver [verificar siempre](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/verificar-siempre/)).
+- **Para cifras, recalcula con código o con una fórmula.** Si el modelo suma una columna «de cabeza», compruébala con `SUMA`. Si la tarea es aritmética o de tablas, mejor que ejecute código a que calcule en texto.
+- **Para citas legales o bibliográficas, ve a la fuente primaria** (el BOE, la base de datos jurídica, el catálogo). Una referencia que no encuentras es una referencia inventada hasta que se demuestre lo contrario.
+
+<Callout tipo="recomendacion">
+
+Trata como «no verificado» todo dato de este tipo hasta que lo veas en su fuente: cifras y porcentajes, citas textuales, referencias legales y bibliográficas, URLs, nombres de personas y cargos, fechas. El porqué: son los datos que el modelo puede inventar con más verosimilitud y los que más daño hacen si se cuelan en un informe. Es una regla de la guía, no una estadística.
+
+</Callout>
+
+## En la práctica
+
+<Steps>
+
+1. **Pon el documento en el contexto** en lugar de preguntar de memoria. Si no tienes documento, usa búsqueda y abre las fuentes.
+2. **Pide extractos literales primero** si el documento es largo, y análisis solo sobre ellos.
+3. **Da permiso para el «no lo sé»** con una frase exacta que puedas buscar.
+4. **Pide una cita por afirmación**, con página o apartado.
+5. **Comprueba tú tres citas al azar** con Ctrl+F en el original. Si una falla, revisa todas las demás.
+6. **Recalcula las cifras clave** con una fórmula o con código.
+7. **Si el resultado va a decidir algo importante**, que lo revise una persona con la fuente delante.
+
+</Steps>
+
+## Ejemplo: el informe trimestral y la cifra que no existe
+
+Una responsable de finanzas pide un resumen del informe trimestral de un proveedor para el comité.
+
+<BeforeAfter
+  antes="Resume el informe del proveedor y dame los datos clave de su crecimiento."
+  despues="Resume el informe adjunto para el comité. Primero copia literalmente, con su página, los pasajes que mencionan crecimiento o ingresos. Después resume usando solo esos pasajes y pon la página entre paréntesis en cada cifra. Si el informe no da una cifra de crecimiento, escribe «No consta en el informe» y no la estimes ni la completes con datos de otras fuentes."
+>
+
+Qué cambió y por qué: en la versión de la izquierda, si el informe no da el crecimiento, el modelo puede construir una cifra razonable desde su memoria. En la de la derecha, la cifra o está con su página, o la respuesta es una frase fija que detectas de un vistazo. Los pasajes literales te dejan comprobar tres cifras en dos minutos.
+
+</BeforeAfter>
+
+Con esto no se garantiza que el resumen sea correcto, pero sí que cada afirmación se puede comprobar y que lo que falta aparece como falta, no como invención. Para el patrón completo con varias fuentes, ver el caso [investigación con fuentes contrastadas](/AI-Optimized_Usage_Web/m10-casos-practicos/investigacion-con-fuentes/) y [el informe de mercado con verificación cruzada](/AI-Optimized_Usage_Web/m8-agentes/casos-completos/).
+
+## Citas y búsqueda según el proveedor
+
+<Callout tipo="varia">
+
+Las tres técnicas de documentos y citas valen con cualquier modelo, pero las funciones que las automatizan cambian de proveedor. Lo que hemos verificado en documentación oficial (consultada el 19 de octubre de 2026):
+
+- **Claude (API):** la función de [citas](https://platform.claude.com/docs/en/build-with-claude/citations) devuelve los pasajes exactos de tus documentos que respaldan cada afirmación; la documentación indica que la admiten todos los modelos activos. Además hay herramienta de búsqueda web. En las apps, la función Research.
+- **OpenAI (API):** la herramienta de [búsqueda web](https://developers.openai.com/api/docs/guides/tools-web-search) de la Responses API incluye por defecto citas en línea con la URL y el título de cada fuente.
+- **Google (API de Gemini):** [Grounding with Google Search](https://ai.google.dev/gemini-api/docs/google-search) conecta el modelo con contenido web en tiempo real y devuelve citas de las fuentes.
+
+No hemos verificado qué ofrecen las apps de chat de OpenAI y Google (recuperación sobre tus documentos, navegación, citas). En todos los casos, una cita automática dice de dónde salió el pasaje; **no garantiza** que el resumen que hace el modelo sea fiel. Abre la fuente.
+
+</Callout>
+
+## Si desarrollas con la API
+
+Hay dos ayudas técnicas. Las [structured outputs](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#structured-outputs) obligan a que la respuesta tenga una forma concreta, con un campo para la cita y otro para el resultado, y facilitan comprobarlas por código. Y puedes registrar la cita devuelta y comprobar de forma automática que el texto citado aparece en el documento original: si no aparece, el caso falla. Este comprobador encaja directamente en tus [evals mínimas](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/evals-minimas/).
+
+## Errores frecuentes
+
+- **Preguntar de memoria por datos precisos.** Cifras, citas y referencias salen mejor de un documento o de una búsqueda que de la memoria del modelo.
+- **Fiarse de una cita porque tiene formato de cita.** Autor, año y página no son prueba de existencia. Búscala.
+- **No dar salida al «no lo sé».** Si la única respuesta posible es una respuesta, el modelo contestará.
+- **Pedir «sé preciso» o «no inventes» como única medida.** Ayuda poco sin documento, extractos y comprobación.
+- **Creer que el razonamiento largo equivale a verdad.** Un modelo puede razonar con cuidado a partir de una premisa falsa.
+- **Dejar la verificación para el final.** Comprueba las cifras clave antes de que el texto circule.
+
+<Checklist
+  id="m9-alucinaciones"
+  titulo="Antes de usar un dato generado"
+  items={[
+    'El modelo tenía el documento o la búsqueda delante, no respondía de memoria.',
+    'Le di permiso explícito para decir que no consta.',
+    'Cada cifra y cada afirmación clave lleva su cita con página o apartado.',
+    'He comprobado al menos tres citas en el original.',
+    'He recalculado las cifras importantes con una fórmula o con código.',
+    'Las referencias legales o bibliográficas las he buscado en la fuente primaria.',
+    'Si el dato decide algo importante, lo ha revisado una persona.',
+  ]}
+/>
+
+## Para profundizar
+
+Cómo estructurar una pregunta sobre un documento largo: [Contexto largo](/AI-Optimized_Usage_Web/m3-prompting/contexto-largo/). Cómo cerrar el bucle de comprobación: [Verificar siempre](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/verificar-siempre/). La guía de Anthropic citada arriba está en [platform.claude.com](https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/reduce-hallucinations), consultada el 19 de octubre de 2026.
