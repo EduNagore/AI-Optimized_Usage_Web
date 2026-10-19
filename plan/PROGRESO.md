@@ -3,9 +3,9 @@
 > Memoria entre sesiones. Actualízalo al cerrar cada tarea: qué se hizo, qué falta, decisiones con su motivo y coste de la fase.
 
 ## Estado actual
-- **Fase en curso:** 4 (contenido avanzado) **terminada**: M7, M8, M6, M9, M10, M1 y M12 redactados, revisados por `revisor-editorial` y corregidos. Siguiente: Fase 5 (interactivos). Puntos de control 1 y 2 siguen pendientes de confirmación del usuario.
+- **Fase en curso:** 5 (interactivos) **terminada**: los nueve interactivos están integrados en sus páginas y comiteados. Siguiente: Fase 6 (calidad final). Puntos de control 1 y 2 siguen pendientes de confirmación del usuario.
 - **Rama:** `feat/web`
-- **Última actualización:** 2026-10-19 (Fase 4: `npm run build`, `npm run check` y `npm run test:e2e` (70 pruebas) pasan; capturas revisadas)
+- **Última actualización:** 2026-10-19 (Fase 5: `npm run build`, `npm run check` (671 tests) y `npm run test:e2e` (106 pruebas) pasan; cada isla revisada en navegador con teclado, 360 px y claro/oscuro)
 
 ## Fases
 - [x] 0. Preparación (2026-10-15: `npm run build`, `npm run check` y `npm run test:e2e` pasan)
@@ -13,7 +13,7 @@
 - [x] 2. Diseño y arquitectura (2026-10-16; punto de control 2 pendiente de confirmación del usuario)
 - [x] 3. Contenido núcleo: M2, M3, M4, M5, M0 (2026-10-16)
 - [x] 4. Contenido avanzado: M7, M8, M6 + M9, M10, M1 + M12 (2026-10-19)
-- [ ] 5. Interactivos
+- [x] 5. Interactivos (2026-10-19)
 - [ ] 6. Calidad final (punto de control 3)
 - [ ] 7. Publicación y mantenimiento
 
@@ -68,6 +68,14 @@
 | 2026-10-19 | Chuleta: una hoja a doble cara (temario corregido: antes «una página»); fechas sin escribir a mano | Cabe en ≈2 A4 sin lista de comprobación ni columna de enlaces |
 | 2026-10-19 | Retiradas del changelog «Plan Pro 500 USD» (precio de plan sin fuente oficial) y notas de proceso en dos `summary`; añadidas 30 fuentes a `sources.json` (Codex, Antigravity, Gemini CLI, Claude Code, API) y títulos legibles | La lista de novedades publica el `summary` completo |
 | 2026-10-19 | `M1`: `que-es-un-llm` y `ventana-de-contexto` pasan a la ruta Esencial | El índice de M1 lo promete para quien tiene diez minutos |
+| 2026-10-19 | Fase 5, infraestructura escrita por la sesión principal antes de delegar: `src/lib/pricing.ts` (catálogo de precios, `unitPricesFor` con tramos largos y cambios programados, TTL de caché, Batch), `src/lib/storage.ts` (localStorage con try/catch), `src/lib/data-access.ts` (carga de colecciones para los envoltorios `.astro`), `interactive.css` y `shared.tsx` (`Field`, `SourceFooter`) | Las islas React no pueden importar `astro:content`: el envoltorio `.astro` carga los datos y los pasa como props. Una sola fuente de precios para calculadora y simulador |
+| 2026-10-19 | Nuevo `src/data/model-pricing-details.json` (22 registros, colección registrada con `modelPricingDetailSchema`): descuento de Batch, mínimo y TTL de caché, tramo de contexto largo (Haiku 5.5 >100K; OpenAI >272K = 2× entrada y caché, 1,5× salida) y cambios de precio programados (Gemini 4 Argon desde 2026-12-01, Gemini 3.8 Flash desde 2027-01-01) | `models.json` no puede expresar tramos ni mínimos y lo genera `merge-research.mjs`: un fichero aparte evita que una regeneración lo pise. Valores tomados de las notas ya verificadas; un test cruza los tramos de OpenAI con las notas |
+| 2026-10-19 | Datos editoriales de los interactivos en ficheros propios importados directamente (no son colecciones): `prompt-lab.json`, `quizzes.json`, `selector-rules.json`, `context-scenarios.json`, `agent-topologies.json`, `maturity.json`. Cada esquema vive en su `src/lib/<nombre>.ts`, su test valida el JSON y el envoltorio lo valida en el build | Cada subagente es dueño de sus datos sin tocar ficheros compartidos; un dato incoherente rompe el build |
+| 2026-10-19 | Todas las islas llevan `not-content` en la raíz; el script de `astro.config.mjs` da `tabindex=0` también a las tablas Markdown con desplazamiento | axe `scrollable-region-focusable` en la tabla de la página del selector a 360 px y en las tablas de las islas |
+| 2026-10-19 | `CommandExplorer` sustituye a `CommandList` en M7 (`CommandList.astro` queda sin uso). `tokenImpact` no existe en ningún registro: el filtro se oculta y aparecerá solo cuando haya datos | No se inventa un dato que falta |
+| 2026-10-19 | Los subagentes de la Fase 5 no ejecutaron build ni Playwright (comparten `dist/` y `.astro/`): la sesión principal compiló, probó cada isla en navegador y comiteó por componente. Un límite de uso interrumpió a los nueve agentes lanzados a la vez; se reanudaron con `SendMessage` y retomaron su trabajo | Para otras fases: lanzar como mucho 4–5 agentes de esfuerzo alto a la vez |
+| 2026-10-19 | Supuestos de la guía editables y etiquetados en pantalla: simulador de caché (entrada disponible tras 5 s; separación igual al TTL cuenta como acierto), visualizador de contexto (tamaños de partida, resumen de `/compact` de 3.000 tokens, 15 % de herramientas MCP con carga diferida), diseñador de equipos (umbrales «cabe en un contexto» = 50 % de la ventana y «hay volumen» = 5 unidades; multiplicadores estructurales como estimación), diagnóstico (niveles 12/24/36 y áreas 33 %/66 %) | Nada de esto es dato de proveedor y no se presenta como tal |
+| 2026-10-19 | e2e nuevo `e2e/interactivos.spec.ts`: axe en claro y oscuro, 360 px y una prueba funcional por cada isla (35 pruebas; total 106) | Las islas son lo más propenso a regresiones de accesibilidad |
 
 ## Conflictos entre fuentes y datos pendientes
 | Dato | Fuentes | Estado |
@@ -112,7 +120,7 @@
 - **Datos sin componente (están en prosa con cita; riesgo para `freshness`):** reglas de `pricing-rules.json` (multiplicadores de caché, mínimos cacheables, reglas de OpenAI y Google), niveles y parámetros de `effort.json`, `features.json` (planes de Cowork/Proyectos). Falta un componente `<Rule>` / `FeatureMatrix` / tabla de equivalencias de esfuerzo (Fase 5 o antes).
 - **Candidatos a `features.json`:** structured outputs (`output_config.format`), esfuerzo por mensaje (cabecera `mid-conversation-output-config-2026-07-01`), `opusplan`, `/fast`, herramienta asesor (beta 2026-04-09), fast mode de Opus 5.5 (fuera de vista previa 2026-10-15), `ultracode`, compactación bajo demanda y por umbral, context editing, tool search/`defer_loading`, programmatic tool calling, `prompt_cache_options.ttl` y `configuration_update` de OpenAI, caché implícita de Gemini, `promptCacheTtl` y línea «Prompt cache» de `/usage` en Claude Code.
 - **Sin verificar con fuente literal (marcado en el texto):** citas de OpenAI y Google procedentes de resúmenes; prellenado → 400 solo verificado en Opus 4.6+ (no Sonnet/Haiku/Fable); `budget_reached` (¿Messages API o Managed Agents?); modelos con esfuerzo por mensaje; «herramientas con parámetros estrechos» (recomendación sin cita); tokens por imagen, Files API, `stop_sequences` por proveedor, lotes de Google, límites por plan de ChatGPT/Gemini.
-- **Interactivos pendientes (Fase 5):** `PromptLab` (laboratorio antes/después), selector de modelo y esfuerzo (M4), calculadora de coste (M5), simulador de caché. Las páginas son estáticas y no prometen fecha.
+- ~~Interactivos pendientes~~: hechos en la Fase 5 (ver «Pendientes tras la Fase 5»).
 - Quizzes de cierre de módulo: ninguno de M0–M5 lo lleva todavía.
 - `ultrathink` verificado (model-config); entrada de «pendiente» en `research/claude-code.json` por retirar.
 - M2 `elegir-superficie` no muestra planes de Cowork/Proyectos desde datos (falta `FeatureMatrix`).
@@ -128,6 +136,15 @@
 - Quizzes de cierre de módulo, `esencial` en más páginas de M1 y recalibrar rutas: Fase 5/6. Los costes de M10 usan `<CostExample>` con supuestos de tamaño marcados como «supuesto de la guía».
 - Canal para avisar de errores en la guía: «pendiente de definir» en la metodología.
 - Coste de la fase: 12 redactores/revisores de Sonnet y Opus (≈ 6,5 M de tokens de subagente en total; la sesión principal se interrumpió dos veces por límite de uso). Anotar `/usage` del usuario.
+
+## Pendientes tras la Fase 5
+- **Quizzes:** el mecanismo (progreso en `localStorage`, `QuizHub`) está hecho, pero `quizzes.json` solo trae el de M2 (6 preguntas). Faltan M0, M1 y M3–M10 (5–8 preguntas con explicación; el esquema exige ese rango): redactor + revisor-editorial. «Borrar mi progreso» no borra los quizzes en línea de MDX con id derivado.
+- **Revisión editorial y de hechos (Fase 6):** anotaciones del laboratorio (troceadas del texto original; los `escenario` son nuevos), preguntas de M2 y textos de `selector-rules.json`, `context-scenarios.json`, `agent-topologies.json` y `maturity.json`. El verificador debe repasar las cifras que citan (≈2,1× del asesor, ≈7× de agent teams, 100 tokens por skill, 55.000 tokens de cinco servidores MCP, «más de un 85 %» de tool search).
+- **Selector:** con combinaciones sin fila en la tabla de la página toma la fila más cercana y más capaz, con aviso; el resultado es largo en móvil (alternativas repetidas por proveedor): valorar resumirlo.
+- **Calculadora:** no modela el almacenamiento de caché de Gemini 3.8 Flash, fast mode, herramientas del servidor ni imágenes, ni aplica tramos largos a los precios anunciados. Falta confirmar con la documentación si el razonamiento previo se reenvía (por defecto no).
+- **Simulador de caché:** sin cita en el repo para «la entrada solo está disponible cuando empieza la primera respuesta» (5 s editables) ni para el límite exacto del TTL.
+- **Datos y limpieza:** `claude-code-commands.json` sin `tokenImpact` ni `example`; las 4 fuentes de comandos acaban en `.md` (el enlace abre Markdown); retirar `CommandList.astro` (sin uso); `cspell.json` tiene un `ignoreRegExpList` con `\b` mal escapado y `cspell-project.txt` acumula palabras sin tilde que son claves de JSON; `astro check` da 3 hints (0 errores).
+- **Coste de la fase:** 9 subagentes `dev-componentes` (Sonnet, esfuerzo high; ≈1,8 M de tokens de subagente contando las reanudaciones: 178K calculadora, 260K selector, 139K explorador, 137K laboratorio, 151K quizzes, 180K simulador, 224K ventana de contexto, 315K equipos, 211K diagnóstico). Anotar `/usage` del usuario.
 
 ## Pendientes y siguientes pasos
 - Tras el punto de control 2: elegir el nombre del sitio (cambiar `title` en `astro.config.mjs` y en `index.mdx`), confirmar o ajustar la dirección visual y empezar la Fase 3 (M2 → M3 → M4 → M5 → M0).
