@@ -1,0 +1,449 @@
+[
+  {
+    "id": "preguntas",
+    "kind": "questions",
+    "taskLabel": "Tipo de tarea",
+    "taskHint": "Elige la más parecida a la tuya. «Otra tarea» usa solo la tabla de decisión de la página.",
+    "otherLabel": "Otra tarea (no está en la lista)",
+    "otherTitle": "Otra tarea",
+    "otherHint": "Sin fila de la matriz: se decide por razonamiento, coste del error y repetición.",
+    "fields": [
+      {
+        "field": "reasoning",
+        "label": "¿Cuánto razonamiento exige?",
+        "hint": "Redactar un correo o extraer campos exige poco; analizar un contrato o depurar un fallo intermitente exige mucho.",
+        "modes": ["generic"],
+        "control": "select",
+        "default": "medio",
+        "options": [
+          { "value": "poco", "label": "Poco" },
+          { "value": "medio", "label": "Medio" },
+          { "value": "mucho", "label": "Mucho" }
+        ]
+      },
+      {
+        "field": "difficulty",
+        "label": "Dificultad de tu caso frente a lo habitual",
+        "modes": ["task"],
+        "control": "select",
+        "default": "habitual",
+        "options": [
+          {
+            "value": "sencilla",
+            "label": "Más sencillo de lo habitual",
+            "hint": "Textos cortos, instrucciones claras y pocos matices."
+          },
+          { "value": "habitual", "label": "Habitual", "hint": "Como la tarea típica de esa fila." },
+          {
+            "value": "compleja",
+            "label": "Más difícil de lo habitual",
+            "hint": "Varias hipótesis, piezas que interactúan o documentos largos y ambiguos."
+          }
+        ]
+      },
+      {
+        "field": "volume",
+        "label": "¿Cuántas veces se repite?",
+        "modes": ["task", "generic"],
+        "control": "select",
+        "default": "puntual",
+        "options": [
+          { "value": "puntual", "label": "Una vez o pocas veces", "hint": "Importa sobre todo tu tiempo." },
+          {
+            "value": "repetido",
+            "label": "Muchas veces (decenas o cientos)",
+            "hint": "Los tokens empiezan a contar."
+          },
+          {
+            "value": "masivo",
+            "label": "En volumen (miles o más) o automatizada",
+            "hint": "Cada token se multiplica y la cola de casos difíciles decide la factura."
+          }
+        ]
+      },
+      {
+        "field": "latency",
+        "label": "¿Cuánto puede esperar el resultado?",
+        "modes": ["task", "generic"],
+        "control": "select",
+        "default": "normal",
+        "options": [
+          {
+            "value": "inmediata",
+            "label": "Lo necesito ya",
+            "hint": "Estás conversando o hay alguien esperando."
+          },
+          { "value": "normal", "label": "Unos minutos me valen" },
+          {
+            "value": "espera",
+            "label": "Puede esperar hasta 24 horas",
+            "hint": "Condición para poder usar lotes (Batch), que ofrecen descuento a cambio de esperar."
+          }
+        ]
+      },
+      {
+        "field": "errorCost",
+        "label": "¿Cuánto cuesta equivocarse?",
+        "modes": ["task", "generic"],
+        "control": "select",
+        "default": "medio",
+        "options": [
+          {
+            "value": "bajo",
+            "label": "Poco",
+            "hint": "Lo lees antes de usarlo y un fallo se corrige sin consecuencias."
+          },
+          { "value": "medio", "label": "Medio", "hint": "Un fallo se nota, pero se corrige." },
+          {
+            "value": "alto",
+            "label": "Mucho",
+            "hint": "Alimenta una decisión, llega a un cliente o es difícil de deshacer."
+          }
+        ]
+      },
+      {
+        "field": "sensitive",
+        "label": "Los datos son sensibles o confidenciales",
+        "hint": "Por ejemplo, datos personales, de clientes, financieros o legales.",
+        "modes": ["task", "generic"],
+        "control": "checkbox",
+        "default": "no",
+        "options": [
+          { "value": "no", "label": "No" },
+          { "value": "si", "label": "Sí" }
+        ]
+      }
+    ],
+    "example": {
+      "taskId": "extraccion-en-volumen",
+      "answers": { "volume": "masivo", "latency": "espera", "errorCost": "medio" }
+    }
+  },
+  {
+    "id": "politica",
+    "kind": "policy",
+    "tierLadder": ["Rápido y barato", "Equilibrado", "Alto rendimiento", "Frontera"],
+    "effortExcluded": ["none"],
+    "defaultKeyPriority": ["api", "claude-code"],
+    "defaultKeyLabels": { "api": "API", "claude-code": "Claude Code" },
+    "defaultEffortRankAs": "medium",
+    "providerNames": { "anthropic": "Anthropic", "openai": "OpenAI", "google": "Google" },
+    "repetitionOf": { "puntual": "baja", "repetido": "alta", "masivo": "alta" },
+    "texts": {
+      "disclaimer": "Punto de partida, no sentencia: contrasta la recomendación con una muestra de tus propias tareas.",
+      "startRule": "Regla de partida de la guía: un modelo capaz con su esfuerzo por defecto; bajar solo midiendo en una muestra; subir cuando falle.",
+      "measureStart": "Cinco casos para una prueba rápida, uno de ellos difícil; entre 20 y 30 si vas a fijar una política.",
+      "genericSurface": "La tabla de decisión no fija la superficie: elige según dónde trabajes (chat, agente de código o API).",
+      "genericVerification": "Escribe antes de probar qué es una respuesta aceptable y compruébalo en una muestra con casos difíciles.",
+      "genericDoubt": "Tu combinación no figura en la tabla de decisión de la página. Siguiendo su regla para cuando dudas entre dos filas, se toma la más capaz de las filas más cercanas.",
+      "legacyModel": "{modelo} es de {gama}: no figura entre las gamas vigentes del mapa de modelos. Para trabajo nuevo, parte del modelo vigente de su escalón.",
+      "effortUnverified": "{modelo}: los niveles de esfuerzo no están verificados en los datos, así que no se propone ninguno. Empieza por el valor por defecto del proveedor y mide.",
+      "effortAdjusted": "{modelo} no admite el nivel {nivel}; se propone {propuesto}.",
+      "defaultUnpublished": "El esfuerzo por defecto de {modelo} no está publicado: no se propone nivel. Empieza por el valor por defecto del proveedor y mide.",
+      "tierSkipped": "{proveedor} no tiene gama {gama} en los datos: se propone {modelo}, de la gama {siguiente}. Compara también su precio con el de la gama inferior.",
+      "tierFloorSwap": "{antes} sube a {despues} por el mínimo de gama que marcan tus respuestas.",
+      "effortFloorRaised": "El esfuerzo de {modelo} sube a {nivel} por el mínimo que marcan tus respuestas.",
+      "noBatchData": "No hay dato verificado de lotes para {proveedor}: no se propone.",
+      "limitedExcluded": "{modelo} tiene acceso limitado y no se recomienda.",
+      "noCheaperBottom": "Ya estás en la gama y el esfuerzo más bajos de {proveedor} en los datos. Quedan las palancas que no cuestan calidad: un encargo más claro, el formato de salida, la caché de prompt y los lotes.",
+      "noCheaperFloor": "No hay alternativa más barata dentro de los mínimos que marcan tus respuestas (por ejemplo, un error caro).",
+      "noStrongerTop": "Ya estás en el escalón más alto de {proveedor} en los datos.",
+      "cheaperEffortWhat": "Bajar el esfuerzo de {modelo} de {de} a {a}.",
+      "cheaperTierWhat": "Pasar de {de} a {a} (gama {gama}) con el nivel {a_nivel}.",
+      "strongerEffortWhat": "Subir el esfuerzo de {modelo} de {de} a {a}.",
+      "strongerTierWhat": "Pasar de {de} a {a} (gama {gama}) con el nivel {a_nivel}.",
+      "cheaperEffortMeasure": "Pasa la misma muestra por ambos niveles, cada uno en una sesión aparte, y compara calidad, coste y tiempo con el listón que fijaste antes de mirar. Cinco casos para una prueba rápida, uno de ellos difícil; entre 20 y 30 si vas a fijar una política.",
+      "cheaperTierMeasure": "Compara ambos modelos en el 10 % más difícil de tu muestra: en los casos fáciles todos aciertan. Baja un solo escalón y deja anotado qué mediste. Entre 20 y 30 casos si vas a fijar una política.",
+      "strongerEffortWhen": "Cuando falle el razonamiento (errores lógicos, pasos saltados). Si falla el encargo (formato, tono, datos que faltan), mejora antes las instrucciones y el contexto.",
+      "strongerTierWhen": "Cuando, con el esfuerzo más alto razonable, siga fallando en tus casos difíciles, o cuando equivocarte cueste más que los tokens de diferencia.",
+      "cheaperEffortNote": "Mismo precio por token: baja el razonamiento, cuyos tokens se facturan como salida.",
+      "strongerEffortNote": "Mismo precio por token, pero más razonamiento: más tokens de salida, más latencia y más coste por tarea.",
+      "priceRatio": "El precio de salida por token es el {porcentaje} % del de {modelo}.",
+      "priceIntro": "Precio introductorio: desde el {fecha} rigen {entrada} de entrada y {salida} de salida.",
+      "priceLong": "Por encima de {umbral} de entrada: {entrada} de entrada y {salida} de salida, aplicados a toda la petición.",
+      "batchLine": "Con lotes ({factor} del precio normal): {entrada} de entrada y {salida} de salida."
+    }
+  },
+  {
+    "id": "error-alto",
+    "kind": "modifier",
+    "title": "El error sale caro",
+    "when": { "all": [{ "field": "errorCost", "in": ["alto"] }] },
+    "effects": [
+      { "type": "effort-floor", "level": "medium", "modes": ["task"] },
+      { "type": "tier-floor", "tier": "Equilibrado", "modes": ["task"] },
+      {
+        "type": "notice",
+        "tone": "aviso",
+        "text": "Con un error caro, aplica siempre la verificación indicada (automática o humana) antes de usar el resultado. La IA señala y resume; la responsabilidad sigue siendo tuya."
+      },
+      {
+        "type": "notice",
+        "tone": "aviso",
+        "target": "cheaper",
+        "text": "Con un error caro, adopta la alternativa más barata solo tras medirla en 20 a 30 casos con los difíciles incluidos, y manteniendo la verificación."
+      }
+    ],
+    "why": "Un esfuerzo bajo no protege de un error caro: lo que protege es la verificación. Por eso se fija un mínimo de gama y de esfuerzo, aunque otra respuesta pida bajar.",
+    "claim": "recomendacion",
+    "sources": ["anthropic-esfuerzo"],
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "dificultad-alta",
+    "kind": "modifier",
+    "title": "Tu caso es más difícil de lo habitual",
+    "when": { "all": [{ "field": "difficulty", "in": ["compleja"] }] },
+    "effects": [
+      { "type": "effort-step", "steps": 1, "modes": ["task"] },
+      { "type": "tier-floor", "tier": "Equilibrado", "modes": ["task"] },
+      {
+        "type": "notice",
+        "tone": "consejo",
+        "target": "stronger",
+        "text": "Sube de esfuerzo cuando falle el razonamiento (errores lógicos, pasos saltados), no cuando falle el encargo (formato, tono, datos que faltan): en ese caso mejora antes las instrucciones y el contexto."
+      }
+    ],
+    "why": "Un caso con más hipótesis o piezas que interactúan se beneficia de más razonamiento, y una gama rápida suele quedarse corta. Se sube un escalón de esfuerzo y se evita la gama rápida.",
+    "claim": "recomendacion",
+    "sources": ["anthropic-esfuerzo"],
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "dificultad-baja",
+    "kind": "modifier",
+    "title": "Tu caso es más sencillo de lo habitual",
+    "when": { "all": [{ "field": "difficulty", "in": ["sencilla"] }] },
+    "effects": [
+      { "type": "effort-step", "steps": -1, "modes": ["task"] },
+      {
+        "type": "notice",
+        "tone": "consejo",
+        "target": "cheaper",
+        "text": "Es un punto de partida a medir: baja de verdad solo si, en cinco casos con uno difícil, la calidad se mantiene."
+      }
+    ],
+    "why": "Con menos que razonar, un esfuerzo menor reduce latencia y tokens de razonamiento. Se baja un escalón de esfuerzo, no de gama, y se mide.",
+    "claim": "recomendacion",
+    "sources": ["anthropic-esfuerzo"],
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "latencia-inmediata",
+    "kind": "modifier",
+    "title": "Necesitas la respuesta ya",
+    "when": { "all": [{ "field": "latency", "in": ["inmediata"] }] },
+    "effects": [
+      { "type": "effort-step", "steps": -1, "modes": ["task"] },
+      {
+        "type": "notice",
+        "tone": "consejo",
+        "text": "Menos esfuerzo suele dar respuestas más rápidas: mide latencia y calidad juntas. Si el error es caro, la rapidez no justifica bajar del mínimo de esfuerzo."
+      }
+    ],
+    "why": "El esfuerzo bajo reduce la latencia, así que se baja un escalón. Si el error es caro, el mínimo de esfuerzo manda sobre esta regla.",
+    "claim": "recomendacion",
+    "sources": ["anthropic-esfuerzo"],
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "lotes",
+    "kind": "modifier",
+    "title": "En volumen y puede esperar",
+    "when": {
+      "all": [
+        { "field": "volume", "in": ["masivo"] },
+        { "field": "latency", "in": ["espera"] }
+      ]
+    },
+    "effects": [
+      { "type": "batch" },
+      {
+        "type": "notice",
+        "tone": "consejo",
+        "text": "Los lotes (Batch) ofrecen descuento a cambio de esperar hasta 24 horas y se usan desde la API: si hoy trabajas en el chat, tendrías que pasar a ella. Solo compensan si hay volumen y el resultado puede esperar."
+      }
+    ],
+    "why": "Los lotes solo tienen sentido con volumen y sin urgencia. El descuento verificado se aplica solo a los proveedores con dato de lotes en los datos.",
+    "claim": "recomendacion",
+    "sources": ["anthropic-batch", "openai-precios"],
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "volumen-masivo",
+    "kind": "modifier",
+    "title": "Volumen alto",
+    "when": { "all": [{ "field": "volume", "in": ["masivo"] }] },
+    "effects": [
+      {
+        "type": "notice",
+        "tone": "consejo",
+        "target": "cheaper",
+        "text": "A esta escala cada token se multiplica: la alternativa más barata deja de ser opcional. Mide esa alternativa en una muestra con la cola de casos difíciles (20 a 30 casos) antes de lanzar todo y revisa la tasa de error por categoría."
+      }
+    ],
+    "why": "En volumen manda el coste por unidad, pero el ahorro solo es real si la calidad se mantiene en los casos difíciles.",
+    "claim": "recomendacion",
+    "sources": ["anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas"],
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "volumen-con-error-alto",
+    "kind": "modifier",
+    "title": "Volumen con error caro",
+    "when": {
+      "all": [
+        { "field": "volume", "in": ["masivo"] },
+        { "field": "errorCost", "in": ["alto"] }
+      ]
+    },
+    "effects": [
+      {
+        "type": "notice",
+        "tone": "aviso",
+        "text": "En volumen y con error caro, ejecutar con esfuerzo medio y reintentar en alto solo los fallos detectados funciona únicamente si tienes una señal de fallo fiable (un test, un esquema, una cifra que no cuadra)."
+      }
+    ],
+    "why": "Es la combinación más delicada de la tabla de decisión: el reintento selectivo ahorra, pero sin una señal de fallo fiable no sabrás qué reintentar.",
+    "claim": "recomendacion",
+    "sources": ["anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas"],
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "error-bajo",
+    "kind": "modifier",
+    "title": "El error sale barato",
+    "when": { "all": [{ "field": "errorCost", "in": ["bajo"] }] },
+    "effects": [
+      {
+        "type": "notice",
+        "tone": "consejo",
+        "target": "cheaper",
+        "text": "Si lees el resultado antes de usarlo, probar antes la alternativa más barata es poco arriesgado y reversible. Mide la diferencia igualmente."
+      }
+    ],
+    "why": "Con un error de bajo coste y revisión previa, probar un esfuerzo o una gama menores es barato de revertir.",
+    "claim": "recomendacion",
+    "sources": [],
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "datos-sensibles",
+    "kind": "modifier",
+    "title": "Datos sensibles",
+    "when": { "all": [{ "field": "sensitive", "in": ["si"] }] },
+    "effects": [
+      {
+        "type": "notice",
+        "tone": "aviso",
+        "text": "Comprueba la política de datos de tu organización y del plan que uses antes de pegar nada. Esta herramienta no afirma condiciones de retención de ningún proveedor: consúltalas en su documentación oficial y reduce lo que pegas a lo imprescindible."
+      }
+    ],
+    "why": "Con datos sensibles, la decisión de qué pegar y dónde depende de políticas que tu organización y tu plan fijan; la recomendación de modelo no las sustituye.",
+    "claim": "recomendacion",
+    "sources": [],
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "tabla-poco-bajo-alta",
+    "kind": "generic",
+    "reasoning": "poco",
+    "errorCost": "bajo",
+    "repetition": "alta",
+    "tiers": ["Rápido y barato"],
+    "effort": "low",
+    "why": "Poco razonamiento, error barato y mucha repetición: manda el coste por unidad y la gama rápida suele bastar.",
+    "notes": ["Lotes si puede esperar."],
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "tabla-poco-bajo-baja",
+    "kind": "generic",
+    "reasoning": "poco",
+    "errorCost": "bajo",
+    "repetition": "baja",
+    "tiers": ["Equilibrado", "Rápido y barato"],
+    "effort": "low",
+    "why": "Poco razonamiento y error barato, pocas veces: la gama equilibrada o la rápida, con esfuerzo bajo, sobran.",
+    "notes": [],
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "tabla-poco-medio-alta",
+    "kind": "generic",
+    "reasoning": "poco",
+    "errorCost": "medio",
+    "repetition": "alta",
+    "tiers": ["Rápido y barato"],
+    "effort": "low",
+    "why": "Poco razonamiento y mucha repetición: gama rápida con esfuerzo bajo, pero el error medio exige medir antes.",
+    "notes": [
+      "Lote si puede esperar, evaluación en una muestra y revisión de los casos dudosos con un modelo superior."
+    ],
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "tabla-poco-alto-cualquiera",
+    "kind": "generic",
+    "reasoning": "poco",
+    "errorCost": "alto",
+    "repetition": "cualquiera",
+    "tiers": ["Equilibrado"],
+    "effort": "default",
+    "why": "Un esfuerzo bajo no te protege de un error caro: gama equilibrada con su esfuerzo por defecto y verificación.",
+    "verification": "Verificación automática o humana del resultado antes de usarlo.",
+    "notes": [],
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "tabla-medio-medio-cualquiera",
+    "kind": "generic",
+    "reasoning": "medio",
+    "errorCost": "medio",
+    "repetition": "cualquiera",
+    "tiers": ["Equilibrado"],
+    "effort": "medium",
+    "why": "Razonamiento y error medios: gama equilibrada con esfuerzo medio.",
+    "notes": [],
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "tabla-mucho-medio-baja",
+    "kind": "generic",
+    "reasoning": "mucho",
+    "errorCost": "medio",
+    "repetition": "baja",
+    "tiers": ["Alto rendimiento", "Equilibrado"],
+    "effort": "high",
+    "why": "Mucho razonamiento, pocas ejecuciones y error medio: gama alta (o equilibrada) con esfuerzo alto.",
+    "notes": [],
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "tabla-mucho-alto-baja",
+    "kind": "generic",
+    "reasoning": "mucho",
+    "errorCost": "alto",
+    "repetition": "baja",
+    "tiers": ["Alto rendimiento", "Frontera"],
+    "effort": "high",
+    "why": "Mucho razonamiento, pocas ejecuciones y mucho en juego: gama alta o de frontera con esfuerzo alto.",
+    "verification": "Verificación humana de las cifras y de las conclusiones.",
+    "notes": [],
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "tabla-mucho-alto-alta",
+    "kind": "generic",
+    "reasoning": "mucho",
+    "errorCost": "alto",
+    "repetition": "alta",
+    "tiers": ["Alto rendimiento"],
+    "effort": "medium",
+    "why": "Mucho razonamiento, mucho en juego y mucha repetición: gama alta con esfuerzo medio.",
+    "notes": [
+      "Reintenta en alto los fallos detectados, solo si tienes una señal de fallo fiable: un test, un esquema, una cifra que no cuadra."
+    ],
+    "verifiedAt": "2026-10-19"
+  }
+]

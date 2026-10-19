@@ -1,0 +1,134 @@
+/* Selector de modelo y esfuerzo. Prefijo propio: .sel-… (la base está en interactive.css). */
+
+.sel-actions {
+  margin-top: var(--space-4);
+  align-items: center;
+}
+
+.sel-copied {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.sel-result-title {
+  margin: 0 0 var(--space-2);
+  color: var(--color-heading);
+  font-size: var(--text-xl, 1.35rem);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.sel-live {
+  margin: 0 0 var(--space-3);
+  font-weight: 600;
+}
+
+.sel-p {
+  margin: 0 0 var(--space-3);
+}
+
+.sel-heading {
+  margin: var(--space-5) 0 var(--space-2);
+  color: var(--color-heading);
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+.sel-subtitle {
+  margin: var(--space-4) 0 var(--space-2);
+  color: var(--color-heading);
+  font-size: var(--text-base, 1rem);
+  font-weight: 600;
+}
+
+.sel-facts {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.sel-facts dt {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.sel-facts dd {
+  margin: 0;
+}
+
+.sel-list {
+  margin: 0;
+  padding-left: var(--space-5);
+}
+
+.sel-list > li + li {
+  margin-top: var(--space-2);
+}
+
+.sel-conditions {
+  margin-top: var(--space-3);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.sel-guidance {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.sel-nowrap {
+  white-space: nowrap;
+}
+
+/* Tabla: las celdas pueden partir línea; la región contenedora desplaza si hace falta. */
+.sel-table {
+  min-width: 34rem;
+}
+
+.sel-table :where(th, td) {
+  white-space: normal;
+  vertical-align: top;
+}
+
+.sel-table tbody th {
+  font-weight: 600;
+}
+
+.sel-sub {
+  display: block;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-weight: 400;
+}
+
+/* Aviso importante: borde y texto «Aviso.» además del color */
+.ix .sel-note.is-aviso {
+  border-color: var(--sem-cuidado-bd);
+  background: var(--sem-cuidado-bg);
+}
+
+.sel-text {
+  margin-top: var(--space-3);
+}
+
+.sel-text summary {
+  min-height: 2.75rem;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.sel-text textarea {
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-sm);
+}
+
+.sel-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

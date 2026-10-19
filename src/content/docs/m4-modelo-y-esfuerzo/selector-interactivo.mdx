@@ -20,25 +20,24 @@ import KeyTakeaways from '@components/KeyTakeaways.astro';
 import Callout from '@components/Callout.astro';
 import Steps from '@components/Steps.astro';
 import Checklist from '@components/Checklist.astro';
+import ModelSelector from '@components/ModelSelector.astro';
 
 <KeyTakeaways>
 
 - Cuatro preguntas bastan para situar una tarea: cuánto razonamiento pide, cuánto cuesta equivocarse, cuántas veces se repite y si puede esperar.
 - Regla de partida: empieza con un modelo capaz (la gama equilibrada o superior) y su esfuerzo por defecto; baja el esfuerzo o el modelo solo cuando lo hayas medido en una muestra y la calidad se mantenga; sube cuando falle.
-- Por ahora esta página ofrece el razonamiento en forma de texto y tabla; el selector interactivo estará disponible en esta misma página.
+- El selector de esta página aplica esas reglas: respondes unas preguntas y te da superficie, modelos, esfuerzo y alternativas, con su porqué.
 - La salida del selector es una hipótesis de partida, no una sentencia.
 
 </KeyTakeaways>
 
-## Qué va a ser esto
+## El selector
 
-Por ahora, esta página ofrece el recorrido en texto y tabla. El selector interactivo (respondes unas preguntas y devuelve una recomendación de superficie, gama de modelo y esfuerzo, con su porqué) estará disponible en esta misma página. Mientras tanto, puedes hacer a mano el mismo recorrido.
+Elige el tipo de tarea y responde a las preguntas; la recomendación se actualiza al momento. Parte de las filas de [la matriz por tarea](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/matriz-por-tarea/) y ajusta el esfuerzo y la gama según tus respuestas. El resultado es un punto de partida: compruébalo con una muestra antes de adoptarlo.
 
-<Callout tipo="preparacion">
+<ModelSelector />
 
-El selector interactivo estará disponible en esta misma página. Lo que sigue es su lógica en texto, y sirve para decidir hoy mismo.
-
-</Callout>
+Si prefieres hacer el recorrido a mano, esta es la lógica que aplica el selector.
 
 ## Las cuatro preguntas
 

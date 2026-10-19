@@ -1,0 +1,76 @@
+---
+import {
+  loadEffort,
+  loadModelPricingDetails,
+  loadModels,
+  loadSources,
+  loadTaskMatrix,
+} from '@lib/data-access';
+import { url } from '@lib/paths';
+import { buildSelectorData, validateSelectorData } from '@lib/model-selector';
+import rawRules from '../data/selector-rules.json';
+import ModelSelector from './interactive/ModelSelector';
+
+/**
+ * Selector de modelo y esfuerzo (isla React). La fila de `task-matrix.json` aporta superficie, modelos,
+ * esfuerzo y verificación; los modificadores y la tabla de decisión de «otra tarea» viven en
+ * `selector-rules.json`. Es una recomendación de la guía: un punto de partida, no una sentencia.
+ */
+const [models, details, effort, tasks, sources] = await Promise.all([
+  loadModels(),
+  loadModelPricingDetails(),
+  loadEffort(),
+  loadTaskMatrix(),
+  loadSources(),
+]);
+const data = buildSelectorData({ rawRules, models, details, effort, tasks, sources });
+// Un dato incoherente (modelo inexistente, nivel desconocido, fuente que falta) rompe el build.
+const problems = validateSelectorData(data);
+if (problems.length > 0) throw new Error(`<ModelSelector>: ${problems.join(' · ')}`);
+
+const field = (name: string) => data.rules.questions.fields.find((f) => f.field === name);
+const label = (name: string, value: string) =>
+  field(name)?.options.find((o) => o.value === value)?.label ?? value;
+const repetition: Record<string, string> = { alta: 'Alta', baja: 'Baja', cualquiera: 'Cualquiera' };
+---
+
+<ModelSelector client:visible data={data} />
+<noscript>
+  <p>
+    <strong>Selector de modelo y esfuerzo.</strong> Necesita JavaScript. Sin él, haz el mismo recorrido a
+    mano: localiza tu tipo de tarea en la{' '}
+    <a href={url('m4-modelo-y-esfuerzo/matriz-por-tarea')}>matriz por tarea</a> (superficie, modelos, esfuerzo
+    y cómo verificar) o, si no está, usa esta tabla de decisión.
+  </p>
+  <p>
+    Regla de partida de la guía: empieza con un modelo capaz y su esfuerzo por defecto; baja el esfuerzo o la
+    gama solo midiendo en una muestra (cinco casos, uno difícil; de 20 a 30 si vas a fijar una política) y
+    sube cuando falle. Un esfuerzo bajo no te protege de un error caro. Los lotes solo compensan si hay
+    volumen y el resultado puede esperar hasta 24 horas. Si trabajas con datos sensibles, comprueba la
+    política de datos de tu organización y del plan que uses antes de pegar nada. El resultado es un punto de
+    partida, no una sentencia.
+  </p>
+  <table>
+    <caption>Tabla de decisión para otra tarea (recomendación de la guía)</caption>
+    <thead>
+      <tr>
+        <th scope="col">Razonamiento</th>
+        <th scope="col">Coste del error</th>
+        <th scope="col">Repetición</th>
+        <th scope="col">Gama (la primera es el punto de partida)</th>
+        <th scope="col">Esfuerzo</th>
+      </tr>
+    </thead>
+    <tbody>
+      {data.rules.generics.map((g) => (
+        <tr>
+          <td>{label('reasoning', g.reasoning)}</td>
+          <td>{label('errorCost', g.errorCost)}</td>
+          <td>{repetition[g.repetition]}</td>
+          <td>{g.tiers.join(' o ')}</td>
+          <td>{g.effort === 'default' ? 'El que trae cada modelo' : g.effort}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</noscript>
