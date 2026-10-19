@@ -24,7 +24,7 @@ sources:
 import KeyTakeaways from '@components/KeyTakeaways.astro';
 import Callout from '@components/Callout.astro';
 import CommandCard from '@components/CommandCard.astro';
-import CommandList from '@components/CommandList.astro';
+import CommandExplorer from '@components/CommandExplorer.astro';
 import Checklist from '@components/Checklist.astro';
 
 <KeyTakeaways>
@@ -49,9 +49,9 @@ En esta página, las columnas **Cuándo usarlo**, **Impacto en tokens** y los ej
 
 ## Lista completa
 
-Todos los comandos del catálogo, agrupados por categoría, con la fase en que suelen usarse. Pulsa en una categoría para desplegarla.
+Todos los comandos del catálogo, con la fase en que suelen usarse. Busca por nombre o por lo que quieres hacer, filtra por categoría o fase y copia el comando con un botón.
 
-<CommandList />
+<CommandExplorer />
 
 ## Los 23 comandos clave
 
@@ -59,7 +59,7 @@ Agrupados por el momento del trabajo en que los usas (la columna «Fase» de la 
 
 <Callout tipo="cuidado">
 
-Solo estos 23 llevan «cuándo usarlo», impacto en tokens y ejemplo. El resto de comandos de la lista completa aparece únicamente con su descripción oficial; está previsto que el explorador de comandos del sitio los cubra, sin fecha comprometida. Y varios comandos de trabajo en paralelo y automatización (`/subtask`, `/background`, `/workflows`, `/autofix-pr`…) se explican en [trabajo en paralelo](/AI-Optimized_Usage_Web/m7-claude-code/trabajo-en-paralelo/) y [automatización](/AI-Optimized_Usage_Web/m7-claude-code/automatizacion/), igual que los comandos que se escriben en la terminal fuera de la sesión (`claude -p`, `claude agents`, `claude --worktree`).
+Solo estos 23 llevan «cuándo usarlo», impacto en tokens y ejemplo. El resto de comandos de la lista completa aparece únicamente con su descripción oficial en el explorador de arriba, sin «cuándo usarlo» ni ejemplo. Y varios comandos de trabajo en paralelo y automatización (`/subtask`, `/background`, `/workflows`, `/autofix-pr`…) se explican en [trabajo en paralelo](/AI-Optimized_Usage_Web/m7-claude-code/trabajo-en-paralelo/) y [automatización](/AI-Optimized_Usage_Web/m7-claude-code/automatizacion/), igual que los comandos que se escriben en la terminal fuera de la sesión (`claude -p`, `claude agents`, `claude --worktree`).
 
 </Callout>
 

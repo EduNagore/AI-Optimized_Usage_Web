@@ -1,0 +1,57 @@
+---
+import { loadCommands, loadSources } from '@lib/data-access';
+import { buildCommandEntries } from '@lib/command-search';
+import { formatDate, latestDate } from '@lib/format';
+import CommandExplorer from './interactive/CommandExplorer';
+
+/**
+ * Explorador de comandos `/` de Claude Code (isla React). Carga el catálogo y resuelve la URL de la
+ * fuente de cada comando; sustituye a la lista estática `CommandList`.
+ *   <CommandExplorer />
+ */
+const [records, sources] = await Promise.all([loadCommands(), loadSources()]);
+const entries = buildCommandEntries(records, sources);
+
+// Solo un orden de presentación (el flujo del trabajo); los valores del filtro salen de los datos.
+const phaseOrder = ['Preparar', 'Trabajar', 'Revisar', 'Medir'];
+
+const retirados = entries
+  .filter((e) => e.status === 'eliminado')
+  .sort((a, b) => a.command.localeCompare(b.command));
+const verifiedAt = latestDate(entries.map((e) => e.verifiedAt));
+---
+
+<CommandExplorer client:visible entries={entries} phaseOrder={phaseOrder} />
+<noscript>
+  <p>
+    Aquí se busca y se filtra el catálogo de comandos <code>/</code> de Claude Code por nombre, categoría y
+    fase, y se copia cada comando con sus argumentos. Sin JavaScript, el buscador, los filtros y los botones
+    de copiar no funcionan: la lista de comandos de este bloque se puede recorrer o buscar con{' '}
+    <kbd>Ctrl + F</kbd>, y cada comando enlaza a la documentación oficial. Los comandos retirados no aparecen
+    en esa lista; son estos:
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th scope="col">Comando retirado</th>
+        <th scope="col">Qué hace la nota oficial</th>
+      </tr>
+    </thead>
+    <tbody>
+      {retirados.map((e) => (
+        <tr>
+          <th scope="row">
+            <code>
+              {e.command}
+              {e.args && ` ${e.args}`}
+            </code>
+          </th>
+          <td>{e.summary}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  {verifiedAt && (
+    <p>Datos verificados el {formatDate(verifiedAt)} en la documentación oficial de Claude Code.</p>
+  )}
+</noscript>
