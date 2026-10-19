@@ -30,6 +30,7 @@ import ProviderTabs from '@components/ProviderTabs.astro';
 import Steps from '@components/Steps.astro';
 import Checklist from '@components/Checklist.astro';
 import VentanaContexto from '@components/diagrams/VentanaContexto.astro';
+import ContextVisualizer from '@components/ContextVisualizer.astro';
 
 <KeyTakeaways>
 
@@ -111,6 +112,12 @@ No todo lo que hay en la ventana se comporta igual. Una parte es idéntica turno
 El espacio libre del diagrama no es solo para tu siguiente mensaje: la respuesta del modelo y su razonamiento en ese turno también se escriben ahí.
 
 La parte estable (instrucciones del sistema, herramientas, ficheros de instrucciones) conviene que vaya primero y que no cambie: la caché solo reutiliza un comienzo idéntico, y cualquier cambio al principio invalida lo que viene detrás ([regla 8](/AI-Optimized_Usage_Web/m0-empieza-aqui/las-10-reglas/)). La parte que crece es donde está el margen para ahorrar y para ensuciar: documentos que ya no usas, resultados voluminosos, temas mezclados.
+
+## Pruébalo: qué llena la ventana y qué la vacía
+
+El visualizador reparte la ventana en sus partes y te deja aplicar las acciones habituales para ver su efecto: añadir ficheros y turnos, `/clear`, `/compact`, invocar una skill, lanzar un subagente o conectar servidores MCP. Los tamaños de partida son supuestos de la guía, editables, con su origen indicado en cada caso; sirve para entender el orden de magnitud, no para medir tu sesión (para eso, [mide](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/medir/)).
+
+<ContextVisualizer />
 
 ## Qué pasa cuando se llena
 

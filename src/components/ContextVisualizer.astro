@@ -1,0 +1,122 @@
+---
+import { loadModels, loadSources } from '@lib/data-access';
+import { url } from '@lib/paths';
+import { formatNumber, formatDate, latestDate } from '@lib/format';
+import {
+  compareWindows,
+  formatPercent,
+  scenarioSchema,
+  stateFromScenario,
+  usedTokens,
+} from '@lib/context-window';
+import ContextVisualizer from './interactive/ContextVisualizer';
+import scenarioData from '../data/context-scenarios.json';
+
+/**
+ * Visualizador de la ventana de contexto (isla React). Las ventanas salen de models.json y los
+ * escenarios de context-scenarios.json (con el origen de cada tamaño). Sin JavaScript se ve la regla
+ * y una tabla con la ocupación de cada escenario en cada ventana, calculada con la misma lógica.
+ */
+interface Props {
+  /** Ids de los modelos cuya ventana se ofrece. Por defecto, uno de 1.000.000 y uno de 200.000 tokens. */
+  modelos?: string[];
+  /** Escenario con el que arranca. */
+  escenario?: string;
+  /** Modelo con el que arranca. */
+  modeloInicial?: string;
+}
+
+const { modelos = ['sonnet-5-5', 'haiku-4-5'], escenario = 'tras-una-hora', modeloInicial } = Astro.props;
+
+const scenarios = scenarioData.map((s) => scenarioSchema.parse(s));
+if (scenarios.length === 0) throw new Error('<ContextVisualizer>: no hay escenarios');
+if (!scenarios.some((s) => s.id === escenario)) {
+  throw new Error(`<ContextVisualizer>: no existe el escenario «${escenario}»`);
+}
+
+const [allModels, allSources] = await Promise.all([loadModels(), loadSources()]);
+const models = modelos.map((id) => {
+  const m = allModels.find((x) => x.id === id);
+  if (!m) throw new Error(`<ContextVisualizer>: no existe el modelo «${id}»`);
+  return m;
+});
+const first = models[0];
+if (!first) throw new Error('<ContextVisualizer>: hace falta al menos un modelo');
+const defaultModel = models.find((m) => m.id === modeloInicial) ?? first;
+
+const sourceById = (ids: string[]) =>
+  [...new Set(ids)].map((id) => {
+    const s = allSources.find((x) => x.id === id);
+    if (!s) throw new Error(`<ContextVisualizer>: no existe la fuente «${id}»`);
+    return { title: s.title, url: s.url };
+  });
+
+const modelSources = sourceById(models.map((m) => m.source));
+const modelsVerifiedAt = latestDate(models.map((m) => m.verifiedAt)) ?? '';
+const scenarioSources = sourceById(scenarios.flatMap((s) => [s.source, ...(s.otherSources ?? [])]));
+const scenariosVerifiedAt = latestDate(scenarios.map((s) => s.verifiedAt)) ?? '';
+
+const windows = models.map((m) => ({ id: m.id, name: m.name, windowTokens: m.contextWindow }));
+const rows = scenarios.map((s) => {
+  const state = stateFromScenario(s);
+  return { s, used: usedTokens(state), cmp: compareWindows(state, windows) };
+});
+---
+
+<ContextVisualizer
+  client:visible
+  scenarios={scenarios}
+  models={models.map((m) => ({ id: m.id, name: m.name, contextWindow: m.contextWindow }))}
+  defaultScenarioId={escenario}
+  defaultModelId={defaultModel.id}
+  baseHref={url('')}
+  modelSources={modelSources}
+  modelsVerifiedAt={modelsVerifiedAt}
+  scenarioSources={scenarioSources}
+  scenariosVerifiedAt={scenariosVerifiedAt}
+/>
+<noscript>
+  <h3>Visualizador de la ventana de contexto</h3>
+  <p>
+    Este visualizador necesita JavaScript. La regla es sencilla: la ventana de contexto es un presupuesto de
+    tokens que comparten las instrucciones del sistema, las herramientas, <code>CLAUDE.md</code> y la memoria,
+    las descripciones de las skills, los servidores MCP, la conversación y los ficheros leídos. La ocupación
+    es la suma de todo eso dividida entre el tamaño de la ventana. <code>/clear</code> vacía la conversación y
+    los ficheros leídos; <code>/compact</code> los sustituye por un resumen; una skill solo suma su
+    descripción hasta que la invocas; un subagente trabaja en su propia ventana y a la tuya solo vuelve el
+    resumen; cada servidor MCP suma las definiciones de sus herramientas, salvo que se carguen bajo demanda.
+  </p>
+  <table>
+    <caption>
+      Ocupación de cada escenario de partida en cada ventana. Los tamaños son supuestos de la guía, salvo
+      donde su nota de origen cita una fuente.
+    </caption>
+    <thead>
+      <tr>
+        <th scope="col">Escenario</th>
+        <th scope="col">Tokens ocupados</th>
+        {windows.map((w) => (
+          <th scope="col">
+            {w.name} ({formatNumber(w.windowTokens)})
+          </th>
+        ))}
+      </tr>
+    </thead>
+    <tbody>
+      {rows.map((r) => (
+        <tr>
+          <th scope="row">{r.s.titulo}</th>
+          <td>{formatNumber(r.used)}</td>
+          {r.cmp.map((c) => (
+            <td>{c.overflow ? `${formatPercent(c.usedPercent)} (no cabe)` : formatPercent(c.usedPercent)}</td>
+          ))}
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p>
+    Ventanas de contexto de los datos del sitio, verificadas el {formatDate(modelsVerifiedAt)}. Cuando la
+    ocupación supera el 80 % es una recomendación de la guía compactar o abrir una sesión nueva; no es un
+    límite del proveedor.
+  </p>
+</noscript>

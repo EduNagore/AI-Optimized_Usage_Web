@@ -1,0 +1,82 @@
+[
+  {
+    "id": "al-abrir",
+    "titulo": "Sesión recién abierta",
+    "resumen": "Claude Code acaba de arrancar: casi todo lo que ocupa es lo estable. Servidores MCP con carga diferida, que es el valor por defecto en Claude Code.",
+    "sizes": { "system": 6000, "tools": 12000, "memory": 1000, "skills": 1000, "conversation": 1000, "files": 0 },
+    "mcp": { "servers": 2, "perServerTokens": 11000, "deferred": true },
+    "origen": {
+      "system": "Supuesto de la guía: el tamaño real depende de la aplicación y no figura en las fuentes del sitio.",
+      "tools": "Supuesto de la guía: herramientas integradas; el tamaño real depende de la herramienta.",
+      "memory": "Supuesto de la guía: un CLAUDE.md de unas 60 líneas, como el de la página «El día a día en Claude Code» (la documentación recomienda no pasar de 200 líneas). Los tokens por línea son un supuesto.",
+      "skills": "10 skills × 100 tokens. Los 100 tokens por skill son el dato de la documentación de la API de Claude (página «Skills»); que haya 10 skills es un supuesto de la guía.",
+      "mcp": "2 servidores con carga diferida. Los 11.000 tokens por servidor salen de dividir entre cinco los 55.000 que cita Anthropic en su documentación de tool search (medición del proveedor sobre su propio ejemplo). Con carga diferida queda el 15 %, supuesto de la guía derivado del «más de un 85 %» de reducción que publica.",
+      "conversation": "Supuesto de la guía: el primer mensaje y su respuesta.",
+      "files": "Supuesto de la guía: todavía no se ha leído ningún fichero."
+    },
+    "nota": "Escenario ilustrativo: ninguna cifra es una medición de tu sesión. En Claude Code, /context te muestra la tuya.",
+    "source": "anthropic-tool-search",
+    "otherSources": ["anthropic-skills", "claude-code-costes"],
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "tras-una-hora",
+    "titulo": "Tras una hora de trabajo",
+    "resumen": "Una hora de conversación y lecturas de ficheros sobre la misma base estable. Con 200.000 tokens de ventana este contexto ya no cabe.",
+    "sizes": { "system": 6000, "tools": 12000, "memory": 1000, "skills": 1000, "conversation": 120000, "files": 80000 },
+    "mcp": { "servers": 2, "perServerTokens": 11000, "deferred": true },
+    "origen": {
+      "system": "Supuesto de la guía: el tamaño real depende de la aplicación y no figura en las fuentes del sitio.",
+      "tools": "Supuesto de la guía: herramientas integradas; el tamaño real depende de la herramienta.",
+      "memory": "Supuesto de la guía: un CLAUDE.md de unas 60 líneas, como el de la página «El día a día en Claude Code».",
+      "skills": "10 skills × 100 tokens. Los 100 tokens por skill son el dato de la documentación de la API de Claude; el número de skills es un supuesto de la guía.",
+      "mcp": "2 servidores con carga diferida: 11.000 tokens por servidor (55.000 entre cinco, medición de Anthropic sobre su ejemplo) y el 15 % restante por la carga diferida (supuesto de la guía).",
+      "conversation": "60 turnos × 2.000 tokens. Los 2.000 tokens por turno son el ejemplo de la página «La ventana de contexto», una cifra inventada para ver la forma y no una medición.",
+      "files": "Supuesto de la guía: unos ocho ficheros de unos 10.000 tokens cada uno."
+    },
+    "nota": "Escenario ilustrativo. Compara la ocupación en las dos ventanas: el mismo contenido ocupa un 22 % de 1.000.000 y no cabe en 200.000.",
+    "source": "anthropic-tool-search",
+    "otherSources": ["anthropic-skills", "claude-code-costes"],
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "muchos-servidores-mcp",
+    "titulo": "Con muchos servidores MCP",
+    "resumen": "Ocho servidores con las definiciones de sus herramientas cargadas por completo, como en la API sin carga diferida. Activa la carga diferida para ver cuánto libera.",
+    "sizes": { "system": 6000, "tools": 12000, "memory": 1000, "skills": 1000, "conversation": 20000, "files": 10000 },
+    "mcp": { "servers": 8, "perServerTokens": 11000, "deferred": false },
+    "origen": {
+      "system": "Supuesto de la guía: el tamaño real depende de la aplicación y no figura en las fuentes del sitio.",
+      "tools": "Supuesto de la guía: herramientas integradas; el tamaño real depende de la herramienta.",
+      "memory": "Supuesto de la guía: un CLAUDE.md de unas 60 líneas.",
+      "skills": "10 skills × 100 tokens (dato de la API de Claude para los 100 tokens; el número de skills es un supuesto de la guía).",
+      "mcp": "8 servidores × 11.000 tokens. Los 11.000 salen de los 55.000 tokens de cinco servidores que cita Anthropic en su documentación de tool search (medición del proveedor sobre su propio ejemplo); que haya 8 servidores es un supuesto de la guía.",
+      "conversation": "10 turnos × 2.000 tokens, con el ejemplo de 2.000 tokens por turno de la página «La ventana de contexto» (cifra inventada para ver la forma).",
+      "files": "Supuesto de la guía: un fichero de unos 10.000 tokens."
+    },
+    "nota": "Escenario ilustrativo. Solo con los servidores MCP, antes de escribir nada, ya está ocupado casi el 44 % de una ventana de 200.000 tokens. Tu cifra depende de qué servidores uses.",
+    "source": "anthropic-tool-search",
+    "otherSources": ["anthropic-skills", "claude-code-costes"],
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "varias-horas-sin-limpiar",
+    "titulo": "Varias horas sin limpiar",
+    "resumen": "Una sesión larga que nunca se ha limpiado ni compactado. Supera el umbral de aviso de la guía en una ventana de 1.000.000 tokens.",
+    "sizes": { "system": 6000, "tools": 12000, "memory": 1000, "skills": 1000, "conversation": 600000, "files": 200000 },
+    "mcp": { "servers": 2, "perServerTokens": 11000, "deferred": true },
+    "origen": {
+      "system": "Supuesto de la guía: el tamaño real depende de la aplicación y no figura en las fuentes del sitio.",
+      "tools": "Supuesto de la guía: herramientas integradas; el tamaño real depende de la herramienta.",
+      "memory": "Supuesto de la guía: un CLAUDE.md de unas 60 líneas.",
+      "skills": "10 skills × 100 tokens (dato de la API de Claude para los 100 tokens; el número de skills es un supuesto de la guía).",
+      "mcp": "2 servidores con carga diferida: 11.000 tokens por servidor (medición de Anthropic sobre su ejemplo) y el 15 % restante por la carga diferida (supuesto de la guía).",
+      "conversation": "300 turnos × 2.000 tokens, con el ejemplo de 2.000 tokens por turno de la página «La ventana de contexto» (cifra inventada para ver la forma).",
+      "files": "Supuesto de la guía: unos veinte ficheros de unos 10.000 tokens cada uno."
+    },
+    "nota": "Escenario ilustrativo para ver el aviso. El umbral del 80 % es una recomendación de la guía, no un límite del proveedor.",
+    "source": "anthropic-tool-search",
+    "otherSources": ["anthropic-skills", "claude-code-costes"],
+    "verifiedAt": "2026-10-19"
+  }
+]

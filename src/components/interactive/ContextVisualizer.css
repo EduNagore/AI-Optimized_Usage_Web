@@ -1,0 +1,364 @@
+/*
+ * Visualizador de la ventana de contexto. Prefijo `.ctxv-`. Los segmentos se distinguen por patrón
+ * y borde además de por color; la barra es complementaria y la leyenda en lista es la versión
+ * accesible. Solo tokens del tema: nada de colores sueltos.
+ */
+
+.ctxv {
+  --ctxv-stable: var(--color-accent);
+  --ctxv-grow: var(--color-text);
+  --ctxv-line: var(--color-border-strong);
+}
+
+.ctxv-h {
+  margin: var(--space-6) 0 var(--space-2);
+  color: var(--color-heading);
+  font-size: var(--text-base);
+  font-weight: 700;
+}
+
+/* Barra apilada: siempre horizontal, también a 360 px */
+.ctxv-bar-wrap {
+  margin-block: var(--space-3);
+}
+
+.ctxv-bar {
+  position: relative;
+  display: flex;
+  box-sizing: border-box;
+  width: 100%;
+  height: 3rem;
+  overflow: hidden;
+  border: 2px solid var(--ctxv-line);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+}
+
+.ctxv-bar.is-overflow {
+  border-right-style: dashed;
+  border-right-color: var(--sem-cuidado-fg);
+  border-right-width: 5px;
+}
+
+.ctxv-seg {
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  min-width: 0;
+  height: 100%;
+  border-right: 1px solid var(--ctxv-line);
+}
+
+.ctxv-seg:last-of-type {
+  border-right: 0;
+}
+
+/* Marca del umbral: línea discontinua sobre la barra */
+.ctxv-threshold {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  border-left: 3px dashed var(--color-heading);
+  pointer-events: none;
+}
+
+.ctxv-scale {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-3);
+  margin-top: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.ctxv-overflow {
+  margin: var(--space-2) 0 0;
+  color: var(--sem-cuidado-fg);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+/* Patrones: cada segmento tiene el suyo; el mismo estilo vale para el cuadrito de la leyenda */
+.ctxv-p-system,
+.ctxv-p-tools,
+.ctxv-p-memory,
+.ctxv-p-skills,
+.ctxv-p-mcp {
+  --ctxv-ink: var(--ctxv-stable);
+}
+
+.ctxv-p-conversation,
+.ctxv-p-files {
+  --ctxv-ink: var(--ctxv-grow);
+}
+
+.ctxv-p-system {
+  background-color: color-mix(in srgb, var(--ctxv-ink) 16%, var(--color-bg));
+}
+
+.ctxv-p-tools {
+  background-color: color-mix(in srgb, var(--ctxv-ink) 28%, var(--color-bg));
+  background-image: repeating-linear-gradient(
+    45deg,
+    color-mix(in srgb, var(--ctxv-ink) 55%, transparent) 0 2px,
+    transparent 2px 7px
+  );
+}
+
+.ctxv-p-memory {
+  background-color: color-mix(in srgb, var(--ctxv-ink) 22%, var(--color-bg));
+  background-image: radial-gradient(
+    color-mix(in srgb, var(--ctxv-ink) 70%, transparent) 1.5px,
+    transparent 1.6px
+  );
+  background-size: 7px 7px;
+}
+
+.ctxv-p-skills {
+  background-color: color-mix(in srgb, var(--ctxv-ink) 34%, var(--color-bg));
+  background-image: repeating-linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--ctxv-ink) 60%, transparent) 0 2px,
+    transparent 2px 6px
+  );
+}
+
+.ctxv-p-mcp {
+  background-color: color-mix(in srgb, var(--ctxv-ink) 46%, var(--color-bg));
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      color-mix(in srgb, var(--color-bg) 55%, transparent) 0 2px,
+      transparent 2px 6px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--color-bg) 55%, transparent) 0 2px,
+      transparent 2px 6px
+    );
+}
+
+.ctxv-p-conversation {
+  background-color: color-mix(in srgb, var(--ctxv-ink) 16%, var(--color-bg));
+  background-image: repeating-linear-gradient(
+    -45deg,
+    color-mix(in srgb, var(--ctxv-ink) 45%, transparent) 0 3px,
+    transparent 3px 8px
+  );
+}
+
+.ctxv-p-files {
+  background-color: color-mix(in srgb, var(--ctxv-ink) 34%, var(--color-bg));
+  background-image: repeating-linear-gradient(
+    0deg,
+    color-mix(in srgb, var(--ctxv-ink) 60%, transparent) 0 2px,
+    transparent 2px 6px
+  );
+}
+
+.ctxv-p-free {
+  background: var(--color-bg);
+}
+
+.ctxv-seg.ctxv-p-free {
+  border-right-style: dashed;
+}
+
+/* Leyenda: lista apilada en una columna; en bloques anchos, dos */
+.ctxv-group {
+  margin: var(--space-4) 0 var(--space-1);
+  color: var(--color-heading);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.ctxv-legend {
+  display: grid;
+  gap: var(--space-2);
+  grid-template-columns: minmax(0, 1fr);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@container (min-width: 40rem) {
+  .ctxv-legend {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.ctxv-legend-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+}
+
+.ctxv-swatch {
+  flex: none;
+  box-sizing: border-box;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin-top: 0.1rem;
+  border: 2px solid var(--ctxv-line);
+  border-radius: var(--radius-sm);
+}
+
+.ctxv-p-free.ctxv-swatch {
+  border-style: dashed;
+}
+
+.ctxv-legend-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: var(--text-sm);
+}
+
+.ctxv-legend-values {
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.ctxv-legend-desc {
+  color: var(--color-text-muted);
+}
+
+.ctxv-live p {
+  margin: var(--space-3) 0 0;
+}
+
+.ctxv-alert {
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width) solid var(--sem-novedad-bd);
+  border-radius: var(--radius-sm);
+  background: var(--sem-novedad-bg);
+  color: var(--color-text);
+  font-size: var(--text-sm);
+}
+
+.ctxv-alert.is-desborde {
+  border-color: var(--sem-cuidado-bd);
+  background: var(--sem-cuidado-bg);
+}
+
+.ctxv-feedback {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.ctxv-offloaded {
+  margin: var(--space-3) 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+/* Acciones: tarjetas en una columna; dos en bloques anchos */
+.ctxv-actions {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@container (min-width: 44rem) {
+  .ctxv-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.ctxv-action {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: var(--space-3);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+}
+
+.ctxv-action .ix-field,
+.ctxv-action .ix-actions {
+  align-self: stretch;
+}
+
+.ctxv-action-title {
+  margin: 0;
+  color: var(--color-heading);
+  font-weight: 700;
+}
+
+.ctxv-action-effect,
+.ctxv-basis,
+.ctxv-count {
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
+.ctxv-basis {
+  margin-top: auto;
+  color: var(--color-text-muted);
+}
+
+.ctxv-empty {
+  margin: 0 0 var(--space-3);
+  color: var(--color-text-muted);
+}
+
+.ctxv-history {
+  margin: 0 0 var(--space-3);
+  padding-left: var(--space-6);
+  font-size: var(--text-sm);
+}
+
+.ctxv-history li {
+  margin-bottom: var(--space-1);
+}
+
+.ctxv-history-pct {
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.ctxv-sizes {
+  min-width: 0;
+  margin: var(--space-6) 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.ctxv-sizes > legend {
+  margin-bottom: var(--space-2);
+  padding: 0;
+  color: var(--color-heading);
+  font-weight: 700;
+}
+
+.ctxv-details {
+  margin-top: var(--space-4);
+  font-size: var(--text-sm);
+}
+
+.ctxv-details > summary {
+  min-height: 2.75rem;
+  padding-block: var(--space-2);
+  color: var(--color-heading);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ctxv-origins dt {
+  color: var(--color-heading);
+  font-weight: 600;
+}
+
+.ctxv-origins dd {
+  margin: 0 0 var(--space-2);
+  color: var(--color-text-muted);
+  overflow-wrap: anywhere;
+}
