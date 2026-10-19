@@ -1,0 +1,109 @@
+/*
+ * Calculadora de coste por tarea. Prefijo `calc-`; la base común está en interactive.css.
+ * El color nunca es la única señal: los avisos llevan etiqueta de texto («Cuidado», «Nota»).
+ */
+
+.calc-group {
+  margin: 0 0 var(--space-4);
+  padding: var(--space-3);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.calc-group > legend {
+  padding: 0 var(--space-2);
+  color: var(--color-heading);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.calc-group > .ix-hint {
+  margin-bottom: var(--space-3);
+}
+
+.calc-group .ix-choice {
+  margin-top: var(--space-2);
+}
+
+.calc-h {
+  margin: var(--space-5) 0 var(--space-2);
+  color: var(--color-heading);
+  font-size: var(--text-base);
+  font-weight: 600;
+}
+
+.ix-result > .calc-h:first-child {
+  margin-top: 0;
+}
+
+.calc-focus {
+  max-width: 24rem;
+  margin-top: var(--space-3);
+}
+
+.calc-flag {
+  color: var(--sem-cuidado-fg);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.calc-total > * {
+  font-weight: 700;
+}
+
+/* Celdas con texto largo: pueden partir línea en vez de ensanchar la tabla */
+.ix-table .calc-wrap {
+  min-width: 11rem;
+  white-space: normal;
+}
+
+.calc-block {
+  display: block;
+  font-weight: 400;
+}
+
+.calc-warnings {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-3);
+  padding: 0;
+  list-style: none;
+  font-size: var(--text-sm);
+}
+
+.calc-model-name {
+  margin: var(--space-2) 0 var(--space-1);
+  color: var(--color-heading);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.calc-notes {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
+.calc-notes dt {
+  color: var(--color-heading);
+  font-weight: 600;
+}
+
+.calc-notes dd {
+  margin: 0;
+}
+
+.calc-note-error {
+  border-color: var(--sem-cuidado-bd);
+  background: var(--sem-cuidado-bg);
+}
+
+.calc-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

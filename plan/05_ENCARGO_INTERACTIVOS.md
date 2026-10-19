@@ -39,6 +39,7 @@ Tampoco toques `src/data/*.json` existentes, `package.json`, `astro.config.mjs`,
 - **Estado inicial útil**: valores de ejemplo precargados, resultado visible desde el primer render. Sin animaciones gratuitas.
 - **Etiquetas visibles** en todos los campos; errores de entrada explicados en una frase (usa `Field`). Los resultados cambian dentro de una región `aria-live="polite"` (breve: el resumen, no la tabla entera).
 - **El color nunca es la única señal**: acompáñalo de texto o icono. Usa los tokens (`var(--color-…)`, `var(--sem-…)`); nada de colores sueltos. Funciona en tema claro y oscuro (contraste AA).
+- **Raíz con `not-content`**: el elemento raíz de la isla lleva `className="ix <prefijo> not-content"`; si no, Starlight aplica su estilo Markdown a tablas y listas (tablas con `display:block` que axe marca como región desplazable sin foco).
 - **Hidratación**: no leas `window`, `localStorage` ni la fecha actual durante el render; hazlo en `useEffect`. Usa `useId` para los ids. Si usas fechas «de hoy», pásalas como prop desde el envoltorio (render en el servidor = fecha de la compilación) o léelas tras montar.
 - **Fuente y fecha** visibles junto a cualquier cifra tomada de los datos (`SourceFooter`).
 - Números con formato español (`format.ts`), dólares con «$» tras la cifra.

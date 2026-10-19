@@ -1,0 +1,62 @@
+---
+import { loadPricingCatalog } from '@lib/data-access';
+import {
+  DEFAULT_MODEL_IDS,
+  DEFAULT_RAW_INPUTS,
+  calculateModelCost,
+  formatCost,
+  parseCostInputs,
+} from '@lib/cost-calculator';
+import { formatDate } from '@lib/format';
+import CostCalculator from './interactive/CostCalculator';
+
+/**
+ * Calculadora de coste por tarea (isla React). Los precios salen del catálogo (models.json y
+ * model-pricing-details.json). Sin JavaScript se ve la fórmula y una tabla con el ejemplo
+ * precargado, calculada con la misma lógica que la isla.
+ */
+const catalog = await loadPricingCatalog();
+const parsed = parseCostInputs(DEFAULT_RAW_INPUTS);
+if (!parsed.ok) throw new Error('<CostCalculator>: el ejemplo por defecto no es válido');
+const rows = DEFAULT_MODEL_IDS.flatMap((id) => {
+  const model = catalog.models.find((m) => m.id === id);
+  return model ? [calculateModelCost(model, parsed.params)] : [];
+});
+---
+
+<CostCalculator client:visible catalog={catalog} />
+<noscript>
+  <h3>Calculadora de coste por tarea</h3>
+  <p>
+    Esta calculadora necesita JavaScript. La cuenta de un intento es: tokens de entrada × precio de entrada +
+    (tokens de salida + tokens de razonamiento) × precio de salida, todo dividido entre un millón porque los
+    precios son por millón de tokens. Con caché, las lecturas se cobran al precio de lectura y las escrituras
+    algo por encima de la entrada normal; con Batch, el total se multiplica por el factor de descuento del
+    modelo (0,5 en los modelos que lo tienen verificado). En una conversación, cada turno reenvía el
+    historial.
+  </p>
+  <table>
+    <caption>
+      Ejemplo: 30.000 tokens de entrada, 1.500 de salida, 2.000 tareas al mes, sin caché ni razonamiento.
+    </caption>
+    <thead>
+      <tr>
+        <th scope="col">Modelo</th>
+        <th scope="col">Por tarea</th>
+        <th scope="col">Al mes</th>
+        <th scope="col">Al mes con Batch</th>
+      </tr>
+    </thead>
+    <tbody>
+      {rows.map((r) => (
+        <tr>
+          <th scope="row">{r.modelName}</th>
+          <td>{formatCost(r.perTaskUsd)}</td>
+          <td>{formatCost(r.monthlyUsd)}</td>
+          <td>{r.monthlyBatchUsd === null ? 'No disponible' : formatCost(r.monthlyBatchUsd)}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p>Precios del catálogo del sitio, verificados el {formatDate(catalog.verifiedAt)}.</p>
+</noscript>

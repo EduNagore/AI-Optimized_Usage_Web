@@ -7,26 +7,27 @@ level: basico
 tracks: [profesional, tecnica]
 readingTime: 5
 lastReviewed: 2026-10-16
-sources: [anthropic-precios, anthropic-batch, anthropic-prompt-caching]
+sources: [anthropic-precios, anthropic-batch, anthropic-prompt-caching, openai-precios, google-precios]
 ---
 
 import KeyTakeaways from '@components/KeyTakeaways.astro';
 import Callout from '@components/Callout.astro';
 import CostExample from '@components/CostExample.astro';
+import CostCalculator from '@components/CostCalculator.astro';
 import Steps from '@components/Steps.astro';
 import Checklist from '@components/Checklist.astro';
 
 <KeyTakeaways>
 
 - Para estimar un coste necesitas cuatro números: tokens de entrada, tokens de salida, tokens de razonamiento y número de ejecuciones.
-- Aquí tienes la fórmula y un ejemplo estático calculado desde los datos de precios; para tus cifras, aplica la fórmula a mano.
-- Mientras tanto, puedes hacer la cuenta tú con la fórmula de abajo.
+- La calculadora de esta página aplica la fórmula con los precios vigentes de los datos del sitio, compara hasta cuatro modelos y muestra el efecto de caché, lotes y salida más corta.
+- Debajo tienes un ejemplo calculado a mano con los mismos datos, para que puedas comprobar la herramienta.
 
 </KeyTakeaways>
 
 ## La idea
 
-El coste de una tarea sale de una multiplicación sencilla: tokens por precio, sumando entrada y salida. Lo difícil no es la fórmula sino saber las cantidades, por eso [medir](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/medir/) va antes que calcular. Esta página recoge la fórmula y un ejemplo ya calculado con los precios vigentes.
+El coste de una tarea sale de una multiplicación sencilla: tokens por precio, sumando entrada y salida. Lo difícil no es la fórmula sino saber las cantidades, por eso [medir](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/medir/) va antes que calcular. Esta página recoge la fórmula, una calculadora para aplicarla a tu caso y un ejemplo ya calculado con los precios vigentes.
 
 ## La fórmula
 
@@ -40,6 +41,12 @@ Los precios son por millón de tokens y salen de [la tabla de modelos](/AI-Optim
 - **Lotes**: el descuento del 50 % se aplica a todo el coste (ver [batch](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/batch/)).
 - **Salida más corta**: reduce el segundo término.
 - **Modelo o esfuerzo**: cambian los precios y los tokens de razonamiento.
+
+## Calcula la tuya
+
+Cambia los tokens, los turnos y las palancas: el resultado se actualiza al momento. Los precios salen de los datos del sitio con su fuente y su fecha; los tokens que escribes son supuestos tuyos. Los valores iniciales reproducen el ejemplo de la sección siguiente.
+
+<CostCalculator />
 
 ## Ejemplo calculado
 
