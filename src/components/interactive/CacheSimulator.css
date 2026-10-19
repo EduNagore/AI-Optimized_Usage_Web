@@ -1,0 +1,227 @@
+/* Simulador de caché (prefijo .cs-). La base común está en interactive.css. */
+
+.cs-block {
+  margin-top: var(--space-5);
+}
+
+.cs-sub {
+  margin: var(--space-4) 0 var(--space-2);
+  color: var(--color-heading);
+  font-size: var(--text-base);
+  font-weight: 600;
+}
+
+.cs-block > .cs-sub:first-child {
+  margin-top: 0;
+}
+
+/* Texto solo para lectores de pantalla (títulos de tabla) */
+.cs-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.cs-ttl {
+  margin-top: var(--space-4);
+}
+
+.cs-ttl-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-5);
+}
+
+.cs-implicit {
+  margin-top: var(--space-3);
+}
+
+.cs-count {
+  margin-top: var(--space-3);
+}
+
+/* Lista editable de peticiones */
+.cs-list {
+  display: grid;
+  gap: var(--space-2);
+  margin: var(--space-3) 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cs-row {
+  display: grid;
+  gap: var(--space-2) var(--space-3);
+  grid-template-columns: minmax(0, 1fr);
+  align-items: end;
+  padding: var(--space-3);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+}
+
+.cs-first {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.cs-row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+@container (min-width: 34rem) {
+  .cs-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+}
+
+.cs-details {
+  margin-top: var(--space-4);
+}
+
+.cs-details > summary {
+  min-height: 2.75rem;
+  padding-block: var(--space-2);
+  color: var(--color-heading);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cs-details-body {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.cs-assumptions {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--text-sm);
+}
+
+/* Resultado */
+.cs-summary {
+  margin-bottom: var(--space-3);
+  color: var(--color-heading);
+  font-weight: 600;
+}
+
+.cs-errors {
+  margin: 0 0 var(--space-3);
+  padding-left: var(--space-5);
+}
+
+.cs-cards {
+  margin-bottom: var(--space-3);
+}
+
+.cs-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+}
+
+/* La más barata se destaca con borde grueso y texto («La más barata»), no solo con color */
+.cs-card.is-best {
+  border: 3px solid var(--sem-verificado-fg);
+  background: var(--sem-verificado-bg);
+}
+
+.cs-card .ix-big-label,
+.cs-card .ix-big,
+.cs-card-note {
+  margin: 0;
+}
+
+.cs-card-note {
+  color: var(--color-text);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.cs-breakeven {
+  margin-top: var(--space-4);
+}
+
+.cs-breakeven p {
+  margin: var(--space-2) 0;
+}
+
+.cs-breakeven .cs-sub {
+  margin-bottom: var(--space-1);
+}
+
+/* Línea temporal (dibujo complementario, aria-hidden) */
+.cs-timeline {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 12rem;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+}
+
+.cs-axis {
+  stroke: var(--color-border-strong);
+  stroke-width: 1;
+}
+
+.cs-bar.is-hit,
+.cs-mark.is-hit {
+  fill: var(--sem-verificado-fg);
+}
+
+.cs-bar.is-write,
+.cs-mark.is-write {
+  fill: var(--sem-novedad-fg);
+}
+
+.cs-bar.is-plain,
+.cs-mark.is-plain {
+  fill: var(--sem-neutro-fg);
+}
+
+.cs-link {
+  stroke-width: 2;
+}
+
+.cs-link.is-alive {
+  stroke: var(--sem-verificado-fg);
+}
+
+.cs-link.is-expired {
+  stroke: var(--sem-cuidado-fg);
+  stroke-dasharray: 5 4;
+}
+
+.cs-label {
+  fill: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.cs-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-4);
+  margin: var(--space-2) 0 var(--space-3);
+  padding: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  list-style: none;
+}

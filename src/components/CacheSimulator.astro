@@ -1,0 +1,80 @@
+---
+import { loadPricingCatalog, loadSources } from '@lib/data-access';
+import { DEFAULT_SIMULATOR_STATE, SCENARIOS, compareOptions, formatCost } from '@lib/cache-simulator';
+import { formatDate, formatNumber } from '@lib/format';
+import type { PriceSource, Provider } from '@lib/pricing';
+import CacheSimulator from './interactive/CacheSimulator';
+
+/**
+ * Simulador de caché de prompts (isla React). Los precios y las reglas de caché salen del catálogo
+ * (models.json y model-pricing-details.json). Sin JavaScript se ve la regla y una tabla con el
+ * ejemplo precargado, calculada con la misma lógica que la isla.
+ */
+const [catalog, allSources] = await Promise.all([loadPricingCatalog(), loadSources()]);
+
+const pick = (ids: string[]): PriceSource[] =>
+  ids.flatMap((id) => {
+    const s = allSources.find((x) => x.id === id);
+    return s ? [{ title: s.title, url: s.url }] : [];
+  });
+const ruleSources: Record<Provider, PriceSource[]> = {
+  anthropic: pick(['anthropic-prompt-caching']),
+  openai: pick(['openai-precios', 'openai-ultimo-modelo-y-migracion']),
+  google: pick(['google-precios']),
+};
+// Fecha de compilación: el servidor y la isla usan la misma, así que el HTML hidratado coincide.
+const asOf = new Date().toISOString().slice(0, 10);
+
+const d = DEFAULT_SIMULATOR_STATE;
+const model = catalog.models.find((m) => m.id === d.modelId);
+const scenario = SCENARIOS.find((s) => s.id === d.scenarioId);
+if (!model || !scenario) throw new Error('<CacheSimulator>: falta el modelo o el escenario del ejemplo');
+const out = compareOptions({
+  model,
+  prefixTokens: d.prefixTokens,
+  variableTokens: d.variableTokens,
+  outputTokens: d.outputTokens,
+  gapsSeconds: scenario.gapsMinutes.map((m) => Math.round(m * 60)),
+  asOf,
+});
+if (!out.ok) throw new Error('<CacheSimulator>: el ejemplo por defecto no es válido');
+const options = out.comparison.options;
+---
+
+<CacheSimulator client:visible catalog={catalog} ruleSources={ruleSources} asOf={asOf} />
+<noscript>
+  <h3>Simulador de caché de prompts</h3>
+  <p>
+    Este simulador necesita JavaScript. La regla que aplica: la primera petición escribe el prefijo en la
+    caché (la escritura cuesta más que la entrada normal); cada petición siguiente que llega dentro del TTL (5
+    minutos o 1 hora en Claude) lo lee a una fracción del precio de entrada y renueva el TTL; si pasa más
+    tiempo que el TTL desde el último uso, la entrada caduca y se vuelve a escribir. Un prefijo por debajo del
+    mínimo cacheable del modelo no se cachea.
+  </p>
+  <table>
+    <caption>
+      Ejemplo con{model.name}:{formatNumber(d.prefixTokens)}tokens de prefijo estable,
+      {formatNumber(d.variableTokens)}variables y{formatNumber(d.outputTokens)}de salida por petición.
+      {scenario.description}
+    </caption>
+    <thead>
+      <tr>
+        <th scope="col">Opción</th>
+        <th scope="col">Aciertos</th>
+        <th scope="col">Escrituras</th>
+        <th scope="col">Coste total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {options.map((o) => (
+        <tr>
+          <th scope="row">{o.label}</th>
+          <td>{o.result.counts.hits}</td>
+          <td>{o.result.counts.writes}</td>
+          <td>{formatCost(o.result.totals.total)}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p>Precios del catálogo del sitio, verificados el {formatDate(model.verifiedAt)}.</p>
+</noscript>

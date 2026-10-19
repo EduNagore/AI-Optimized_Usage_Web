@@ -30,6 +30,7 @@ import ProviderTabs from '@components/ProviderTabs.astro';
 import Steps from '@components/Steps.astro';
 import Checklist from '@components/Checklist.astro';
 import CostExample from '@components/CostExample.astro';
+import CacheSimulator from '@components/CacheSimulator.astro';
 
 <KeyTakeaways>
 
@@ -91,6 +92,12 @@ En esa misma guía, Anthropic calcula que el punto de equilibrio está en torno 
 En el tráfico real de un día de Anthropic, los bucles de agente leyeron de la caché una mediana del 84 % de su entrada, y el 10 % superior, el 94 % o más. Son cifras del proveedor en su propio entorno, que la propia página presenta como direccionales y no como garantía. Aun así, indican que en un bucle bien construido casi toda la entrada se lee, no se paga completa.
 
 </Callout>
+
+## Simula tu caso
+
+Pon el tamaño de tu prefijo estable y la separación entre peticiones, y el simulador cuenta aciertos y fallos con cada TTL y compara el coste sin caché, con 5 minutos y con 1 hora. Los precios salen de los datos del sitio; los tamaños y las separaciones son supuestos tuyos, y los supuestos del modelo de cálculo (por ejemplo, cuándo está disponible una entrada recién escrita) están a la vista y se pueden cambiar.
+
+<CacheSimulator />
 
 ## Qué invalida la caché
 
