@@ -1,0 +1,204 @@
+/*
+ * Diagnóstico de madurez. Prefijo `mad-`; la base común está en interactive.css.
+ * El tramo de cada dimensión se escribe siempre con texto («Sólido», «En camino»…): la barra
+ * (`<meter>`) refuerza, no es la única señal.
+ */
+
+/* Solo para lectores de pantalla */
+.mad-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.maturity .mad-heading {
+  margin: 0 0 var(--space-2);
+  color: var(--color-heading);
+  font-size: var(--text-xl);
+  line-height: 1.25;
+}
+
+.maturity .mad-heading:focus-visible,
+.maturity .mad-question legend:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 4px;
+}
+
+.maturity .mad-subheading {
+  margin: var(--space-5) 0 var(--space-2);
+  color: var(--color-heading);
+  font-size: var(--text-lg);
+  line-height: 1.3;
+}
+
+.mad-notes {
+  margin: 0 0 var(--space-4);
+  padding-left: var(--space-5);
+  font-size: var(--text-sm);
+}
+
+.mad-notes li + li {
+  margin-top: var(--space-2);
+}
+
+/* Progreso: barra + texto «Pregunta n de N» dentro de la leyenda */
+.mad-progress {
+  margin-bottom: var(--space-3);
+}
+
+.maturity progress {
+  display: block;
+  width: 100%;
+  height: 0.75rem;
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  accent-color: var(--color-accent);
+}
+
+.maturity progress::-webkit-progress-bar {
+  background: var(--color-bg);
+}
+
+.maturity progress::-webkit-progress-value {
+  background: var(--color-accent);
+}
+
+.maturity progress::-moz-progress-bar {
+  background: var(--color-accent);
+}
+
+.mad-question {
+  min-width: 0;
+  margin: 0 0 var(--space-3);
+  padding: 0;
+  border: 0;
+}
+
+.mad-question legend {
+  display: block;
+  width: 100%;
+  margin-bottom: var(--space-2);
+  padding: 0;
+}
+
+.mad-step {
+  display: block;
+  margin-bottom: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.mad-question-text {
+  display: block;
+  margin-top: var(--space-2);
+  color: var(--color-heading);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+/* Tabla del perfil: dos columnas que se ajustan al ancho, sin desplazamiento */
+.maturity .mad-table {
+  display: table;
+  width: 100%;
+  margin: 0;
+}
+
+.maturity .mad-table :where(th, td) {
+  white-space: normal;
+  vertical-align: top;
+}
+
+.maturity .mad-table tbody th {
+  width: 45%;
+  color: var(--color-heading);
+  font-weight: 600;
+}
+
+.mad-table-wrap {
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.mad-points {
+  display: block;
+  margin-bottom: var(--space-1);
+  font-variant-numeric: tabular-nums;
+}
+
+.maturity meter {
+  display: block;
+  width: 100%;
+  height: 0.75rem;
+  background: var(--color-bg);
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+}
+
+.maturity meter::-webkit-meter-bar {
+  background: var(--color-bg);
+  border: 0;
+}
+
+.maturity meter::-webkit-meter-optimum-value,
+.maturity meter::-webkit-meter-suboptimum-value,
+.maturity meter::-webkit-meter-even-less-good-value {
+  background: var(--color-accent);
+}
+
+.maturity meter::-moz-meter-bar {
+  background: var(--color-accent);
+}
+
+.maturity :where(.mad-focus, .mad-pages) {
+  margin: 0;
+  padding-left: var(--space-5);
+}
+
+.mad-focus li + li,
+.mad-pages li + li {
+  margin-top: var(--space-3);
+}
+
+.mad-aside {
+  color: var(--color-text-muted);
+}
+
+.mad-pages li {
+  padding-left: var(--space-1);
+}
+
+.mad-pages a {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.mad-meta,
+.mad-why {
+  display: block;
+  font-size: var(--text-sm);
+}
+
+.mad-meta {
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.maturity .ix-actions {
+  margin-top: var(--space-4);
+}
+
+.maturity .ix-big-label {
+  margin-bottom: var(--space-2);
+  color: var(--color-heading);
+  font-size: var(--text-lg);
+  font-weight: 700;
+}

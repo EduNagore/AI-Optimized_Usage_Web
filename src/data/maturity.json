@@ -1,0 +1,734 @@
+[
+  {
+    "id": "diagnostico-madurez",
+    "version": 1,
+    "dimensions": [
+      {
+        "id": "metodo",
+        "label": "Método y encargo",
+        "summary": "Cómo defines la tarea, el criterio de éxito y qué haces cuando algo no sale."
+      },
+      {
+        "id": "prompting",
+        "label": "Prompting",
+        "summary": "Cómo das contexto y pides la forma de la respuesta."
+      },
+      {
+        "id": "modelo",
+        "label": "Modelo y esfuerzo",
+        "summary": "Cómo eliges el modelo y el nivel de razonamiento."
+      },
+      {
+        "id": "tokens",
+        "label": "Tokens y coste",
+        "summary": "Cómo gestionas el contexto y controlas lo que cuesta."
+      },
+      {
+        "id": "herramientas",
+        "label": "Herramientas y conexiones",
+        "summary": "Qué superficie usas y cómo aprovechas conectores, skills e instrucciones persistentes."
+      },
+      {
+        "id": "calidad",
+        "label": "Calidad y seguridad",
+        "summary": "Cómo verificas, mides los cambios y proteges los datos."
+      },
+      {
+        "id": "agentes",
+        "label": "Agentes y automatización",
+        "summary": "Cuándo recurres a agentes o tareas programadas y cómo les encargas el trabajo.",
+        "note": "Si tu trabajo no pide agentes ni automatizaciones, una puntuación baja aquí es razonable: la guía recomienda usar la superficie más simple que resuelva la tarea.",
+        "prerequisites": [{ "dimension": "metodo", "minPercent": 33 }]
+      }
+    ],
+    "questions": [
+      {
+        "id": "metodo-encargo",
+        "dimension": "metodo",
+        "text": "Cuando vas a pedirle algo importante a un modelo, ¿cómo suele ser tu encargo?",
+        "options": [
+          { "id": "a", "points": 0, "text": "Escribo lo primero que se me ocurre y lo voy corrigiendo sobre la marcha." },
+          { "id": "b", "points": 1, "text": "Pienso lo que quiero y lo resumo en una o dos frases." },
+          { "id": "c", "points": 2, "text": "Indico el objetivo, el material de partida y el formato que espero." },
+          {
+            "id": "d",
+            "points": 3,
+            "text": "Uso una estructura fija: objetivo, motivo, material, restricciones, formato y criterio de éxito, con más detalle cuanto mayor es el riesgo."
+          }
+        ]
+      },
+      {
+        "id": "metodo-reinicio",
+        "dimension": "metodo",
+        "text": "Cuando una conversación se alarga o el resultado no te convence, ¿qué haces?",
+        "options": [
+          { "id": "a", "points": 0, "text": "Sigo en la misma conversación, corrigiendo hasta que sale bien." },
+          { "id": "b", "points": 1, "text": "Sigo corrigiendo y, si se enreda mucho, abro una conversación nueva." },
+          {
+            "id": "c",
+            "points": 2,
+            "text": "Tras dos correcciones que no funcionan, empiezo una conversación nueva con un encargo mejor."
+          },
+          {
+            "id": "d",
+            "points": 3,
+            "text": "Una tarea, una conversación; y lo que aprendo del fallo lo guardo en una plantilla para la próxima vez."
+          }
+        ]
+      },
+      {
+        "id": "prompting-contexto",
+        "dimension": "prompting",
+        "text": "¿Cómo le explicas al modelo el contexto y las restricciones?",
+        "options": [
+          { "id": "a", "points": 0, "text": "Pido solo lo que quiero, sin explicar para qué." },
+          {
+            "id": "b",
+            "points": 1,
+            "text": "Añado algo de contexto y recurro a mayúsculas o a «muy importante» para lo crítico."
+          },
+          { "id": "c", "points": 2, "text": "Doy el contexto y el objetivo, y explico el motivo de cada restricción." },
+          {
+            "id": "d",
+            "points": 3,
+            "text": "Además ordeno el material: documentos primero, pregunta al final, y cada documento identificado."
+          }
+        ]
+      },
+      {
+        "id": "prompting-formato",
+        "dimension": "prompting",
+        "text": "¿Cómo consigues la forma de respuesta que necesitas (tabla, tono, longitud, JSON)?",
+        "options": [
+          { "id": "a", "points": 0, "text": "Acepto la respuesta como venga y le cambio el formato yo." },
+          { "id": "b", "points": 1, "text": "Lo pido con palabras: «en una tabla», «breve», «formal»." },
+          { "id": "c", "points": 2, "text": "Incluyo un ejemplo del resultado que espero." },
+          {
+            "id": "d",
+            "points": 3,
+            "text": "Incluyo un ejemplo y, cuando lo lee un programa, uso una salida estructurada con esquema; reutilizo los prompts que funcionan."
+          }
+        ]
+      },
+      {
+        "id": "modelo-cual",
+        "dimension": "modelo",
+        "text": "¿Cómo eliges el modelo para una tarea?",
+        "options": [
+          { "id": "a", "points": 0, "text": "Uso el que viene por defecto, sin pensarlo." },
+          { "id": "b", "points": 1, "text": "Uso siempre el más potente por si acaso, o siempre el más barato." },
+          { "id": "c", "points": 2, "text": "Distingo entre tareas sencillas y difíciles y cambio de modelo según el caso." },
+          {
+            "id": "d",
+            "points": 3,
+            "text": "Parto de un modelo capaz y pruebo con una muestra de mis tareas antes de subir o bajar de modelo."
+          }
+        ]
+      },
+      {
+        "id": "modelo-esfuerzo",
+        "dimension": "modelo",
+        "text": "¿Qué haces con el nivel de esfuerzo (effort) o el modo de razonamiento?",
+        "options": [
+          { "id": "a", "points": 0, "text": "No lo toco o no sabía que existía." },
+          { "id": "b", "points": 1, "text": "Lo subo al máximo cuando la respuesta no me convence." },
+          {
+            "id": "c",
+            "points": 2,
+            "text": "Lo ajusto según la dificultad: bajo en lo simple, alto en lo que exige razonar."
+          },
+          {
+            "id": "d",
+            "points": 3,
+            "text": "Lo ajusto y lo compruebo con casos reales, incluidos los difíciles; subo solo si falla y lo anoto."
+          }
+        ]
+      },
+      {
+        "id": "tokens-contexto",
+        "dimension": "tokens",
+        "text": "¿Cómo gestionas el contexto en conversaciones largas o con muchos documentos?",
+        "options": [
+          { "id": "a", "points": 0, "text": "No lo había pensado: pego todo y sigo en el mismo chat." },
+          { "id": "b", "points": 1, "text": "Abro un chat nuevo cuando el actual va lento o se pierde." },
+          {
+            "id": "c",
+            "points": 2,
+            "text": "Una conversación por tema, pego solo el fragmento relevante y uso proyectos o conocimiento propio cuando existen."
+          },
+          {
+            "id": "d",
+            "points": 3,
+            "text": "Además vigilo el contexto con las herramientas que lo permiten y cargo lo voluminoso solo bajo demanda."
+          }
+        ]
+      },
+      {
+        "id": "tokens-coste",
+        "dimension": "tokens",
+        "text": "¿Cómo controlas el coste de lo que repites o haces en volumen?",
+        "options": [
+          { "id": "a", "points": 0, "text": "No lo controlo: o no uso la API, o no he mirado el coste." },
+          { "id": "b", "points": 1, "text": "Miro el consumo o la factura cuando ya ha pasado." },
+          {
+            "id": "c",
+            "points": 2,
+            "text": "Estimo el coste por tarea antes de lanzar y uso lotes (batch) para lo que no corre prisa."
+          },
+          {
+            "id": "d",
+            "points": 3,
+            "text": "Mido el coste por tarea completada, ordeno el prompt para aprovechar la caché y compruebo que acierta."
+          }
+        ]
+      },
+      {
+        "id": "herramientas-superficie",
+        "dimension": "herramientas",
+        "text": "¿Qué superficie usas para cada tipo de trabajo?",
+        "options": [
+          { "id": "a", "points": 0, "text": "Un chat para todo." },
+          { "id": "b", "points": 1, "text": "El chat, y a veces subo ficheros." },
+          {
+            "id": "c",
+            "points": 2,
+            "text": "Chat, proyectos con conocimiento propio y alguna función específica (investigación, ejecución de código) según la tarea."
+          },
+          {
+            "id": "d",
+            "points": 3,
+            "text": "Elijo la superficie más simple que resuelve cada tarea (chat, proyecto, agente de código, API) y sé explicar por qué."
+          }
+        ]
+      },
+      {
+        "id": "herramientas-extensiones",
+        "dimension": "herramientas",
+        "text": "¿Cómo usas conectores, MCP, skills o instrucciones persistentes (instrucciones personalizadas, CLAUDE.md, AGENTS.md)?",
+        "options": [
+          { "id": "a", "points": 0, "text": "No los uso." },
+          {
+            "id": "b",
+            "points": 1,
+            "text": "Los he activado, pero no he revisado qué permisos tienen ni cuánto contexto ocupan."
+          },
+          {
+            "id": "c",
+            "points": 2,
+            "text": "Tengo instrucciones persistentes cortas y conecto solo lo que necesito."
+          },
+          {
+            "id": "d",
+            "points": 3,
+            "text": "Mantengo las instrucciones breves, uso skills para lo repetible y reviso permisos y coste en contexto de cada conector."
+          }
+        ]
+      },
+      {
+        "id": "calidad-verificacion",
+        "dimension": "calidad",
+        "text": "¿Cómo compruebas el trabajo del modelo antes de usarlo?",
+        "options": [
+          { "id": "a", "points": 0, "text": "Si suena bien, lo uso." },
+          { "id": "b", "points": 1, "text": "Lo leo por encima." },
+          { "id": "c", "points": 2, "text": "Pido citas o cifras comprobables y reviso una muestra." },
+          {
+            "id": "d",
+            "points": 3,
+            "text": "Pido evidencias en el propio encargo, vuelvo a calcular lo crítico y, si el riesgo es alto, añado una segunda revisión en contexto limpio."
+          }
+        ]
+      },
+      {
+        "id": "calidad-evals",
+        "dimension": "calidad",
+        "text": "Cuando cambias de modelo, de prompt o de configuración, ¿cómo sabes si el resultado mejora?",
+        "options": [
+          { "id": "a", "points": 0, "text": "Pruebo un par de casos y me quedo con mi impresión." },
+          { "id": "b", "points": 1, "text": "Comparo lado a lado unos ejemplos que recuerdo." },
+          { "id": "c", "points": 2, "text": "Guardo algunos casos reales y los repito cuando cambio algo." },
+          {
+            "id": "d",
+            "points": 3,
+            "text": "Tengo un conjunto de 20 a 30 casos reales con un criterio de juicio y comparo acierto y coste por tarea."
+          }
+        ]
+      },
+      {
+        "id": "calidad-datos",
+        "dimension": "calidad",
+        "text": "¿Qué criterio sigues con datos personales, confidenciales o secretos (claves, contraseñas)?",
+        "options": [
+          { "id": "a", "points": 0, "text": "No lo había considerado: pego lo que haga falta." },
+          {
+            "id": "b",
+            "points": 1,
+            "text": "Evito lo más obvio por prudencia, sin conocer la política de la herramienta."
+          },
+          {
+            "id": "c",
+            "points": 2,
+            "text": "Sé qué datos no pegar y he mirado la política de retención y de uso de datos de la herramienta."
+          },
+          {
+            "id": "d",
+            "points": 3,
+            "text": "Además reviso los permisos de conectores y agentes, trato el contenido externo como dato y no como instrucciones, y dejo las claves fuera del prompt."
+          }
+        ]
+      },
+      {
+        "id": "agentes-decision",
+        "dimension": "agentes",
+        "text": "¿Cómo decides si una tarea necesita un agente o una automatización?",
+        "options": [
+          { "id": "a", "points": 0, "text": "No uso agentes ni automatizaciones, por ahora no los he necesitado." },
+          { "id": "b", "points": 1, "text": "Pruebo un agente cuando oigo que hace algo útil, sin compararlo con un chat." },
+          {
+            "id": "c",
+            "points": 2,
+            "text": "Lo uso cuando la tarea tiene varios pasos que no puedo especificar de antemano; si basta un chat o un flujo fijo, uso eso."
+          },
+          {
+            "id": "d",
+            "points": 3,
+            "text": "Aplico criterios explícitos (complejidad, valor, viabilidad y coste del error) y subo de escalón solo cuando el anterior falla."
+          }
+        ]
+      },
+      {
+        "id": "agentes-reparto",
+        "dimension": "agentes",
+        "text": "Cuando delegas trabajo en un agente, un subagente o una tarea programada, ¿cómo lo haces?",
+        "options": [
+          { "id": "a", "points": 0, "text": "No delego trabajo así por ahora." },
+          { "id": "b", "points": 1, "text": "Doy una instrucción general y reviso el resultado al final." },
+          {
+            "id": "c",
+            "points": 2,
+            "text": "Doy objetivo, límites y formato de retorno, y pido confirmación antes de las acciones irreversibles."
+          },
+          {
+            "id": "d",
+            "points": 3,
+            "text": "Dejo el encargo completo por escrito (objetivo, ficheros, límites, criterio de terminado), asigno modelo y esfuerzo por rol y verifico con un revisor independiente."
+          }
+        ]
+      }
+    ],
+    "bands": [
+      { "id": "recorrido", "label": "Con recorrido", "minPercent": 0 },
+      { "id": "en-camino", "label": "En camino", "minPercent": 33 },
+      { "id": "solido", "label": "Sólido", "minPercent": 66 }
+    ],
+    "levels": [
+      {
+        "id": "primeros-pasos",
+        "label": "Primeros pasos",
+        "min": 0,
+        "description": "Usas la IA sobre todo de forma intuitiva: pruebas, preguntas y ajustas sobre la marcha. Hay mucho margen con poco esfuerzo: unos pocos hábitos (dar contexto, pedir el formato y comprobar el resultado) cambian bastante lo que obtienes."
+      },
+      {
+        "id": "uso-habitual",
+        "label": "Uso habitual",
+        "min": 12,
+        "description": "Ya tienes rutinas que funcionan y obtienes resultados útiles con regularidad. El siguiente paso es depender menos de la improvisación: convertir lo que te funciona en método y empezar a comprobar el resultado y el coste."
+      },
+      {
+        "id": "uso-con-metodo",
+        "label": "Uso metódico",
+        "min": 24,
+        "requires": [
+          { "dimension": "metodo", "minPercent": 33 },
+          { "dimension": "calidad", "minPercent": 33 }
+        ],
+        "description": "Trabajas con método: defines el encargo, eliges herramienta y modelo con criterio y compruebas lo que sale. Lo que queda es ajustar con datos: medir coste y calidad y sistematizar lo repetible."
+      },
+      {
+        "id": "uso-optimizado",
+        "label": "Uso optimizado",
+        "min": 36,
+        "requires": [
+          { "dimension": "metodo", "minPercent": 66 },
+          { "dimension": "calidad", "minPercent": 66 }
+        ],
+        "description": "Mides, comparas y automatizas con criterio, y sabes cuándo no hace falta más complejidad. Mantén el hábito de revisar tus decisiones: los modelos, los precios y las herramientas cambian cada pocas semanas."
+      }
+    ],
+    "limits": { "focusMax": 3, "pagesMax": 8 },
+    "recommendations": {
+      "metodo": [
+        {
+          "page": "m0-empieza-aqui/las-10-reglas",
+          "bands": ["recorrido"],
+          "why": "Resume el método en diez hábitos, cada uno con su porqué. Es la entrada más corta a todo lo demás."
+        },
+        {
+          "page": "m2-metodo/plantilla-de-encargo",
+          "bands": ["recorrido", "en-camino"],
+          "why": "Una plantilla con objetivo, motivo, material, restricciones, formato y criterio de éxito para no empezar cada encargo desde cero."
+        },
+        {
+          "page": "m2-metodo/ciclo-de-7-pasos",
+          "bands": ["recorrido", "en-camino"],
+          "why": "El marco completo, de clasificar la tarea a sistematizarla; sitúa el resto de páginas."
+        },
+        {
+          "page": "m2-metodo/errores-de-metodo",
+          "bands": ["recorrido", "en-camino", "solido"],
+          "why": "Describe la conversación cajón de sastre y el bucle de correcciones, y cuándo conviene empezar de cero."
+        },
+        {
+          "page": "m2-metodo/taxonomia-de-tareas",
+          "bands": ["en-camino"],
+          "why": "Clasificar la tarea es el primer paso del ciclo: doce tipos con su superficie y su verificación habituales."
+        },
+        {
+          "page": "m3-prompting/que-la-ia-te-entreviste",
+          "bands": ["en-camino", "solido"],
+          "why": "Cuando no sabes cómo formular el encargo, deja que el modelo te pregunte y escriba la especificación."
+        },
+        {
+          "page": "m2-metodo/coste-por-tarea",
+          "bands": ["solido"],
+          "why": "Para pasar de «me funciona» a «cuánto cuesta terminar la tarea»."
+        }
+      ],
+      "prompting": [
+        {
+          "page": "m3-prompting/principios",
+          "bands": ["recorrido", "en-camino"],
+          "why": "Claridad, contexto y motivo, ejemplos y estructura: los principios que siguen valiendo con cualquier modelo."
+        },
+        {
+          "page": "m3-prompting/que-ha-cambiado",
+          "bands": ["recorrido", "en-camino"],
+          "why": "Qué trucos (mayúsculas, «piensa paso a paso») ya no hacen falta y qué los sustituye."
+        },
+        {
+          "page": "m3-prompting/formato-y-longitud",
+          "bands": ["recorrido", "en-camino", "solido"],
+          "why": "Cómo pedir la forma de la salida con un ejemplo y cuándo usar una salida estructurada."
+        },
+        {
+          "page": "m3-prompting/biblioteca-de-plantillas",
+          "bands": ["recorrido", "en-camino"],
+          "why": "Veinte plantillas copiables para empezar con algo ya probado."
+        },
+        {
+          "page": "m3-prompting/laboratorio-antes-despues",
+          "bands": ["en-camino"],
+          "why": "Prompts reales mejorados y anotados: se aprende por comparación."
+        },
+        {
+          "page": "m3-prompting/contexto-largo",
+          "bands": ["en-camino", "solido"],
+          "why": "Documentos primero, pregunta al final y citas antes del análisis cuando el material es largo."
+        },
+        {
+          "page": "m3-prompting/encadenar-y-autocorregir",
+          "bands": ["solido"],
+          "why": "Borrador, revisión contra criterios y versión final, cada paso por separado."
+        },
+        {
+          "page": "m3-prompting/auditar-tus-prompts",
+          "bands": ["solido"],
+          "why": "Una lista para limpiar de tus prompts los restos que los modelos actuales ya no necesitan."
+        },
+        {
+          "page": "m3-prompting/notas-por-modelo",
+          "bands": ["solido"],
+          "why": "Particularidades de cada modelo actual que conviene tener en cuenta al escribir el encargo."
+        }
+      ],
+      "modelo": [
+        {
+          "page": "m4-modelo-y-esfuerzo/mapa-de-modelos",
+          "bands": ["recorrido", "en-camino"],
+          "why": "Qué modelos hay por nivel, con su contexto, su precio y para qué destacan."
+        },
+        {
+          "page": "m1-fundamentos/razonamiento-y-esfuerzo",
+          "bands": ["recorrido"],
+          "why": "Cómo decide un modelo cuánto pensar y qué controla el parámetro de esfuerzo."
+        },
+        {
+          "page": "m4-modelo-y-esfuerzo/esfuerzo-y-razonamiento",
+          "bands": ["recorrido", "en-camino"],
+          "why": "Los niveles de esfuerzo, qué cambia en cada uno y sus equivalencias entre proveedores."
+        },
+        {
+          "page": "m4-modelo-y-esfuerzo/selector-interactivo",
+          "bands": ["recorrido", "en-camino"],
+          "why": "Una recomendación razonada de superficie, modelo y esfuerzo para una tarea concreta."
+        },
+        {
+          "page": "m4-modelo-y-esfuerzo/matriz-por-tarea",
+          "bands": ["en-camino"],
+          "why": "Superficie, modelo, esfuerzo y verificación recomendados para cada tipo de tarea."
+        },
+        {
+          "page": "m4-modelo-y-esfuerzo/estrategia-de-seleccion",
+          "bands": ["en-camino", "solido"],
+          "why": "Cómo decidir midiendo: del modelo capaz a esfuerzo bajo a los patrones mixtos."
+        },
+        {
+          "page": "m4-modelo-y-esfuerzo/modelos-de-frontera",
+          "bands": ["solido"],
+          "why": "Para qué trabajo compensa el modelo más potente y qué restricciones trae."
+        }
+      ],
+      "tokens": [
+        {
+          "page": "m1-fundamentos/tokens",
+          "bands": ["recorrido"],
+          "why": "Qué es un token y por qué el mismo texto cuesta distinto según el modelo."
+        },
+        {
+          "page": "m1-fundamentos/ventana-de-contexto",
+          "bands": ["recorrido", "en-camino"],
+          "why": "Por qué cada turno reenvía todo el historial y por qué conviene no llenar la ventana."
+        },
+        {
+          "page": "m5-tokens-y-contexto/por-que-se-dispara-el-gasto",
+          "bands": ["recorrido", "en-camino"],
+          "why": "Las causas habituales de un consumo inesperado y cómo reconocerlas."
+        },
+        {
+          "page": "m5-tokens-y-contexto/orden-de-las-palancas",
+          "bands": ["recorrido", "en-camino"],
+          "why": "Qué ahorra sin coste de calidad y qué exige un compromiso medido: el orden importa."
+        },
+        {
+          "page": "m5-tokens-y-contexto/en-apps-de-chat",
+          "bands": ["recorrido", "en-camino"],
+          "why": "Hábitos para el chat: una conversación por tema y fragmentos en lugar de documentos enteros."
+        },
+        {
+          "page": "m5-tokens-y-contexto/calculadora-de-coste",
+          "bands": ["en-camino", "solido"],
+          "why": "Estima el coste de una tarea y de un mes de trabajo y comprueba el efecto de cada palanca."
+        },
+        {
+          "page": "m5-tokens-y-contexto/higiene-de-entrada",
+          "bands": ["en-camino", "solido"],
+          "why": "Cargar solo lo necesario: skills, documentos tras una herramienta, imágenes reducidas."
+        },
+        {
+          "page": "m5-tokens-y-contexto/prompt-caching",
+          "bands": ["en-camino", "solido"],
+          "why": "Cómo ordenar el prompt para aprovechar la caché y comprobar que funciona."
+        },
+        {
+          "page": "m5-tokens-y-contexto/medir",
+          "bands": ["en-camino", "solido"],
+          "why": "Los campos de uso y los indicadores que importan: coste por tarea y acierto de caché."
+        },
+        {
+          "page": "m5-tokens-y-contexto/batch",
+          "bands": ["solido"],
+          "why": "El descuento por el trabajo que nadie espera de inmediato y cómo se combina con la caché."
+        },
+        {
+          "page": "m5-tokens-y-contexto/higiene-del-bucle",
+          "bands": ["solido"],
+          "why": "Context editing, compactación y subagentes para sesiones largas."
+        },
+        {
+          "page": "m5-tokens-y-contexto/dia-a-dia-en-claude-code",
+          "bands": ["solido"],
+          "why": "Hábitos y comandos para gastar menos en Claude Code."
+        }
+      ],
+      "herramientas": [
+        {
+          "page": "m6-herramientas/mapa-de-superficies",
+          "bands": ["recorrido", "en-camino"],
+          "why": "Apps de chat, agentes de código y APIs de cada proveedor, y para qué sirve cada una."
+        },
+        {
+          "page": "m6-herramientas/cual-usar-para-que",
+          "bands": ["recorrido", "en-camino"],
+          "why": "Una tabla de decisión por tipo de tarea y perfil."
+        },
+        {
+          "page": "m1-fundamentos/herramientas-mcp-y-agentes",
+          "bands": ["recorrido"],
+          "why": "Qué es una herramienta, para qué sirve MCP y en qué se diferencian chat, flujo y agente."
+        },
+        {
+          "page": "m6-herramientas/ficheros-de-instrucciones-y-memoria",
+          "bands": ["recorrido", "en-camino", "solido"],
+          "why": "Qué incluir y qué dejar fuera en las instrucciones persistentes y en la memoria."
+        },
+        {
+          "page": "m2-metodo/elegir-superficie",
+          "bands": ["en-camino", "solido"],
+          "why": "Cuándo basta el chat y cuándo un proyecto, un agente o la API."
+        },
+        {
+          "page": "m6-herramientas/conectores-y-mcp",
+          "bands": ["en-camino", "solido"],
+          "why": "Qué cuestan los conectores en contexto, qué permisos piden y qué riesgos tienen."
+        },
+        {
+          "page": "m6-herramientas/skills",
+          "bands": ["en-camino", "solido"],
+          "why": "Cuándo usar una skill, un fichero de instrucciones, un hook o un subagente."
+        },
+        {
+          "page": "m7-claude-code/primeros-pasos",
+          "bands": ["solido"],
+          "why": "Si trabajas con código: instalación, permisos y configuración inicial de Claude Code."
+        },
+        {
+          "page": "m7-claude-code/extender-claude-code",
+          "bands": ["solido"],
+          "why": "Qué extensión usar para cada necesidad y cuánto cuesta en contexto."
+        }
+      ],
+      "calidad": [
+        {
+          "page": "m9-calidad-y-seguridad/verificar-siempre",
+          "bands": ["recorrido", "en-camino"],
+          "why": "Pedir evidencias y cerrar el bucle en el propio encargo: un resultado bien redactado no es un resultado correcto."
+        },
+        {
+          "page": "m9-calidad-y-seguridad/privacidad-y-seguridad",
+          "bands": ["recorrido", "en-camino", "solido"],
+          "why": "Qué datos no pegar, qué retención aplica y cómo tratar el contenido externo y las acciones irreversibles."
+        },
+        {
+          "page": "m9-calidad-y-seguridad/alucinaciones",
+          "bands": ["recorrido", "en-camino"],
+          "why": "Cómo reducirlas con citas literales, permiso para decir «no lo sé» y comprobación cruzada."
+        },
+        {
+          "page": "m9-calidad-y-seguridad/evals-minimas",
+          "bands": ["recorrido", "en-camino", "solido"],
+          "why": "Un conjunto de 20 a 30 casos reales para saber si un cambio mejora de verdad."
+        },
+        {
+          "page": "m9-calidad-y-seguridad/gobernanza-para-equipos",
+          "bands": ["solido"],
+          "why": "Si coordinas a un equipo: límites de gasto, configuración compartida y plan de adopción."
+        }
+      ],
+      "agentes": [
+        {
+          "page": "m1-fundamentos/herramientas-mcp-y-agentes",
+          "bands": ["recorrido"],
+          "why": "El bucle de un agente y la diferencia entre chat, flujo y agente."
+        },
+        {
+          "page": "m8-agentes/escalera-de-complejidad",
+          "bands": ["recorrido", "en-camino"],
+          "why": "De la llamada única al multiagente: cuatro preguntas para decidir hasta dónde subir."
+        },
+        {
+          "page": "m8-agentes/cuando-no-orquestar",
+          "bands": ["recorrido", "en-camino", "solido"],
+          "why": "Señales de que te conviene quedarte con un solo modelo."
+        },
+        {
+          "page": "m3-prompting/tareas-largas-y-agentes",
+          "bands": ["en-camino", "solido"],
+          "why": "Cómo escribir encargos con criterios de verificación y límites de autonomía."
+        },
+        {
+          "page": "m8-agentes/patrones",
+          "bands": ["en-camino", "solido"],
+          "why": "Cuándo compensa cada patrón de orquestación y cuándo no."
+        },
+        {
+          "page": "m8-agentes/encargo-a-subagentes",
+          "bands": ["en-camino", "solido"],
+          "why": "Plantilla de encargo a un subagente, con un ejemplo malo frente a uno bueno."
+        },
+        {
+          "page": "m8-agentes/modelo-y-esfuerzo-por-rol",
+          "bands": ["solido"],
+          "why": "Qué modelo y qué esfuerzo asignar a orquestador, trabajador y verificador."
+        },
+        {
+          "page": "m7-claude-code/automatizacion",
+          "bands": ["solido"],
+          "why": "Claude Code sin estar delante: modo no interactivo, bucles, rutinas y GitHub."
+        },
+        {
+          "page": "m7-claude-code/trabajo-en-paralelo",
+          "bands": ["solido"],
+          "why": "Subagentes, worktrees y /batch: cuánto cuesta cada forma de trabajar en paralelo."
+        },
+        {
+          "page": "m8-agentes/disenador-de-equipos",
+          "bands": ["solido"],
+          "why": "De la forma de tu tarea a una topología de equipo, con aviso si no compensa orquestar."
+        }
+      ]
+    },
+    "quick": [
+      {
+        "dimension": "metodo",
+        "page": "m2-metodo/plantilla-de-encargo",
+        "why": "Con una sola plantilla mejoras el encargo de tu próxima tarea."
+      },
+      {
+        "dimension": "prompting",
+        "page": "m3-prompting/principios",
+        "why": "Los principios de un buen encargo caben en una lectura corta."
+      },
+      {
+        "dimension": "tokens",
+        "page": "m5-tokens-y-contexto/orden-de-las-palancas",
+        "why": "Te dice por dónde empezar a ahorrar sin perder calidad."
+      },
+      {
+        "dimension": "calidad",
+        "page": "m9-calidad-y-seguridad/verificar-siempre",
+        "why": "El hábito con más retorno: comprobar el resultado antes de usarlo."
+      }
+    ],
+    "quickFallback": {
+      "page": "m0-empieza-aqui/las-10-reglas",
+      "why": "Resume todo el método en diez hábitos con su porqué."
+    },
+    "keepingUp": [
+      {
+        "page": "m12-recursos/novedades",
+        "bands": [],
+        "why": "Modelos, precios y herramientas cambian cada pocas semanas: conviene revisar qué ha cambiado."
+      },
+      {
+        "page": "m9-calidad-y-seguridad/evals-minimas",
+        "bands": [],
+        "why": "Mantén un conjunto de casos para comprobar con datos cada cambio de modelo o de prompt."
+      },
+      {
+        "page": "m8-agentes/cuando-no-orquestar",
+        "bands": [],
+        "why": "Un contrapeso útil: repasa si cada capa de complejidad sigue compensando."
+      }
+    ],
+    "example": {
+      "label": "Perfil de ejemplo: uso habitual con poco control del coste",
+      "answers": {
+        "metodo-encargo": "c",
+        "metodo-reinicio": "b",
+        "prompting-contexto": "c",
+        "prompting-formato": "b",
+        "modelo-cual": "b",
+        "modelo-esfuerzo": "b",
+        "tokens-contexto": "b",
+        "tokens-coste": "a",
+        "herramientas-superficie": "c",
+        "herramientas-extensiones": "b",
+        "calidad-verificacion": "b",
+        "calidad-evals": "a",
+        "calidad-datos": "c",
+        "agentes-decision": "c",
+        "agentes-reparto": "b"
+      }
+    }
+  }
+]

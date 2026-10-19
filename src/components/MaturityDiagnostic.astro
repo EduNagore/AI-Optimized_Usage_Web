@@ -1,0 +1,83 @@
+---
+import { getEntry } from 'astro:content';
+import { levels } from '@lib/modules';
+import { maxTotal, parseMaturityFile, referencedPages, validateMaturityData } from '@lib/maturity';
+import { url } from '@lib/paths';
+import raw from '../data/maturity.json';
+import MaturityDiagnostic, { type MaturityPageInfo } from './interactive/MaturityDiagnostic';
+
+/**
+ * Diagnóstico de madurez (isla React). Las preguntas, los puntos, los niveles y las páginas
+ * recomendadas viven en `src/data/maturity.json`. Aquí se validan en el build (un dato incoherente o
+ * una página inexistente rompe la compilación) y se resuelven los títulos, los tiempos de lectura y las
+ * URL con `base` de cada página citada. Sin JavaScript se ve la explicación estática.
+ */
+const data = parseMaturityFile(raw);
+const problems = validateMaturityData(data);
+if (problems.length > 0) throw new Error(`<MaturityDiagnostic>: datos incoherentes: ${problems.join('; ')}`);
+
+const pages: Record<string, MaturityPageInfo> = {};
+for (const slug of referencedPages(data)) {
+  const entry = await getEntry('docs', slug);
+  if (!entry) throw new Error(`<MaturityDiagnostic>: no existe la página «${slug}»`);
+  if (entry.data.status === 'en-preparacion') {
+    throw new Error(`<MaturityDiagnostic>: la página «${slug}» está en preparación`);
+  }
+  pages[slug] = {
+    title: entry.data.title,
+    url: url(entry.id),
+    readingTime: entry.data.readingTime,
+    levelLabel: entry.data.level ? levels[entry.data.level] : undefined,
+  };
+}
+
+const total = maxTotal(data);
+const ranges = data.levels.map((level, i) => {
+  const next = data.levels[i + 1];
+  return { ...level, to: next ? next.min - 1 : total };
+});
+---
+
+<MaturityDiagnostic client:visible data={data} pages={pages} />
+<noscript>
+  <p>
+    El diagnóstico es un cuestionario de {data.questions.length} preguntas sobre tus hábitos de trabajo con
+    modelos de IA. Cada respuesta suma de 0 a 3 puntos en una de {data.dimensions.length} dimensiones; la suma
+    total, de 0 a {total}, da tu nivel. Es una autoevaluación orientativa, no una evaluación. Necesita
+    JavaScript para hacerse; tus respuestas nunca salen del navegador.
+  </p>
+  <h3>Las dimensiones</h3>
+  <ul>
+    {data.dimensions.map((d) => (
+      <li>
+        <strong>{d.label}.</strong> {d.summary}
+      </li>
+    ))}
+  </ul>
+  <h3>Los niveles</h3>
+  <table>
+    <thead>
+      <tr>
+        <th scope="col">Nivel</th>
+        <th scope="col">Puntos</th>
+        <th scope="col">Qué significa</th>
+      </tr>
+    </thead>
+    <tbody>
+      {ranges.map((l) => (
+        <tr>
+          <th scope="row">{l.label}</th>
+          <td>
+            {l.min} a {l.to}
+          </td>
+          <td>{l.description}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p>
+    Si no puedes ejecutar el cuestionario, empieza por{' '}
+    <a href={pages[data.quickFallback.page]?.url}>{pages[data.quickFallback.page]?.title}</a> y sigue la ruta
+    que se explica en <a href={url('m0-empieza-aqui/como-usar-la-guia')}>Cómo usar esta guía</a>.
+  </p>
+</noscript>
