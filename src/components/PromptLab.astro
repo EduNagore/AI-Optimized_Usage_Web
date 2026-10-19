@@ -1,0 +1,61 @@
+---
+import { getEntry } from 'astro:content';
+import { url } from '@lib/paths';
+import datos from '../data/prompt-lab.json';
+import { promptLabSchema } from '@lib/prompt-lab';
+import PromptLab from './interactive/PromptLab';
+import BeforeAfter from './BeforeAfter.astro';
+
+/**
+ * Laboratorio antes/después (isla React). Sin JavaScript se ven los casos estáticos con las
+ * diferencias resaltadas y sus anotaciones como lista. Los casos viven en `src/data/prompt-lab.json`.
+ */
+// El esquema valida el JSON en el build: un ancla vacía o un campo que falta rompe la compilación.
+const casos = promptLabSchema.parse(datos);
+
+// Lecciones a las que enlazan las anotaciones (una sola consulta por ruta distinta).
+const rutas = [...new Set(casos.flatMap((c) => c.anotaciones.map((a) => a.principio)))];
+const lecciones: Record<string, { titulo: string; href: string }> = {};
+for (const ruta of rutas) {
+  const entry = await getEntry('docs', ruta);
+  if (entry) lecciones[ruta] = { titulo: entry.data.title, href: url(ruta) };
+}
+---
+
+<PromptLab client:visible casos={casos} lecciones={lecciones} />
+<noscript>
+  <p>
+    Ocho prompts reales mejorados. En cada caso se muestra el prompt de partida, el mejorado con las
+    diferencias resaltadas y una lista de qué cambió y por qué. Son ejemplos de la guía, no mediciones.
+  </p>
+  {casos.map((caso, i) => (
+    <section>
+      <h3>
+        {i + 1}. {caso.titulo}
+      </h3>
+      <p>
+        <strong>Para qué se usa:</strong> {caso.escenario}
+      </p>
+      <BeforeAfter antes={caso.antes} despues={caso.despues}>
+        <p>
+          <strong>Qué cambió y por qué</strong>
+        </p>
+        <ol>
+          {caso.anotaciones.map((a) => (
+            <li>
+              <strong>{a.titulo}.</strong> {a.texto}
+              {lecciones[a.principio] && (
+                <>
+                  {' '}
+                  Principio: <a href={lecciones[a.principio]!.href}>{lecciones[a.principio]!.titulo}</a>.
+                </>
+              )}
+              <br />
+              <em>Fragmento: «{a.ancla}»</em>
+            </li>
+          ))}
+        </ol>
+      </BeforeAfter>
+    </section>
+  ))}
+</noscript>

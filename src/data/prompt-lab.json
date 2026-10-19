@@ -1,0 +1,245 @@
+[
+  {
+    "id": "correo-cliente",
+    "titulo": "Un correo al cliente",
+    "escenario": "Avisar a un cliente de un retraso en la entrega.",
+    "antes": "Escribe un correo diciendo que nos retrasamos.",
+    "despues": "Escribe un correo a la responsable de compras de un cliente con el que llevamos cuatro años trabajando. Entregamos con dos semanas de retraso por un fallo de nuestro proveedor. Quiero conservar su confianza y acordar una nueva fecha antes del viernes. Tono cercano y profesional, sin disculpas repetidas. Incluye qué ha pasado, qué hacemos para que no se repita y qué necesito de ella. No prometas nada que no aparezca aquí.",
+    "anotaciones": [
+      {
+        "id": "vinculo",
+        "ancla": "con el que llevamos cuatro años trabajando",
+        "titulo": "La relación",
+        "texto": "Aparece la relación (cuatro años de clientes).",
+        "principio": "m3-prompting/principios"
+      },
+      {
+        "id": "objetivo-tono",
+        "ancla": "Quiero conservar su confianza y acordar una nueva fecha antes del viernes. Tono cercano y profesional, sin disculpas repetidas.",
+        "titulo": "Objetivo y tono",
+        "texto": "Aparecen el objetivo (confianza y fecha) y el motivo del tono.",
+        "principio": "m3-prompting/principios"
+      },
+      {
+        "id": "limite",
+        "ancla": "No prometas nada que no aparezca aquí.",
+        "titulo": "El límite",
+        "texto": "El límite («no prometas nada») evita compromisos inventados.",
+        "principio": "m3-prompting/principios"
+      }
+    ]
+  },
+  {
+    "id": "resumir-informe",
+    "titulo": "Resumir un informe",
+    "escenario": "Preparar un resumen de un informe para quien tiene que decidir.",
+    "antes": "Resume este informe.",
+    "despues": "Resume este informe para el comité de dirección, que decidirá el jueves si renovamos al proveedor. Dame cinco puntos, cada uno con la página donde aparece. Señala las cifras del cuerpo del informe que contradigan el resumen ejecutivo. Si falta información para sostener un punto, dilo.",
+    "anotaciones": [
+      {
+        "id": "quien-decide",
+        "ancla": "para el comité de dirección, que decidirá el jueves si renovamos al proveedor",
+        "titulo": "Quién decide y qué decide",
+        "texto": "Se añade quién decide y qué decide (así el modelo prioriza).",
+        "principio": "m3-prompting/principios"
+      },
+      {
+        "id": "paginas",
+        "ancla": "Dame cinco puntos, cada uno con la página donde aparece.",
+        "titulo": "Páginas para verificar",
+        "texto": "Se piden páginas para verificar.",
+        "principio": "m3-prompting/contexto-largo"
+      },
+      {
+        "id": "contradicciones",
+        "ancla": "Señala las cifras del cuerpo del informe que contradigan el resumen ejecutivo.",
+        "titulo": "Buscar contradicciones",
+        "texto": "Se pide buscar contradicciones, algo que un resumen genérico no hace.",
+        "principio": "m3-prompting/encadenar-y-autocorregir"
+      }
+    ]
+  },
+  {
+    "id": "contrato",
+    "titulo": "Primera lectura de un contrato",
+    "escenario": "Preparar la revisión de un contrato antes de enseñárselo a un abogado.",
+    "antes": "¿Es bueno este contrato?",
+    "despues": "Soy el cliente en este contrato de servicios y mi prioridad es poder salir con poco coste. Para cada cláusula que me perjudique o sea inusual, indica el número, qué dice en lenguaje llano, por qué me afecta y qué cambio pediría. Después, lista las cláusulas habituales que faltan. Cita la cláusula literalmente. Cierra con las tres preguntas que debería hacer a un abogado: esto prepara la revisión profesional, no la sustituye.",
+    "anotaciones": [
+      {
+        "id": "lado-prioridad",
+        "ancla": "Soy el cliente en este contrato de servicios y mi prioridad es poder salir con poco coste.",
+        "titulo": "Desde qué lado se lee",
+        "texto": "«Bueno» no significa nada sin saber desde qué lado se lee; se concreta la prioridad.",
+        "principio": "m3-prompting/principios"
+      },
+      {
+        "id": "citar",
+        "ancla": "Cita la cláusula literalmente.",
+        "titulo": "Citar la cláusula",
+        "texto": "Se pide citar la cláusula (comprobable).",
+        "principio": "m3-prompting/contexto-largo"
+      },
+      {
+        "id": "preparacion",
+        "ancla": "Cierra con las tres preguntas que debería hacer a un abogado: esto prepara la revisión profesional, no la sustituye.",
+        "titulo": "Preparación, no sustitución",
+        "texto": "Se enmarca como preparación de una revisión profesional.",
+        "principio": "m3-prompting/principios"
+      }
+    ]
+  },
+  {
+    "id": "excel",
+    "titulo": "Analizar un Excel",
+    "escenario": "Analizar una hoja de ventas para decidir dónde reforzar al equipo comercial.",
+    "antes": "Analiza este Excel de ventas y dime qué ves.",
+    "despues": "Cada fila del Excel es una venta. Las columnas son fecha, producto, región e importe. Quiero saber en qué región y producto cayeron las ventas de septiembre respecto a agosto, porque decido dónde reforzar al equipo comercial. Antes, revisa vacíos y duplicados y cuéntamelo. Calcula con código, no de cabeza, y entrégame la respuesta en dos frases, la tabla de cifras y las limitaciones.",
+    "anotaciones": [
+      {
+        "id": "estructura",
+        "ancla": "Cada fila del Excel es una venta. Las columnas son fecha, producto, región e importe.",
+        "titulo": "Estructura de los datos",
+        "texto": "Se describe la estructura de los datos.",
+        "principio": "m3-prompting/principios"
+      },
+      {
+        "id": "pregunta-decision",
+        "ancla": "Quiero saber en qué región y producto cayeron las ventas de septiembre respecto a agosto, porque decido dónde reforzar al equipo comercial.",
+        "titulo": "Pregunta y decisión",
+        "texto": "Se plantea una pregunta con su decisión asociada. «Dime qué ves» invita a un análisis largo sin foco.",
+        "principio": "m3-prompting/principios"
+      },
+      {
+        "id": "codigo",
+        "ancla": "Calcula con código, no de cabeza",
+        "titulo": "Calcular con código",
+        "texto": "Se exige calcular con código.",
+        "principio": "m3-prompting/tareas-largas-y-agentes"
+      }
+    ]
+  },
+  {
+    "id": "asistente-interno",
+    "titulo": "Un asistente interno",
+    "escenario": "Dar instrucciones de sistema a un asistente interno de RR. HH.",
+    "antes": "Eres un asistente de RR. HH. NUNCA des información salarial. SIEMPRE sé educado. Responde breve.",
+    "despues": "Eres el asistente de RR. HH. de una empresa de 300 personas. Respondes dudas de vacaciones, permisos y gastos con la política interna adjunta como fuente. No das información salarial de nadie porque es confidencial; en ese caso, indica que escriban a rrhh@ejemplo.com. Si la respuesta no está en la política, dilo y no la inventes. Responde breve y cita el apartado, porque la gente quiere comprobarlo.",
+    "anotaciones": [
+      {
+        "id": "veto-con-motivo",
+        "ancla": "No das información salarial de nadie porque es confidencial; en ese caso, indica que escriban a rrhh@ejemplo.com.",
+        "anclaAntes": "NUNCA des información salarial.",
+        "titulo": "La prohibición con su motivo",
+        "texto": "La prohibición gana su motivo y una salida útil (a quién dirigirse).",
+        "principio": "m3-prompting/auditar-tus-prompts"
+      },
+      {
+        "id": "tono",
+        "ancla": "Eres el asistente de RR. HH. de una empresa de 300 personas. Respondes dudas de vacaciones, permisos y gastos con la política interna adjunta como fuente.",
+        "anclaAntes": "SIEMPRE sé educado.",
+        "titulo": "El tono lo marca el contexto",
+        "texto": "«Sé educado» desaparece (el tono ya lo marca el resto del prompt).",
+        "principio": "m3-prompting/auditar-tus-prompts"
+      },
+      {
+        "id": "breve",
+        "ancla": "Responde breve y cita el apartado, porque la gente quiere comprobarlo.",
+        "anclaAntes": "Responde breve.",
+        "titulo": "«Breve» con su porqué",
+        "texto": "«Breve» se justifica con el uso real.",
+        "principio": "m3-prompting/principios"
+      }
+    ]
+  },
+  {
+    "id": "agente-codigo",
+    "titulo": "Un encargo a un agente de código",
+    "escenario": "Pedir a un agente de código que corrija un error en una tienda en línea.",
+    "antes": "Arregla el bug de los pedidos duplicados.",
+    "despues": "Los pedidos se duplican cuando el cliente pulsa dos veces «Pagar». Quiero que el segundo envío se ignore y devuelva el pedido original. No cambies la API pública: hay clientes que dependen de ella. Escribe primero un test que reproduzca el fallo, arregla el código y comprueba que pasa toda la suite. No modifiques los tests existentes para que pasen. Antes de editar, lee los ficheros afectados. Al terminar, resume lo cambiado y lo probado.",
+    "anotaciones": [
+      {
+        "id": "problema",
+        "ancla": "Los pedidos se duplican cuando el cliente pulsa dos veces «Pagar». Quiero que el segundo envío se ignore y devuelva el pedido original.",
+        "titulo": "Síntoma y resultado esperado",
+        "texto": "Se describe el síntoma y el comportamiento esperado.",
+        "principio": "m3-prompting/principios"
+      },
+      {
+        "id": "limite-api",
+        "ancla": "No cambies la API pública: hay clientes que dependen de ella.",
+        "titulo": "Restricción con motivo",
+        "texto": "Se fija una restricción con motivo.",
+        "principio": "m3-prompting/principios"
+      },
+      {
+        "id": "verificar",
+        "ancla": "Escribe primero un test que reproduzca el fallo, arregla el código y comprueba que pasa toda la suite.",
+        "titulo": "Forma de verificar",
+        "texto": "Se fija una forma de verificar (test que reproduce el fallo).",
+        "principio": "m3-prompting/tareas-largas-y-agentes"
+      },
+      {
+        "id": "sin-atajos",
+        "ancla": "No modifiques los tests existentes para que pasen.",
+        "titulo": "Sin atajos",
+        "texto": "Se cierra el atajo de adaptar los tests.",
+        "principio": "m3-prompting/tareas-largas-y-agentes"
+      }
+    ]
+  },
+  {
+    "id": "extraer-datos",
+    "titulo": "Extraer datos de correos",
+    "escenario": "Sacar de varios correos cuatro campos concretos para procesarlos después.",
+    "antes": "Saca los datos importantes de estos correos y respóndeme en JSON.",
+    "despues": "Extrae de cada correo: cliente, número de pedido, importe y fecha. Si un campo no aparece, escribe «no consta». Fechas en AAAA-MM-DD. [En la API: usa structured outputs con un esquema de estos cuatro campos en lugar de pedir el JSON en texto.]",
+    "anotaciones": [
+      {
+        "id": "campos",
+        "ancla": "Extrae de cada correo: cliente, número de pedido, importe y fecha.",
+        "titulo": "Campos concretos",
+        "texto": "«Datos importantes» se convierte en campos concretos.",
+        "principio": "m3-prompting/principios"
+      },
+      {
+        "id": "faltantes",
+        "ancla": "Si un campo no aparece, escribe «no consta».",
+        "titulo": "Si faltan datos",
+        "texto": "Se prevé el caso de que falten (evita inventar).",
+        "principio": "m3-prompting/tareas-largas-y-agentes"
+      },
+      {
+        "id": "esquema",
+        "ancla": "[En la API: usa structured outputs con un esquema de estos cuatro campos en lugar de pedir el JSON en texto.]",
+        "titulo": "El esquema garantiza la forma",
+        "texto": "Para uso programático, la forma la garantiza el esquema y no la petición.",
+        "principio": "m3-prompting/formato-y-longitud"
+      }
+    ]
+  },
+  {
+    "id": "investigar-fuentes",
+    "titulo": "Investigar con fuentes",
+    "escenario": "Investigar una normativa para decidir si se incluye una partida en el presupuesto.",
+    "antes": "Cuéntame todo sobre la normativa de accesibilidad web.",
+    "despues": "Necesito saber qué exige la normativa europea de accesibilidad a la web de una empresa de servicios y desde cuándo, para decidir si incluimos la adaptación en el presupuesto de este año. Usa organismos oficiales y la normativa; descarta blogs salvo como pista. Entrega una respuesta breve, los datos clave con enlace y fecha de la fuente, los puntos en que las fuentes discrepan y lo que no hayas podido confirmar.",
+    "anotaciones": [
+      {
+        "id": "decision-empresa",
+        "ancla": "Necesito saber qué exige la normativa europea de accesibilidad a la web de una empresa de servicios y desde cuándo, para decidir si incluimos la adaptación en el presupuesto de este año.",
+        "titulo": "Decisión y tipo de empresa",
+        "texto": "«Todo sobre» es inabarcable; con la decisión (presupuesto) y el tipo de empresa, la respuesta se centra.",
+        "principio": "m3-prompting/principios"
+      },
+      {
+        "id": "fuentes-aceptables",
+        "ancla": "Usa organismos oficiales y la normativa; descarta blogs salvo como pista.",
+        "titulo": "Fuentes aceptables",
+        "texto": "Con las fuentes aceptables, la respuesta se puede comprobar.",
+        "principio": "m3-prompting/contexto-largo"
+      }
+    ]
+  }
+]

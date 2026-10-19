@@ -12,7 +12,7 @@ sources: [anthropic-buenas-practicas-de-prompting, anthropic-structured-outputs]
 
 import KeyTakeaways from '@components/KeyTakeaways.astro';
 import Callout from '@components/Callout.astro';
-import BeforeAfter from '@components/BeforeAfter.astro';
+import PromptLab from '@components/PromptLab.astro';
 import Checklist from '@components/Checklist.astro';
 
 <KeyTakeaways>
@@ -34,93 +34,7 @@ Haz el ejercicio con tus propios prompts: escoge uno que uses cada semana, aplic
 
 </Callout>
 
-## 1. Un correo al cliente
-
-<BeforeAfter
-  antes="Escribe un correo diciendo que nos retrasamos."
-  despues="Escribe un correo a la responsable de compras de un cliente con el que llevamos cuatro años trabajando. Entregamos con dos semanas de retraso por un fallo de nuestro proveedor. Quiero conservar su confianza y acordar una nueva fecha antes del viernes. Tono cercano y profesional, sin disculpas repetidas. Incluye qué ha pasado, qué hacemos para que no se repita y qué necesito de ella. No prometas nada que no aparezca aquí."
->
-
-Qué cambió y por qué: aparece la relación (cuatro años de clientes), el objetivo (confianza y fecha), el motivo del tono y el límite («no prometas nada») que evita compromisos inventados.
-
-</BeforeAfter>
-
-## 2. Resumir un informe
-
-<BeforeAfter
-  antes="Resume este informe."
-  despues="Resume este informe para el comité de dirección, que decidirá el jueves si renovamos al proveedor. Dame cinco puntos, cada uno con la página donde aparece. Señala las cifras del cuerpo del informe que contradigan el resumen ejecutivo. Si falta información para sostener un punto, dilo."
->
-
-Qué cambió y por qué: se añade quién decide y qué decide (así el modelo prioriza), se piden páginas para verificar, y se pide buscar contradicciones, algo que un resumen genérico no hace.
-
-</BeforeAfter>
-
-## 3. Primera lectura de un contrato
-
-<BeforeAfter
-  antes="¿Es bueno este contrato?"
-  despues="Soy el cliente en este contrato de servicios y mi prioridad es poder salir con poco coste. Para cada cláusula que me perjudique o sea inusual, indica el número, qué dice en lenguaje llano, por qué me afecta y qué cambio pediría. Después, lista las cláusulas habituales que faltan. Cita la cláusula literalmente. Cierra con las tres preguntas que debería hacer a un abogado: esto prepara la revisión profesional, no la sustituye."
->
-
-Qué cambió y por qué: «bueno» no significa nada sin saber desde qué lado se lee; se concreta la prioridad, se pide citar la cláusula (comprobable) y se enmarca como preparación de una revisión profesional.
-
-</BeforeAfter>
-
-## 4. Analizar un Excel
-
-<BeforeAfter
-  antes="Analiza este Excel de ventas y dime qué ves."
-  despues="Cada fila del Excel es una venta. Las columnas son fecha, producto, región e importe. Quiero saber en qué región y producto cayeron las ventas de septiembre respecto a agosto, porque decido dónde reforzar al equipo comercial. Antes, revisa vacíos y duplicados y cuéntamelo. Calcula con código, no de cabeza, y entrégame la respuesta en dos frases, la tabla de cifras y las limitaciones."
->
-
-Qué cambió y por qué: se describe la estructura de los datos, se plantea una pregunta con su decisión asociada y se exige calcular con código. «Dime qué ves» invita a un análisis largo sin foco.
-
-</BeforeAfter>
-
-## 5. Un asistente interno
-
-<BeforeAfter
-  antes="Eres un asistente de RR. HH. NUNCA des información salarial. SIEMPRE sé educado. Responde breve."
-  despues="Eres el asistente de RR. HH. de una empresa de 300 personas. Respondes dudas de vacaciones, permisos y gastos con la política interna adjunta como fuente. No das información salarial de nadie porque es confidencial; en ese caso, indica que escriban a rrhh@ejemplo.com. Si la respuesta no está en la política, dilo y no la inventes. Responde breve y cita el apartado, porque la gente quiere comprobarlo."
->
-
-Qué cambió y por qué: la prohibición gana su motivo y una salida útil (a quién dirigirse); «sé educado» desaparece (el tono ya lo marca el resto del prompt); «breve» se justifica con el uso real.
-
-</BeforeAfter>
-
-## 6. Un encargo a un agente de código
-
-<BeforeAfter
-  antes="Arregla el bug de los pedidos duplicados."
-  despues="Los pedidos se duplican cuando el cliente pulsa dos veces «Pagar». Quiero que el segundo envío se ignore y devuelva el pedido original. No cambies la API pública: hay clientes que dependen de ella. Escribe primero un test que reproduzca el fallo, arregla el código y comprueba que pasa toda la suite. No modifiques los tests existentes para que pasen. Antes de editar, lee los ficheros afectados. Al terminar, resume lo cambiado y lo probado."
->
-
-Qué cambió y por qué: se describe el síntoma y el comportamiento esperado, se fija una restricción con motivo y una forma de verificar (test que reproduce el fallo), y se cierra el atajo de adaptar los tests.
-
-</BeforeAfter>
-
-## 7. Extraer datos de correos
-
-<BeforeAfter
-  antes="Saca los datos importantes de estos correos y respóndeme en JSON."
-  despues="Extrae de cada correo: cliente, número de pedido, importe y fecha. Si un campo no aparece, escribe «no consta». Fechas en AAAA-MM-DD. [En la API: usa structured outputs con un esquema de estos cuatro campos en lugar de pedir el JSON en texto.]"
->
-
-Qué cambió y por qué: «datos importantes» se convierte en campos concretos; se prevé el caso de que falten (evita inventar) y, para uso programático, la forma la garantiza el esquema y no la petición.
-
-</BeforeAfter>
-
-## 8. Investigar con fuentes
-
-<BeforeAfter
-  antes="Cuéntame todo sobre la normativa de accesibilidad web."
-  despues="Necesito saber qué exige la normativa europea de accesibilidad a la web de una empresa de servicios y desde cuándo, para decidir si incluimos la adaptación en el presupuesto de este año. Usa organismos oficiales y la normativa; descarta blogs salvo como pista. Entrega una respuesta breve, los datos clave con enlace y fecha de la fuente, los puntos en que las fuentes discrepan y lo que no hayas podido confirmar."
->
-
-Qué cambió y por qué: «todo sobre» es inabarcable; con la decisión (presupuesto), el tipo de empresa y las fuentes aceptables, la respuesta se centra y se puede comprobar.
-
-</BeforeAfter>
+<PromptLab />
 
 ## Errores frecuentes
 
