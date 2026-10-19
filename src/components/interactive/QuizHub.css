@@ -1,0 +1,134 @@
+/* Panel de quizzes por módulo. Prefijo `.qh-`; el resto viene de interactive.css. */
+
+.qh-heading,
+.qh-module-title {
+  margin: 0 0 var(--space-2);
+  color: var(--color-heading);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.qh-heading {
+  font-size: var(--text-lg);
+}
+
+.qh-module-title {
+  font-size: var(--text-base, 1rem);
+}
+
+.qh-heading:focus {
+  outline: none;
+}
+
+.qh-heading:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.qh-totals {
+  margin: 0 0 var(--space-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.qh-hint {
+  margin-top: var(--space-2);
+}
+
+.qh-actions {
+  margin-top: var(--space-3);
+}
+
+.qh-confirm {
+  margin-top: var(--space-3);
+}
+
+.qh-confirm p {
+  margin: 0 0 var(--space-3);
+}
+
+.qh-message {
+  margin: var(--space-2) 0 0;
+  min-height: 1.5em;
+  font-size: var(--text-sm);
+}
+
+/* Barra de progreso: el texto de al lado da la cifra; la barra no depende solo del color */
+.qh-bar {
+  height: 0.75rem;
+  overflow: hidden;
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+}
+
+.qh-bar-fill {
+  display: block;
+  height: 100%;
+  background: var(--color-accent);
+}
+
+.qh-module {
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: var(--border-width) solid var(--color-border);
+}
+
+.qh-quizzes {
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.qh-quiz {
+  margin: 0;
+  padding: var(--space-2) 0;
+}
+
+.qh-quiz-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.qh-quiz-info {
+  flex: 1 1 14rem;
+  min-width: 0;
+}
+
+.qh-quiz-title {
+  margin: 0;
+  color: var(--color-heading);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.qh-quiz-status {
+  margin: var(--space-1) 0 0;
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.qh-panel:not([hidden]) {
+  margin-top: var(--space-3);
+}
+
+.qh-panel:focus {
+  outline: none;
+}
+
+.qh-panel:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.qh-panel .quiz {
+  margin-block: 0;
+}
+
+.qh-pending {
+  margin: var(--space-5) 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}

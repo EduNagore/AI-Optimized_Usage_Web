@@ -1,0 +1,40 @@
+---
+import { getCollection } from 'astro:content';
+import quizzesData from '../data/quizzes.json';
+import { modules } from '@lib/modules';
+import { quizzesSchema } from '@lib/quiz-progress';
+import QuizHub from './interactive/QuizHub.tsx';
+
+/**
+ * Panel «Quizzes por módulo». Los datos se validan en la compilación (un quiz mal formado rompe el
+ * build) y cada pregunta recibe el título de la lección que enlaza, tomado de la colección de páginas.
+ */
+const quizzes = quizzesSchema.parse(quizzesData);
+const titles = new Map((await getCollection('docs')).map((page) => [page.id, page.data.title]));
+
+const hubQuizzes = quizzes.map((quiz) => ({
+  ...quiz,
+  preguntas: quiz.preguntas.map((q) => {
+    const title = q.leccion ? (titles.get(q.leccion) ?? titles.get(`${q.leccion}/index`)) : undefined;
+    return title ? { ...q, leccionTitulo: title } : q;
+  }),
+}));
+
+const hubModules = modules.map(({ dir, label }) => ({ dir, label }));
+const label = (dir: string) => modules.find((m) => m.dir === dir)?.label ?? dir;
+---
+
+<QuizHub client:visible quizzes={hubQuizzes} modulos={hubModules} />
+<noscript>
+  <p>
+    Los quizzes necesitan JavaScript para comprobar las respuestas y guardar tu progreso en este navegador.
+    Estos son los que hay publicados:
+  </p>
+  <ul>
+    {quizzes.map((quiz) => (
+      <li>
+        {label(quiz.modulo)}: {quiz.titulo} ({quiz.preguntas.length} preguntas).
+      </li>
+    ))}
+  </ul>
+</noscript>

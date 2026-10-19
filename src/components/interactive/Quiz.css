@@ -92,3 +92,67 @@
   font-size: var(--text-sm);
   font-variant-numeric: tabular-nums;
 }
+
+.quiz-title:focus,
+.quiz-question:focus {
+  outline: none;
+}
+
+.quiz-title:focus-visible,
+.quiz-question:focus-visible {
+  outline: 2px solid var(--color-accent-strong);
+  outline-offset: 4px;
+}
+
+.quiz-feedback a {
+  font-weight: 600;
+}
+
+.quiz-resume {
+  margin: 0 0 var(--space-4);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+/* Resumen al terminar: cifra clara, falladas con su enlace y botón para reiniciar */
+.quiz-summary {
+  margin-top: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+}
+
+.quiz-result {
+  margin: 0 0 var(--space-2);
+  color: var(--color-heading);
+  font-size: var(--text-lg);
+  font-variant-numeric: tabular-nums;
+}
+
+.quiz-summary-lead {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-sm);
+}
+
+.quiz-review-list {
+  margin: 0 0 var(--space-3);
+  padding-left: var(--space-5);
+  font-size: var(--text-sm);
+}
+
+.quiz-review-list li {
+  margin-block: var(--space-2);
+  overflow-wrap: anywhere;
+}
+
+.quiz-summary .btn {
+  min-height: 2.75rem;
+}
+
+/* Aviso discreto: solo texto, sin alarmas */
+.quiz-aviso {
+  margin: var(--space-2) 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}

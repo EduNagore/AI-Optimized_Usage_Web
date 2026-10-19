@@ -1,0 +1,80 @@
+[
+  {
+    "id": "m2-metodo",
+    "modulo": "m2-metodo",
+    "titulo": "Quiz del módulo 2: El método",
+    "preguntas": [
+      {
+        "pregunta": "Un compañero pega un acta en el chat, recibe un resumen impecable y lo envía a dirección sin más, porque «está muy bien escrito». ¿Qué paso del ciclo se ha saltado y por qué importa?",
+        "opciones": [
+          "El paso 3, elegir modelo y esfuerzo: un resumen bien escrito solo sale con el modelo más caro.",
+          "El paso 7, sistematizar: sin una plantilla guardada, el resumen no puede ser correcto.",
+          "El paso 6, verificar: que el texto suene bien no prueba que sea correcto, y sin ese paso no hay método.",
+          "Ninguno: si el texto está bien escrito, el método ya se ha cumplido."
+        ],
+        "correcta": 2,
+        "explicacion": "La lección lo resume así: sin el paso 6 «no hay método: solo hay un texto que suena bien». La fluidez no es una evidencia. Verificar significa comprobar citas, cifras o pruebas, no fiarse de la impresión. Los pasos 3 y 7 importan, pero no son lo que falla en este caso.",
+        "leccion": "m2-metodo/ciclo-de-7-pasos"
+      },
+      {
+        "pregunta": "Un modelo barato necesita tres intentos para dejar bien una tarea y otro más capaz acierta a la primera. ¿Con qué criterio los compara la guía?",
+        "opciones": [
+          "Con lo que cuesta terminar la tarea bien: los tokens de cada intento, el número de intentos y el tiempo de revisión.",
+          "Con el precio por millón de tokens, porque es el único dato objetivo.",
+          "Con la velocidad de la primera respuesta, porque ahorra tiempo de espera.",
+          "Con la longitud de la respuesta: el que escribe menos es siempre el más barato."
+        ],
+        "correcta": 0,
+        "explicacion": "La guía compara el coste por tarea completada, que suma los tokens de cada intento, los intentos hasta que sale bien, el tiempo de una persona para revisar y los errores que se escapan. Comparar solo el precio por token es como comparar coches por el precio del litro de gasolina: el dato es real, pero no responde a cuánto cuesta llegar.",
+        "leccion": "m2-metodo/coste-por-tarea"
+      },
+      {
+        "pregunta": "Tienes dos tareas: copiar un importe de un contrato a un correo (fácil, pero un error costaría dinero) y proponer diez ideas para un lema de campaña (más creativo, sin consecuencias si falla). ¿A cuál dedicas más verificación según la guía?",
+        "opciones": [
+          "A la del lema, porque es la más difícil.",
+          "A la del importe, porque el riesgo pesa más que la dificultad.",
+          "A las dos por igual: toda tarea con IA exige la misma verificación.",
+          "A ninguna: con un modelo capaz no hace falta verificar."
+        ],
+        "correcta": 1,
+        "explicacion": "La guía recomienda poner antes el riesgo que la dificultad: una tarea fácil con riesgo alto exige más verificación que una difícil sin consecuencias. Lo difícil impresiona, pero lo arriesgado es lo que cuesta dinero si falla y nadie lo detecta. Y cuando la tarea es generar ideas, verificar es simplemente elegir con tu criterio.",
+        "leccion": "m2-metodo/taxonomia-de-tareas"
+      },
+      {
+        "pregunta": "Tienes que casar 400 tickets con un extracto del banco. La tarea se puede describir entera de antemano (casar importe, fecha y comercio) y los dudosos los revisará una persona. ¿Qué escalón encaja mejor según los criterios de la guía?",
+        "opciones": [
+          "Un agente, porque son muchos documentos y conviene que decida él los pasos.",
+          "Un chat, pegando los tickets de uno en uno.",
+          "Un flujo fijo o una automatización que repita el mismo encargo por cada ticket, con revisión humana de los que no casen."
+        ],
+        "correcta": 2,
+        "explicacion": "El criterio de complejidad dice que, si la tarea se puede especificar por completo de antemano, basta un flujo fijo o una sola llamada: el agente es para cuando los pasos dependen de lo que va apareciendo. Un chat no escala a cientos de elementos, y el volumen es justo lo que lleva a la API o a una automatización.",
+        "leccion": "m2-metodo/elegir-superficie"
+      },
+      {
+        "pregunta": "¿Qué aporta escribir «no uses viñetas porque esto se pega en un correo de texto plano» frente a un simple «nunca uses viñetas»?",
+        "opciones": [
+          "Hace que el modelo obedezca siempre de forma literal, sin excepciones.",
+          "Permite al modelo aplicar la regla con criterio, porque sabe para qué existe.",
+          "Ahorra tokens de entrada, porque el motivo sustituye a otras instrucciones.",
+          "Sustituye al criterio de éxito, que entonces ya no hace falta."
+        ],
+        "correcta": 1,
+        "explicacion": "Según la plantilla de la guía, cada restricción lleva su motivo para que el modelo generalice en lugar de aplicar la regla a ciegas: con el porqué puede decidir los casos intermedios. El motivo no ahorra tokens ni reemplaza al criterio de éxito, que es otra pieza del encargo.",
+        "leccion": "m2-metodo/plantilla-de-encargo"
+      },
+      {
+        "pregunta": "Has corregido dos veces al modelo sobre el mismo punto y el resultado sigue sin ser el que querías. ¿Qué recomienda la guía?",
+        "opciones": [
+          "Abrir una conversación nueva con un encargo reescrito que incorpore lo que has aprendido.",
+          "Seguir corrigiendo en la misma conversación con instrucciones más enfáticas.",
+          "Pasar a un modelo más caro sin cambiar el encargo.",
+          "Añadir una regla permanente al fichero de instrucciones para que no vuelva a ocurrir."
+        ],
+        "correcta": 0,
+        "explicacion": "Tras dos correcciones fallidas sobre el mismo punto, la guía recomienda empezar de cero con un encargo mejor: cada intento deja en el contexto los errores anteriores, que el modelo tiende a seguir, y un contexto limpio con un buen encargo suele superar a uno largo lleno de correcciones. Si llevas más de dos correcciones, el problema es el encargo, no el modelo.",
+        "leccion": "m2-metodo/errores-de-metodo"
+      }
+    ]
+  }
+]
