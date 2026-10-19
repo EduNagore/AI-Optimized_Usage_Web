@@ -1,0 +1,146 @@
+/* Diseñador de equipos de agentes. Prefijo propio: .team-… (la base está en interactive.css). */
+
+.team-group {
+  min-width: 0;
+  margin: 0 0 var(--space-4);
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.team-group > legend {
+  padding-inline: var(--space-2);
+  color: var(--color-heading);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.team-more {
+  margin: 0 0 var(--space-4);
+}
+
+.team-more > summary {
+  min-height: 2.75rem;
+  display: flex;
+  align-items: center;
+  color: var(--color-heading);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.team-actions {
+  align-items: center;
+  margin-top: var(--space-3);
+}
+
+.team-copied {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.team-live {
+  margin-bottom: var(--space-3);
+}
+
+.team-summary {
+  margin: var(--space-2) 0 0;
+  font-weight: 600;
+}
+
+.team-warn {
+  border-color: var(--sem-cuidado-bd);
+  background: var(--sem-cuidado-bg);
+  color: var(--color-text);
+}
+
+.team-warn-title {
+  margin: 0 0 var(--space-1);
+  color: var(--sem-cuidado-fg);
+}
+
+.team-warn p {
+  margin: 0 0 var(--space-2);
+}
+
+.team-h {
+  margin: var(--space-5) 0 var(--space-2);
+  color: var(--color-heading);
+  font-size: var(--text-base, 1rem);
+  font-weight: 700;
+}
+
+.team-list {
+  margin: 0 0 var(--space-3);
+  padding-left: var(--space-5);
+}
+
+.team-list li {
+  margin-bottom: var(--space-1);
+}
+
+.team-fit {
+  margin: 0 0 var(--space-2);
+}
+
+.team-table th,
+.team-table td {
+  white-space: normal;
+  vertical-align: top;
+  min-width: 8rem;
+}
+
+.team-table td:last-child {
+  min-width: 16rem;
+}
+
+.team-table .num {
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.team-sub {
+  display: block;
+  margin-top: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-weight: 400;
+}
+
+.team-sub-lead {
+  margin: var(--space-1) 0 var(--space-2);
+}
+
+.team-cost {
+  padding: var(--space-3) var(--space-4);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+}
+
+.team-assumptions {
+  margin-top: var(--space-3);
+  margin-bottom: 0;
+}
+
+.team-text {
+  box-sizing: border-box;
+  width: 100%;
+  margin-top: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--text-sm);
+}
+
+@container (max-width: 26rem) {
+  .team-group {
+    padding-inline: var(--space-3);
+  }
+
+  .team-list {
+    padding-left: var(--space-4);
+  }
+}

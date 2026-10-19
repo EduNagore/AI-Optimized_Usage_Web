@@ -26,14 +26,15 @@ import Fact from '@components/Fact.astro';
 import Steps from '@components/Steps.astro';
 import PromptTemplate from '@components/PromptTemplate.astro';
 import Checklist from '@components/Checklist.astro';
+import AgentTeamDesigner from '@components/AgentTeamDesigner.astro';
 
 <KeyTakeaways>
 
-- Esta página es el diseñador en su versión estática: unas preguntas sobre la forma de tu tarea y una tabla que lleva de ahí a una topología, unos roles, un modelo y esfuerzo de partida y una idea del coste.
+- Esta página es el diseñador: unas preguntas sobre la forma de tu tarea y una tabla (o la herramienta de abajo) que lleva de ahí a una topología, unos roles, un modelo y esfuerzo de partida y una idea del coste.
 - La primera fila de la tabla es la que más veces te toca: «no orquestes». Si tu tarea es una sola pieza que cabe en un contexto, o una cadena, un solo modelo gana.
 - Todo modelo y esfuerzo de la tabla es un punto de partida según la regla del sitio: modelo capaz, esfuerzo por defecto, bajar midiendo, subir si falla.
 - La tabla es una recomendación de la guía construida sobre las mediciones y la documentación de los módulos anteriores; no es un resultado medido sobre tu caso.
-- Más adelante la guía incorporará una versión interactiva de esta misma lógica.
+- La herramienta interactiva aplica esta misma lógica y deja a la vista los supuestos de su estimación de coste, que puedes cambiar.
 
 </KeyTakeaways>
 
@@ -87,6 +88,12 @@ Si dudas entre dos filas, quédate con la de arriba. Es una recomendación de la
 Lo que sostiene la primera fila y el aviso de la del orquestador es una medición de Anthropic: delegar ahorró dinero solo con trabajo rutinario con cola larga de coste y con trabajo mayor que una ventana de contexto (medido con trabajadores de una generación anterior). En cadenas dependientes o trabajo que cabe en un contexto, el modelo del orquestador solo y a menor esfuerzo salió mejor en todos los casos medidos. El resto de la tabla extiende ese criterio a los demás patrones como recomendación de la guía, no como medición. Detalle en [cuándo no orquestar](/AI-Optimized_Usage_Web/m8-agentes/cuando-no-orquestar/).
 
 </Callout>
+
+## Diseña el tuyo
+
+Describe la forma de tu tarea y la herramienta devuelve la topología, los roles con su modelo y esfuerzo y un multiplicador de coste orientativo. Aplica las mismas reglas que la tabla de arriba. Cada cifra lleva su etiqueta: medición publicada por un proveedor, estimación de la guía con su fórmula, o supuesto tuyo.
+
+<AgentTeamDesigner />
 
 ## En la práctica
 

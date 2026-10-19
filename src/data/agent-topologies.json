@@ -1,0 +1,1295 @@
+[
+  {
+    "id": "umbrales",
+    "kind": "ajustes",
+    "fitFraction": 0.5,
+    "volumeMinUnits": 5,
+    "rationale": "Supuestos de la guía, no datos de ningún proveedor. «Cabe en un contexto» se cuenta como máximo la mitad de la ventana para dejar sitio a las instrucciones, al historial y a la salida; «hay volumen» empieza en 5 unidades iguales, el mínimo con el que /batch reparte un cambio (5 a 30 unidades). Por debajo, depurar el encargo con uno o dos elementos y estimar con tres ya es casi todo el trabajo.",
+    "source": "claude-code-comandos",
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "alta",
+    "kind": "gama",
+    "nombre": "Gama alta (orquestador, verificador, agente único)",
+    "tiers": ["Alto rendimiento", "Equilibrado", "Frontera"],
+    "nota": "Punto de partida de la guía para planificar y verificar. Si el proveedor no tiene gama «Alto rendimiento», se usa la siguiente de la lista.",
+    "source": "anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas",
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "equilibrada",
+    "kind": "gama",
+    "nombre": "Gama equilibrada (trabajador general)",
+    "tiers": ["Equilibrado", "Rápido y barato"],
+    "nota": "Trabajador general: el puesto que más tokens consume. Si el proveedor no tiene gama «Equilibrado», se usa la rápida.",
+    "source": "anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas",
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "rapida",
+    "kind": "gama",
+    "nombre": "Gama rápida y barata (clasificación, lectura masiva)",
+    "tiers": ["Rápido y barato"],
+    "nota": "Candidata a medir en lectura, extracción o clasificación masivas; no es el punto de partida.",
+    "source": "anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas",
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "frontera",
+    "kind": "gama",
+    "nombre": "Gama de frontera (solo si falla)",
+    "tiers": ["Frontera"],
+    "nota": "Solo si la gama alta falla y el error de plan es caro; con condiciones propias de acceso y uso.",
+    "source": "anthropic-modelos",
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "volumen",
+    "kind": "razon",
+    "texto": "Hay volumen de piezas iguales que repartir",
+    "detalle": "Muchas piezas iguales e independientes con un solo molde: es la forma que aprovecha el fan-out.",
+    "pagina": "m8-agentes/patrones",
+    "source": "anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas",
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "tamano",
+    "kind": "razon",
+    "texto": "El trabajo es mayor que una ventana de contexto",
+    "detalle": "Una de las dos situaciones en las que Anthropic midió que delegar ahorró dinero (con trabajadores de una generación anterior y con menos acierto).",
+    "pagina": "m8-agentes/cuando-no-orquestar",
+    "source": "anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas",
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "cola",
+    "kind": "razon",
+    "texto": "Trabajo rutinario con una cola larga de coste",
+    "detalle": "La otra situación en la que Anthropic midió ahorro al delegar: unos pocos casos concentran el gasto y el resto es rutinario.",
+    "pagina": "m8-agentes/cuando-no-orquestar",
+    "source": "anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas",
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "revision",
+    "kind": "razon",
+    "texto": "Quieres una revisión o una segunda opinión con contexto limpio",
+    "detalle": "Una de las tres razones de la escalera para subir a multiagente: quien ha hecho el trabajo tiende a validar sus propias premisas.",
+    "pagina": "m8-agentes/escalera-de-complejidad",
+    "source": "claude-code-agentes-en-paralelo",
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "tiempo",
+    "kind": "razon",
+    "texto": "No puedes esperar y las piezas son independientes",
+    "detalle": "Repartir acorta el tiempo si las piezas son independientes; no abarata el coste, y puede subirlo.",
+    "pagina": "m8-agentes/casos-completos",
+    "source": "claude-code-agentes-en-paralelo",
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "s-cadena",
+    "kind": "senal",
+    "senal": "Cada paso necesita el resultado del anterior",
+    "significa": "Es una cadena: nada se puede hacer a la vez",
+    "quehacer": "Un solo agente, o un flujo secuencial en código",
+    "cond": [{ "campo": "chain", "es": true }],
+    "pagina": "m8-agentes/cuando-no-orquestar",
+    "source": "anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas",
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "s-cabe",
+    "kind": "senal",
+    "senal": "Todo el material cabe en la ventana y no hay cola larga",
+    "significa": "No hay nada que repartir por tamaño",
+    "quehacer": "Modelo solo, esfuerzo por defecto; baja el esfuerzo si mide bien",
+    "cond": [
+      { "campo": "fits", "es": true },
+      { "campo": "longTail", "es": false }
+    ],
+    "pagina": "m8-agentes/cuando-no-orquestar",
+    "source": "anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas",
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "s-comparten",
+    "kind": "senal",
+    "senal": "Las piezas se contradicen o comparten decisiones",
+    "significa": "Los agentes tomarán decisiones incompatibles",
+    "quehacer": "Un único agente con el panorama completo",
+    "cond": [
+      { "campo": "units", "min": 2 },
+      { "campo": "independentPieces", "es": false },
+      { "campo": "dependentSteps", "es": false }
+    ],
+    "pagina": "m8-agentes/cuando-no-orquestar",
+    "source": "anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas",
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "s-terminado",
+    "kind": "senal",
+    "senal": "No sabes qué es «terminado»",
+    "significa": "Cada agente decidirá por su cuenta",
+    "quehacer": "Escribe el criterio antes de repartir",
+    "pagina": "m8-agentes/cuando-no-orquestar",
+    "source": "anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas",
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "s-cola",
+    "kind": "senal",
+    "senal": "Un solo caso grande pesa más que los demás juntos",
+    "significa": "La factura la decide la cola",
+    "quehacer": "Trata la cola aparte y mide",
+    "cond": [{ "campo": "longTail", "es": true }],
+    "pagina": "m8-agentes/cuando-no-orquestar",
+    "source": "anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas",
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "s-una-vez",
+    "kind": "senal",
+    "senal": "Es una tarea que haces una vez y en diez minutos",
+    "significa": "No amortizas ni el plan ni la prueba",
+    "quehacer": "Hazla a mano o con una llamada",
+    "pagina": "m8-agentes/cuando-no-orquestar",
+    "source": "anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas",
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "outputRatio",
+    "kind": "parametro",
+    "etiqueta": "Salida por cada token de entrada",
+    "ayuda": "Cuántos tokens escribe un agente por cada token que lee. Supuesto tuyo: 0,2 es un valor de partida de la guía, no un dato.",
+    "min": 0,
+    "max": 5,
+    "step": 0.05,
+    "valor": 0.2,
+    "origen": "supuesto"
+  },
+  {
+    "id": "sharedTokens",
+    "kind": "parametro",
+    "etiqueta": "Contexto común que relee cada agente (tokens)",
+    "ayuda": "Instrucciones, guía y ejemplos que se pagan una vez por agente: el material común se paga varias veces. Supuesto tuyo; con caché de prompt sería menor.",
+    "min": 0,
+    "max": 1000000,
+    "step": 100,
+    "valor": 2000,
+    "origen": "supuesto"
+  },
+  {
+    "id": "planTokens",
+    "kind": "parametro",
+    "etiqueta": "Tokens que lee el orquestador para planificar",
+    "ayuda": "Descripción de la tarea y del reparto. Supuesto tuyo.",
+    "min": 0,
+    "max": 1000000,
+    "step": 500,
+    "valor": 5000,
+    "origen": "supuesto"
+  },
+  {
+    "id": "verifyShare",
+    "kind": "parametro",
+    "etiqueta": "Fracción de resultados que revisa un verificador (0 a 1)",
+    "ayuda": "1 = todos; 0,1 = una muestra del 10 %. Lo que un script puede comprobar no entra aquí: se comprueba con código.",
+    "min": 0,
+    "max": 1,
+    "step": 0.05,
+    "valor": 0.1,
+    "origen": "supuesto"
+  },
+  {
+    "id": "agents",
+    "kind": "parametro",
+    "etiqueta": "Agentes en paralelo (grupos de unidades)",
+    "ayuda": "Con /batch, entre 5 y 30 unidades independientes; cada una se lleva un grupo de elementos.",
+    "min": 5,
+    "max": 30,
+    "step": 1,
+    "valor": 30,
+    "origen": "documentacion"
+  },
+  {
+    "id": "readings",
+    "kind": "parametro",
+    "etiqueta": "Lecturas independientes",
+    "ayuda": "Cuántas veces se hace la misma pregunta con contexto limpio. El ejemplo de la guía usa tres.",
+    "min": 2,
+    "max": 10,
+    "step": 1,
+    "valor": 3,
+    "origen": "guia"
+  },
+  {
+    "id": "rounds",
+    "kind": "parametro",
+    "etiqueta": "Máximo de vueltas de revisión",
+    "ayuda": "Cada vuelta es una revisión completa. El ejemplo de la guía pone dos vueltas como máximo.",
+    "min": 1,
+    "max": 5,
+    "step": 1,
+    "valor": 2,
+    "origen": "guia"
+  },
+  {
+    "id": "easyShare",
+    "kind": "parametro",
+    "etiqueta": "Fracción de casos que atiende el modelo rápido (0 a 1)",
+    "ayuda": "Solo tiene sentido si el clasificador distingue bien los casos fáciles de los difíciles. Supuesto tuyo.",
+    "min": 0,
+    "max": 1,
+    "step": 0.05,
+    "valor": 0.5,
+    "origen": "supuesto"
+  },
+  {
+    "id": "agent-teams",
+    "kind": "topologia",
+    "nombre": "Agent teams (experimental)",
+    "escalon": 4,
+    "multiAgente": true,
+    "seleccion": [
+      { "campo": "agentsTalk", "es": true },
+      { "campo": "provider", "en": ["anthropic"] },
+      { "campo": "independent", "es": true }
+    ],
+    "cuandoEncaja": "Agentes que necesitan hablarse y discutir entre sí, no solo devolver un resultado al orquestador.",
+    "cuandoNo": "Cuando basta con que cada trabajador devuelva su resultado: unos subagentes cuestan una fracción. Son experimentales y están desactivados por defecto.",
+    "porQue": "Has marcado que los agentes tienen que hablarse entre sí y hay piezas independientes. En Claude Code eso son los agent teams, la opción más cara y experimental del módulo.",
+    "flujo": [
+      "El líder (tu sesión) reparte el trabajo entre compañeros.",
+      "Los compañeros trabajan a la vez, cada uno con su contexto, y se comunican entre sí.",
+      "El líder reúne el resultado y comprueba el criterio de terminado.",
+      "Una persona verifica una muestra antes de usarlo."
+    ],
+    "roles": [
+      {
+        "id": "lider",
+        "nombre": "Líder",
+        "funcion": "Reparte, coordina y reúne; es tu propia sesión.",
+        "cantidad": "uno",
+        "gama": "alta",
+        "esfuerzo": "defecto",
+        "siguienteAjuste": "Pocas veces conviene bajarlo: el error de plan lo heredan todos los compañeros.",
+        "porQue": "El líder fija el modelo de los compañeros si no hay nada definido."
+      },
+      {
+        "id": "companeros",
+        "nombre": "Compañeros",
+        "funcion": "Trabajan una parte cada uno y se hablan entre sí.",
+        "cantidad": "companeros",
+        "gama": "equilibrada",
+        "esfuerzo": "hereda",
+        "siguienteAjuste": "Fija modelo y esfuerzo en la definición del subagente si quieres uno distinto al del líder.",
+        "porQue": "Por defecto heredan el esfuerzo del líder."
+      }
+    ],
+    "coste": {
+      "tipo": "citada",
+      "cifra": {
+        "valor": 7,
+        "base": "una sesión normal (en tokens, con los compañeros en plan mode)",
+        "claim": "medicion",
+        "texto": "Según la documentación de costes de Claude Code, los agent teams usan unas 7 veces más tokens que una sesión normal cuando los compañeros trabajan en plan mode.",
+        "source": "claude-code-costes"
+      },
+      "nota": "Es una cifra del proveedor sobre un caso concreto: no es un cálculo sobre tu tarea. Mídelo con una prueba corta."
+    },
+    "limites": [],
+    "implementaciones": [
+      {
+        "proveedor": "anthropic",
+        "texto": "Claude Code, con CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1. Un equipo por sesión, sin equipos anidados y líder fijo. La documentación recomienda empezar con 3 a 5 compañeros."
+      },
+      {
+        "proveedor": "openai",
+        "texto": "No hay equivalente documentado: tendrías que montarlo tú."
+      },
+      {
+        "proveedor": "google",
+        "texto": "No hay equivalente documentado: tendrías que montarlo tú."
+      }
+    ],
+    "avisos": [
+      "Si los agentes no necesitan hablarse, los subagentes del patrón orquestador y trabajadores cuestan una fracción.",
+      "Activarlos hace que un subagente al que Claude da nombre se lance como compañero, aunque no lo hayas pedido."
+    ],
+    "masSimple": {
+      "id": "orquestador",
+      "texto": "Subagentes con orquestador: cada trabajador devuelve su resultado y no se habla con los demás."
+    },
+    "pagina": "m8-agentes/implementacion-por-superficie",
+    "fuentes": ["claude-code-agent-teams", "claude-code-costes"],
+    "claim": "recomendacion",
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "flujo-dinamico",
+    "kind": "topologia",
+    "nombre": "Flujos dinámicos con verificación cruzada",
+    "escalon": 4,
+    "multiAgente": true,
+    "diagrama": "flujo",
+    "seleccion": [
+      { "campo": "independent", "es": true },
+      { "campo": "pieceKind", "en": ["definidas", "abiertas"] },
+      { "campo": "verification", "es": "revision" }
+    ],
+    "cuandoEncaja": "Muchas piezas, homogéneas o no, donde hay que contrastar: auditorías, migraciones, investigación profunda y comprobaciones cruzadas.",
+    "cuandoNo": "Cuando la tarea cabe en un contexto o cuando no sabes cuánto vas a gastar: el coste es proporcional al número de agentes.",
+    "porQue": "Hay piezas independientes y distintas, y exiges que otros agentes con contexto limpio comprueben lo que otros han producido. Es la forma del informe con verificación cruzada del módulo.",
+    "flujo": [
+      "El orquestador (tu sesión) reparte las piezas y fija el formato y las fuentes permitidas de cada resultado.",
+      "Los investigadores trabajan cada uno una pieza y devuelven cifras con fuente y cita literal.",
+      "Un script determinista une las tablas y comprueba que cada cifra tiene fuente y que las sumas cuadran.",
+      "Los verificadores, con contexto limpio, comprueban cada cifra clave contra su fuente sin ver el razonamiento del investigador.",
+      "El orquestador sintetiza solo lo confirmado; lo no confirmado se marca o se descarta.",
+      "Una persona comprueba una muestra antes de usar el resultado."
+    ],
+    "roles": [
+      {
+        "id": "orquestador",
+        "nombre": "Orquestador y sintetizador",
+        "funcion": "Reparte las piezas, fija el formato y sintetiza al final.",
+        "cantidad": "uno",
+        "gama": "alta",
+        "esfuerzo": "defecto",
+        "escalaA": "frontera",
+        "siguienteAjuste": "Pocas veces conviene bajar. Si la tarea es de las más difíciles, sube el esfuerzo antes que el modelo, y la frontera solo si falla y el error de plan es caro.",
+        "porQue": "Una mala decisión de plan se paga en todo lo que viene después."
+      },
+      {
+        "id": "trabajador",
+        "nombre": "Investigadores",
+        "funcion": "Investigan una pieza cada uno y devuelven cifras con fuente y cita.",
+        "cantidad": "unidades",
+        "gama": "equilibrada",
+        "esfuerzo": "defecto",
+        "candidata": "rapida",
+        "siguienteAjuste": "Bajar el esfuerzo un escalón y comprobar el acierto; el modelo rápido solo para extraer pasajes de fuentes largas, tras medir.",
+        "porQue": "Es el puesto que más tokens consume y donde bajar de escalón ahorra más."
+      },
+      {
+        "id": "verificador",
+        "nombre": "Verificadores",
+        "funcion": "Comprueban cada cifra clave contra su fuente, con contexto limpio.",
+        "cantidad": "muestra",
+        "gama": "alta",
+        "esfuerzo": "defecto",
+        "siguienteAjuste": "Bajar el esfuerzo solo si la lista de comprobación es mecánica.",
+        "porQue": "No debe corregir quien hizo el trabajo: comparte sus premisas y sus sesgos."
+      },
+      {
+        "id": "script",
+        "nombre": "Comprobaciones deterministas",
+        "funcion": "Une tablas, comprueba fuentes y sumas.",
+        "cantidad": "codigo",
+        "gama": "codigo",
+        "esfuerzo": "ninguno",
+        "siguienteAjuste": "No aplica.",
+        "porQue": "Si la entrada determina la salida, un modelo solo añade coste y variabilidad."
+      }
+    ],
+    "coste": {
+      "tipo": "reparto",
+      "roles": { "planificador": "orquestador", "trabajador": "trabajador", "verificador": "verificador" },
+      "trabajadores": "unidad",
+      "fusion": true,
+      "params": [
+        { "id": "outputRatio" },
+        { "id": "sharedTokens" },
+        { "id": "planTokens" },
+        { "id": "verifyShare", "valor": 1 }
+      ],
+      "nota": "No hay cifra publicada para un flujo dinámico y el proveedor avisa de que el coste es difícil de predecir: la fórmula da un suelo, sin reintentos ni lecturas repetidas."
+    },
+    "limites": [
+      {
+        "id": "agentes",
+        "max": 25,
+        "texto": "Claude Code muestra el aviso «Large workflow» cuando un flujo proyecta más de 25 agentes (no aparece con /effort ultracode activado en la sesión).",
+        "source": "claude-code-flujos-dinamicos"
+      },
+      {
+        "id": "tokens",
+        "max": 1500000,
+        "texto": "Claude Code muestra el aviso «Large workflow» cuando un flujo proyecta más de 1,5 millones de tokens (no aparece con /effort ultracode activado en la sesión).",
+        "source": "claude-code-flujos-dinamicos"
+      }
+    ],
+    "implementaciones": [
+      {
+        "proveedor": "anthropic",
+        "texto": "Claude Code: pide un flujo dinámico (palabra clave ultracode en el prompt o /effort ultracode) o usa /deep-research para investigación citada; en Managed Agents (beta), flujos dinámicos desde el 9 de octubre de 2026. Fija un tamaño máximo y un presupuesto antes de lanzarlo."
+      },
+      {
+        "proveedor": "openai",
+        "texto": "Subagentes de Codex (ficheros TOML en .codex/agents/). La orquestación multiagente de la Responses API está sin verificar en la documentación consultada."
+      },
+      {
+        "proveedor": "google",
+        "texto": "No consta orquestación multiagente en la API de Gemini en las fuentes consultadas: tendrías que montarlo con tu propio código."
+      }
+    ],
+    "avisos": [
+      "Limita el tamaño del flujo y mide primero sobre una parte: ejecútalo sobre una sola pieza y mira /usage.",
+      "Probablemente el coste suba frente al modelo solo: la justificación es el tiempo y la verificación con contexto limpio."
+    ],
+    "masSimple": {
+      "id": "encadenamiento",
+      "texto": "Versión económica: un solo modelo, una conversación por pieza en secuencia y una de síntesis, con una persona que comprueba una muestra."
+    },
+    "pagina": "m8-agentes/casos-completos",
+    "fuentes": [
+      "claude-code-flujos-dinamicos",
+      "platform-claude-com-docs-en-managed-agents-multiagent-orchestration-2",
+      "anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas"
+    ],
+    "claim": "recomendacion",
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "enrutado",
+    "kind": "topologia",
+    "nombre": "Enrutado",
+    "escalon": 2,
+    "multiAgente": true,
+    "diagrama": "enrutado",
+    "seleccion": [
+      { "campo": "independent", "es": true },
+      { "campo": "pieceKind", "es": "iguales" },
+      { "campo": "difficulty", "es": "mixta" },
+      { "campo": "units", "min": "volumeMinUnits" }
+    ],
+    "cuandoEncaja": "Hay mezcla real de dificultades, volumen alto y una señal fiable para distinguirlas.",
+    "cuandoNo": "Casi todo es del mismo tipo, o un error del clasificador es caro: un caso difícil mandado al modelo flojo sale peor que haberlo mandado a todos al capaz.",
+    "porQue": "Tienes muchos casos del mismo tipo con dificultad mixta que se puede distinguir de antemano: un clasificador barato decide quién atiende cada uno.",
+    "flujo": [
+      "Cada entrada llega a un clasificador barato.",
+      "Los casos sencillos van al modelo rápido, con una plantilla.",
+      "Los complejos van al modelo capaz, con su esfuerzo por defecto.",
+      "Los sensibles pasan a una persona.",
+      "Antes de montarlo, mide el clasificador sobre una muestra pasada que incluya los casos más difíciles."
+    ],
+    "roles": [
+      {
+        "id": "clasificador",
+        "nombre": "Clasificador",
+        "funcion": "Decide quién atiende cada caso.",
+        "cantidad": "uno",
+        "gama": "rapida",
+        "esfuerzo": "defecto",
+        "siguienteAjuste": "Medirlo sobre una muestra con casos difíciles antes de fiarte; baja el esfuerzo solo si acierta igual.",
+        "porQue": "Un clasificador flojo es peor que no enrutar."
+      },
+      {
+        "id": "trabajador-rapido",
+        "nombre": "Trabajador rápido",
+        "funcion": "Atiende los casos sencillos.",
+        "cantidad": "uno",
+        "gama": "rapida",
+        "esfuerzo": "defecto",
+        "siguienteAjuste": "Mide el acierto en los casos sencillos antes de ampliar lo que le envías.",
+        "porQue": "No pagas el modelo capaz por lo que el rápido hace igual de bien."
+      },
+      {
+        "id": "trabajador",
+        "nombre": "Trabajador capaz",
+        "funcion": "Atiende los casos complejos.",
+        "cantidad": "uno",
+        "gama": "equilibrada",
+        "esfuerzo": "defecto",
+        "siguienteAjuste": "Bajar el esfuerzo un escalón y comprobar el acierto.",
+        "porQue": "Los difíciles son los que deciden la factura y los que más importa acertar."
+      },
+      {
+        "id": "persona",
+        "nombre": "Persona",
+        "funcion": "Atiende los casos sensibles.",
+        "cantidad": "persona",
+        "gama": "persona",
+        "esfuerzo": "ninguno",
+        "siguienteAjuste": "No aplica.",
+        "porQue": "Un fallo que pasa desapercibido o es irreversible pide revisión humana."
+      }
+    ],
+    "coste": {
+      "tipo": "enrutado",
+      "roles": { "clasificador": "clasificador", "rapido": "trabajador-rapido", "capaz": "trabajador" },
+      "params": [{ "id": "outputRatio" }, { "id": "easyShare" }],
+      "nota": "El clasificador solo lee y devuelve una etiqueta (su salida se cuenta como cero). No se modela la pérdida de caché al repartir entre varios modelos ni el coste de la persona."
+    },
+    "limites": [],
+    "implementaciones": [
+      {
+        "proveedor": "anthropic",
+        "texto": "Un clasificador y un flujo escritos en código con la API de Claude; en Claude Code, el alias opusplan reparte plan y ejecución entre dos modelos (es otra cosa)."
+      },
+      {
+        "proveedor": "openai",
+        "texto": "Se monta con tu código y los modelos de la gama que corresponda."
+      },
+      {
+        "proveedor": "google",
+        "texto": "Se monta con tu código y los modelos de la gama que corresponda."
+      }
+    ],
+    "avisos": [
+      "Cada modelo tiene su propia caché: repartir el tráfico entre varios modelos reduce los aciertos de caché de cada uno."
+    ],
+    "masSimple": {
+      "id": "fanout",
+      "texto": "Todo al mismo modelo capaz con un encargo depurado, y baja el esfuerzo si mide bien."
+    },
+    "pagina": "m8-agentes/patrones",
+    "fuentes": ["anthropic-prompt-caching", "anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas"],
+    "claim": "recomendacion",
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "fanout",
+    "kind": "topologia",
+    "nombre": "Fan-out por lotes",
+    "escalon": 4,
+    "multiAgente": true,
+    "diagrama": "fanout",
+    "seleccion": [
+      { "campo": "independent", "es": true },
+      { "campo": "pieceKind", "es": "iguales" },
+      { "campo": "units", "min": "volumeMinUnits" }
+    ],
+    "cuandoEncaja": "Mucho volumen homogéneo, con trabajo por elemento pequeño y comprobable.",
+    "cuandoNo": "Los elementos dependen entre sí o el encargo no está probado: un error de encargo se multiplica por N.",
+    "porQue": "Hay muchas unidades iguales e independientes: el mismo encargo se aplica a cada una, con un script que valida el resultado.",
+    "flujo": [
+      "Escribe la guía, tres ejemplos ya resueltos a mano y un script de validación: son el criterio de terminado.",
+      "Depura el encargo con uno o dos elementos y estima el coste con tres antes de lanzar el resto.",
+      "Reparte las unidades entre los trabajadores, todas con el mismo encargo.",
+      "El script determinista valida todos los resultados y que no falte ni sobre ninguno.",
+      "Un revisor con contexto limpio lee solo una muestra, por lo que un script no ve.",
+      "Fusiona o usa el resultado solo cuando el script y la muestra estén en verde."
+    ],
+    "roles": [
+      {
+        "id": "orquestador",
+        "nombre": "Orquestador (tu sesión)",
+        "funcion": "Prepara la guía y el validador, aprueba el plan y revisa muestras.",
+        "cantidad": "uno",
+        "gama": "alta",
+        "esfuerzo": "defecto",
+        "siguienteAjuste": "Pocas veces conviene bajar; en /batch es el modelo que ya tenga tu sesión.",
+        "porQue": "El error de plan se multiplica por todas las unidades."
+      },
+      {
+        "id": "trabajador",
+        "nombre": "Trabajador por unidad",
+        "funcion": "Aplica el encargo a sus elementos y ejecuta el validador sobre cada uno.",
+        "cantidad": "unidades-o-grupos",
+        "gama": "equilibrada",
+        "esfuerzo": "defecto",
+        "candidata": "rapida",
+        "siguienteAjuste": "Si acierta de forma estable, probar a bajar el esfuerzo o el modelo con una muestra de cinco elementos que incluya los más raros, un escalón cada vez.",
+        "porQue": "Es el puesto que más tokens consume y donde bajar de escalón ahorra más."
+      },
+      {
+        "id": "script",
+        "nombre": "Validador determinista",
+        "funcion": "Comprueba cada resultado y que no falte ni sobre ninguno.",
+        "cantidad": "codigo",
+        "gama": "codigo",
+        "esfuerzo": "ninguno",
+        "siguienteAjuste": "No aplica.",
+        "porQue": "Un script comprueba todo con el mismo criterio y sin coste de modelo."
+      },
+      {
+        "id": "verificador",
+        "nombre": "Revisor de muestra",
+        "funcion": "Lee una muestra de resultados contra el original y contra la guía.",
+        "cantidad": "muestra",
+        "gama": "alta",
+        "esfuerzo": "defecto",
+        "siguienteAjuste": "Bajar el esfuerzo solo si la lista de comprobación es mecánica.",
+        "porQue": "Un revisor con modelo no es repetible al 100 %: úsalo donde un script no llega."
+      }
+    ],
+    "coste": {
+      "tipo": "reparto",
+      "roles": { "planificador": "orquestador", "trabajador": "trabajador", "verificador": "verificador" },
+      "trabajadores": "grupos",
+      "agentes": { "min": 5, "max": 30 },
+      "lotesSiEspera": true,
+      "fusion": false,
+      "params": [
+        { "id": "outputRatio" },
+        { "id": "sharedTokens" },
+        { "id": "planTokens" },
+        { "id": "verifyShare" },
+        { "id": "agents" }
+      ],
+      "nota": "Con Batch (puedes esperar), cada unidad es una petición y el contexto común se paga en cada una; el descuento solo se aplica a los trabajadores y solo si el proveedor tiene un descuento verificado. Con /batch, el contexto común se paga una vez por agente."
+    },
+    "limites": [],
+    "implementaciones": [
+      {
+        "proveedor": "anthropic",
+        "cuando": "espera",
+        "texto": "API de Claude: Message Batches, una petición por unidad, con el 50 % de descuento sobre todos los tokens a cambio de esperar hasta 24 horas, sin bucle de herramientas."
+      },
+      {
+        "proveedor": "anthropic",
+        "cuando": "ya",
+        "texto": "Claude Code: /batch descompone un cambio grande en 5 a 30 unidades independientes, cada una en su worktree y su subagente, y pide aprobar el plan. Necesita un repositorio git o un hook WorktreeCreate. Alternativa: un flujo dinámico."
+      },
+      {
+        "proveedor": "openai",
+        "cuando": "espera",
+        "texto": "Batch de la API de OpenAI (los datos del sitio recogen un descuento del 50 %). Una petición por unidad."
+      },
+      {
+        "proveedor": "openai",
+        "cuando": "ya",
+        "texto": "Subagentes de Codex (ficheros TOML en .codex/agents/); sus flujos consumen más tokens que ejecuciones comparables de un solo agente."
+      },
+      {
+        "proveedor": "google",
+        "texto": "No consta orquestación multiagente en la API de Gemini en las fuentes consultadas, ni un descuento de lotes verificado: tendrías que montarlo con tu propio código."
+      }
+    ],
+    "avisos": [
+      "Un error de encargo se multiplica por N: depura con uno y estima el coste con tres.",
+      "Repartir en más agentes acorta el tiempo; no reduce el coste, que lo marcan los tokens de cada elemento."
+    ],
+    "masSimple": {
+      "id": "agente",
+      "texto": "Versión económica: un solo agente, los elementos de diez en diez y el mismo validador. Más lento, menos coordinación."
+    },
+    "pagina": "m8-agentes/casos-completos",
+    "fuentes": ["anthropic-batch", "claude-code-agentes-en-paralelo", "claude-code-comandos"],
+    "claim": "recomendacion",
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "paralelizacion-votacion",
+    "kind": "topologia",
+    "nombre": "Paralelización por votación",
+    "escalon": 4,
+    "multiAgente": true,
+    "diagrama": "paralelo-votacion",
+    "seleccion": [{ "campo": "verification", "es": "segunda-opinion" }],
+    "cuandoEncaja": "El error es caro y quieres una segunda opinión: la misma pregunta con contextos limpios y una comparación.",
+    "cuandoNo": "Se vota con el mismo contexto: si las lecturas comparten sesgos, coinciden en el error.",
+    "porQue": "Una decisión ambigua o de alto riesgo se contrasta con varias lecturas independientes: donde coinciden hay confianza; donde difieren, hay que mirar.",
+    "flujo": [
+      "La misma pregunta se lanza varias veces, cada una en una sesión nueva y con la misma configuración.",
+      "Un comparador (o código, si la respuesta es una etiqueta) mira dónde coinciden.",
+      "Si coinciden, sigues. Si difieren, el caso va a una persona."
+    ],
+    "roles": [
+      {
+        "id": "lector",
+        "nombre": "Lectores independientes",
+        "funcion": "Responden la misma pregunta cada uno con contexto limpio.",
+        "cantidad": "lecturas",
+        "gama": "alta",
+        "esfuerzo": "defecto",
+        "siguienteAjuste": "Bajar el esfuerzo de todos a la vez solo si la tasa de coincidencia no cae al medirlo.",
+        "porQue": "La independencia es lo que da valor a la votación."
+      },
+      {
+        "id": "comparador",
+        "nombre": "Comparador",
+        "funcion": "Compara las respuestas y marca las discrepancias.",
+        "cantidad": "uno",
+        "gama": "alta",
+        "esfuerzo": "defecto",
+        "siguienteAjuste": "Si la respuesta es una etiqueta o un número, sustitúyelo por código.",
+        "porQue": "Lo que se puede comparar con exactitud no necesita un modelo."
+      },
+      {
+        "id": "persona",
+        "nombre": "Persona",
+        "funcion": "Decide los casos en los que las lecturas difieren.",
+        "cantidad": "persona",
+        "gama": "persona",
+        "esfuerzo": "ninguno",
+        "siguienteAjuste": "No aplica.",
+        "porQue": "Una discrepancia es justo el caso que la votación no resuelve sola."
+      }
+    ],
+    "coste": {
+      "tipo": "votacion",
+      "roles": { "lector": "lector", "comparador": "comparador" },
+      "params": [{ "id": "outputRatio" }, { "id": "readings" }],
+      "nota": "N × una lectura más la comparación. Con N lecturas del mismo modelo capaz el multiplicador es algo mayor que N."
+    },
+    "limites": [],
+    "implementaciones": [
+      {
+        "proveedor": "anthropic",
+        "texto": "Varias sesiones nuevas (o subagentes con contexto limpio en Claude Code) con el mismo encargo."
+      },
+      {
+        "proveedor": "openai",
+        "texto": "Varias sesiones nuevas o subagentes de Codex con el mismo encargo."
+      },
+      {
+        "proveedor": "google",
+        "texto": "Varias sesiones nuevas con el mismo encargo, lanzadas desde tu código."
+      }
+    ],
+    "avisos": ["Con el mismo contexto, las lecturas coinciden en el error: cada lectura en sesión nueva."],
+    "masSimple": {
+      "id": "evaluador",
+      "texto": "Una sola lectura más un revisor con criterio escrito y contexto limpio."
+    },
+    "pagina": "m8-agentes/patrones",
+    "fuentes": ["claude-code-agentes-en-paralelo", "anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas"],
+    "claim": "recomendacion",
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "orquestador",
+    "kind": "topologia",
+    "nombre": "Orquestador y trabajadores",
+    "escalon": 4,
+    "multiAgente": true,
+    "diagrama": "orquestador",
+    "seleccion": [
+      { "campo": "independent", "es": true },
+      { "campo": "pieceKind", "es": "abiertas" },
+      {
+        "alguna": [
+          { "campo": "fits", "es": false },
+          { "campo": "longTail", "es": true },
+          { "campo": "canWait", "es": false }
+        ]
+      }
+    ],
+    "cuandoEncaja": "Hay volumen que repartir y el trabajo se parte en partes con contexto propio, cuyo reparto decide el orquestador leyendo la tarea.",
+    "cuandoNo": "La tarea es una cadena o cabe en una ventana: pagas el plan, el reparto y la fusión por nada.",
+    "porQue": "Hay piezas independientes y distintas cuyo reparto no está fijado de antemano, y se da al menos una razón para repartir (tamaño, cola larga de coste o tiempo).",
+    "flujo": [
+      "El orquestador lee la tarea y decide el reparto en partes.",
+      "Cada trabajador recibe su encargo con los seis elementos (objetivo, contexto, fuentes, límites, formato de retorno y criterio de terminado).",
+      "Los trabajadores devuelven resultados con su prueba.",
+      "Un script determinista une y comprueba lo que se puede calcular.",
+      "Un verificador con contexto limpio comprueba una muestra.",
+      "El orquestador fusiona y resuelve contradicciones."
+    ],
+    "roles": [
+      {
+        "id": "orquestador",
+        "nombre": "Orquestador",
+        "funcion": "Planifica el reparto, lanza a los trabajadores y fusiona.",
+        "cantidad": "uno",
+        "gama": "alta",
+        "esfuerzo": "defecto",
+        "escalaA": "frontera",
+        "siguienteAjuste": "Pocas veces conviene bajar. Si la tarea es de las más difíciles, sube el esfuerzo antes que el modelo; la frontera solo si falla y el error de plan es caro.",
+        "porQue": "Una mala decisión de plan se paga en todo lo que viene después: todos los trabajadores heredan el error."
+      },
+      {
+        "id": "trabajador",
+        "nombre": "Trabajadores",
+        "funcion": "Cada uno ejecuta una parte del trabajo con su contexto.",
+        "cantidad": "unidades",
+        "gama": "equilibrada",
+        "esfuerzo": "defecto",
+        "candidata": "rapida",
+        "siguienteAjuste": "Bajar el esfuerzo un escalón y comprobar el acierto; el modelo rápido solo para lectura o extracción masiva, tras medir.",
+        "porQue": "Es el puesto que más tokens consume y donde bajar de escalón ahorra más."
+      },
+      {
+        "id": "verificador",
+        "nombre": "Verificador",
+        "funcion": "Comprueba una muestra con contexto limpio.",
+        "cantidad": "muestra",
+        "gama": "alta",
+        "esfuerzo": "defecto",
+        "siguienteAjuste": "Bajar el esfuerzo solo si la lista de comprobación es mecánica.",
+        "porQue": "No debe corregir quien hizo el trabajo: comparte sus premisas y sus sesgos."
+      },
+      {
+        "id": "script",
+        "nombre": "Pasos deterministas",
+        "funcion": "Unir tablas, validar formatos, comparar ficheros.",
+        "cantidad": "codigo",
+        "gama": "codigo",
+        "esfuerzo": "ninguno",
+        "siguienteAjuste": "No aplica.",
+        "porQue": "Si la entrada determina la salida, un modelo solo añade coste y variabilidad."
+      }
+    ],
+    "coste": {
+      "tipo": "reparto",
+      "roles": { "planificador": "orquestador", "trabajador": "trabajador", "verificador": "verificador" },
+      "trabajadores": "unidad",
+      "fusion": true,
+      "params": [
+        { "id": "outputRatio" },
+        { "id": "sharedTokens" },
+        { "id": "planTokens" },
+        { "id": "verifyShare" }
+      ],
+      "nota": "Plan, N trabajadores y fusión. Solo ahorra frente al modelo capaz solo si los trabajadores son de una gama más barata y el reparto compensa el plan y la fusión."
+    },
+    "limites": [],
+    "implementaciones": [
+      {
+        "proveedor": "anthropic",
+        "texto": "Claude Code: subagentes en .claude/agents/ con model y effort. API de Claude: Agent SDK o Managed Agents (beta, con delegación a un solo nivel y como máximo 25 hilos hijos a la vez)."
+      },
+      {
+        "proveedor": "openai",
+        "texto": "Subagentes de Codex (ficheros TOML en .codex/agents/). La orquestación multiagente de la Responses API está sin verificar en la documentación consultada."
+      },
+      {
+        "proveedor": "google",
+        "texto": "No consta orquestación multiagente en la API de Gemini en las fuentes consultadas: tendrías que montarlo con tu propio código (Gemini CLI tiene subagentes, con formato sin confirmar)."
+      }
+    ],
+    "avisos": [
+      "Cuesta el plan y la fusión: solo ahorra con volumen o con trabajo que no cabe.",
+      "En la medición de Anthropic, el orquestador con trabajadores de una generación anterior costó aproximadamente la mitad que el modelo solo, con una puntuación de 10 a 12 puntos más baja."
+    ],
+    "masSimple": {
+      "id": "encadenamiento",
+      "texto": "Un solo modelo con una conversación por pieza en secuencia y una de síntesis; compáralo con el equipo en una prueba de tres elementos."
+    },
+    "pagina": "m8-agentes/patrones",
+    "fuentes": [
+      "anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas",
+      "claude-code-subagentes",
+      "platform-claude-com-docs-en-managed-agents-multiagent-orchestration-2"
+    ],
+    "claim": "recomendacion",
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "paralelizacion-secciones",
+    "kind": "topologia",
+    "nombre": "Paralelización por secciones",
+    "escalon": 4,
+    "multiAgente": true,
+    "diagrama": "paralelo-secciones",
+    "seleccion": [
+      { "campo": "independent", "es": true },
+      { "campo": "pieceKind", "es": "definidas" },
+      {
+        "alguna": [
+          { "campo": "fits", "es": false },
+          { "campo": "longTail", "es": true },
+          { "campo": "canWait", "es": false }
+        ]
+      }
+    ],
+    "cuandoEncaja": "Las piezas son realmente independientes y ya sabes cuáles son: se hacen a la vez y se fusionan.",
+    "cuandoNo": "Las piezas dependen unas de otras o comparten decisiones.",
+    "porQue": "Hay piezas independientes y distintas que ya conoces, así que el reparto no necesita un orquestador que lo decida, y se da al menos una razón para repartir.",
+    "flujo": [
+      "El encargo se divide en las piezas que ya conoces.",
+      "Cada pieza se resuelve a la vez, con su contexto y su encargo.",
+      "Se fusionan los resultados en uno solo (con código si es mecánico).",
+      "Una persona o un revisor comprueba que las piezas no se contradicen."
+    ],
+    "roles": [
+      {
+        "id": "trabajador",
+        "nombre": "Trabajador por sección",
+        "funcion": "Resuelve una sección con su contexto.",
+        "cantidad": "unidades",
+        "gama": "equilibrada",
+        "esfuerzo": "defecto",
+        "siguienteAjuste": "Bajar el esfuerzo un escalón y comprobar el acierto.",
+        "porQue": "Es el puesto que más tokens consume y donde bajar de escalón ahorra más."
+      },
+      {
+        "id": "orquestador",
+        "nombre": "Fusión",
+        "funcion": "Reúne los resultados y resuelve contradicciones.",
+        "cantidad": "uno",
+        "gama": "alta",
+        "esfuerzo": "defecto",
+        "siguienteAjuste": "Si la fusión es mecánica, hazla con código.",
+        "porQue": "Ningún trabajador ve el conjunto: alguien tiene que leerlo entero."
+      }
+    ],
+    "coste": {
+      "tipo": "reparto",
+      "roles": { "planificador": "orquestador", "trabajador": "trabajador" },
+      "trabajadores": "unidad",
+      "fusion": true,
+      "params": [{ "id": "outputRatio" }, { "id": "sharedTokens" }],
+      "nota": "Sin plan (las piezas ya están definidas) y sin verificación: solo trabajadores y fusión."
+    },
+    "limites": [],
+    "implementaciones": [
+      {
+        "proveedor": "anthropic",
+        "texto": "Claude Code: varios subagentes en paralelo (consulta «trabajo en paralelo»). API de Claude: peticiones concurrentes desde tu código."
+      },
+      {
+        "proveedor": "openai",
+        "texto": "Subagentes de Codex o peticiones concurrentes desde tu código."
+      },
+      {
+        "proveedor": "google",
+        "texto": "Peticiones concurrentes desde tu código."
+      }
+    ],
+    "avisos": ["Fusionar mal los resultados es el riesgo principal: define el formato de cada resultado antes de repartir."],
+    "masSimple": {
+      "id": "encadenamiento",
+      "texto": "Una conversación por sección en secuencia con el mismo modelo, y una de síntesis."
+    },
+    "pagina": "m8-agentes/patrones",
+    "fuentes": ["claude-code-agentes-en-paralelo", "anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas"],
+    "claim": "recomendacion",
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "evaluador",
+    "kind": "topologia",
+    "nombre": "Evaluador y optimizador",
+    "escalon": 4,
+    "multiAgente": true,
+    "diagrama": "evaluador",
+    "seleccion": [{ "campo": "verification", "es": "revision" }],
+    "cuandoEncaja": "El criterio de calidad se puede escribir y comprobar (una rúbrica, un test, un esquema) y un fallo cuesta más que una vuelta extra.",
+    "cuandoNo": "El criterio es una sensación («que suene bien»): el revisor inventa objeciones o se da por satisfecho sin motivo.",
+    "porQue": "Quieres que alguien con contexto limpio revise el resultado contra un criterio escrito: quien ha hecho el trabajo tiende a validar sus propias premisas.",
+    "flujo": [
+      "El escritor produce el resultado.",
+      "El revisor, con contexto limpio o un modelo distinto, lo contrasta con el criterio escrito y devuelve solo los fallos que afectan a la corrección.",
+      "El escritor corrige.",
+      "Se repite hasta cumplir el criterio o llegar al máximo de vueltas."
+    ],
+    "roles": [
+      {
+        "id": "escritor",
+        "nombre": "Escritor",
+        "funcion": "Produce y corrige el resultado.",
+        "cantidad": "uno",
+        "gama": "equilibrada",
+        "esfuerzo": "defecto",
+        "siguienteAjuste": "Bajar el esfuerzo un escalón y comprobar el acierto.",
+        "porQue": "Es el trabajador general: el puesto de más volumen."
+      },
+      {
+        "id": "revisor",
+        "nombre": "Revisor",
+        "funcion": "Contrasta el resultado con el criterio escrito, en contexto limpio.",
+        "cantidad": "vueltas",
+        "gama": "alta",
+        "esfuerzo": "defecto",
+        "siguienteAjuste": "Bajar el esfuerzo solo si la lista de comprobación es mecánica.",
+        "porQue": "No debe corregir quien hizo el trabajo; que sea otro modelo o al menos otro contexto."
+      }
+    ],
+    "coste": {
+      "tipo": "evaluacion",
+      "roles": { "escritor": "escritor", "revisor": "revisor" },
+      "params": [{ "id": "outputRatio" }, { "id": "rounds" }],
+      "nota": "Producción más una revisión completa por vuelta, como máximo. No se cuenta la reescritura tras cada revisión."
+    },
+    "limites": [],
+    "implementaciones": [
+      {
+        "proveedor": "anthropic",
+        "texto": "Claude Code: /goal fija una condición de finalización que un modelo evaluador comprueba tras cada turno. Managed Agents (beta): los outcomes ponen a un evaluador con contexto separado a puntuar contra una rúbrica, con 3 iteraciones por defecto y hasta 20."
+      },
+      {
+        "proveedor": "openai",
+        "texto": "Se monta con tu código: un segundo agente (por ejemplo, un subagente de Codex) con el criterio escrito."
+      },
+      {
+        "proveedor": "google",
+        "texto": "Se monta con tu código: una segunda llamada con el criterio escrito y contexto limpio."
+      }
+    ],
+    "avisos": [
+      "Pon un máximo de vueltas: sin criterio escrito, el bucle no converge.",
+      "Pide al revisor solo los fallos que afectan a la corrección, para no sobredimensionar el trabajo."
+    ],
+    "masSimple": {
+      "id": "llamada-unica",
+      "texto": "Una sola llamada con el criterio incluido en el encargo, y tú (o una persona) revisas el resultado."
+    },
+    "pagina": "m8-agentes/patrones",
+    "fuentes": ["anthropic-managed-agents-outcomes", "claude-code-comandos"],
+    "claim": "recomendacion",
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "asesor",
+    "kind": "topologia",
+    "nombre": "Asesor",
+    "escalon": 3,
+    "multiAgente": true,
+    "diagrama": "asesor",
+    "seleccion": [{ "campo": "difficulty", "es": "pocas-criticas" }],
+    "cuandoEncaja": "Mucho trabajo mecánico con pocas decisiones críticas, y el ejecutor sabe cuándo consultar.",
+    "cuandoNo": "El ejecutor casi no consulta, o consulta tanto que pagas dos modelos por cada paso.",
+    "porQue": "Tu trabajo es mayormente mecánico con unas pocas decisiones difíciles: un ejecutor hace todo y consulta a un modelo superior solo en lo crítico.",
+    "flujo": [
+      "El ejecutor hace toda la tarea.",
+      "En los puntos difíciles (planificar, revisar el final) consulta al asesor.",
+      "El asesor aconseja; no actúa.",
+      "Mide cuántas veces consulta tu ejecutor antes de dar por bueno el patrón."
+    ],
+    "roles": [
+      {
+        "id": "ejecutor",
+        "nombre": "Ejecutor",
+        "funcion": "Hace todo el trabajo y decide cuándo consultar.",
+        "cantidad": "uno",
+        "gama": "equilibrada",
+        "esfuerzo": "defecto",
+        "siguienteAjuste": "Bajar el esfuerzo un escalón y comprobar el acierto y la tasa de consultas.",
+        "porQue": "Es el puesto que consume la mayoría de los tokens."
+      },
+      {
+        "id": "asesor",
+        "nombre": "Asesor",
+        "funcion": "Aconseja en las decisiones difíciles.",
+        "cantidad": "uno",
+        "gama": "alta",
+        "esfuerzo": "defecto",
+        "siguienteAjuste": "Debe ser al menos tan capaz como el ejecutor.",
+        "porQue": "Un asesor solo puede ayudar si el ejecutor lo consulta."
+      }
+    ],
+    "coste": {
+      "tipo": "citada",
+      "cifra": {
+        "valor": 2.1,
+        "base": "el ejecutor solo (en el único emparejamiento medido cuyo ejecutor consultó a menudo)",
+        "claim": "medicion",
+        "texto": "En las mediciones de Anthropic, el único emparejamiento cuyo ejecutor consultó a menudo mejoró 1,7 puntos sobre el ejecutor solo, en el límite del ruido, a un coste de unas 2,1 veces. Donde consultó poco o nada, el resultado quedó dentro del ruido o por debajo.",
+        "source": "anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas"
+      },
+      "nota": "Es una cifra de un caso concreto del proveedor: tu tasa de consultas decide el coste real. La definición de la herramienta añade unos 1.000 tokens de entrada por petición aunque nunca se consulte."
+    },
+    "limites": [],
+    "implementaciones": [
+      {
+        "proveedor": "anthropic",
+        "texto": "API de Claude: herramienta advisor_20260301 (beta, cabecera anthropic-beta: advisor-tool-2026-03-01). Claude Code: /advisor. Los ejecutores Fable 5.1 o Mythos 5.1 solo se emparejan con asesores de esas mismas gamas."
+      },
+      {
+        "proveedor": "openai",
+        "texto": "No hay equivalente documentado en las fuentes consultadas: tendrías que montarlo tú."
+      },
+      {
+        "proveedor": "google",
+        "texto": "No hay equivalente documentado en las fuentes consultadas: tendrías que montarlo tú."
+      }
+    ],
+    "avisos": [
+      "Si el ejecutor casi no consulta, el asesor no sirve: mide la tasa de consultas.",
+      "En una de las pruebas de Anthropic el emparejamiento quedó 7 puntos por debajo del ejecutor solo."
+    ],
+    "masSimple": {
+      "id": "llamada-unica",
+      "texto": "El ejecutor solo, con el esfuerzo por defecto, y subes el esfuerzo si falla en lo difícil."
+    },
+    "pagina": "m8-agentes/patrones",
+    "fuentes": [
+      "platform-claude-com-docs-en-agents-and-tools-tool-use-advisor-tool",
+      "anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas"
+    ],
+    "claim": "recomendacion",
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "agente",
+    "kind": "topologia",
+    "nombre": "Agente",
+    "escalon": 3,
+    "multiAgente": false,
+    "diagrama": "escalera",
+    "seleccion": [{ "campo": "pathKnown", "es": false }],
+    "cuandoEncaja": "Los pasos dependen de lo que va apareciendo y no se pueden escribir de antemano.",
+    "cuandoNo": "Si puedes escribir los pasos, es un flujo: más barato y más predecible.",
+    "porQue": "No conoces los pasos de antemano: un único agente elige los pasos y las herramientas en bucle hasta terminar, con un criterio de terminado verificable.",
+    "flujo": [
+      "Escribe el encargo como una especificación: objetivo, contexto, fuentes, límites, formato de retorno y criterio de terminado verificable.",
+      "El agente elige los pasos y las herramientas en bucle.",
+      "Limita herramientas, turnos y gasto.",
+      "Comprueba el resultado contra el criterio y con una muestra humana si el error pasa desapercibido."
+    ],
+    "roles": [
+      {
+        "id": "agente-unico",
+        "nombre": "Agente",
+        "funcion": "Hace todo el trabajo en bucle con herramientas.",
+        "cantidad": "uno",
+        "gama": "alta",
+        "esfuerzo": "defecto",
+        "siguienteAjuste": "Prueba un esfuerzo más bajo y mide; sube el esfuerzo antes que el modelo si falla.",
+        "porQue": "Regla de partida: modelo capaz y su esfuerzo por defecto; bajar midiendo, subir si falla."
+      }
+    ],
+    "coste": {
+      "tipo": "sin-cifra",
+      "nota": "Cada vuelta del bucle reenvía contexto, así que el coste depende del número de vueltas y no hay una cifra que sostener. Estima el coste con tres elementos y mira /usage."
+    },
+    "limites": [],
+    "implementaciones": [
+      {
+        "proveedor": "anthropic",
+        "texto": "Claude Code, el Tool Runner (beta en los SDK) o el Agent SDK, según cuánto quieras construir."
+      },
+      {
+        "proveedor": "openai",
+        "texto": "Codex o tu propio bucle con la Responses API."
+      },
+      {
+        "proveedor": "google",
+        "texto": "Gemini CLI o tu propio bucle con la API de Gemini."
+      }
+    ],
+    "avisos": ["Con un criterio de terminado verificable: un agente que para cuando le parece no es un agente útil."],
+    "masSimple": {
+      "id": "encadenamiento",
+      "texto": "Si puedes listar los pasos, un flujo con un encargo corto por paso."
+    },
+    "pagina": "m8-agentes/escalera-de-complejidad",
+    "fuentes": ["claude-code-costes", "anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas"],
+    "claim": "recomendacion",
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "encadenamiento",
+    "kind": "topologia",
+    "nombre": "Encadenamiento",
+    "escalon": 2,
+    "multiAgente": false,
+    "diagrama": "encadenamiento",
+    "seleccion": [{ "campo": "dependentSteps", "es": true }],
+    "cuandoEncaja": "La tarea tiene fases claras y cada una se puede comprobar y se beneficia de un encargo propio.",
+    "cuandoNo": "La tarea cabe cómoda en un solo encargo: cada eslabón añade una llamada y una ocasión de que el formato se rompa.",
+    "porQue": "Cada paso necesita el resultado del anterior y conoces los pasos: es una cadena, un flujo programado, no un equipo de agentes.",
+    "flujo": [
+      "Paso 1 con su propio encargo y su formato de salida.",
+      "Comprobación entre pasos (un esquema, una cifra que debe cuadrar): si falla, la cadena se detiene.",
+      "Paso 2 recibe solo lo que necesita.",
+      "Los pasos deterministas (sumar, ordenar, validar un formato) van en código.",
+      "Revisión final del resultado."
+    ],
+    "roles": [
+      {
+        "id": "paso",
+        "nombre": "Un paso por fase",
+        "funcion": "Cada fase tiene su encargo corto y su formato de salida.",
+        "cantidad": "uno",
+        "gama": "alta",
+        "esfuerzo": "defecto",
+        "siguienteAjuste": "Baja primero el paso que más tokens gasta, un escalón cada vez, midiendo.",
+        "porQue": "Regla de partida: modelo capaz y su esfuerzo por defecto en cada paso."
+      },
+      {
+        "id": "script",
+        "nombre": "Pasos deterministas",
+        "funcion": "Sumas, comparaciones, validaciones de formato.",
+        "cantidad": "codigo",
+        "gama": "codigo",
+        "esfuerzo": "ninguno",
+        "siguienteAjuste": "No aplica.",
+        "porQue": "Si la entrada determina la salida, un modelo solo añade coste y variabilidad."
+      }
+    ],
+    "coste": {
+      "tipo": "sin-cifra",
+      "nota": "Suma de varias llamadas cortas, sin coordinación de agentes: del orden del modelo solo, pero sin una cifra que sostener. Mídelo con tres elementos."
+    },
+    "limites": [],
+    "implementaciones": [
+      {
+        "proveedor": "anthropic",
+        "texto": "Varias llamadas a la API de Claude en un script, o encargos encadenados en una conversación de Claude Code."
+      },
+      {
+        "proveedor": "openai",
+        "texto": "Varias llamadas a la API en un script."
+      },
+      {
+        "proveedor": "google",
+        "texto": "Varias llamadas a la API en un script."
+      }
+    ],
+    "avisos": ["Un fallo temprano se arrastra: comprueba entre fases."],
+    "masSimple": {
+      "id": "llamada-unica",
+      "texto": "Todo en un solo encargo bien escrito, si cabe cómodo."
+    },
+    "pagina": "m8-agentes/patrones",
+    "fuentes": ["anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas"],
+    "claim": "recomendacion",
+    "verifiedAt": "2026-10-19"
+  },
+  {
+    "id": "llamada-unica",
+    "kind": "topologia",
+    "nombre": "Llamada única",
+    "escalon": 1,
+    "multiAgente": false,
+    "diagrama": "escalera",
+    "seleccion": [],
+    "cuandoEncaja": "Una sola pieza de trabajo que cabe en un contexto y que el modelo puede razonar entera, con un encargo bien escrito.",
+    "cuandoNo": "El fallo es de estructura (varias fases, pasos que dependen de lo que aparece), no de un encargo ambiguo.",
+    "porQue": "Es el escalón más bajo que resuelve tu tarea: un encargo bien escrito, una respuesta. Cada escalón conserva lo del anterior y le suma coste.",
+    "flujo": [
+      "Escribe el encargo con la plantilla universal.",
+      "Prueba el encargo con uno o dos casos reales y corrígelo si falla.",
+      "Mide el modelo capaz solo, a su esfuerzo por defecto y a uno más bajo, en cinco casos reales con los difíciles incluidos.",
+      "Verifica el resultado antes de usarlo."
+    ],
+    "roles": [
+      {
+        "id": "agente-unico",
+        "nombre": "Un solo modelo",
+        "funcion": "Hace todo el trabajo en una llamada.",
+        "cantidad": "uno",
+        "gama": "alta",
+        "esfuerzo": "defecto",
+        "siguienteAjuste": "Prueba un esfuerzo más bajo y mide; baja un escalón cada vez.",
+        "porQue": "Regla de partida: modelo capaz y su esfuerzo por defecto; bajar midiendo, subir si falla."
+      }
+    ],
+    "coste": {
+      "tipo": "referencia",
+      "nota": "Es la línea base: el modelo capaz solo a su esfuerzo por defecto, por definición 1×."
+    },
+    "limites": [],
+    "implementaciones": [
+      {
+        "proveedor": "anthropic",
+        "texto": "Un chat, o una llamada a la API de Claude."
+      },
+      {
+        "proveedor": "openai",
+        "texto": "Un chat, o una llamada a la API de OpenAI."
+      },
+      {
+        "proveedor": "google",
+        "texto": "Un chat, o una llamada a la API de Gemini."
+      }
+    ],
+    "avisos": [],
+    "masSimple": {
+      "id": null,
+      "texto": "Ya es el escalón más bajo. Lo único más simple es hacerlo a mano si lo haces una vez y en diez minutos."
+    },
+    "pagina": "m8-agentes/escalera-de-complejidad",
+    "fuentes": ["anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas", "claude-code-costes"],
+    "claim": "recomendacion",
+    "verifiedAt": "2026-10-19"
+  }
+]

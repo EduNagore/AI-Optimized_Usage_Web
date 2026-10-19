@@ -1,0 +1,99 @@
+---
+import { loadModelPricingDetails, loadModels, loadSources } from '@lib/data-access';
+import { formatNumber } from '@lib/format';
+import { url } from '@lib/paths';
+import { buildAgentModels, parseDesignerData, validateDesignerData } from '@lib/agent-team';
+import FlujoAgentes from './diagrams/FlujoAgentes.astro';
+import rawTopologies from '../data/agent-topologies.json';
+import AgentTeamDesigner from './interactive/AgentTeamDesigner';
+
+/**
+ * Diseñador de equipos de agentes (isla React). Las topologías, las señales de «no orquestar» y los
+ * umbrales viven en `agent-topologies.json`; los modelos y precios, en `models.json`. Es una
+ * recomendación de la guía: un punto de partida que se mide, no una sentencia.
+ */
+const [models, details, sources] = await Promise.all([
+  loadModels(),
+  loadModelPricingDetails(),
+  loadSources(),
+]);
+const data = parseDesignerData(rawTopologies);
+const agentModels = buildAgentModels(models, details);
+// Un dato incoherente (rol sin modelo, fuente inexistente, alternativa que no existe) rompe el build.
+const problems = validateDesignerData(
+  data,
+  agentModels,
+  sources.map((s) => s.id),
+);
+if (problems.length > 0) throw new Error(`<AgentTeamDesigner>: ${problems.join(' · ')}`);
+
+// Fuentes y páginas que pueden aparecer en el resultado, como objetos planos para la isla.
+const sourceMap = Object.fromEntries(sources.map((s) => [s.id, { title: s.title, url: s.url }]));
+const pages = new Set<string>([
+  ...data.topologias.map((t) => t.pagina),
+  ...data.razones.map((r) => r.pagina),
+  ...data.senales.map((s) => s.pagina),
+]);
+const pageUrls = Object.fromEntries([...pages].map((p) => [p, url(p)]));
+
+// Diagramas de los patrones (complemento visual, plegado): uno por patrón, sin repetir.
+const diagrams = [...new Set(data.topologias.flatMap((t) => (t.diagrama ? [t.diagrama] : [])))];
+const params = data.parametros.filter((p) => p.id === 'outputRatio' || p.id === 'sharedTokens');
+---
+
+<AgentTeamDesigner client:visible data={data} models={agentModels} sources={sourceMap} pageUrls={pageUrls} />
+
+<details class="not-content">
+  <summary>Diagramas de los patrones</summary>
+  {diagrams.map((d) => (
+    <FlujoAgentes patron={d as never} />
+  ))}
+</details>
+
+<noscript>
+  <p>
+    <strong>Diseñador de equipos de agentes.</strong> Necesita JavaScript para calcular. Sin él, haz el mismo
+    recorrido a mano: lee de arriba abajo la tabla de abajo y párate en la primera fila que describa tu tarea.
+    Es una recomendación de la guía, no una medición sobre tu caso.
+  </p>
+  <p>
+    Regla de partida: modelo capaz y su esfuerzo por defecto en cada puesto; bajar un escalón cada vez,
+    midiendo en una muestra con casos difíciles; subir si falla. Repartir solo compensa por volumen de piezas
+    iguales, por trabajo que no cabe en una ventana (cuenta como «cabe» hasta el{' '}
+    {formatNumber(data.ajustes.fitFraction * 100)}% de la ventana), por una cola larga de coste o por una
+    revisión con contexto limpio. Si la tarea es una cadena, cabe en un contexto o son menos de{' '}
+    {formatNumber(data.ajustes.volumeMinUnits)} unidades iguales, probablemente no compensa orquestar.
+  </p>
+  <p>
+    Multiplicador orientativo del reparto (estimación de la guía, con supuestos tuyos): coste del equipo =
+    trabajadores + plan + fusión + verificación, con trabajadores = (material + agentes × contexto común) ×
+    precio efectivo, y precio efectivo = (entrada + salida por entrada × precio de salida) / 10^6. Se divide
+    por el coste de un solo agente con el modelo capaz. Salida por entrada de partida:{' '}
+    {formatNumber(params.find((p) => p.id === 'outputRatio')?.valor ?? 0)}; contexto común de partida:{' '}
+    {formatNumber(params.find((p) => p.id === 'sharedTokens')?.valor ?? 0)} tokens por agente (ambos son
+    supuestos, no datos).
+  </p>
+  <table>
+    <caption>Topologías, en orden de prueba (la primera que encaja gana)</caption>
+    <thead>
+      <tr>
+        <th scope="col">Topología</th>
+        <th scope="col">Cuándo encaja</th>
+        <th scope="col">Cuándo no</th>
+        <th scope="col">Página</th>
+      </tr>
+    </thead>
+    <tbody>
+      {data.topologias.map((t) => (
+        <tr>
+          <th scope="row">{t.nombre}</th>
+          <td>{t.cuandoEncaja}</td>
+          <td>{t.cuandoNo}</td>
+          <td>
+            <a href={pageUrls[t.pagina]}>Ver</a>
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</noscript>
