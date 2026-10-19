@@ -119,6 +119,39 @@ export const changelogSchema = z.object({
   ...volatile,
 });
 
+const unitPrices = {
+  input: z.number().nonnegative(),
+  output: z.number().nonnegative(),
+  cacheRead: z.number().nonnegative(),
+  cacheWrite5m: z.number().nonnegative().optional(),
+  cacheWrite1h: z.number().nonnegative().optional(),
+};
+
+/**
+ * Mecánica de precios de cada modelo que `models.json` no puede expresar como número único:
+ * tramo de contexto largo, mínimo y TTL de la caché, descuento de lotes y cambios de precio
+ * programados. Alimenta la calculadora de coste y el simulador de caché.
+ * Los TTL se asignan por posición: el primero usa `cacheWrite5m`, el segundo `cacheWrite1h`
+ * (en OpenAI, el único TTL de 30 min usa `cacheWrite5m`).
+ */
+export const modelPricingDetailSchema = z.object({
+  id: z.string().min(1),
+  modelId: z.string().min(1),
+  /** Multiplicador de Batch sobre todo el coste; `null` si no hay dato verificado. */
+  batchFactor: z.number().positive().max(1).nullable(),
+  cache: z.object({
+    mode: z.enum(['explicit', 'implicit']),
+    minTokens: z.number().int().positive(),
+    ttlMinutes: z.array(z.number().int().positive()).max(2),
+  }),
+  /** Si la petición supera `thresholdTokens` de entrada, toda la petición paga estos precios. */
+  longContext: z.object({ thresholdTokens: z.number().int().positive(), ...unitPrices }).optional(),
+  /** Cambio de precio ya anunciado: desde `effectiveFrom` rigen estos precios. */
+  scheduledChange: z.object({ effectiveFrom: isoDate, ...unitPrices }).optional(),
+  note: z.string().optional(),
+  ...volatile,
+});
+
 /** Nombre de fichero (sin .json) → esquema de cada registro. */
 export const dataSchemas = {
   sources: sourceSchema,
@@ -130,4 +163,15 @@ export const dataSchemas = {
   'task-matrix': taskMatrixSchema,
   glossary: glossarySchema,
   changelog: changelogSchema,
+  'model-pricing-details': modelPricingDetailSchema,
 } as const;
+
+export type SourceRecord = z.infer<typeof sourceSchema>;
+export type ModelRecord = z.infer<typeof modelSchema>;
+export type EffortRecord = z.infer<typeof effortSchema>;
+export type PricingRuleRecord = z.infer<typeof pricingRuleSchema>;
+export type CommandRecord = z.infer<typeof commandSchema>;
+export type FeatureRecord = z.infer<typeof featureSchema>;
+export type TaskMatrixRecord = z.infer<typeof taskMatrixSchema>;
+export type GlossaryRecord = z.infer<typeof glossarySchema>;
+export type ModelPricingDetailRecord = z.infer<typeof modelPricingDetailSchema>;

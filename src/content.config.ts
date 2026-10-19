@@ -38,4 +38,5 @@ export const collections = {
   'task-matrix': fromFile('task-matrix', dataSchemas['task-matrix']),
   glossary: fromFile('glossary', dataSchemas.glossary),
   changelog: fromFile('changelog', dataSchemas.changelog),
+  'model-pricing-details': fromFile('model-pricing-details', dataSchemas['model-pricing-details']),
 };

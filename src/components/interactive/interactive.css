@@ -1,0 +1,256 @@
+/*
+ * Base común de los interactivos (plan/03_DISENO.md §8). Cada isla importa este fichero y añade
+ * solo lo propio con su prefijo (p. ej. `.calc-…`). Usa los tokens: nada de colores sueltos.
+ * Solo se anima lo imprescindible y `prefers-reduced-motion` ya está anulado en theme.css.
+ */
+
+.ix {
+  margin-block: var(--space-6);
+  padding: var(--space-4);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  /* Contenedor de consultas: la maquetación responde al ancho del bloque y no al de la pantalla. */
+  container-type: inline-size;
+}
+
+.ix-title {
+  margin: 0 0 var(--space-3);
+  color: var(--color-heading);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.ix-lead {
+  margin: 0 0 var(--space-4);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+/* Formularios: una columna en móvil, dos a partir de 34rem de ancho del bloque */
+.ix-fields {
+  display: grid;
+  gap: var(--space-3) var(--space-4);
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@container (min-width: 34rem) {
+  .ix-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.ix-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.ix-field > label,
+.ix-field > legend {
+  padding: 0;
+  color: var(--color-heading);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.ix-hint {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.ix-error {
+  margin: 0;
+  color: var(--sem-cuidado-fg);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.ix input[type='number'],
+.ix input[type='text'],
+.ix input[type='search'],
+.ix select,
+.ix textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.75rem;
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+}
+
+.ix input[aria-invalid='true'] {
+  border-color: var(--sem-cuidado-fg);
+}
+
+.ix input[type='checkbox'],
+.ix input[type='radio'] {
+  flex: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  accent-color: var(--color-accent);
+}
+
+/* Opción de radio o casilla con su texto, con zona de pulsación amplia */
+.ix-choice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  min-height: 2.75rem;
+  padding-block: var(--space-2);
+  cursor: pointer;
+}
+
+.ix-choice input {
+  margin-top: 0.15rem;
+}
+
+.ix :where(button, input, select, textarea, summary):focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.ix .btn {
+  min-height: 2.75rem;
+  justify-content: center;
+}
+
+.ix .btn[aria-pressed='true'] {
+  border-color: var(--color-accent);
+  background: var(--color-accent-tint);
+  color: var(--color-accent-strong);
+}
+
+.ix .btn:disabled {
+  border-color: var(--color-border);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+.ix-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* Resultados: cifra grande y desglose debajo */
+.ix-result {
+  margin-top: var(--space-4);
+  padding: var(--space-4);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+}
+
+.ix-big {
+  margin: 0;
+  color: var(--color-heading);
+  font-size: var(--text-2xl, 1.75rem);
+  font-weight: 700;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+}
+
+.ix-big-label {
+  margin: 0 0 var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.ix-stats {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+}
+
+/* Tablas de desglose: se desplazan dentro de su región, nunca desbordan la página */
+.ix-table-wrap {
+  overflow-x: auto;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.ix-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.ix-table :where(th, td) {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: var(--border-width) solid var(--color-border);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.ix-table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.ix-table tbody tr:last-child > * {
+  border-bottom: 0;
+}
+
+/* Etiquetas de tipo de afirmación (dato, medición, recomendación) */
+.ix-tag {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  border: var(--border-width) solid var(--sem-neutro-bd);
+  border-radius: var(--radius-sm);
+  background: var(--sem-neutro-bg);
+  color: var(--sem-neutro-fg);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.ix-tag.is-verificado {
+  border-color: var(--sem-verificado-bd);
+  background: var(--sem-verificado-bg);
+  color: var(--sem-verificado-fg);
+}
+
+.ix-tag.is-recomendacion {
+  border-color: var(--sem-recomendacion-bd);
+  background: var(--sem-recomendacion-bg);
+  color: var(--sem-recomendacion-fg);
+}
+
+.ix-tag.is-medicion {
+  border-color: var(--sem-medicion-bd);
+  background: var(--sem-medicion-bg);
+  color: var(--sem-medicion-fg);
+}
+
+.ix-tag.is-cuidado {
+  border-color: var(--sem-cuidado-bd);
+  background: var(--sem-cuidado-bg);
+  color: var(--sem-cuidado-fg);
+}
+
+/* Avisos dentro de un interactivo (con icono o texto, nunca solo color) */
+.ix-note {
+  margin: var(--space-3) 0 0;
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width) solid var(--sem-novedad-bd);
+  border-radius: var(--radius-sm);
+  background: var(--sem-novedad-bg);
+  color: var(--color-text);
+  font-size: var(--text-sm);
+}
+
+.ix-source {
+  margin: var(--space-4) 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}

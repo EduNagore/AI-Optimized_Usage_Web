@@ -1,0 +1,398 @@
+[
+  {
+    "id": "fable-5-1",
+    "modelId": "fable-5-1",
+    "batchFactor": 0.5,
+    "cache": {
+      "mode": "explicit",
+      "minTokens": 512,
+      "ttlMinutes": [
+        5,
+        60
+      ]
+    },
+    "source": "anthropic-precios",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "fable-5",
+    "modelId": "fable-5",
+    "batchFactor": 0.5,
+    "cache": {
+      "mode": "explicit",
+      "minTokens": 512,
+      "ttlMinutes": [
+        5,
+        60
+      ]
+    },
+    "source": "anthropic-precios",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "opus-5-5",
+    "modelId": "opus-5-5",
+    "batchFactor": 0.5,
+    "cache": {
+      "mode": "explicit",
+      "minTokens": 512,
+      "ttlMinutes": [
+        5,
+        60
+      ]
+    },
+    "source": "anthropic-precios",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "opus-5",
+    "modelId": "opus-5",
+    "batchFactor": 0.5,
+    "cache": {
+      "mode": "explicit",
+      "minTokens": 512,
+      "ttlMinutes": [
+        5,
+        60
+      ]
+    },
+    "source": "anthropic-precios",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "opus-4-8",
+    "modelId": "opus-4-8",
+    "batchFactor": 0.5,
+    "cache": {
+      "mode": "explicit",
+      "minTokens": 1024,
+      "ttlMinutes": [
+        5,
+        60
+      ]
+    },
+    "source": "anthropic-precios",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "opus-4-7",
+    "modelId": "opus-4-7",
+    "batchFactor": 0.5,
+    "cache": {
+      "mode": "explicit",
+      "minTokens": 2048,
+      "ttlMinutes": [
+        5,
+        60
+      ]
+    },
+    "source": "anthropic-precios",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "opus-4-6",
+    "modelId": "opus-4-6",
+    "batchFactor": 0.5,
+    "cache": {
+      "mode": "explicit",
+      "minTokens": 4096,
+      "ttlMinutes": [
+        5,
+        60
+      ]
+    },
+    "source": "anthropic-precios",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "sonnet-5-5",
+    "modelId": "sonnet-5-5",
+    "batchFactor": 0.5,
+    "cache": {
+      "mode": "explicit",
+      "minTokens": 512,
+      "ttlMinutes": [
+        5,
+        60
+      ]
+    },
+    "source": "anthropic-precios",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "sonnet-5",
+    "modelId": "sonnet-5",
+    "batchFactor": 0.5,
+    "cache": {
+      "mode": "explicit",
+      "minTokens": 1024,
+      "ttlMinutes": [
+        5,
+        60
+      ]
+    },
+    "source": "anthropic-precios",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "sonnet-4-6",
+    "modelId": "sonnet-4-6",
+    "batchFactor": 0.5,
+    "cache": {
+      "mode": "explicit",
+      "minTokens": 1024,
+      "ttlMinutes": [
+        5,
+        60
+      ]
+    },
+    "source": "anthropic-precios",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "haiku-5-5",
+    "modelId": "haiku-5-5",
+    "batchFactor": 0.5,
+    "cache": {
+      "mode": "explicit",
+      "minTokens": 512,
+      "ttlMinutes": [
+        5,
+        60
+      ]
+    },
+    "longContext": {
+      "thresholdTokens": 100000,
+      "input": 0.5,
+      "output": 2.5,
+      "cacheRead": 0.05,
+      "cacheWrite5m": 0.625,
+      "cacheWrite1h": 1
+    },
+    "source": "anthropic-precios",
+    "note": "El tramo lo fija la longitud total del prompt de cada petición (incluidas las lecturas y escrituras de caché); una petición por encima del umbral paga los precios altos aunque parte del prompt sea un acierto de caché.",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "haiku-4-5",
+    "modelId": "haiku-4-5",
+    "batchFactor": 0.5,
+    "cache": {
+      "mode": "explicit",
+      "minTokens": 4096,
+      "ttlMinutes": [
+        5,
+        60
+      ]
+    },
+    "source": "anthropic-precios",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "mythos-5-1",
+    "modelId": "mythos-5-1",
+    "batchFactor": 0.5,
+    "cache": {
+      "mode": "explicit",
+      "minTokens": 512,
+      "ttlMinutes": [
+        5,
+        60
+      ]
+    },
+    "source": "anthropic-precios",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "gpt-6-astra",
+    "modelId": "gpt-6-astra",
+    "batchFactor": 0.5,
+    "cache": {
+      "mode": "explicit",
+      "minTokens": 1024,
+      "ttlMinutes": [
+        30
+      ]
+    },
+    "longContext": {
+      "thresholdTokens": 272000,
+      "input": 20,
+      "output": 75,
+      "cacheRead": 2,
+      "cacheWrite5m": 25
+    },
+    "source": "openai-precios",
+    "note": "Por encima de 272.000 tokens de entrada se cobra toda la petición a 2× entrada y caché y 1,5× salida. La caché tiene un único TTL de 30 minutos y la escritura se factura a 1,25× la entrada.",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "gpt-6-1-sol",
+    "modelId": "gpt-6-1-sol",
+    "batchFactor": 0.5,
+    "cache": {
+      "mode": "explicit",
+      "minTokens": 1024,
+      "ttlMinutes": [
+        30
+      ]
+    },
+    "longContext": {
+      "thresholdTokens": 272000,
+      "input": 4,
+      "output": 15,
+      "cacheRead": 0.2,
+      "cacheWrite5m": 5
+    },
+    "source": "openai-precios",
+    "note": "Por encima de 272.000 tokens de entrada se cobra toda la petición a 2× entrada y caché y 1,5× salida. La caché tiene un único TTL de 30 minutos y la escritura se factura a 1,25× la entrada.",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "gpt-6-sol",
+    "modelId": "gpt-6-sol",
+    "batchFactor": 0.5,
+    "cache": {
+      "mode": "explicit",
+      "minTokens": 1024,
+      "ttlMinutes": [
+        30
+      ]
+    },
+    "longContext": {
+      "thresholdTokens": 272000,
+      "input": 4,
+      "output": 15,
+      "cacheRead": 0.4,
+      "cacheWrite5m": 5
+    },
+    "source": "openai-precios",
+    "note": "Por encima de 272.000 tokens de entrada se cobra toda la petición a 2× entrada y caché y 1,5× salida. La caché tiene un único TTL de 30 minutos y la escritura se factura a 1,25× la entrada.",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "gpt-6-luna",
+    "modelId": "gpt-6-luna",
+    "batchFactor": 0.5,
+    "cache": {
+      "mode": "explicit",
+      "minTokens": 1024,
+      "ttlMinutes": [
+        30
+      ]
+    },
+    "longContext": {
+      "thresholdTokens": 272000,
+      "input": 0.2,
+      "output": 0.75,
+      "cacheRead": 0.02,
+      "cacheWrite5m": 0.25
+    },
+    "source": "openai-precios",
+    "note": "Por encima de 272.000 tokens de entrada se cobra toda la petición a 2× entrada y caché y 1,5× salida. La caché tiene un único TTL de 30 minutos y la escritura se factura a 1,25× la entrada.",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "gpt-5-6-sol",
+    "modelId": "gpt-5-6-sol",
+    "batchFactor": 0.5,
+    "cache": {
+      "mode": "explicit",
+      "minTokens": 1024,
+      "ttlMinutes": [
+        30
+      ]
+    },
+    "longContext": {
+      "thresholdTokens": 272000,
+      "input": 8,
+      "output": 30,
+      "cacheRead": 0.8,
+      "cacheWrite5m": 10
+    },
+    "source": "openai-precios",
+    "note": "Por encima de 272.000 tokens de entrada se cobra toda la petición a 2× entrada y caché y 1,5× salida. La caché tiene un único TTL de 30 minutos y la escritura se factura a 1,25× la entrada.",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "gpt-5-6-terra",
+    "modelId": "gpt-5-6-terra",
+    "batchFactor": 0.5,
+    "cache": {
+      "mode": "explicit",
+      "minTokens": 1024,
+      "ttlMinutes": [
+        30
+      ]
+    },
+    "longContext": {
+      "thresholdTokens": 272000,
+      "input": 4,
+      "output": 18,
+      "cacheRead": 0.4,
+      "cacheWrite5m": 5
+    },
+    "source": "openai-precios",
+    "note": "Por encima de 272.000 tokens de entrada se cobra toda la petición a 2× entrada y caché y 1,5× salida. La caché tiene un único TTL de 30 minutos y la escritura se factura a 1,25× la entrada.",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "gpt-5-6-luna",
+    "modelId": "gpt-5-6-luna",
+    "batchFactor": 0.5,
+    "cache": {
+      "mode": "explicit",
+      "minTokens": 1024,
+      "ttlMinutes": [
+        30
+      ]
+    },
+    "longContext": {
+      "thresholdTokens": 272000,
+      "input": 0.4,
+      "output": 1.8,
+      "cacheRead": 0.04,
+      "cacheWrite5m": 0.5
+    },
+    "source": "openai-precios",
+    "note": "Por encima de 272.000 tokens de entrada se cobra toda la petición a 2× entrada y caché y 1,5× salida. La caché tiene un único TTL de 30 minutos y la escritura se factura a 1,25× la entrada.",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "gemini-4-argon",
+    "modelId": "gemini-4-argon",
+    "batchFactor": null,
+    "cache": {
+      "mode": "implicit",
+      "minTokens": 4096,
+      "ttlMinutes": []
+    },
+    "source": "google-precios",
+    "scheduledChange": {
+      "effectiveFrom": "2026-12-01",
+      "input": 4,
+      "output": 20,
+      "cacheRead": 0.2
+    },
+    "note": "Caché implícita: sin escritura facturada ni TTL configurable; el acierto no está garantizado. El precio actual es introductorio y cambia en la fecha indicada.",
+    "verifiedAt": "2026-10-16"
+  },
+  {
+    "id": "gemini-3-8-flash",
+    "modelId": "gemini-3-8-flash",
+    "batchFactor": null,
+    "cache": {
+      "mode": "implicit",
+      "minTokens": 4096,
+      "ttlMinutes": []
+    },
+    "source": "google-precios",
+    "scheduledChange": {
+      "effectiveFrom": "2027-01-01",
+      "input": 1.5,
+      "output": 7.5,
+      "cacheRead": 0.15
+    },
+    "note": "Caché implícita: sin escritura facturada ni TTL configurable; el acierto no está garantizado. El precio actual es introductorio y cambia en la fecha indicada.",
+    "verifiedAt": "2026-10-16"
+  }
+]
