@@ -3,7 +3,7 @@
 > Memoria entre sesiones. Actualízalo al cerrar cada tarea: qué se hizo, qué falta, decisiones con su motivo y coste de la fase.
 
 ## Estado actual
-- **Fase en curso:** 6 (calidad final) **terminada**; esperando el punto de control 3 (informe de calidad y permiso para publicar). Los puntos de control 1, 2 y 3 siguen pendientes de confirmación del usuario. Siguiente: Fase 7, solo con aprobación.
+- **Fase en curso:** 6 (calidad final) **terminada**; esperando el punto de control 3 (informe de calidad y permiso para publicar). Los puntos de control 1, 2 y 3 siguen pendientes de confirmación del usuario. Fase 7 preparada en local (sin push). Pendiente: respuesta sobre la rutina mensual y permiso para subir la rama y activar Pages.
 - **Rama:** `feat/web`
 - **Última actualización:** 2026-10-20 (Fase 6: `npm run build`, `npm run check` (673 tests), `npm run test:e2e` (106 pruebas) y `npm run freshness` pasan; Lighthouse 96–100 en las cuatro páginas medidas)
 
@@ -15,7 +15,7 @@
 - [x] 4. Contenido avanzado: M7, M8, M6 + M9, M10, M1 + M12 (2026-10-19)
 - [x] 5. Interactivos (2026-10-19)
 - [x] 6. Calidad final (2026-10-20; punto de control 3 pendiente de confirmación del usuario)
-- [ ] 7. Publicación y mantenimiento
+- [x] 7. Publicación y mantenimiento (2026-10-20: workflow `.github/workflows/deploy.yml`, `README.md` y `docs/MANTENIMIENTO.md`; `npm run build` y `npm run check` pasan; sin push ni activación de Pages; rutina mensual propuesta, pendiente de respuesta)
 
 ## Decisiones
 | Fecha | Decisión | Motivo |
