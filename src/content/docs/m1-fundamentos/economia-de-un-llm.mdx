@@ -68,7 +68,7 @@ Los detalles de caché y lotes difieren por proveedor. Datos de la guía, verifi
 <ProviderTabs>
 <div slot="claude">
 
-Escribir en la caché cuesta 1,25 veces la entrada con la caché de 5 minutos (la de por defecto) y 2 veces con la de 1 hora. Leer cuesta 0,1 veces la entrada en la mayoría de los modelos, y menos en Opus 5.5 y Sonnet 5.5 (0,05 veces) y en Fable 5.1 (0,025 veces). La API de lotes da un 50 % de descuento sobre todos los tokens (también los de caché), con resultados en menos de 24 horas.
+Escribir en la caché cuesta 1,25 veces la entrada con la caché de 5 minutos (la de por defecto) y 2 veces con la de 1 hora. Leer cuesta 0,1 veces la entrada en la mayoría de los modelos, y menos en Opus 5.5 y Sonnet 5.5 (0,05 veces) y en Fable 5.1 (0,025 veces). La API de lotes da un 50 % de descuento sobre todos los tokens (también los de caché), con la mayoría de los lotes terminados en menos de una hora; los que no terminan en 24 horas caducan.
 
 </div>
 <div slot="openai">
@@ -78,7 +78,7 @@ La caché dura 30 minutos (el único valor admitido, en GPT-5.6 y posteriores), 
 </div>
 <div slot="google">
 
-La caché implícita está activa por defecto, con un mínimo de 4.096 tokens, y en Gemini 4 Argon da un 95 % de descuento en los aciertos; Argon no admite caché explícita. Los precios de Gemini 4 Argon y Gemini 3.8 Flash son introductorios y suben después de las fechas que indican las notas de la tabla. No hemos verificado un descuento por lotes equivalente en Google.
+La caché implícita está activa por defecto, con un mínimo de 4.096 tokens, y en Gemini 4 Argon da un 95 % de descuento en los aciertos; Argon no admite caché explícita. Los precios de Gemini 4 Argon y Gemini 3.8 Flash son introductorios y suben después de las fechas que indican las notas de la tabla. Google publica también niveles Batch y Flex a la mitad del precio estándar para Gemini 4 Argon y Gemini 3.8 Flash (consulta la página de precios de Google).
 
 </div>
 </ProviderTabs>
@@ -127,7 +127,7 @@ Una hipótesis de trabajo, no un dato: en muchas cargas de trabajo, unas pocas t
 2. Estima lo que añade cada turno: tu mensaje y la respuesta (A) y cuántos turnos esperas (n).
 3. Calcula la entrada total procesada, sin caché: F × n + A × n × (n − 1) ÷ 2. Con F = 10.000, A = 1.500 y n = 20 salen 200.000 + 285.000 = 485.000 tokens, aunque la conversación final tenga unos 40.000.
 4. Calcula la salida total: lo que escribe en cada turno (razonamiento incluido) × n.
-5. Multiplica la entrada total por el precio de entrada y la salida total por el de salida, y divide entre 1.000.000. Con caché, lo que se repite desde el turno anterior se factura al precio de lectura, salvo la primera escritura (algo más cara que la entrada normal) y salvo que la caché caduque entre turnos (5 minutos por defecto en Claude). Es una aproximación.
+5. Multiplica la entrada total por el precio de entrada y la salida total por el de salida, y divide entre 1.000.000. Con caché, lo que se repite desde el turno anterior se factura al precio de lectura, salvo la primera escritura (algo más cara que la entrada normal) y salvo que la caché caduque entre turnos (5 minutos por defecto en la API de Claude; 1 hora en Claude Code con suscripción). Es una aproximación.
 6. Compara con lo que marca tu herramienta ([medir](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/medir/)) y ajusta tus estimaciones. Por ahora este cálculo es manual; para hacerlo con tus cifras, la guía tiene [la calculadora de coste](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/calculadora-de-coste/).
 
 </Steps>

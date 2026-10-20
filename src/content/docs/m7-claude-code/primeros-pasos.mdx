@@ -96,14 +96,14 @@ Revisa lo que genera y quita todo lo que Claude podría deducir leyendo los fich
 
 Un modo de permisos fija qué acciones puede hacer Claude en la sesión sin preguntarte antes. Estos son los seis modos que documenta Anthropic:
 
-| Modo                            | Qué permite sin preguntar                                                            | Cuándo encaja (recomendación de la guía)                 |
-| ------------------------------- | ------------------------------------------------------------------------------------ | -------------------------------------------------------- |
-| `default` (etiquetado «Manual») | Solo lectura                                                                         | Los primeros días con un proyecto nuevo                  |
-| `acceptEdits`                   | Ediciones y órdenes habituales del sistema de ficheros                               | Tareas acotadas en las que ya confías en el plan         |
-| `plan`                          | Exploración de solo lectura                                                          | Antes de tocar nada, cuando planificar es lo difícil     |
-| `auto`                          | Un clasificador revisa cada acción en lugar de ti                                    | Trabajo diario con un proyecto que conoces               |
-| `dontAsk`                       | Deniega lo que habría pedido confirmación; sigue ejecutando lo que ya está permitido | Ejecuciones desatendidas con una lista de permisos corta |
-| `bypassPermissions`             | Nada se comprueba                                                                    | Solo en un entorno aislado y desechable                  |
+| Modo                            | Qué permite sin preguntar                                                                                 | Cuándo encaja (recomendación de la guía)                 |
+| ------------------------------- | --------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| `default` (etiquetado «Manual») | Solo lectura                                                                                              | Los primeros días con un proyecto nuevo                  |
+| `acceptEdits`                   | Ediciones y órdenes habituales del sistema de ficheros                                                    | Tareas acotadas en las que ya confías en el plan         |
+| `plan`                          | Exploración de solo lectura (más comandos que apruebe el clasificador, si el modo `auto` está disponible) | Antes de tocar nada, cuando planificar es lo difícil     |
+| `auto`                          | Un clasificador revisa las acciones en lugar de ti (con comprobaciones de seguridad de fondo)             | Trabajo diario con un proyecto que conoces               |
+| `dontAsk`                       | Deniega lo que habría pedido confirmación; sigue ejecutando lo que ya está permitido                      | Ejecuciones desatendidas con una lista de permisos corta |
+| `bypassPermissions`             | Nada se comprueba                                                                                         | Solo en un entorno aislado y desechable                  |
 
 `Shift+Tab` recorre los modos durante la sesión en este orden: `default`, `acceptEdits`, `plan`, después `bypassPermissions` (solo si has arrancado la sesión de forma que esté disponible) y por último `auto`. Desde `auto`, la primera pulsación vuelve a `default`. `dontAsk` nunca entra en el ciclo: se fija al arrancar con `--permission-mode dontAsk`. `/plan` entra en modo plan directamente, con una tarea opcional.
 
@@ -123,7 +123,7 @@ Usa `bypassPermissions` solo dentro de un contenedor o máquina desechable. Por 
 
 <CommandCard comando="/fewer-permission-prompts" />
 
-Úsalo **tras unos días de trabajo**, no el primer día. Por qué: el comando revisa tus transcripciones en busca de llamadas de solo lectura frecuentes (Bash y MCP) para proponerlas como permitidas; sin historial no tiene nada que proponer.
+Úsalo **tras unos días de trabajo**, no el primer día. Por qué: el comando revisa tus transcripciones en busca de llamadas de solo lectura frecuentes (Bash y MCP) para proponerlas como permitidas. Ojo: escribe esa lista en el `.claude/settings.json` del proyecto, un fichero que suele subirse al repositorio; revísala antes de compartirla. Sin historial no tiene nada que proponer.
 
 `/permissions` gestiona las reglas `allow`, `ask` y `deny` y los directorios accesibles; `/add-dir` suma una carpeta a la sesión. `/auto-mode-setup` redacta entradas de `autoMode.environment` a partir de tu proyecto y tus sesiones recientes, para que el clasificador entienda tu entorno.
 

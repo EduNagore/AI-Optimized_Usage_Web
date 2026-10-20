@@ -1,4 +1,4 @@
-import { useEffect, useId, useMemo, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useId, useMemo, useRef, useState, type SubmitEvent } from 'react';
 import {
   MATURITY_STORAGE_KEY,
   firstUnanswered,
@@ -110,7 +110,7 @@ export default function MaturityDiagnostic({ data, pages }: Props) {
     persist(next);
   }
 
-  function goNext(event: FormEvent) {
+  function goNext(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     const question = data.questions[step];
     if (!question) return;

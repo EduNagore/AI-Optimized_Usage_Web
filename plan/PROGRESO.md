@@ -3,9 +3,9 @@
 > Memoria entre sesiones. Actualízalo al cerrar cada tarea: qué se hizo, qué falta, decisiones con su motivo y coste de la fase.
 
 ## Estado actual
-- **Fase en curso:** 5 (interactivos) **terminada**: los nueve interactivos están integrados en sus páginas y comiteados. Siguiente: Fase 6 (calidad final). Puntos de control 1 y 2 siguen pendientes de confirmación del usuario.
+- **Fase en curso:** 6 (calidad final) **terminada**; esperando el punto de control 3 (informe de calidad y permiso para publicar). Los puntos de control 1, 2 y 3 siguen pendientes de confirmación del usuario. Siguiente: Fase 7, solo con aprobación.
 - **Rama:** `feat/web`
-- **Última actualización:** 2026-10-19 (Fase 5: `npm run build`, `npm run check` (671 tests) y `npm run test:e2e` (106 pruebas) pasan; cada isla revisada en navegador con teclado, 360 px y claro/oscuro)
+- **Última actualización:** 2026-10-20 (Fase 6: `npm run build`, `npm run check` (673 tests), `npm run test:e2e` (106 pruebas) y `npm run freshness` pasan; Lighthouse 96–100 en las cuatro páginas medidas)
 
 ## Fases
 - [x] 0. Preparación (2026-10-15: `npm run build`, `npm run check` y `npm run test:e2e` pasan)
@@ -14,7 +14,7 @@
 - [x] 3. Contenido núcleo: M2, M3, M4, M5, M0 (2026-10-16)
 - [x] 4. Contenido avanzado: M7, M8, M6 + M9, M10, M1 + M12 (2026-10-19)
 - [x] 5. Interactivos (2026-10-19)
-- [ ] 6. Calidad final (punto de control 3)
+- [x] 6. Calidad final (2026-10-20; punto de control 3 pendiente de confirmación del usuario)
 - [ ] 7. Publicación y mantenimiento
 
 ## Decisiones
@@ -77,6 +77,14 @@
 | 2026-10-19 | Supuestos de la guía editables y etiquetados en pantalla: simulador de caché (entrada disponible tras 5 s; separación igual al TTL cuenta como acierto), visualizador de contexto (tamaños de partida, resumen de `/compact` de 3.000 tokens, 15 % de herramientas MCP con carga diferida), diseñador de equipos (umbrales «cabe en un contexto» = 50 % de la ventana y «hay volumen» = 5 unidades; multiplicadores estructurales como estimación), diagnóstico (niveles 12/24/36 y áreas 33 %/66 %) | Nada de esto es dato de proveedor y no se presenta como tal |
 | 2026-10-19 | e2e nuevo `e2e/interactivos.spec.ts`: axe en claro y oscuro, 360 px y una prueba funcional por cada isla (35 pruebas; total 106) | Las islas son lo más propenso a regresiones de accesibilidad |
 
+| 2026-10-20 | Fase 6: verificación en 4 tandas por el `verificador-hechos` (M1–M4, M5/M6/M9, M7/M8 con comandos y topologías, M10/M12/M0 con datos de interactivos) y revisión editorial del inicio, M0 y la chuleta. Correcciones aplicadas salvo las de «Pendientes tras la Fase 6» | Los 162 `<Fact>` y ≈520 cifras de texto cuadran con la fuente; los errores estaban en el texto libre |
+| 2026-10-20 | Gemini 4 Argon y 3.8 Flash tienen Batch al 50 % (`model-pricing-details.json`, `batchFactor: 0.5`), comprobado por la sesión principal en la página de precios de Google (Batch = mitad de Standard; Flex igual). Los tests, que fijaban «Google sin Batch», se actualizaron con valores calculados a mano | Las páginas y la línea base decían que no había dato; el verificador lo desmintió |
+| 2026-10-20 | `sources.json`: 61 URLs de documentación de Anthropic dejan de acabar en `.md` (se comprobó que cada una responde HTML); mismo cambio en `changelog.json` y dos páginas; títulos repetidos distinguidos | El lector llegaba a Markdown crudo al pulsar una fuente |
+| 2026-10-20 | `scripts/freshness.mjs`: reintenta con GET si HEAD falla, libera el cuerpo y trata 429 como no caído. `seed-sources.mjs` y `merge-research.mjs` exigen `--force` | Falso positivo de Google con HEAD; los dos scripts pisan datos corregidos a mano |
+| 2026-10-20 | `cspell.json`: el filtro de ids con guion estaba mal escapado; ahora usa lookarounds Unicode | No debe partir palabras españolas como «Conversación-río» |
+| 2026-10-20 | `tests/chuleta.test.ts` cruza los comandos y niveles de esfuerzo escritos a mano en la chuleta con `claude-code-commands.json` y `effort.json` | Evita un componente nuevo; si un dato cambia, falla `npm run check` |
+| 2026-10-20 | `catalogo-de-componentes` se queda (los e2e lo usan) con `noindex` y fuera de la búsqueda; `CommandList.astro` eliminado; `src/lib/clipboard.ts` unifica la copia al portapapeles (con respaldo `execCommand`) en las islas y en `PromptTemplate` | Hallazgos de `/code-review` y `/simplify` |
+
 ## Conflictos entre fuentes y datos pendientes
 | Dato | Fuentes | Estado |
 |---|---|---|
@@ -96,7 +104,7 @@
 | Gemini 3.8 Flash `thinking_level` por defecto: `medium` (whats-new-gemini-3.8); la guía de Gemini 3 está deprecada y se contradice | Dos páginas de Google | Resuelto a favor de la actual |
 | GPT-5.6 Sol 4/20 $ es precio promocional (al menos hasta 2026-11-21) | changelog de OpenAI | Anotado en `models.json` |
 
-**No confirmado (no se publica como dato):** reparto por plan y fecha de GPT-6 en ChatGPT (help.openai.com da 403); esfuerzo por defecto de GPT-6 Astra; niveles de esfuerzo de GPT-5.6 Terra y Luna; lista completa de comandos de la CLI de Codex; precios en euros de la app de Gemini y de AI Pro en USD; precios de planes de Claude (claude.com/pricing, lectura automatizada); límites numéricos de Research y de proyectos; umbral de compactación de 150K y datos de Vision (28×28 px); cifra «2 de 20 problemas = 43 % del gasto»; modelos que admiten razonamiento adaptativo (la URL redirige); semanas 31 y 38–42 de whats-new (el índice acaba en la 37).
+**No confirmado (no se publica como dato):** reparto por plan y fecha de GPT-6 en ChatGPT (help.openai.com da 403); esfuerzo por defecto de GPT-6 Astra; niveles de esfuerzo de GPT-5.6 Terra y Luna; lista completa de comandos de la CLI de Codex; precios en euros de la app de Gemini y de AI Pro en USD; precios de planes de Claude (claude.com/pricing, lectura automatizada); límites numéricos de Research y de proyectos; modelos que admiten razonamiento adaptativo (la URL redirige); semanas 31 y 38–42 de whats-new (el índice acaba en la 37).
 
 **Pendientes menores del verificador (no aplicados):** `/privacy-settings` solo Pro y Max; alias `/reset` y `/new` de `/clear`; matices de memoria en Team/Enterprise (desactivada por miembro, no con HIPAA ni CMEK). `features.json` fila `codex-surfaces`: fuente genérica.
 | Avisos benignos de Astro en el build: «Entry docs → 404 was not found» y `No items found` en los JSON vacíos | — | Desaparecen al añadir datos (Fase 1) y al personalizar la 404 (Fase 2) |
@@ -146,8 +154,19 @@
 - **Datos y limpieza:** `claude-code-commands.json` sin `tokenImpact` ni `example`; las 4 fuentes de comandos acaban en `.md` (el enlace abre Markdown); retirar `CommandList.astro` (sin uso); `cspell.json` tiene un `ignoreRegExpList` con `\b` mal escapado y `cspell-project.txt` acumula palabras sin tilde que son claves de JSON; `astro check` da 3 hints (0 errores).
 - **Coste de la fase:** 9 subagentes `dev-componentes` (Sonnet, esfuerzo high; ≈1,8 M de tokens de subagente contando las reanudaciones: 178K calculadora, 260K selector, 139K explorador, 137K laboratorio, 151K quizzes, 180K simulador, 224K ventana de contexto, 315K equipos, 211K diagnóstico). Anotar `/usage` del usuario.
 
+## Pendientes tras la Fase 6
+- **Puertas (2026-10-20):** build sin errores (queda el aviso benigno de Starlight «Could not render /404 … conflicts with higher priority route»; la página sale bien); `astro check` 0 errores y 1 hint (`execCommand` deprecado: respaldo necesario sin `navigator.clipboard`); eslint, prettier, 673 tests, enlaces internos y cspell limpios; e2e 106/106; `freshness` al día; Lighthouse (móvil, servidor local; rendimiento/accesibilidad/buenas prácticas/SEO): inicio 99/100/100/100, las-10-reglas 98/100/100/100, estrategia-de-seleccion 96/100/100/100, prompt-caching 97/100/100/100. `npm audit`: 10 moderadas en `postcss-selector-parser` → `@expressive-code` → Starlight (herramientas de build; arreglarlo exige `--force` y bajar Starlight a 0.21): no se aplica.
+- **Verificador, no aplicado o por confirmar:** hooks y subagentes de Antigravity CLI (solo el blog de Google; la guía de migración dice «partial parity»); celdas de Gemini CLI sin leer; tramo >272K de OpenAI «a toda la petición» (no literal); `idleCompaction` 2.1.290 frente a 2.1.299 (dos páginas oficiales); skills en apps «todos los planes» (ayuda) frente a Pro/Max/Team/Enterprise (API); `minimal` en GPT-6 Sol/Luna/Astra; «caché por modelo» en la API; alcance de la Compliance API, `count_tokens` y Admin API; fecha de Opus 4.6 (la URL redirige; se quitó el día); coste por tarea de Opus 5.5: 0,12/0,22 $ (tabla superior) frente a 0,11/0,21 $ (tabla de esfuerzo).
+- **Datos:** `context-scenarios.json` cita solo `anthropic-tool-search`; las 200 líneas de `CLAUDE.md` y los ≈100 tokens por skill salen de `memory.md`/`costs.md` y de la página de Skills de la API (cifras correctas; faltan fuentes en el registro). `models.json`: el `source` de los esfuerzos por defecto es `anthropic-precios` (debería ser `anthropic-esfuerzo` / `claude-code-modelo-y-esfuerzo`). Si se vuelve a ejecutar `merge-research.mjs` hay que repetir las correcciones de `.md`, Gemini y comandos.
+- **Resuelto en la Fase 6 y fuera de «No confirmado»:** umbral de compactación (150.000 en la API, mínimo 50.000), 2 de 20 problemas = 43 % del gasto, `budget_reached` (Managed Agents), structured outputs en Batch, mensajes de sistema a mitad de conversación y esfuerzo por mensaje en Opus 5.5/Sonnet 5.5/Fable 5.1, `CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL`, «despliegues programados» de Managed Agents, Vision 28×28.
+- **Revisión editorial no aplicada:** enlace o tooltip al glosario en todo el sitio (solo se enlazaron cuatro términos en las 10 reglas); `<EffortTable>` y `CommandList ids` para la chuleta (cubierto con test); matices de estilo opcionales.
+- **`/code-review` y `/simplify`, no aplicados:** cifras y TTL escritos a mano en `CostCalculator.tsx` y `CacheSimulator.tsx` («mediana del 84 %», «Batch ×0,5», 5 min/1 h); `cacheTtlOptions` asigna precios por posición; proveedores y modelos por defecto fijados en código; tres analizadores de números es-ES distintos («30.000» se lee distinto según la herramienta); cuatro formateadores de dólares; `Checklist.astro` usa `localStorage` sin `storage.ts`; el script de `tabindex` de `astro.config.mjs` (mejor un envoltorio de tablas y código); `src/lib/contrast.ts` solo lo usa un test; concurrencia ilimitada en `freshness`. Ninguno cambia lo que ve el lector hoy: es deuda de mantenimiento para la Fase 7.
+- **Cola de fases anteriores que sigue abierta:** quizzes de M0, M1 y M3–M10; `changelog.json` con 211 `impact` «Pendiente de redactar» (no se muestran); canal para avisar de errores (pendiente de definir en la metodología); `README.md` y `docs/MANTENIMIENTO.md` (Fase 7); `/skill-doctor` y `/design` sin versión publicada.
+- **Coste de la fase:** 4 verificadores Opus (≈1,83 M tokens de subagente: 414K M1–M4, 479K M5/M6/M9, 490K M7/M8, 448K M10/M12/M0), 1 revisor editorial Opus (≈86K) y 4 agentes de `/simplify` Sonnet (≈229K); los cinco de Opus se cortaron una vez por el límite de uso y se reanudaron. Total ≈2,15 M de tokens de subagente. Anotar `/usage` del usuario.
+- **Coste acumulado según este fichero** (solo subagentes; el `/usage` de la sesión principal no está anotado en ninguna fase): F1 ≈1,45 M, F4 ≈6,5 M, F5 ≈1,8 M, F6 ≈2,15 M → ≈11,9 M de tokens de subagente. Las fases 0, 2 y 3 no tienen cifra registrada.
+
 ## Pendientes y siguientes pasos
 - Tras el punto de control 2: elegir el nombre del sitio (cambiar `title` en `astro.config.mjs` y en `index.mdx`), confirmar o ajustar la dirección visual y empezar la Fase 3 (M2 → M3 → M4 → M5 → M0).
 - Verificar al redactar: valores del resumen de `claude-code.json` que no entran en `src/data/` (hooks, skills, límites de flujos, rutinas). Están en `research/claude-code.json` con cita.
 - Si no existe el repo remoto o hay que subir la rama, pedir confirmación (no se ha hecho push).
-- `npm audit` marca 10 vulnerabilidades moderadas en dependencias de desarrollo/transitivas; revisar antes de publicar (Fase 6).
+- `npm audit`: revisado en la Fase 6 (ver «Pendientes tras la Fase 6»).

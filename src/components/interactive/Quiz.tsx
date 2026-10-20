@@ -1,4 +1,4 @@
-import { useEffect, useId, useReducer, useRef, useState } from 'react';
+import { useEffect, useId, useMemo, useReducer, useRef, useState } from 'react';
 import { url } from '../../lib/paths';
 import {
   derivedQuizId,
@@ -86,7 +86,7 @@ export default function Quiz({
     onProgresoRef.current = onProgreso;
   }, [onProgreso]);
 
-  const summary = summarizeQuiz(state, preguntas);
+  const summary = useMemo(() => summarizeQuiz(state, preguntas), [state, preguntas]);
 
   // Mover el foco cuando el contenido ya está pintado (tras restaurar o reiniciar). Va antes del
   // efecto de restauración para que, al montar, no consuma el aviso antes de que se cargue el estado.

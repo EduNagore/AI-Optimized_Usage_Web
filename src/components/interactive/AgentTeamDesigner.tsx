@@ -10,6 +10,7 @@ import {
   type ParamId,
   type TeamInput,
 } from '../../lib/agent-team';
+import { copyText } from '../../lib/clipboard';
 import { formatNumber } from '../../lib/format';
 import type { PriceSource } from '../../lib/pricing';
 import { Field, SourceFooter } from './shared';
@@ -150,12 +151,7 @@ export default function AgentTeamDesigner({ data, models, sources, pageUrls }: P
   const anthropic = form.provider === 'anthropic';
 
   async function copy() {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopyState('ok');
-    } catch {
-      setCopyState('fail');
-    }
+    setCopyState((await copyText(text)) ? 'ok' : 'fail');
   }
 
   return (

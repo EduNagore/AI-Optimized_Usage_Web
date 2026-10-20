@@ -57,7 +57,7 @@ Dos detalles prácticos. En Opus 5.5 el razonamiento no se puede desactivar (en 
 </div>
 <div slot="openai">
 
-El parámetro es `reasoning.effort`. En la familia GPT-6 los niveles admitidos incluyen `low`, `medium`, `high`, `xhigh` y `max`; `none` (sin razonamiento) existe en algunos modelos y no en GPT-6 Astra ni en GPT-6.1 Sol. Con un esfuerzo distinto de `none`, hay que eliminar parámetros de muestreo como `temperature` y `top_p`, porque la API no los admite en ese modo. El esfuerzo por defecto de Astra no figura en la documentación publicada.
+El parámetro es `reasoning.effort`. En la familia GPT-6 los niveles admitidos incluyen `low`, `medium`, `high`, `xhigh` y `max`; `none` (sin razonamiento) existe en algunos modelos y no en GPT-6 Astra ni en GPT-6.1 Sol. Con un esfuerzo distinto de `none`, hay que eliminar parámetros de muestreo como `temperature` y `top_p`: OpenAI pide retirarlos en ese modo. El esfuerzo por defecto de Astra no figura en la documentación publicada.
 
 </div>
 <div slot="google">
@@ -75,15 +75,15 @@ El mismo mando se llama `output_config.effort` en Anthropic, `reasoning.effort` 
 
 ## Tabla de equivalencias
 
-|                                                       | Anthropic                                              | OpenAI                                                                                                        | Google                                        |
-| ----------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
-| Parámetro                                             | `output_config.effort`                                 | `reasoning.effort`                                                                                            | `thinking_level`                              |
-| Niveles                                               | `low`, `medium`, `high`, `xhigh`, `max`                | `none`, `low`, `medium`, `high`, `xhigh`, `max`                                                               | `low`, `medium`, `high`                       |
-| Excepciones                                           | Sin `xhigh` en Opus 4.6 ni Sonnet 4.6                  | `none` no existe en Astra ni en 6.1 Sol; `minimal` existe en el parámetro, pero ningún modelo GPT-6 lo admite | `minimal` da error en Gemini 3.8 Flash        |
-| Defecto                                               | Depende del modelo y de la superficie (tabla de abajo) | `medium` en la familia GPT-6, salvo Astra (no publicado)                                                      | `medium` en Gemini 4 Argon y Gemini 3.8 Flash |
-| Cambiarlo a mitad de conversación sin romper la caché | Función en beta por mensaje, con cabecera específica   | `configuration_update`                                                                                        | Sin dato en la guía                           |
+|                                                       | Anthropic                                              | OpenAI                                                                                                                          | Google                                        |
+| ----------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| Parámetro                                             | `output_config.effort`                                 | `reasoning.effort`                                                                                                              | `thinking_level`                              |
+| Niveles                                               | `low`, `medium`, `high`, `xhigh`, `max`                | `none`, `low`, `medium`, `high`, `xhigh`, `max`                                                                                 | `low`, `medium`, `high`                       |
+| Excepciones                                           | Sin `xhigh` en Opus 4.6 ni Sonnet 4.6                  | `none` no existe en Astra ni en 6.1 Sol; GPT-6.1 Sol no admite `minimal` (para el resto de GPT-6 la documentación no lo indica) | `minimal` da error en Gemini 3.8 Flash        |
+| Defecto                                               | Depende del modelo y de la superficie (tabla de abajo) | `medium` en la familia GPT-6, salvo Astra (no publicado)                                                                        | `medium` en Gemini 4 Argon y Gemini 3.8 Flash |
+| Cambiarlo a mitad de conversación sin romper la caché | Función en beta por mensaje, con cabecera específica   | `configuration_update`                                                                                                          | Sin dato en la guía                           |
 
-Dos avisos de OpenAI: con un esfuerzo distinto de `none` hay que eliminar `temperature`, `top_p` y `top_logprobs`, y el nombre de un nivel no equivale al mismo grado de razonamiento en otro proveedor. Un `high` de Google no es un `high` de Anthropic.
+Un aviso de OpenAI: con un esfuerzo distinto de `none` hay que eliminar `temperature`, `top_p` y `top_logprobs`. Y una advertencia de Anthropic, que aplicamos también entre proveedores como recomendación de la guía: el nombre de un nivel no equivale al mismo grado de razonamiento en otro modelo. Un `high` de Google no es un `high` de Anthropic.
 
 ## El valor por defecto depende de la superficie
 
@@ -133,7 +133,7 @@ En Claude Code el esfuerzo se cambia sin tocar código:
 
 **`ultrathink`.** Si incluyes la palabra `ultrathink` en cualquier parte de tu prompt, Claude Code pide un razonamiento más profundo en ese turno sin cambiar el esfuerzo de la sesión: añade una instrucción en el contexto y el nivel de esfuerzo que se envía a la API no cambia. Es la única palabra de este tipo: «think», «think hard» o «think more» se pasan como texto normal y no son palabras clave.
 
-**`ultracode`.** No es un nivel de esfuerzo, sino un ajuste de Claude Code: con él activado, Claude orquesta flujos dinámicos (muchos subagentes coordinados por un script) en las tareas sustanciales, al nivel de esfuerzo en que corra la sesión. `/effort ultracode` lo activa y `/effort ultracode off` lo desactiva, sin cambiar el nivel. Arrancar con `claude --effort ultracode` (o fijarlo desde el SDK) lo activa y además pone `xhigh`. No está disponible si los flujos están desactivados o si el modelo no admite `xhigh`; en ese caso la sesión arranca sin ultracode, en el nivel más alto que permita el modelo.
+**`ultracode`.** No es un nivel de esfuerzo, sino un ajuste de Claude Code: con él activado, Claude orquesta flujos dinámicos (muchos subagentes coordinados por un script) en las tareas sustanciales, al nivel de esfuerzo en que corra la sesión. `/effort ultracode` lo activa y `/effort ultracode off` lo desactiva, sin cambiar el nivel. Arrancar con `claude --effort ultracode` (o fijarlo desde el SDK) lo activa y además pone `xhigh`. No está disponible si los flujos están desactivados o si el modelo no admite `xhigh`; en ese caso la sesión arranca sin ultracode, en el nivel más alto que permitan el modelo y el límite de la organización, como mucho `xhigh`.
 
 ## En la práctica
 

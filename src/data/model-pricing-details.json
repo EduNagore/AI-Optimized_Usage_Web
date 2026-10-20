@@ -360,7 +360,7 @@
   {
     "id": "gemini-4-argon",
     "modelId": "gemini-4-argon",
-    "batchFactor": null,
+    "batchFactor": 0.5,
     "cache": {
       "mode": "implicit",
       "minTokens": 4096,
@@ -373,13 +373,13 @@
       "output": 20,
       "cacheRead": 0.2
     },
-    "note": "Caché implícita: sin escritura facturada ni TTL configurable; el acierto no está garantizado. El precio actual es introductorio y cambia en la fecha indicada.",
-    "verifiedAt": "2026-10-16"
+    "note": "Caché implícita: sin escritura facturada ni TTL configurable; el acierto no está garantizado. El precio actual es introductorio y cambia en la fecha indicada. Batch API con un 50 % de reducción (Google; también Flex al mismo precio).",
+    "verifiedAt": "2026-10-20"
   },
   {
     "id": "gemini-3-8-flash",
     "modelId": "gemini-3-8-flash",
-    "batchFactor": null,
+    "batchFactor": 0.5,
     "cache": {
       "mode": "implicit",
       "minTokens": 4096,
@@ -392,7 +392,7 @@
       "output": 7.5,
       "cacheRead": 0.15
     },
-    "note": "Caché implícita: sin escritura facturada ni TTL configurable; el acierto no está garantizado. El precio actual es introductorio y cambia en la fecha indicada.",
-    "verifiedAt": "2026-10-16"
+    "note": "Caché implícita: sin escritura facturada ni TTL configurable; el acierto no está garantizado. El precio actual es introductorio y cambia en la fecha indicada. Batch API con un 50 % de reducción (Google; también Flex al mismo precio).",
+    "verifiedAt": "2026-10-20"
   }
 ]

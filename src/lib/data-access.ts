@@ -15,7 +15,6 @@ export const loadSources = async () => (await getCollection('sources')).map((e) 
 export const loadEffort = async () => (await getCollection('effort')).map((e) => e.data);
 export const loadTaskMatrix = async () => (await getCollection('task-matrix')).map((e) => e.data);
 export const loadCommands = async () => (await getCollection('claude-code-commands')).map((e) => e.data);
-export const loadPricingRules = async () => (await getCollection('pricing-rules')).map((e) => e.data);
 
 /** Catálogo de precios para la calculadora y el simulador de caché. */
 export async function loadPricingCatalog(): Promise<PricingCatalog> {

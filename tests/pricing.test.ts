@@ -111,7 +111,7 @@ describe('caché y lotes', () => {
   it('el multiplicador de Batch solo aplica si se usa y el proveedor lo tiene', () => {
     expect(batchMultiplier(get('sonnet-5-5'), true)).toBe(0.5);
     expect(batchMultiplier(get('sonnet-5-5'), false)).toBe(1);
-    expect(batchMultiplier(get('gemini-4-argon'), true)).toBe(1);
+    expect(batchMultiplier(get('gemini-4-argon'), true)).toBe(0.5);
   });
 
   it('formatTtl', () => {

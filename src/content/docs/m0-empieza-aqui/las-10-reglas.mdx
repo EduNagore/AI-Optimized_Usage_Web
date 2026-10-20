@@ -8,7 +8,14 @@ tracks: [esencial, profesional, tecnica]
 readingTime: 6
 lastReviewed: 2026-10-16
 sources:
-  [anthropic-buenas-practicas-de-prompting, anthropic-esfuerzo, anthropic-prompt-caching, claude-code-costes]
+  [
+    anthropic-buenas-practicas-de-prompting,
+    anthropic-esfuerzo,
+    anthropic-prompt-caching,
+    claude-code-costes,
+    anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas,
+    anthropic-com-engineering-effective-context-engineering-for-ai-agents,
+  ]
 ---
 
 import KeyTakeaways from '@components/KeyTakeaways.astro';
@@ -17,7 +24,7 @@ import Checklist from '@components/Checklist.astro';
 
 <KeyTakeaways>
 
-- Las diez reglas resumen el método de la guía: primero decidir, luego pedir, después comprobar y guardar.
+- Las diez reglas resumen el método de la guía: primero decidir (1-3), luego encargar y comprobar (4-6) y mantener hábitos que bajan el coste (7-10).
 - Cada regla es una recomendación de la guía con su porqué; algunas se apoyan en datos o mediciones de los proveedores.
 - Si solo aplicas una hoy, que sea la sexta: dale al modelo una forma de comprobar su trabajo.
 
@@ -39,7 +46,7 @@ Casi todo lo que sigue en la guía son detalles de estas diez reglas. Son recome
 
 ### 3. Empieza con un modelo capaz y su esfuerzo por defecto; baja midiendo, sube si falla
 
-**Por qué:** el esfuerzo (`effort`) controla cuánto razona el modelo, y el razonamiento se factura como salida. La documentación de Anthropic parte de un modelo capaz y de su esfuerzo por defecto, y ajustar el esfuerzo suele ser mejor palanca que cambiar de modelo. Bajarlo es un ahorro posible, pero es un compromiso: se comprueba con una muestra de tus tareas antes de generalizarlo. Ver la [estrategia de selección](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/estrategia-de-seleccion/) y [esfuerzo y razonamiento](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/esfuerzo-y-razonamiento/).
+**Por qué:** por «modelo capaz» entendemos la gama equilibrada o superior de cada proveedor (ver el [mapa de modelos](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/mapa-de-modelos/)). El esfuerzo ([`effort`](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#esfuerzo)) controla cuánto razona el modelo, y el razonamiento se factura como salida. La documentación de Anthropic parte de un modelo capaz y de su esfuerzo por defecto, y ajustar el esfuerzo suele ser mejor palanca que cambiar de modelo. Bajarlo es un ahorro posible, pero es un compromiso: se comprueba con una muestra de tus tareas antes de generalizarlo. Ver la [estrategia de selección](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/estrategia-de-seleccion/) y [esfuerzo y razonamiento](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/esfuerzo-y-razonamiento/).
 
 <Callout tipo="medicion" titulo="Medición publicada por Anthropic">
 
@@ -53,7 +60,7 @@ En su guía de optimización de coste e inteligencia, Anthropic publica que, en 
 
 ### 5. Pide el formato exacto, con un ejemplo
 
-**Por qué:** los ejemplos se imitan, y uno de salida fija longitud, tono y estructura mucho mejor que una descripción. Si el resultado lo va a leer un programa, un esquema (structured outputs) es más fiable que pedirlo con palabras. Ver [formato y longitud](/AI-Optimized_Usage_Web/m3-prompting/formato-y-longitud/).
+**Por qué:** los ejemplos se imitan, y uno de salida fija longitud, tono y estructura mucho mejor que una descripción. Si el resultado lo va a leer un programa, un esquema ([structured outputs](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#structured-outputs)) es más fiable que pedirlo con palabras. Ver [formato y longitud](/AI-Optimized_Usage_Web/m3-prompting/formato-y-longitud/).
 
 ### 6. Dale una forma de verificar su trabajo
 
@@ -61,11 +68,11 @@ En su guía de optimización de coste e inteligencia, Anthropic publica que, en 
 
 ### 7. Una tarea, una conversación: limpia el contexto al cambiar de tema
 
-**Por qué:** cada turno reenvía todo el historial, de modo que una conversación larga cuesta más y, según la documentación de Anthropic sobre ingeniería de contexto, puede perder precisión a medida que el contexto crece. Un contexto limpio con un buen encargo suele superar a uno lleno de correcciones. Ver [errores de método](/AI-Optimized_Usage_Web/m2-metodo/errores-de-metodo/) y [por qué se dispara el gasto](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/por-que-se-dispara-el-gasto/).
+**Por qué:** cada turno reenvía todo el historial, de modo que una conversación larga cuesta más y, según la documentación de Anthropic sobre ingeniería de contexto, puede perder precisión a medida que el contexto crece. Como recomendación de la guía: un contexto limpio con un buen encargo suele superar a uno lleno de correcciones. Ver [errores de método](/AI-Optimized_Usage_Web/m2-metodo/errores-de-metodo/) y [por qué se dispara el gasto](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/por-que-se-dispara-el-gasto/).
 
 ### 8. Lo estable, primero: así se aprovecha la caché
 
-**Por qué:** el prompt caching guarda el procesamiento del comienzo de la petición y cobra su lectura a un precio menor, pero solo acierta si ese comienzo es idéntico. Instrucciones y documentos de referencia al principio; lo que cambia en cada petición (la pregunta, la fecha), al final. Ver [prompt caching a fondo](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/prompt-caching/).
+**Por qué:** el [prompt caching](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#prompt-caching) guarda el procesamiento del comienzo de la petición y cobra su lectura a un precio menor, pero solo acierta si ese comienzo es idéntico. Instrucciones y documentos de referencia al principio; lo que cambia en cada petición (la pregunta, la fecha), al final. Ver [prompt caching a fondo](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/prompt-caching/).
 
 <Callout tipo="medicion" titulo="Medición publicada por Anthropic">
 
@@ -75,7 +82,7 @@ En el tráfico de un día de Anthropic, los bucles de agente leyeron de la cach�
 
 ### 9. Lo que repitas, conviértelo en plantilla, skill o automatización
 
-**Por qué:** un encargo que funciona una vez y se reescribe de memoria cada semana pierde calidad y tiempo. Guardarlo como plantilla lo hace repetible, y una skill carga sus instrucciones solo cuando hacen falta en lugar de pagarlas en cada turno. Ver la [biblioteca de plantillas](/AI-Optimized_Usage_Web/m3-prompting/biblioteca-de-plantillas/), las [skills](/AI-Optimized_Usage_Web/m6-herramientas/skills/) y la [higiene de entrada](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/higiene-de-entrada/).
+**Por qué:** un encargo que funciona una vez y se reescribe de memoria cada semana pierde calidad y tiempo. Guardarlo como plantilla lo hace repetible, y una [skill](/AI-Optimized_Usage_Web/m0-empieza-aqui/glosario/#skill) carga sus instrucciones solo cuando hacen falta en lugar de pagarlas en cada turno (solo su descripción breve está siempre en el contexto). Ver la [biblioteca de plantillas](/AI-Optimized_Usage_Web/m3-prompting/biblioteca-de-plantillas/), las [skills](/AI-Optimized_Usage_Web/m6-herramientas/skills/) y la [higiene de entrada](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/higiene-de-entrada/).
 
 ### 10. Mide el coste por tarea completada, no por mensaje
 
@@ -88,17 +95,17 @@ Un departamento de compras prepara cada mes un informe con 300 albaranes y una p
 1. **Clasifica.** Hay dos tareas: extraer importes (volumen alto, riesgo medio) y decidir la renovación (volumen uno, riesgo alto).
 2. **Superficie.** Para la extracción, un chat con diez albaranes de prueba y, si funciona, una automatización; para la decisión, un chat normal.
 3. **Modelo y esfuerzo.** Un modelo capaz con su esfuerzo por defecto; para la extracción repetitiva, esfuerzo menor tras comprobarlo en una muestra. Para decidir, no bajar de ahí y subir si el análisis se queda corto.
-4. **Contexto y porqué.** «Los importes alimentan la conciliación contable; un importe mal leído se paga dos veces» da al modelo el motivo para ser cuidadoso.
+4. **Contexto y porqué.** «Los importes alimentan la conciliación contable; un importe mal leído se paga de más o de menos» da al modelo el motivo para ser cuidadoso.
 5. **Formato.** Una tabla con fecha, proveedor, importe y NIF, con una fila de ejemplo.
-6. **Verificación.** Los totales del lote deben cuadrar con el pie del albarán y se revisan a mano cinco filas al azar. Para la decisión, se piden los argumentos en contra.
+6. **Verificación.** La suma extraída de cada albarán debe cuadrar con su total, la del lote con el extracto del proveedor, y se revisan a mano cinco filas al azar. Para la decisión, se piden los argumentos en contra.
 7. **Una conversación por tarea.** La extracción y la decisión van en conversaciones separadas; la segunda opinión, en una tercera, sin el historial de la primera.
-8. **Lo estable primero.** Las instrucciones de extracción y el formato van al principio y la lista de albaranes del mes al final, para que las instrucciones se cacheen entre lotes.
+8. **Lo estable primero.** Las instrucciones, el formato y las filas de ejemplo van al principio y los albaranes del mes al final. Si esa parte fija supera el mínimo cacheable del modelo, se reutiliza entre lotes; si no, el orden sigue ayudando a que el modelo lea las reglas antes que los datos.
 9. **Sistematiza.** El encargo de extracción se guarda como plantilla del departamento; el mes que viene solo cambian los albaranes.
 10. **Mide.** No cuenta lo que cuesta cada mensaje, sino lo que costó el informe completo, incluido el tiempo que alguien tardó en revisarlo. Con ese dato se decide si el modelo o el esfuerzo se pueden bajar.
 
 ## Errores frecuentes
 
-- **Aplicar las diez reglas a la vez desde el primer día.** Empieza por una o dos: la 1 y la 6 son las de mayor retorno.
+- **Aplicar las diez reglas a la vez desde el primer día.** Empieza por una o dos. La guía recomienda la 1 y la 6: clasificar evita elegir mal todo lo demás, y verificar evita dar por bueno un error.
 - **Convertir las recomendaciones en dogmas.** Cada una tiene su porqué; si no se da en tu caso, no la apliques.
 - **Optimizar el coste antes de que el resultado sea bueno.** Primero que funcione y se pueda comprobar; después, que cueste menos.
 
@@ -111,7 +118,9 @@ Un departamento de compras prepara cada mes un informe con 300 albaranes y una p
     'Empiezo con un modelo capaz y su esfuerzo por defecto, y bajo solo tras medir.',
     'El encargo lleva contexto, el porqué y el formato con un ejemplo.',
     'Está en una conversación propia.',
+    'Lo fijo va al principio del encargo y lo variable al final.',
     'Si se repite, la guardaré como plantilla.',
+    'Sabré cuánto me costó la tarea completa, revisión incluida.',
   ]}
 />
 

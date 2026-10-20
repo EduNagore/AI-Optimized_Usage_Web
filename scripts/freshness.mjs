@@ -26,13 +26,15 @@ if (!offline) {
   await Promise.all(
     sources.map(async (s) => {
       try {
-        const res = await fetch(s.url, {
-          method: 'HEAD',
-          redirect: 'follow',
-          signal: AbortSignal.timeout(15_000),
-        });
-        // 403/405 en HEAD no implican caída (algunos sitios bloquean automatismos).
-        if (res.status >= 400 && ![403, 405].includes(res.status)) throw new Error(`HTTP ${res.status}`);
+        const ask = (method) =>
+          fetch(s.url, { method, redirect: 'follow', signal: AbortSignal.timeout(15_000) });
+        let res = await ask('HEAD');
+        // Algunos servidores responden mal a HEAD (404/405): se reintenta con GET.
+        if (res.status >= 400) res = await ask('GET');
+        // No hace falta el cuerpo: se libera la conexión.
+        await res.body?.cancel();
+        // 403 y 429 no implican caída (bloqueo de automatismos o límite de peticiones).
+        if (res.status >= 400 && ![403, 429].includes(res.status)) throw new Error(`HTTP ${res.status}`);
       } catch (e) {
         problems++;
         console.log(`SIN RESPUESTA  ${s.id} · ${s.url} · ${e.message}`);

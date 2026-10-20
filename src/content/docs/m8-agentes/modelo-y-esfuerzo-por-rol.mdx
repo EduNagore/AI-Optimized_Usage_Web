@@ -79,7 +79,7 @@ Esta tabla es una **recomendación de la guía**, no un dato oficial. Respeta la
 
 **Ojo con el trabajador en Claude Code.** Allí Sonnet 5.5 ya arranca en <Fact id="sonnet-5-5.effort.default.claude-code" />, y en la medición de Anthropic que sigue, `medium` quedó unos 7 puntos por debajo de `high`. Si el acierto del trabajador flojea, prueba a subir el esfuerzo antes de bajarlo más o de cambiar de modelo.
 
-El orden de los siguientes ajustes importa: primero se baja el **esfuerzo** del trabajador, que es la palanca más fina, y después, si hace falta, el **modelo**. La documentación de Anthropic apunta en esa dirección: tocar el esfuerzo suele rendir más que cambiar de modelo, y además un solo modelo mantiene una sola caché.
+El orden de los siguientes ajustes importa: primero se baja el **esfuerzo** del trabajador, que es la palanca más fina, y después, si hace falta, el **modelo**. La documentación de Anthropic recomienda ajustar un modelo antes de añadir un segundo (probar primero distintos esfuerzos con el modelo actual, porque la mayoría de las cargas acaban ahí); que tocar el esfuerzo rinda más que cambiar de modelo es la recomendación de la guía, y además un solo modelo mantiene una sola caché.
 
 <Callout tipo="medicion" titulo="Medición publicada por Anthropic">
 

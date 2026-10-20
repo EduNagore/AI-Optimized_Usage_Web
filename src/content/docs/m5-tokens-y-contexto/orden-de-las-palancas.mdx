@@ -61,7 +61,7 @@ Anthropic publica en su guía de optimización de coste e inteligencia comparati
 
 <Callout tipo="medicion" titulo="Medición publicada por Anthropic">
 
-En un subconjunto de SWE-bench Pro (tareas de programación), Sonnet 5.5 en `medium` obtuvo unos 7 puntos menos que en `high` (su nivel por defecto en la API) con aproximadamente el 59 % del coste por tarea. Es decir: `medium` **no igualó** a `high`; ahorró coste a cambio de acierto. En el mismo documento, ejecutar en `low` y repetir en `high` los casos que fallan costó cerca de un 40 % menos que hacerlo todo en `high`, con la misma tasa de acierto en las pruebas de Anthropic. Son resultados del proveedor sobre sus propias tareas, con pocas repeticiones: orientan, no garantizan.
+En un subconjunto de SWE-bench Pro (tareas de programación), Sonnet 5.5 en `medium` obtuvo unos 7 puntos menos que en `high` (su nivel por defecto en la API) con aproximadamente el 59 % del coste por tarea. Es decir: `medium` **no igualó** a `high`; ahorró coste a cambio de acierto. En el mismo documento, con Opus 5.5, ejecutar en `low` y repetir en `high` los casos que fallan costó cerca de un 40 % menos que hacerlo todo en `high`, con la misma tasa de acierto en las pruebas de Anthropic. Son resultados del proveedor sobre sus propias tareas, con pocas repeticiones: orientan, no garantizan.
 
 </Callout>
 
@@ -69,7 +69,7 @@ Dos lecciones. Una: bajar el esfuerzo tiene un precio en calidad que puede ser p
 
 ### Qué son los presupuestos y el asesor
 
-Un **presupuesto** es un tope de consumo por tarea o sesión: al llegar al tope, la tarea se detiene en lugar de seguir gastando. Según la guía de optimización de Anthropic, al alcanzar el tope de una sesión esta se pausa con `stop_reason: budget_reached` y se reanuda al ampliarlo. Es una red de seguridad para tareas autónomas, no una forma de mejorar el resultado.
+Un **presupuesto** es un tope de consumo por tarea o sesión: al llegar al tope, la tarea se detiene en lugar de seguir gastando. Según la guía de optimización de Anthropic, en Claude Managed Agents (beta), que fija el presupuesto en dólares por sesión, al alcanzar el tope la sesión queda en reposo con `stop_reason: budget_reached` y se reanuda al ampliarlo; en la Messages API, los presupuestos de tareas son orientativos y se miden en tokens. Es una red de seguridad para tareas autónomas, no una forma de mejorar el resultado.
 
 Un **asesor** es un modelo más capaz al que consulta otro más barato (el ejecutor) cuando lo necesita. En las mediciones de Anthropic, el único emparejamiento cuyo ejecutor consultó a menudo puntuó 1,7 puntos más que el ejecutor solo, al límite del ruido entre ejecuciones, con un coste de aproximadamente 2,1 veces; y la definición de la herramienta añade en torno a 1.000 tokens de prompt por petición aunque nunca se consulte. Cuándo compensa, en [estrategia de selección](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/estrategia-de-seleccion/).
 

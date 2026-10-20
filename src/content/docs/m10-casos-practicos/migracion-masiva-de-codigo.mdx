@@ -130,7 +130,7 @@ Cambia los tamaños en la [calculadora de coste](/AI-Optimized_Usage_Web/m5-toke
 
 ## Versión económica frente a premium
 
-- **Económica (a probar midiendo):** trabajadores en Haiku 5.5, fijado con `CLAUDE_CODE_SUBAGENT_MODEL` o en la definición del agente. Prueba con tres ficheros que incluyan una excepción conocida. Si deja pasar excepciones o rompe tests, el ahorro es falso: el reproceso lo paga el equipo.
+- **Económica (a probar midiendo):** trabajadores en Haiku 5.5, fijado en la definición del agente, o con `CLAUDE_CODE_SUBAGENT_MODEL` más `CLAUDE_CODE_SUBAGENT_MODEL_FORCE=1` (la variable sola es solo un valor por defecto). Prueba con tres ficheros que incluyan una excepción conocida. Si deja pasar excepciones o rompe tests, el ahorro es falso: el reproceso lo paga el equipo.
 - **Estándar:** trabajadores en Sonnet 5.5 a `medium`.
 - **Premium:** trabajadores en Opus 5.5, solo para las piezas que los de Sonnet dejaron sin migrar (la cola difícil). Aplicar el modelo caro a las excepciones y no a todo es la misma lógica de cascada del caso de los [50.000 tickets](/AI-Optimized_Usage_Web/m10-casos-practicos/clasificar-50000-tickets/).
 

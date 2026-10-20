@@ -1,3 +1,10 @@
+if (!process.argv.includes('--force')) {
+  console.error(
+    'Este script sobrescribe ficheros de src/data/ (con correcciones hechas a mano después). Añade --force si es lo que quieres.',
+  );
+  process.exit(1);
+}
+
 // Fusiona research/*.json en src/data/ (Fase 1). Sobrescribe models, effort, pricing-rules,
 // claude-code-commands, features y changelog, y añade fuentes a sources.json.
 import { readFileSync, writeFileSync } from 'node:fs';

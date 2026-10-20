@@ -114,9 +114,8 @@ describe('datos de las reglas', () => {
     expect(parseRationale('Sin fuentes.')).toEqual({ why: 'Sin fuentes.', sourceIds: [] });
   });
 
-  it('Batch no tiene dato verificado para Google', () => {
-    for (const m of data.models.filter((x) => x.provider === 'google')) expect(m.batchFactor).toBeNull();
-    for (const m of data.models.filter((x) => x.provider !== 'google')) expect(m.batchFactor).toBe(0.5);
+  it('Batch tiene dato verificado (50 %) para todos los proveedores', () => {
+    for (const m of data.models) expect(m.batchFactor).toBe(0.5);
   });
 });
 
@@ -152,17 +151,17 @@ describe('estado inicial de ejemplo', () => {
 });
 
 describe('modificadores, calculados a mano', () => {
-  it('volumen masivo y puede esperar: lotes con el 50 % solo donde hay dato (Anthropic y OpenAI)', () => {
+  it('volumen masivo y puede esperar: lotes con el 50 % (Anthropic, OpenAI y Google)', () => {
     // Extracción: Haiku 5.5 (0,1 / 0,5), GPT-6 Luna (0,1 / 0,5) y Gemini 3.8 Flash.
-    // Lotes ×0,5: 0,1 × 0,5 = 0,05 y 0,5 × 0,5 = 0,25. Google no tiene factor verificado.
+    // Lotes ×0,5: 0,1 × 0,5 = 0,05 y 0,5 × 0,5 = 0,25; Gemini 3.8 Flash (0,75 / 3,75): 0,375 y 1,875.
     const r = rec(exampleAnswers(data.rules));
     expect(r.rules.map((x) => x.id)).toEqual(['lotes', 'volumen-masivo']);
     expect(r.batch!.items.map((i) => [i.model.id, i.input, i.output])).toEqual([
       ['haiku-5-5', 0.05, 0.25],
       ['gpt-6-luna', 0.05, 0.25],
+      ['gemini-3-8-flash', 0.375, 1.875],
     ]);
-    expect(r.batch!.unavailable).toEqual(['Google']);
-    expect(r.notices.some((n) => n.text.includes('No hay dato verificado de lotes para Google'))).toBe(true);
+    expect(r.batch!.unavailable).toEqual([]);
     expect(r.notices.some((n) => n.text.includes('hasta 24 horas'))).toBe(true);
   });
 
@@ -526,7 +525,7 @@ describe('«otra tarea»: solo la tabla de decisión de la página', () => {
         sensitive: 'si',
       }),
     );
-    expect(r.batch!.items.map((i) => i.model.id)).toEqual(['haiku-5-5', 'gpt-6-luna']);
+    expect(r.batch!.items.map((i) => i.model.id)).toEqual(['haiku-5-5', 'gpt-6-luna', 'gemini-3-8-flash']);
     expect(r.notices.some((n) => n.text.includes('política de datos'))).toBe(true);
   });
 });
@@ -653,13 +652,12 @@ describe('invariantes sobre todas las combinaciones', () => {
     }
   });
 
-  it('nunca propone lotes para Google y solo cuando hay volumen y el resultado puede esperar', () => {
+  it('solo propone lotes cuando hay volumen y el resultado puede esperar', () => {
     for (const { answers, r } of all) {
       if (r.batch) {
         expect(answers.volume).toBe('masivo');
         expect(answers.latency).toBe('espera');
         for (const i of r.batch.items) {
-          expect(i.model.provider).not.toBe('google');
           expect(i.factor).toBe(0.5);
         }
       } else {
@@ -723,7 +721,7 @@ describe('texto de resumen', () => {
     expect(text).toContain('Cómo verificar: Validación contra el esquema');
     expect(text).toContain('Con lotes:');
     expect(text).toContain('0,05 $ de entrada y 0,25 $ de salida');
-    expect(text).toContain('verificados el 16 de octubre de 2026');
+    expect(text).toMatch(/verificados el \d+ de octubre de 2026/);
     expect(text).toContain('no sentencia');
     expect(text).toContain(data.sources['anthropic-precios']!.url);
   });

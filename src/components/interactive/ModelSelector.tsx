@@ -19,6 +19,7 @@ import {
   type Recommendation,
   type SelectorData,
 } from '../../lib/model-selector';
+import { copyText } from '../../lib/clipboard';
 import { formatDate } from '../../lib/format';
 import { Field, SourceFooter } from './shared';
 import './interactive.css';
@@ -251,12 +252,7 @@ export default function ModelSelector({ data }: Props) {
   const task = data.tasks.find((t) => t.id === answers.taskId);
 
   const copy = async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied('ok');
-    } catch {
-      setCopied('error');
-    }
+    setCopied((await copyText(text)) ? 'ok' : 'error');
   };
 
   const renderField = (f: QuestionField) => {

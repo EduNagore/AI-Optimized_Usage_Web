@@ -99,7 +99,7 @@ En Claude Code hay dos caminos, de menor a mayor control. El primero es `/deep-r
 
 <Callout tipo="cuidado">
 
-Antes de lanzar el flujo completo, ejecútalo sobre una sola línea y mira `/workflows` y `/usage`: tokens por agente, tiempo y calidad de la tabla. Claude Code muestra el aviso «Large workflow» cuando un flujo proyecta más de 25 agentes o 1,5 millones de tokens, y una guía de tamaño (`small`, `medium`, `large`) limita cuántos agentes propone Claude. Pon el tamaño más bajo que cubra tu caso. Ojo: con `/effort ultracode` activado en la sesión el aviso no aparece, porque ya te incluye en las ejecuciones grandes; si quieres verlo, usa la palabra clave `ultracode` en el prompt de esa tarea (la documentación solo exime del aviso al ajuste de sesión; que la palabra clave no lo exima es una deducción nuestra).
+Antes de lanzar el flujo completo, ejecútalo sobre una sola línea y mira `/workflows` y `/usage`: tokens por agente, tiempo y calidad de la tabla. Claude Code muestra el aviso «Large workflow» cuando un flujo proyecta más de 25 agentes o 1,5 millones de tokens, y una guía de tamaño (`small`, `medium`, `large`) orienta cuántos agentes propone Claude (no es un tope). El umbral de 25 agentes vale con la guía por defecto: si eliges otra guía de tamaño, su número de agentes lo sustituye. Pon el tamaño más bajo que cubra tu caso. Ojo: con `/effort ultracode` activado en la sesión el aviso no aparece, porque ya te incluye en las ejecuciones grandes; si quieres verlo, usa la palabra clave `ultracode` en el prompt de esa tarea (la documentación solo exime del aviso al ajuste de sesión; que la palabra clave no lo exima es una deducción nuestra).
 
 </Callout>
 

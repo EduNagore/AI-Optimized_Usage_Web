@@ -160,7 +160,7 @@ Para procesos desatendidos que leen documentos externos, ver [automatización](/
 
 Un agente que lee tus ficheros y ejecuta comandos necesita fronteras. Claude Code tiene dos mecanismos distintos que se complementan.
 
-**Modos de permiso.** Fijan qué puede hacer Claude sin preguntarte. Los seis modos (`default`, `acceptEdits`, `plan`, `auto`, `dontAsk` y `bypassPermissions`) están en [primeros pasos](/AI-Optimized_Usage_Web/m7-claude-code/primeros-pasos/). La recomendación de seguridad, con su porqué: empieza en `default` o `plan` con un proyecto nuevo y usa `bypassPermissions` solo dentro de un contenedor o máquina desechable, porque en ese modo no se comprueba ninguna acción.
+**Modos de permiso.** Fijan qué puede hacer Claude sin preguntarte. Los seis modos (`default`, `acceptEdits`, `plan`, `auto`, `dontAsk` y `bypassPermissions`) están en [primeros pasos](/AI-Optimized_Usage_Web/m7-claude-code/primeros-pasos/). La recomendación de seguridad, con su porqué: empieza en el modo Manual (`default`) o en `plan` con un proyecto nuevo (desde la v2.1.283 la sesión interactiva arranca en `auto`, así que tendrás que cambiar de modo) y usa `bypassPermissions` solo dentro de un contenedor o máquina desechable, porque en ese modo no se comprueba ninguna acción.
 
 <CommandCard comando="/permissions" />
 
@@ -221,7 +221,7 @@ Qué cambió y por qué: con conector de correo y permisos de escritura, un corr
 2. **Comprueba la herramienta y el plan** aprobados para ese tipo de dato. En caso de duda, pregunta a tu responsable de protección de datos o a tu asesoría antes de pegar.
 3. **Reduce lo que envías.** Anonimiza o seudonimiza y pega solo el fragmento necesario, no el expediente entero.
 4. **Marca el contenido externo como dato** con la política de contenido no fiable cuando el documento venga de fuera.
-5. **Da los permisos mínimos.** Conectores de solo lectura, modo plan o `default` en agentes, reglas `deny` sobre ficheros sensibles.
+5. **Da los permisos mínimos.** Conectores de solo lectura, modo plan o Manual (`default`) en agentes, reglas `deny` sobre ficheros sensibles.
 6. **Separa preparar de ejecutar.** El asistente propone; una persona aprueba lo irreversible.
 7. **Revisa y deja rastro.** Lee el resultado, y conserva la transcripción por si hay que reconstruir qué pasó.
 

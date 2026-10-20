@@ -11,5 +11,8 @@
     }
   ],
   "ignorePaths": ["node_modules", "dist", ".astro", "package-lock.json", "src/data/sources.json"],
-  "ignoreRegExpList": ["/^(level|tracks|status):.*$/m", "/\b[a-z0-9]+(?:-[a-z0-9]+)+\b/"]
+  "ignoreRegExpList": [
+    "/^(level|tracks|status):.*$/m",
+    "/(?<![\\p{L}\\d-])[a-z0-9]+(?:-[a-z0-9]+)+(?![\\p{L}\\d-])/gu"
+  ]
 }

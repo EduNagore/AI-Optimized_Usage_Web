@@ -89,7 +89,7 @@ export const levels = {
 export const tracks = {
   esencial: {
     label: 'Esencial',
-    audience: 'Para cualquier perfil que quiera lo imprescindible en una sola sesión.',
+    audience: 'Para cualquier perfil que quiera lo imprescindible en pocas sesiones.',
   },
   profesional: {
     label: 'Profesional',

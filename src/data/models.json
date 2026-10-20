@@ -731,7 +731,7 @@
       }
     },
     "bestFor": [],
-    "notes": "GA el 2026-09-02. minimal da error. gemini-3.7-flash está deprecado desde 2026-10-08 y redirige a este modelo. Caché implícita desde 4.096 tokens (0,075 $ frente a 0,75 $ de entrada) y precio de almacenamiento de caché (0,50 $ por MTok y hora hasta 2026-12-31).",
+    "notes": "GA el 2026-09-02. minimal da error. gemini-3.7-flash está deprecado desde 2026-10-08 y redirige a este modelo. Caché implícita desde 4.096 tokens (0,075 $ frente a 0,75 $ de entrada) y precio de almacenamiento de caché (0,50 $ por MTok y hora hasta 2026-12-31; 1,00 $ desde 2027-01-01).",
     "source": "google-ultimo-modelo",
     "verifiedAt": "2026-10-16"
   }

@@ -1,6 +1,6 @@
 ---
 import { getCollection, getEntry } from 'astro:content';
-import { formatDate } from '@lib/format';
+import { formatDate, formatNumber } from '@lib/format';
 
 /**
  * Coste de un intento y de un volumen, calculado desde models.json y el descuento de Batch de
@@ -54,11 +54,8 @@ const rows = ids.map((id) => {
         volumen;
   return { m, perAttempt, total: perAttempt * volumen, cached };
 });
-const fmt = (n: number) =>
-  `${new Intl.NumberFormat('es-ES', {
-    maximumFractionDigits: n < 0.01 ? 4 : n < 10 ? 3 : 0,
-  }).format(n)} $`;
-const num = (n: number) => new Intl.NumberFormat('es-ES').format(n);
+const fmt = (n: number) => `${formatNumber(n, n < 0.01 ? 4 : n < 10 ? 3 : 0)} $`;
+const num = (n: number) => formatNumber(n);
 const verified = rows
   .map((r) => r.m.verifiedAt)
   .sort()

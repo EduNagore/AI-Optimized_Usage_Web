@@ -1,3 +1,10 @@
+if (!process.argv.includes('--force')) {
+  console.error(
+    'Este script sobrescribe ficheros de src/data/ (con correcciones hechas a mano después). Añade --force si es lo que quieres.',
+  );
+  process.exit(1);
+}
+
 // Siembra src/data/sources.json con las URLs oficiales de plan/02_HECHOS_VERIFICADOS.md §2.
 // Uso único en la Fase 0; después sources.json se edita a mano o lo amplía la Fase 1.
 import { readFileSync, writeFileSync } from 'node:fs';

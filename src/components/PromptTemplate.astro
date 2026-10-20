@@ -135,6 +135,8 @@ const hasUsage = Astro.slots.has('default');
 </style>
 
 <script>
+  import { copyText } from '../lib/clipboard';
+
   // Mejora progresiva: sin JS, la plantilla se lee y se copia a mano.
   function say(root: HTMLElement, message: string) {
     const status = root.querySelector<HTMLElement>('[data-status]');
@@ -143,16 +145,6 @@ const hasUsage = Astro.slots.has('default');
     window.setTimeout(() => {
       status.textContent = '';
     }, 2500);
-  }
-
-  async function copyText(text: string): Promise<boolean> {
-    try {
-      await navigator.clipboard.writeText(text);
-      return true;
-    } catch {
-      // Sin permiso de portapapeles (o sin contexto seguro): el texto sigue siendo seleccionable.
-      return false;
-    }
   }
 
   document.querySelectorAll<HTMLElement>('.prompt-template').forEach((root) => {

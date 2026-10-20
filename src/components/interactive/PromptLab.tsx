@@ -1,4 +1,5 @@
 import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
+import { copyText } from '../../lib/clipboard';
 import { wordDiff } from '../../lib/diff';
 import {
   annotationRanges,
@@ -171,14 +172,10 @@ export default function PromptLab({ casos, lecciones = {} }: Props) {
 
   const copy = async (which: 'antes' | 'despues') => {
     const text = which === 'antes' ? caso.antes : caso.despues;
-    let message: string;
-    try {
-      await navigator.clipboard.writeText(text);
-      message = `Copiado el «${which === 'antes' ? 'antes' : 'después'}» al portapapeles.`;
-    } catch {
-      // Sin permiso de portapapeles (o sin contexto seguro): el texto sigue siendo seleccionable.
-      message = 'No se pudo copiar: selecciona el texto a mano.';
-    }
+    // Si falla, el texto sigue siendo seleccionable.
+    const message = (await copyText(text))
+      ? `Copiado el «${which === 'antes' ? 'antes' : 'después'}» al portapapeles.`
+      : 'No se pudo copiar: selecciona el texto a mano.';
     setStatus(message);
     window.clearTimeout(timer.current);
     timer.current = window.setTimeout(() => setStatus(''), 3000);

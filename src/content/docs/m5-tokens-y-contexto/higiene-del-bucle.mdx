@@ -69,7 +69,7 @@ En Haiku 5.5, compacta una sesión larga en un límite de tarea antes de que sus
 
 <Callout tipo="cuidado">
 
-El valor por defecto del umbral de compactación automática no está verificado en la documentación que hemos podido leer; no lo des por conocido. Si te importa, indícalo tú de forma explícita.
+En la API, la compactación por umbral salta por defecto a los 150.000 tokens de entrada y el mínimo configurable es de 50.000 (documentación de compactación por umbral). En Claude Code, `/autocompact auto` usa la ventana ajustada a cada modelo. Si te importa, fija el umbral de forma explícita.
 
 </Callout>
 
@@ -91,7 +91,7 @@ La documentación reporta una reducción de aproximadamente el 38 % de los token
 
 ## Memoria para persistir entre sesiones
 
-En lugar de arrastrar una conversación eterna, el agente puede escribir lo aprendido en notas y leerlas en la sesión siguiente. La API de Claude ofrece una herramienta de memoria cuyos comandos implementa tu aplicación (ver, crear, reemplazar, insertar, borrar), sobre un directorio `/memories`. En Claude Code, el equivalente son los ficheros de memoria y la auto memoria (ver [Ficheros de instrucciones y memoria](/AI-Optimized_Usage_Web/m6-herramientas/ficheros-de-instrucciones-y-memoria/)). El efecto es que una sesión nueva empieza limpia pero informada.
+En lugar de arrastrar una conversación eterna, el agente puede escribir lo aprendido en notas y leerlas en la sesión siguiente. La API de Claude ofrece una herramienta de memoria cuyos comandos implementa tu aplicación (ver, crear, reemplazar, insertar, borrar, renombrar), sobre un directorio `/memories`. En Claude Code, el equivalente son los ficheros de memoria y la auto memoria (ver [Ficheros de instrucciones y memoria](/AI-Optimized_Usage_Web/m6-herramientas/ficheros-de-instrucciones-y-memoria/)). El efecto es que una sesión nueva empieza limpia pero informada.
 
 ## Historiales «solo añadir»
 

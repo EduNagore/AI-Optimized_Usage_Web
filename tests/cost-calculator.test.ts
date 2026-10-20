@@ -98,7 +98,7 @@ describe('los precios que usan los casos a mano siguen siendo los del catálogo'
       prices: { input: 4, output: 20, cacheRead: 0.2 },
     });
     expect(get('gemini-4-argon').cache).toMatchObject({ mode: 'implicit', minTokens: 4096 });
-    expect(get('gemini-4-argon').batchFactor).toBeNull();
+    expect(get('gemini-4-argon').batchFactor).toBe(0.5);
     expect(get('haiku-4-5')).toMatchObject({ contextWindow: 200_000, maxOutput: 64_000 });
   });
 });
@@ -446,13 +446,13 @@ describe('caché implícita de Gemini y ausencia de Batch', () => {
     expect(b.perTaskUsd).toBe(a.perTaskUsd);
     expect(b.plannedPriceApplied).toBe(false);
   });
-  it('Batch no existe: se cobra a precio estándar, se avisa y no hay columna de Batch', () => {
-    // 10.000 × 2 + 1.000 × 10 = 30.000 → 0,03 $, con o sin la opción de Batch.
+  it('Batch existe al 50 %: 30.000 de precio estándar pasan a 15.000 (0,015 $)', () => {
+    // 10.000 × 2 + 1.000 × 10 = 30.000 → 0,03 $ sin Batch; con Batch, la mitad.
     const r = calculateModelCost(argon, p({ inputTokens: 10_000, outputTokens: 1_000, useBatch: true }));
-    expect(r.perTaskUsd).toBeCloseTo(0.03, 12);
-    expect(r.perTaskBatchUsd).toBeNull();
-    expect(r.batchApplied).toBe(false);
-    expect(codes(r)).toContain('no-batch');
+    expect(r.perTaskUsd).toBeCloseTo(0.015, 12);
+    expect(r.perTaskBatchUsd).toBeCloseTo(0.015, 12);
+    expect(r.batchApplied).toBe(true);
+    expect(codes(r)).not.toContain('no-batch');
   });
 });
 
@@ -576,10 +576,9 @@ describe('efecto de cada palanca', () => {
     expect(withBatch.savingPerTaskUsd).toBeCloseTo(0.00375, 10);
     expect(byId('output-half').savingPerTaskUsd).toBeCloseTo(0.0075, 10);
   });
-  it('Batch no aplicable en Google', () => {
+  it('Batch aplicable también en Google (50 %)', () => {
     const l = leverEffects(get('gemini-4-argon'), args).find((x) => x.id === 'batch')!;
-    expect(l.applicable).toBe(false);
-    expect(l.reason).toMatch(/Batch/);
+    expect(l.applicable).toBe(true);
   });
   it('TTL: con caché activa y dos TTL se ofrece el cambio, con su coste', () => {
     // Misma tarea de la prueba del prefijo (0,0576 con 5 min → 0,0696 con 1 h): cuesta 0,012 más.

@@ -17,7 +17,7 @@
     "title": "v2.1.301: variable del temporizador de espera por límite de uso",
     "summary": "Nueva variable CLAUDE_CODE_RETRY_WATCHDOG_MAX_USAGE_LIMIT_WAIT_MS para el modo de reintentos desatendidos; movimiento de % en vim; LaTeX en VS Code.",
     "impact": "Pendiente de redactar en la Fase 3.",
-    "link": "https://code.claude.com/docs/en/changelog.md",
+    "link": "https://code.claude.com/docs/en/changelog",
     "source": "claude-code-changelog",
     "verifiedAt": "2026-10-16"
   },
@@ -50,7 +50,7 @@
     "title": "v2.1.299: compactación en reposo; /effort y /fast en agent view",
     "summary": "Conversaciones de 200K o más tokens inactivas unos 54 minutos se compactan antes de que caduque la caché de 1 hora; /effort y /fast en la vista de agentes.",
     "impact": "Pendiente de redactar en la Fase 3.",
-    "link": "https://code.claude.com/docs/en/changelog.md",
+    "link": "https://code.claude.com/docs/en/changelog",
     "source": "claude-code-changelog",
     "verifiedAt": "2026-10-16"
   },
@@ -61,7 +61,7 @@
     "title": "v2.1.300: /advisor en Claude Platform on AWS y OpenTelemetry GenAI",
     "summary": "/advisor en Claude Platform on AWS; trazas OpenTelemetry con atributos GenAI; los flags --sandbox y --no-sandbox de claude remote-control dan error.",
     "impact": "Pendiente de redactar en la Fase 3.",
-    "link": "https://code.claude.com/docs/en/changelog.md",
+    "link": "https://code.claude.com/docs/en/changelog",
     "source": "claude-code-changelog",
     "verifiedAt": "2026-10-16"
   },
@@ -127,7 +127,7 @@
     "title": "v2.1.296: CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL y autoCompactWindow en subagentes",
     "summary": "Nueva variable para fijar el modelo de los agentes de flujo; autoCompactWindow en subagentes; el changelog resumido indica precio de lectura de caché de Sonnet 5.5 a 0,10 $/MTok (a confirmar).",
     "impact": "Pendiente de redactar en la Fase 3.",
-    "link": "https://code.claude.com/docs/en/changelog.md",
+    "link": "https://code.claude.com/docs/en/changelog",
     "source": "claude-code-changelog",
     "verifiedAt": "2026-10-16"
   },
@@ -149,7 +149,7 @@
     "title": "v2.1.295: hooks con onFailure block",
     "summary": "Hooks command y http aceptan onFailure: block; límite de 16.384 caracteres en descripciones de herramientas MCP con tool search; máximo 32 skills precargadas por subagente.",
     "impact": "Pendiente de redactar en la Fase 3.",
-    "link": "https://code.claude.com/docs/en/changelog.md",
+    "link": "https://code.claude.com/docs/en/changelog",
     "source": "claude-code-changelog",
     "verifiedAt": "2026-10-16"
   },
@@ -215,7 +215,7 @@
     "title": "v2.1.293: Haiku 5.5 por defecto en Haiku",
     "summary": "Claude Haiku 5.5 (claude-haiku-5-5) pasa a ser el modelo Haiku por defecto (alias haiku) en la API de Anthropic. Es también la versión mínima para usarlo en Claude Code.",
     "impact": "Pendiente de redactar en la Fase 3.",
-    "link": "https://code.claude.com/docs/en/changelog.md",
+    "link": "https://code.claude.com/docs/en/changelog",
     "source": "claude-code-changelog",
     "verifiedAt": "2026-10-16"
   },
@@ -270,7 +270,7 @@
     "title": "v2.1.292: effort en la herramienta Agent y --marketplace",
     "summary": "claude plugin install --marketplace; la herramienta Agent acepta effort; nombres de agente de hasta 256 caracteres.",
     "impact": "Pendiente de redactar en la Fase 3.",
-    "link": "https://code.claude.com/docs/en/changelog.md",
+    "link": "https://code.claude.com/docs/en/changelog",
     "source": "claude-code-changelog",
     "verifiedAt": "2026-10-16"
   },
@@ -325,7 +325,7 @@
     "title": "v2.1.290: WebSearch a 100 llamadas por hora",
     "summary": "Presupuesto de WebSearch de 100 llamadas por hora; /effort, /model y /rename desde claude agents se aplican al instante; los TeammateIdle ya no se disparan desde subagentes.",
     "impact": "Pendiente de redactar en la Fase 3.",
-    "link": "https://code.claude.com/docs/en/changelog.md",
+    "link": "https://code.claude.com/docs/en/changelog",
     "source": "claude-code-changelog",
     "verifiedAt": "2026-10-16"
   },
@@ -347,7 +347,7 @@
     "title": "v2.1.288: renombrado claude project purge a claude purge",
     "summary": "claude project purge pasa a claude purge (el nombre antiguo sigue funcionando); /autocompact se guarda por modelo; /code-review admite --max-findings.",
     "impact": "Pendiente de redactar en la Fase 3.",
-    "link": "https://code.claude.com/docs/en/changelog.md",
+    "link": "https://code.claude.com/docs/en/changelog",
     "source": "claude-code-changelog",
     "verifiedAt": "2026-10-16"
   },
@@ -369,7 +369,7 @@
     "title": "v2.1.287: Claude Mods y ventana de 1M en terceros",
     "summary": "Llegan Claude Mods y el mod You should know; Opus 4.7 o posterior y Fable usan ventana de 1M en Bedrock, Vertex, Foundry y gateway (CLAUDE_CODE_DISABLE_1M_CONTEXT=1 la desactiva); plugin-authoring desde esta versión.",
     "impact": "Pendiente de redactar en la Fase 3.",
-    "link": "https://code.claude.com/docs/en/changelog.md",
+    "link": "https://code.claude.com/docs/en/changelog",
     "source": "claude-code-changelog",
     "verifiedAt": "2026-10-16"
   },
@@ -380,7 +380,7 @@
     "title": "Deprecación de Sonnet 4.5 y paso de Admin API fuera de beta",
     "summary": "Sonnet 4.5 deprecado; retirada 2026-11-30 con sustituto claude-sonnet-5-5. Métodos de Admin API salen de beta en los SDK.",
     "impact": "Pendiente de redactar en la Fase 3.",
-    "link": "https://platform.claude.com/docs/en/about-claude/model-deprecations.md",
+    "link": "https://platform.claude.com/docs/en/about-claude/model-deprecations",
     "source": "platform-claude-com-docs-en-about-claude-model-deprecations",
     "verifiedAt": "2026-10-16"
   },
@@ -391,7 +391,7 @@
     "title": "v2.1.286: /hooks agrupado y reintentos",
     "summary": "Hasta 14 envíos por llamada fallida; --bare conecta solo los MCP nombrados; /hooks abre una lista agrupada por evento.",
     "impact": "Pendiente de redactar en la Fase 3.",
-    "link": "https://code.claude.com/docs/en/changelog.md",
+    "link": "https://code.claude.com/docs/en/changelog",
     "source": "claude-code-changelog",
     "verifiedAt": "2026-10-16"
   },
@@ -446,7 +446,7 @@
     "title": "v2.1.284: Sonnet 5.5 por defecto en la API; ultracode como interruptor",
     "summary": "Sonnet 5.5 es el Sonnet por defecto en la API de Anthropic; ultracode pasa a interruptor propio de /effort y ya no fuerza xhigh.",
     "impact": "Pendiente de redactar en la Fase 3.",
-    "link": "https://code.claude.com/docs/en/changelog.md",
+    "link": "https://code.claude.com/docs/en/changelog",
     "source": "claude-code-changelog",
     "verifiedAt": "2026-10-16"
   },
@@ -523,7 +523,7 @@
     "title": "v2.1.280: Claude Opus 5.5 es el Opus por defecto",
     "summary": "Opus 5.5 pasa a ser el Opus por defecto; en Pro y Team Standard el modelo por defecto pasa de Sonnet a Opus.",
     "impact": "Pendiente de redactar en la Fase 3.",
-    "link": "https://code.claude.com/docs/en/changelog.md",
+    "link": "https://code.claude.com/docs/en/changelog",
     "source": "claude-code-changelog",
     "verifiedAt": "2026-10-16"
   },
@@ -655,7 +655,7 @@
     "title": "v2.1.271: omitClaudeMd en subagentes",
     "summary": "Los subagentes admiten omitClaudeMd para no cargar CLAUDE.md. claude plugin eval y CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS llegaron en la v2.1.269 (2026-09-11).",
     "impact": "Pendiente de redactar en la Fase 3.",
-    "link": "https://code.claude.com/docs/en/changelog.md",
+    "link": "https://code.claude.com/docs/en/changelog",
     "source": "claude-code-changelog",
     "verifiedAt": "2026-10-16"
   },
@@ -677,7 +677,7 @@
     "title": "v2.1.269: /output-style y revisión publicada",
     "summary": "Nuevo comando /output-style; agente map en VS Code; /ultrareview --post publica directamente.",
     "impact": "Pendiente de redactar en la Fase 3.",
-    "link": "https://code.claude.com/docs/en/changelog.md",
+    "link": "https://code.claude.com/docs/en/changelog",
     "source": "claude-code-changelog",
     "verifiedAt": "2026-10-16"
   },
@@ -754,7 +754,7 @@
     "title": "v2.1.261: ajustes bashOutputMaxChars y taskOutputMaxChars",
     "summary": "Nuevos ajustes bashOutputMaxChars y taskOutputMaxChars (hasta 128.000 caracteres); keybindingFlavor deja de tener efecto. /skill-doctor: el changelog lo sitúa en la v2.1.261 y commands.md exige la v2.1.252 (fuentes oficiales en conflicto).",
     "impact": "Pendiente de redactar en la Fase 3.",
-    "link": "https://code.claude.com/docs/en/changelog.md",
+    "link": "https://code.claude.com/docs/en/changelog",
     "source": "claude-code-changelog",
     "verifiedAt": "2026-10-16"
   },
@@ -776,7 +776,7 @@
     "title": "v2.1.260: panel /diff y /reload-plugins sin terminal",
     "summary": "Panel /diff en fullscreen; /reload-plugins en sesiones headless; /effort en Fable 5.1 ya no invalida la caché a mitad de sesión.",
     "impact": "Pendiente de redactar en la Fase 3.",
-    "link": "https://code.claude.com/docs/en/changelog.md",
+    "link": "https://code.claude.com/docs/en/changelog",
     "source": "claude-code-changelog",
     "verifiedAt": "2026-10-16"
   },
@@ -831,7 +831,7 @@
     "title": "v2.1.257: Fable 5.1 por defecto para Fable; CLAUDE_CODE_SUBAGENT_MODEL_FORCE",
     "summary": "claude-fable-5-1 pasa a ser el Fable por defecto (en pasarelas, fable y best siguen en Fable 5); /effort con la opción s para la sesión actual; CLAUDE_CODE_SUBAGENT_MODEL_FORCE.",
     "impact": "Pendiente de redactar en la Fase 3.",
-    "link": "https://code.claude.com/docs/en/changelog.md",
+    "link": "https://code.claude.com/docs/en/changelog",
     "source": "claude-code-changelog",
     "verifiedAt": "2026-10-16"
   },
@@ -875,7 +875,7 @@
     "title": "v2.1.251: Opus 5 en asientos Enterprise; /effort por modelo; hooks de cambio de modelo",
     "summary": "Opus 5 pasa a ser el modelo por defecto de los asientos Enterprise; /effort guarda el esfuerzo por modelo; CLAUDE_CODE_SUBAGENT_MODEL pasa a ser valor por defecto; nuevos hooks PreModelSwitch y PostModelSwitch.",
     "impact": "Pendiente de redactar en la Fase 3.",
-    "link": "https://code.claude.com/docs/en/changelog.md",
+    "link": "https://code.claude.com/docs/en/changelog",
     "source": "claude-code-changelog",
     "verifiedAt": "2026-10-16"
   },
@@ -897,7 +897,7 @@
     "title": "v2.1.248: --restricted y experimental.cacheTtl",
     "summary": "Nuevo modo --restricted (o CLAUDE_CODE_RESTRICTED=1) sin herramientas que ejecutan comandos ni WebFetch; subagentes con experimental.cacheTtl; descripción de la herramienta Workflow reducida de ~5,7k a ~1k tokens.",
     "impact": "Pendiente de redactar en la Fase 3.",
-    "link": "https://code.claude.com/docs/en/changelog.md",
+    "link": "https://code.claude.com/docs/en/changelog",
     "source": "claude-code-changelog",
     "verifiedAt": "2026-10-16"
   },
@@ -930,7 +930,7 @@
     "title": "v2.1.247: herramienta SendFeedback y /claude-api cost-optimize",
     "summary": "Claude puede redactar un informe de feedback (SendFeedback); /loop dinámico disponible en Bedrock, Vertex y Foundry; auto-compact de Sonnet 5 usa la ventana completa de 1M.",
     "impact": "Pendiente de redactar en la Fase 3.",
-    "link": "https://code.claude.com/docs/en/changelog.md",
+    "link": "https://code.claude.com/docs/en/changelog",
     "source": "claude-code-changelog",
     "verifiedAt": "2026-10-16"
   },
@@ -941,7 +941,7 @@
     "title": "v2.1.243: ajustes modelPicker, promptCacheTtl y modelPricing",
     "summary": "/usage añade el desglose de Loops; nuevos ajustes modelPicker, promptCacheTtl y modelPricing; /model, /fast y /effort se ejecutan al instante en Bedrock, Vertex y Foundry.",
     "impact": "Pendiente de redactar en la Fase 3.",
-    "link": "https://code.claude.com/docs/en/changelog.md",
+    "link": "https://code.claude.com/docs/en/changelog",
     "source": "claude-code-changelog",
     "verifiedAt": "2026-10-16"
   },
@@ -963,7 +963,7 @@
     "title": "v2.1.239: /claude-api upgrade y /goal con retroceso",
     "summary": "/claude-api upgrade migra de anthropic 0.x a 1.x; las comprobaciones de /goal tienen retroceso (30 min, 1 h, luego cada 2 h); --resume restaura el objetivo.",
     "impact": "Pendiente de redactar en la Fase 3.",
-    "link": "https://code.claude.com/docs/en/changelog.md",
+    "link": "https://code.claude.com/docs/en/changelog",
     "source": "claude-code-changelog",
     "verifiedAt": "2026-10-16"
   },
@@ -996,7 +996,7 @@
     "title": "v2.1.237: estilo de salida Concise",
     "summary": "Nuevo estilo de salida integrado Concise: la respuesta empieza por el resultado y omite preámbulos.",
     "impact": "Pendiente de redactar en la Fase 3.",
-    "link": "https://code.claude.com/docs/en/whats-new/2026-w34.md",
+    "link": "https://code.claude.com/docs/en/whats-new/2026-w34",
     "source": "code-claude-com-docs-en-whats-new-2026-w34",
     "verifiedAt": "2026-10-16"
   },
@@ -1018,7 +1018,7 @@
     "title": "v2.1.236: variable ANTHROPIC_DEFAULT_MODEL",
     "summary": "Nueva variable ANTHROPIC_DEFAULT_MODEL que fija el modelo con el que arrancan las sesiones nuevas; SendMessage admite notify_when_idle.",
     "impact": "Pendiente de redactar en la Fase 3.",
-    "link": "https://code.claude.com/docs/en/changelog.md",
+    "link": "https://code.claude.com/docs/en/changelog",
     "source": "claude-code-changelog",
     "verifiedAt": "2026-10-16"
   },
@@ -1040,7 +1040,7 @@
     "title": "v2.1.234: /goal con comprobaciones tras 30 minutos",
     "summary": "/goal se limpia ante errores irrecuperables y añade comprobación de trabajo en segundo plano a los 30 minutos (CLAUDE_CODE_GOAL_CHECKIN_MINUTES); los compañeros de equipo usan el modelo del líder.",
     "impact": "Pendiente de redactar en la Fase 3.",
-    "link": "https://code.claude.com/docs/en/changelog.md",
+    "link": "https://code.claude.com/docs/en/changelog",
     "source": "claude-code-changelog",
     "verifiedAt": "2026-10-16"
   },
@@ -1051,7 +1051,7 @@
     "title": "v2.1.233: herramientas de tareas fuera de algunos modelos",
     "summary": "TaskCreate, TaskGet, TaskUpdate, TaskList y TodoWrite dejan de estar disponibles en Opus 4.8, Sonnet 5, Fable 5, Mythos 5 y posteriores, salvo CLAUDE_CODE_ENABLE_TODO_TOOLS=1.",
     "impact": "Pendiente de redactar en la Fase 3.",
-    "link": "https://code.claude.com/docs/en/changelog.md",
+    "link": "https://code.claude.com/docs/en/changelog",
     "source": "claude-code-changelog",
     "verifiedAt": "2026-10-16"
   },
@@ -1062,7 +1062,7 @@
     "title": "v2.1.232: fork de subagentes activado por defecto",
     "summary": "El subagente fork (hereda la conversación completa y la caché) pasa a estar activo por defecto en sesiones interactivas; /code-review en niveles high, xhigh y max corre en segundo plano.",
     "impact": "Pendiente de redactar en la Fase 3.",
-    "link": "https://code.claude.com/docs/en/whats-new/2026-w33.md",
+    "link": "https://code.claude.com/docs/en/whats-new/2026-w33",
     "source": "code-claude-com-docs-en-whats-new-2026-w33",
     "verifiedAt": "2026-10-16"
   },
@@ -1128,7 +1128,7 @@
     "title": "v2.1.224: mensajería entre sesiones y entornos self-hosted",
     "summary": "Sesiones de Claude Code que se envían mensajes con SendMessage y ListAgents (macOS y Linux); claude self-hosted-runner; se elimina el límite de 200 subagentes por sesión.",
     "impact": "Pendiente de redactar en la Fase 3.",
-    "link": "https://code.claude.com/docs/en/whats-new/2026-w32.md",
+    "link": "https://code.claude.com/docs/en/whats-new/2026-w32",
     "source": "code-claude-com-docs-en-whats-new-2026-w32",
     "verifiedAt": "2026-10-16"
   },
@@ -1139,7 +1139,7 @@
     "title": "v2.1.223: /review pasa a alias de /code-review",
     "summary": "/review es alias de /code-review; /code-review reutiliza el último nivel de esfuerzo; /code-review ultra lanza una revisión profunda en la nube.",
     "impact": "Pendiente de redactar en la Fase 3.",
-    "link": "https://code.claude.com/docs/en/changelog.md",
+    "link": "https://code.claude.com/docs/en/changelog",
     "source": "claude-code-changelog",
     "verifiedAt": "2026-10-16"
   },
@@ -1172,7 +1172,7 @@
     "title": "v2.1.222: se elimina ultraplan",
     "summary": "Se elimina la función ultraplan (y su comando); el auto-arranque de Remote Control ya no se puede activar desde ajustes del repositorio. Sustituto: modo plan.",
     "impact": "Pendiente de redactar en la Fase 3.",
-    "link": "https://code.claude.com/docs/en/changelog.md",
+    "link": "https://code.claude.com/docs/en/changelog",
     "source": "claude-code-changelog",
     "verifiedAt": "2026-10-16"
   },
@@ -1249,7 +1249,7 @@
     "title": "v2.1.219: Claude Opus 5 es el Opus por defecto",
     "summary": "Claude Opus 5 (claude-opus-5) pasa a ser el modelo Opus por defecto en Claude Code; /fast aplica a Opus 5 y 4.8; profundidad de subagentes por defecto 3; flujos con tamaño medio por defecto; nuevo hook DirectoryAdded.",
     "impact": "Pendiente de redactar en la Fase 3.",
-    "link": "https://code.claude.com/docs/en/whats-new/2026-w30.md",
+    "link": "https://code.claude.com/docs/en/whats-new/2026-w30",
     "source": "code-claude-com-docs-en-whats-new-2026-w30",
     "verifiedAt": "2026-10-16"
   },
@@ -1271,7 +1271,7 @@
     "title": "v2.1.218: /code-review en segundo plano; /deep-research solo manual",
     "summary": "/code-review corre como subagente en segundo plano; /deep-research y /verify solo los lanza el usuario; skills con context: fork pasan a segundo plano por defecto.",
     "impact": "Pendiente de redactar en la Fase 3.",
-    "link": "https://code.claude.com/docs/en/changelog.md",
+    "link": "https://code.claude.com/docs/en/changelog",
     "source": "claude-code-changelog",
     "verifiedAt": "2026-10-16"
   },
@@ -1293,7 +1293,7 @@
     "title": "v2.1.217: límite de 20 subagentes concurrentes",
     "summary": "Se introduce CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS con valor por defecto 20; autocompletado de emojis en el prompt.",
     "impact": "Pendiente de redactar en la Fase 3.",
-    "link": "https://code.claude.com/docs/en/changelog.md",
+    "link": "https://code.claude.com/docs/en/changelog",
     "source": "claude-code-changelog",
     "verifiedAt": "2026-10-16"
   },
@@ -1326,7 +1326,7 @@
     "title": "v2.1.216: /context avisa al superar la ventana",
     "summary": "/context avisa cuando la conversación supera la ventana de contexto; /rewind no sigue symlinks; /fork muestra confirmación en una línea; background sessions aparcan peticiones de /mcp y /install-github-app.",
     "impact": "Pendiente de redactar en la Fase 3.",
-    "link": "https://code.claude.com/docs/en/changelog.md",
+    "link": "https://code.claude.com/docs/en/changelog",
     "source": "claude-code-changelog",
     "verifiedAt": "2026-10-16"
   },

@@ -2,15 +2,15 @@
   {
     "id": "anthropic-modelos",
     "title": "Modelos",
-    "url": "https://platform.claude.com/docs/en/about-claude/models/overview.md",
+    "url": "https://platform.claude.com/docs/en/about-claude/models/overview",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-15"
   },
   {
     "id": "anthropic-precios",
-    "title": "Precios",
-    "url": "https://platform.claude.com/docs/en/about-claude/pricing.md",
+    "title": "Precios de la API de Anthropic",
+    "url": "https://platform.claude.com/docs/en/about-claude/pricing",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-15"
@@ -18,7 +18,7 @@
   {
     "id": "anthropic-optimizar-coste-e-inteligencia-mediciones-publicadas",
     "title": "Optimizar coste e inteligencia (mediciones publicadas)",
-    "url": "https://platform.claude.com/docs/en/about-claude/models/optimizing-for-cost-and-intelligence.md",
+    "url": "https://platform.claude.com/docs/en/about-claude/models/optimizing-for-cost-and-intelligence",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-15"
@@ -26,7 +26,7 @@
   {
     "id": "anthropic-guia-de-migracion",
     "title": "Guía de migración",
-    "url": "https://platform.claude.com/docs/en/about-claude/models/migration-guide.md",
+    "url": "https://platform.claude.com/docs/en/about-claude/models/migration-guide",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-15"
@@ -34,7 +34,7 @@
   {
     "id": "anthropic-buenas-practicas-de-prompting",
     "title": "Buenas prácticas de prompting",
-    "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices.md",
+    "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-15"
@@ -42,7 +42,7 @@
   {
     "id": "anthropic-esfuerzo",
     "title": "Esfuerzo",
-    "url": "https://platform.claude.com/docs/en/build-with-claude/effort.md",
+    "url": "https://platform.claude.com/docs/en/build-with-claude/effort",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-15"
@@ -50,15 +50,15 @@
   {
     "id": "anthropic-razonamiento-adaptativo",
     "title": "Razonamiento adaptativo",
-    "url": "https://platform.claude.com/docs/en/build-with-claude/adaptive-thinking.md",
+    "url": "https://platform.claude.com/docs/en/build-with-claude/adaptive-thinking",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-15"
   },
   {
     "id": "anthropic-prompt-caching",
-    "title": "Prompt caching",
-    "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching.md",
+    "title": "Prompt caching (Anthropic)",
+    "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-15"
@@ -66,7 +66,7 @@
   {
     "id": "anthropic-batch",
     "title": "Batch",
-    "url": "https://platform.claude.com/docs/en/build-with-claude/batch-processing.md",
+    "url": "https://platform.claude.com/docs/en/build-with-claude/batch-processing",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-15"
@@ -74,7 +74,7 @@
   {
     "id": "anthropic-conteo-de-tokens",
     "title": "Conteo de tokens",
-    "url": "https://platform.claude.com/docs/en/build-with-claude/token-counting.md",
+    "url": "https://platform.claude.com/docs/en/build-with-claude/token-counting",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-15"
@@ -82,7 +82,7 @@
   {
     "id": "anthropic-compactacion",
     "title": "Compactación",
-    "url": "https://platform.claude.com/docs/en/build-with-claude/compaction.md",
+    "url": "https://platform.claude.com/docs/en/build-with-claude/compaction",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-15"
@@ -90,7 +90,7 @@
   {
     "id": "anthropic-context-editing",
     "title": "Context editing",
-    "url": "https://platform.claude.com/docs/en/build-with-claude/context-editing.md",
+    "url": "https://platform.claude.com/docs/en/build-with-claude/context-editing",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-15"
@@ -98,7 +98,7 @@
   {
     "id": "anthropic-preserved-thinking",
     "title": "Preserved thinking",
-    "url": "https://platform.claude.com/docs/en/build-with-claude/preserved-thinking.md",
+    "url": "https://platform.claude.com/docs/en/build-with-claude/preserved-thinking",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-15"
@@ -106,7 +106,7 @@
   {
     "id": "anthropic-tool-search",
     "title": "Tool search",
-    "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-search-tool.md",
+    "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-search-tool",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-15"
@@ -114,7 +114,7 @@
   {
     "id": "anthropic-programmatic-tool-calling",
     "title": "Programmatic tool calling",
-    "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling.md",
+    "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-15"
@@ -122,7 +122,7 @@
   {
     "id": "anthropic-memory-tool",
     "title": "Memory tool",
-    "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool.md",
+    "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-15"
@@ -130,7 +130,7 @@
   {
     "id": "anthropic-skills",
     "title": "Skills (API de Claude)",
-    "url": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview.md",
+    "url": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-15"
@@ -138,7 +138,7 @@
   {
     "id": "anthropic-structured-outputs",
     "title": "Structured outputs",
-    "url": "https://platform.claude.com/docs/en/build-with-claude/structured-outputs.md",
+    "url": "https://platform.claude.com/docs/en/build-with-claude/structured-outputs",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-15"
@@ -146,7 +146,7 @@
   {
     "id": "anthropic-vision",
     "title": "Visión",
-    "url": "https://platform.claude.com/docs/en/build-with-claude/vision.md",
+    "url": "https://platform.claude.com/docs/en/build-with-claude/vision",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-15"
@@ -154,7 +154,7 @@
   {
     "id": "anthropic-managed-agents",
     "title": "Managed Agents",
-    "url": "https://platform.claude.com/docs/en/managed-agents/overview.md",
+    "url": "https://platform.claude.com/docs/en/managed-agents/overview",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-15"
@@ -162,7 +162,7 @@
   {
     "id": "anthropic-admin-api-de-uso-y-coste",
     "title": "Admin API de uso y coste",
-    "url": "https://platform.claude.com/docs/en/manage-claude/usage-cost-api.md",
+    "url": "https://platform.claude.com/docs/en/manage-claude/usage-cost-api",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-15"
@@ -186,7 +186,7 @@
   {
     "id": "claude-code-comandos",
     "title": "Comandos",
-    "url": "https://code.claude.com/docs/en/commands.md",
+    "url": "https://code.claude.com/docs/en/commands",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-15"
@@ -194,7 +194,7 @@
   {
     "id": "claude-code-modelo-y-esfuerzo",
     "title": "Modelo y esfuerzo",
-    "url": "https://code.claude.com/docs/en/model-config.md",
+    "url": "https://code.claude.com/docs/en/model-config",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-15"
@@ -202,7 +202,7 @@
   {
     "id": "claude-code-costes",
     "title": "Costes",
-    "url": "https://code.claude.com/docs/en/costs.md",
+    "url": "https://code.claude.com/docs/en/costs",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-15"
@@ -210,7 +210,7 @@
   {
     "id": "claude-code-buenas-practicas",
     "title": "Buenas prácticas",
-    "url": "https://code.claude.com/docs/en/best-practices.md",
+    "url": "https://code.claude.com/docs/en/best-practices",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-15"
@@ -218,7 +218,7 @@
   {
     "id": "claude-code-agentes-en-paralelo",
     "title": "Agentes en paralelo",
-    "url": "https://code.claude.com/docs/en/agents.md",
+    "url": "https://code.claude.com/docs/en/agents",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-15"
@@ -226,7 +226,7 @@
   {
     "id": "claude-code-subagentes",
     "title": "Subagentes",
-    "url": "https://code.claude.com/docs/en/sub-agents.md",
+    "url": "https://code.claude.com/docs/en/sub-agents",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-15"
@@ -234,7 +234,7 @@
   {
     "id": "claude-code-flujos-dinamicos",
     "title": "Flujos dinámicos",
-    "url": "https://code.claude.com/docs/en/workflows.md",
+    "url": "https://code.claude.com/docs/en/workflows",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-15"
@@ -242,7 +242,7 @@
   {
     "id": "claude-code-agent-teams",
     "title": "Agent teams",
-    "url": "https://code.claude.com/docs/en/agent-teams.md",
+    "url": "https://code.claude.com/docs/en/agent-teams",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-15"
@@ -250,7 +250,7 @@
   {
     "id": "claude-code-skills",
     "title": "Skills (Claude Code)",
-    "url": "https://code.claude.com/docs/en/skills.md",
+    "url": "https://code.claude.com/docs/en/skills",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-15"
@@ -258,7 +258,7 @@
   {
     "id": "claude-code-hooks",
     "title": "Hooks",
-    "url": "https://code.claude.com/docs/en/hooks-guide.md",
+    "url": "https://code.claude.com/docs/en/hooks-guide",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-15"
@@ -266,7 +266,7 @@
   {
     "id": "claude-code-memoria-y-claude-md",
     "title": "Memoria y CLAUDE.md",
-    "url": "https://code.claude.com/docs/en/memory.md",
+    "url": "https://code.claude.com/docs/en/memory",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-15"
@@ -274,7 +274,7 @@
   {
     "id": "claude-code-modos-de-permiso",
     "title": "Modos de permiso",
-    "url": "https://code.claude.com/docs/en/permission-modes.md",
+    "url": "https://code.claude.com/docs/en/permission-modes",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-15"
@@ -282,7 +282,7 @@
   {
     "id": "claude-code-prompt-caching-en-claude-code",
     "title": "Prompt caching en Claude Code",
-    "url": "https://code.claude.com/docs/en/prompt-caching.md",
+    "url": "https://code.claude.com/docs/en/prompt-caching",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-15"
@@ -290,7 +290,7 @@
   {
     "id": "claude-code-rutinas",
     "title": "Rutinas",
-    "url": "https://code.claude.com/docs/en/routines.md",
+    "url": "https://code.claude.com/docs/en/routines",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-15"
@@ -298,7 +298,7 @@
   {
     "id": "claude-code-changelog",
     "title": "Claude Code: registro de cambios",
-    "url": "https://code.claude.com/docs/en/changelog.md",
+    "url": "https://code.claude.com/docs/en/changelog",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-15"
@@ -313,7 +313,7 @@
   },
   {
     "id": "openai-precios",
-    "title": "Precios",
+    "title": "Precios de la API de OpenAI",
     "url": "https://developers.openai.com/api/docs/pricing",
     "publisher": "OpenAI",
     "official": true,
@@ -361,7 +361,7 @@
   },
   {
     "id": "google-precios",
-    "title": "Precios",
+    "title": "Precios de la API de Google",
     "url": "https://ai.google.dev/gemini-api/docs/pricing",
     "publisher": "Google",
     "official": true,
@@ -370,7 +370,7 @@
   {
     "id": "code-claude-com-docs-en-goal",
     "title": "Claude Code: /goal",
-    "url": "https://code.claude.com/docs/en/goal.md",
+    "url": "https://code.claude.com/docs/en/goal",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-16"
@@ -378,7 +378,7 @@
   {
     "id": "code-claude-com-docs-en-scheduled-tasks",
     "title": "Claude Code: tareas programadas",
-    "url": "https://code.claude.com/docs/en/scheduled-tasks.md",
+    "url": "https://code.claude.com/docs/en/scheduled-tasks",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-16"
@@ -466,7 +466,7 @@
   {
     "id": "code-claude-com-docs-en-hooks",
     "title": "Claude Code: hooks",
-    "url": "https://code.claude.com/docs/en/hooks.md",
+    "url": "https://code.claude.com/docs/en/hooks",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-16"
@@ -497,7 +497,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-managed-agents-multiagent-orchestration",
-    "title": "Multiagent orchestration",
+    "title": "Multiagent orchestration — dynamic workflows",
     "url": "https://platform.claude.com/docs/en/managed-agents/multiagent-orchestration#dynamic-workflows",
     "publisher": "Anthropic",
     "official": true,
@@ -530,7 +530,7 @@
   {
     "id": "platform-claude-com-docs-en-about-claude-model-deprecations",
     "title": "Claude: deprecación de modelos",
-    "url": "https://platform.claude.com/docs/en/about-claude/model-deprecations.md",
+    "url": "https://platform.claude.com/docs/en/about-claude/model-deprecations",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-16"
@@ -545,7 +545,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-build-with-claude-refusals-and-fallback",
-    "title": "Refusals and fallback",
+    "title": "Refusals and fallback — how refusals are billed",
     "url": "https://platform.claude.com/docs/en/build-with-claude/refusals-and-fallback#how-refusals-are-billed",
     "publisher": "Anthropic",
     "official": true,
@@ -569,7 +569,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-manage-claude-compliance-sessions",
-    "title": "Compliance sessions",
+    "title": "Compliance sessions — retrieve local sessions",
     "url": "https://platform.claude.com/docs/en/manage-claude/compliance-sessions#retrieve-local-sessions",
     "publisher": "Anthropic",
     "official": true,
@@ -585,7 +585,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-managed-agents-permission-policies",
-    "title": "Permission policies",
+    "title": "Permission policies — let the server evaluate each call with auto",
     "url": "https://platform.claude.com/docs/en/managed-agents/permission-policies#let-the-server-evaluate-each-call-with-auto",
     "publisher": "Anthropic",
     "official": true,
@@ -609,7 +609,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-build-with-claude-files",
-    "title": "Build with claude: files",
+    "title": "Build with claude: files — migrate from files api 2025 04 14",
     "url": "https://platform.claude.com/docs/en/build-with-claude/files#migrate-from-files-api-2025-04-14",
     "publisher": "Anthropic",
     "official": true,
@@ -617,7 +617,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-manage-claude-compliance-sessions-2",
-    "title": "Compliance sessions",
+    "title": "Compliance sessions (resumen)",
     "url": "https://platform.claude.com/docs/en/manage-claude/compliance-sessions",
     "publisher": "Anthropic",
     "official": true,
@@ -665,7 +665,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-manage-claude-compliance-sessions-3",
-    "title": "Compliance sessions",
+    "title": "Compliance sessions — retrieve remote sessions",
     "url": "https://platform.claude.com/docs/en/manage-claude/compliance-sessions#retrieve-remote-sessions",
     "publisher": "Anthropic",
     "official": true,
@@ -673,7 +673,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-managed-agents-dreams",
-    "title": "Dreams",
+    "title": "Dreams — limits",
     "url": "https://platform.claude.com/docs/en/managed-agents/dreams#limits",
     "publisher": "Anthropic",
     "official": true,
@@ -689,7 +689,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-managed-agents-agent-setup",
-    "title": "Agent setup",
+    "title": "Agent setup — create an agent",
     "url": "https://platform.claude.com/docs/en/managed-agents/agent-setup#create-an-agent",
     "publisher": "Anthropic",
     "official": true,
@@ -713,7 +713,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-manage-claude-authentication",
-    "title": "Authentication",
+    "title": "Authentication — key expiration",
     "url": "https://platform.claude.com/docs/en/manage-claude/authentication#key-expiration",
     "publisher": "Anthropic",
     "official": true,
@@ -721,7 +721,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-managed-agents-memory",
-    "title": "Managed agents: memory",
+    "title": "Managed agents: memory — list memories",
     "url": "https://platform.claude.com/docs/en/managed-agents/memory#list-memories",
     "publisher": "Anthropic",
     "official": true,
@@ -745,7 +745,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-build-with-claude-fast-mode-2",
-    "title": "Build with claude: fast mode",
+    "title": "Build with claude: fast mode — supported models",
     "url": "https://platform.claude.com/docs/en/build-with-claude/fast-mode#supported-models",
     "publisher": "Anthropic",
     "official": true,
@@ -777,7 +777,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-models-overview",
-    "title": "Models: visión general",
+    "title": "Models: visión general — latest models comparison",
     "url": "https://platform.claude.com/docs/en/models/overview#latest-models-comparison",
     "publisher": "Anthropic",
     "official": true,
@@ -809,7 +809,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-build-with-claude-extended-thinking",
-    "title": "Extended thinking",
+    "title": "Extended thinking — budget rules and tuning",
     "url": "https://platform.claude.com/docs/en/build-with-claude/extended-thinking#budget-rules-and-tuning",
     "publisher": "Anthropic",
     "official": true,
@@ -841,7 +841,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-managed-agents-multiagent-orchestration-2",
-    "title": "Multiagent orchestration",
+    "title": "Multiagent orchestration (resumen)",
     "url": "https://platform.claude.com/docs/en/managed-agents/multiagent-orchestration",
     "publisher": "Anthropic",
     "official": true,
@@ -881,7 +881,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-managed-agents-memory-2",
-    "title": "Managed agents: memory",
+    "title": "Managed agents: memory (resumen)",
     "url": "https://platform.claude.com/docs/en/managed-agents/memory",
     "publisher": "Anthropic",
     "official": true,
@@ -905,7 +905,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-build-with-claude-batch-processing",
-    "title": "Batch processing",
+    "title": "Batch processing — extended output beta",
     "url": "https://platform.claude.com/docs/en/build-with-claude/batch-processing#extended-output-beta",
     "publisher": "Anthropic",
     "official": true,
@@ -913,7 +913,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-build-with-claude-thinking",
-    "title": "Build with claude: thinking",
+    "title": "Build with claude: thinking — controlling thinking display",
     "url": "https://platform.claude.com/docs/en/build-with-claude/thinking#controlling-thinking-display",
     "publisher": "Anthropic",
     "official": true,
@@ -921,7 +921,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-build-with-claude-prompt-caching",
-    "title": "Prompt caching",
+    "title": "Prompt caching — automatic caching",
     "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching#automatic-caching",
     "publisher": "Anthropic",
     "official": true,
@@ -929,7 +929,7 @@
   },
   {
     "id": "platform-claude-com-docs-en-models-overview-2",
-    "title": "Models: visión general",
+    "title": "Models: visión general (resumen)",
     "url": "https://platform.claude.com/docs/en/models/overview",
     "publisher": "Anthropic",
     "official": true,
@@ -954,7 +954,7 @@
   {
     "id": "code-claude-com-docs-en-whats-new-2026-w30",
     "title": "Claude Code: novedades de la semana 30 de 2026",
-    "url": "https://code.claude.com/docs/en/whats-new/2026-w30.md",
+    "url": "https://code.claude.com/docs/en/whats-new/2026-w30",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-16"
@@ -962,7 +962,7 @@
   {
     "id": "code-claude-com-docs-en-whats-new-2026-w32",
     "title": "Claude Code: novedades de la semana 32 de 2026",
-    "url": "https://code.claude.com/docs/en/whats-new/2026-w32.md",
+    "url": "https://code.claude.com/docs/en/whats-new/2026-w32",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-16"
@@ -970,7 +970,7 @@
   {
     "id": "code-claude-com-docs-en-whats-new-2026-w33",
     "title": "Claude Code: novedades de la semana 33 de 2026",
-    "url": "https://code.claude.com/docs/en/whats-new/2026-w33.md",
+    "url": "https://code.claude.com/docs/en/whats-new/2026-w33",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-16"
@@ -978,7 +978,7 @@
   {
     "id": "code-claude-com-docs-en-whats-new-2026-w34",
     "title": "Claude Code: novedades de la semana 34 de 2026",
-    "url": "https://code.claude.com/docs/en/whats-new/2026-w34.md",
+    "url": "https://code.claude.com/docs/en/whats-new/2026-w34",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-16"
@@ -1001,7 +1001,7 @@
   },
   {
     "id": "gemini-google-release-notes",
-    "title": "Release notes",
+    "title": "Notas de versión de la app de Gemini",
     "url": "https://gemini.google/release-notes/",
     "publisher": "Google",
     "official": true,
@@ -1017,7 +1017,7 @@
   },
   {
     "id": "support-claude-com-en-articles-12138966-release-notes",
-    "title": "Release notes",
+    "title": "Notas de versión de las apps de Claude",
     "url": "https://support.claude.com/en/articles/12138966-release-notes",
     "publisher": "Anthropic",
     "official": true,
@@ -1042,7 +1042,7 @@
   {
     "id": "anthropic-prompting-opus-5-5",
     "title": "Guía de prompting de Claude Opus 5.5",
-    "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5-5.md",
+    "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5-5",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-16"
@@ -1050,7 +1050,7 @@
   {
     "id": "anthropic-prompting-sonnet-5-5",
     "title": "Guía de prompting de Claude Sonnet 5.5",
-    "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-sonnet-5-5.md",
+    "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-sonnet-5-5",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-16"
@@ -1058,7 +1058,7 @@
   {
     "id": "anthropic-prompting-haiku-5-5",
     "title": "Guía de prompting de Claude Haiku 5.5",
-    "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-haiku-5-5.md",
+    "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-haiku-5-5",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-16"
@@ -1066,7 +1066,7 @@
   {
     "id": "anthropic-prompting-fable-5-1",
     "title": "Guía de prompting de Claude Fable 5.1",
-    "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5-1.md",
+    "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5-1",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-16"
@@ -1090,7 +1090,7 @@
   {
     "id": "anthropic-skills-buenas-practicas",
     "title": "Agent Skills: buenas prácticas",
-    "url": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices.md",
+    "url": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-16"
@@ -1098,7 +1098,7 @@
   {
     "id": "claude-code-referencia-cli",
     "title": "Referencia de la CLI",
-    "url": "https://code.claude.com/docs/en/cli-reference.md",
+    "url": "https://code.claude.com/docs/en/cli-reference",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-19"
@@ -1106,7 +1106,7 @@
   {
     "id": "claude-code-modo-interactivo",
     "title": "Modo interactivo",
-    "url": "https://code.claude.com/docs/en/interactive-mode.md",
+    "url": "https://code.claude.com/docs/en/interactive-mode",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-19"
@@ -1114,7 +1114,7 @@
   {
     "id": "claude-code-inicio-rapido",
     "title": "Inicio rápido",
-    "url": "https://code.claude.com/docs/en/quickstart.md",
+    "url": "https://code.claude.com/docs/en/quickstart",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-19"
@@ -1178,7 +1178,7 @@
   {
     "id": "codex-non-interactive",
     "title": "Codex: modo no interactivo (codex exec)",
-    "url": "https://learn.chatgpt.com/docs/non-interactive-mode.md",
+    "url": "https://learn.chatgpt.com/docs/non-interactive-mode",
     "publisher": "OpenAI",
     "official": true,
     "lastChecked": "2026-10-19"
@@ -1210,7 +1210,7 @@
   {
     "id": "anthropic-managed-agents-outcomes",
     "title": "Managed Agents: definir outcomes",
-    "url": "https://platform.claude.com/docs/en/managed-agents/define-outcomes.md",
+    "url": "https://platform.claude.com/docs/en/managed-agents/define-outcomes",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-19"
@@ -1218,7 +1218,7 @@
   {
     "id": "claude-code-github-actions",
     "title": "Claude Code GitHub Actions",
-    "url": "https://code.claude.com/docs/en/github-actions.md",
+    "url": "https://code.claude.com/docs/en/github-actions",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-19"
@@ -1226,7 +1226,7 @@
   {
     "id": "claude-code-tareas-programadas-escritorio",
     "title": "Tareas programadas de la app de escritorio",
-    "url": "https://code.claude.com/docs/en/desktop-scheduled-tasks.md",
+    "url": "https://code.claude.com/docs/en/desktop-scheduled-tasks",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-19"
@@ -1234,7 +1234,7 @@
   {
     "id": "claude-code-modo-headless",
     "title": "Ejecutar Claude Code por programa (claude -p, --bare)",
-    "url": "https://code.claude.com/docs/en/headless.md",
+    "url": "https://code.claude.com/docs/en/headless",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-19"
@@ -1242,7 +1242,7 @@
   {
     "id": "claude-code-plugins-descubrir",
     "title": "Instalar y gestionar plugins; marketplaces",
-    "url": "https://code.claude.com/docs/en/discover-plugins.md",
+    "url": "https://code.claude.com/docs/en/discover-plugins",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-19"
@@ -1250,7 +1250,7 @@
   {
     "id": "claude-code-sandbox",
     "title": "Sandbox de Bash",
-    "url": "https://code.claude.com/docs/en/sandboxing.md",
+    "url": "https://code.claude.com/docs/en/sandboxing",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-19"
@@ -1354,7 +1354,7 @@
   {
     "id": "claude-code-mcp",
     "title": "Claude Code: conectar herramientas con MCP",
-    "url": "https://code.claude.com/docs/en/mcp.md",
+    "url": "https://code.claude.com/docs/en/mcp",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-19"
@@ -1362,7 +1362,7 @@
   {
     "id": "claude-code-vision-general",
     "title": "Claude Code: visión general (superficies)",
-    "url": "https://code.claude.com/docs/en/overview.md",
+    "url": "https://code.claude.com/docs/en/overview",
     "publisher": "Anthropic",
     "official": true,
     "lastChecked": "2026-10-19"

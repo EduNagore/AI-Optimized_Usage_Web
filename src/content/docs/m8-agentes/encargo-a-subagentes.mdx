@@ -43,7 +43,7 @@ Y lo que devuelve no se queda fuera: vuelve a tu hilo y ocupa tu ventana de cont
 
 <Callout tipo="verificado" fecha="2026-10-19">
 
-En Claude Code, un subagente es un fichero Markdown en `.claude/agents/` y solo `name` y `description` son obligatorios; el resto (`tools`, `model`, `effort`, `permissionMode`, `maxTurns`…) es opcional. Los subagentes integrados Explore y Plan trabajan con herramientas de solo lectura. Hay una excepción importante: el subagente bifurcado (`fork`, que se lanza con `/subtask`) hereda toda la conversación, con su prompt de sistema, herramientas y modelo, y el modo bifurcado está activado por defecto en las sesiones interactivas (desde la v2.1.232 según el changelog; `CLAUDE_CODE_FORK_SUBAGENT=0` lo desactiva). Por tanto, Claude puede lanzar un bifurcado sin que lo pidas. Un subagente definido en `.claude/agents/`, en cambio, empieza en blanco.
+En Claude Code, un subagente es un fichero Markdown en `.claude/agents/` y solo `name` y `description` son obligatorios; el resto (`tools`, `model`, `effort`, `permissionMode`, `maxTurns`…) es opcional. Los subagentes integrados Explore y Plan trabajan con herramientas de solo lectura. Hay una excepción importante: el subagente bifurcado (`fork`, que se lanza con `/subtask`) hereda toda la conversación, con su prompt de sistema, herramientas y modelo, y el modo bifurcado está activado por defecto desde la v2.1.302 y, en sesiones interactivas de terminal, desde la v2.1.232 (según el registro de cambios; `CLAUDE_CODE_FORK_SUBAGENT=0` lo desactiva). Por tanto, Claude puede lanzar un bifurcado sin que lo pidas. Un subagente definido en `.claude/agents/`, en cambio, empieza en blanco.
 
 </Callout>
 

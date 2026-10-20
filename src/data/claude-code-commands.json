@@ -327,7 +327,7 @@
     "command": "/design-login",
     "category": "Artefactos y diseño",
     "phase": "Trabajar",
-    "summary": "Autoriza el acceso a el design system para /design-sync con tu cuenta de claude.ai.",
+    "summary": "Autoriza el acceso al design system para /design-sync con tu cuenta de claude.ai.",
     "status": "activo",
     "source": "claude-code-comandos",
     "verifiedAt": "2026-10-16"
@@ -443,11 +443,10 @@
     "command": "/focus",
     "category": "Sesiones y paralelismo",
     "phase": "Trabajar",
-    "summary": "Alterna la vista de foco, que muestra solo tu último prompt, un resumen de herramientas y la respuesta final.",
+    "summary": "Alterna la vista de foco, que muestra solo tu último prompt, un resumen de herramientas y la respuesta final. Desde un cliente de Remote Control admite on u off.",
     "status": "activo",
     "source": "claude-code-comandos",
-    "verifiedAt": "2026-10-16",
-    "args": "[on|off]"
+    "verifiedAt": "2026-10-16"
   },
   {
     "id": "cmd-fork",
@@ -928,7 +927,7 @@
     "id": "cmd-security-review",
     "command": "/security-review",
     "category": "Permisos y seguridad",
-    "phase": "Preparar",
+    "phase": "Revisar",
     "summary": "Analiza los cambios de la rama buscando vulnerabilidades de seguridad.",
     "status": "activo",
     "source": "claude-code-comandos",
@@ -978,7 +977,7 @@
   {
     "id": "cmd-skills",
     "command": "/skills",
-    "category": "Otros",
+    "category": "Integraciones y extensiones",
     "phase": "Trabajar",
     "summary": "Lista las skills disponibles, con filtro y control de visibilidad.",
     "status": "activo",

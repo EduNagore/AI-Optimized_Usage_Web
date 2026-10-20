@@ -21,7 +21,7 @@ sources:
 import Callout from '@components/Callout.astro';
 import Fact from '@components/Fact.astro';
 
-**Cómo imprimirla.** Pulsa `Ctrl+P` (`Cmd+P` en Mac), elige papel A4 y, si no te cabe en una hoja a doble cara, activa «ajustar a la página» o baja la escala. Las cifras de esfuerzo y los comandos se actualizan en la web, no en el papel: si han pasado más de 45 días desde la fecha del pie de la página, comprueba la fuente.
+**Cómo imprimirla.** Pulsa `Ctrl+P` (`Cmd+P` en Mac), elige papel A4 y, si no te cabe en una hoja a doble cara, activa «ajustar a la página» o baja la escala. Las cifras de esfuerzo y los comandos se actualizan en la web, no en el papel: si han pasado más de 45 días desde la fecha de verificación que aparece junto a cada cifra en la web, comprueba la fuente.
 
 ## La regla de partida
 
@@ -55,7 +55,7 @@ Detalle en [el ciclo](/AI-Optimized_Usage_Web/m2-metodo/ciclo-de-7-pasos/).
 | Paso | Pregunta                                                      |
 | ---- | ------------------------------------------------------------- |
 | 1    | ¿Qué tipo de tarea es y qué pasa si sale mal?                 |
-| 2    | ¿Qué superficie basta: chat, proyecto, agente, API?           |
+| 2    | ¿Qué superficie basta: chat, proyecto, flujo, agente, API?    |
 | 3    | ¿Qué modelo y cuánto esfuerzo?                                |
 | 4    | ¿Qué contexto necesita, y solo ese? Documentos primero.       |
 | 5    | ¿Cómo lo formulo? Con la plantilla de abajo.                  |
@@ -73,10 +73,10 @@ Objetivo · para quién y qué decide (el porqué) · material primero · restri
 | Proveedor | Parámetro              | Niveles                                         | Por defecto                                                                                                                                                                                                                                                                                      |
 | --------- | ---------------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Claude    | `output_config.effort` | `low`, `medium`, `high`, `xhigh`, `max`         | Opus 5.5 <Fact id="opus-5-5.effort.default.api" />; Sonnet 5.5 <Fact id="sonnet-5-5.effort.default.api" /> (API) y <Fact id="sonnet-5-5.effort.default.claude-code" /> (Claude Code); Haiku 5.5 <Fact id="haiku-5-5.effort.default.api" />; Fable 5.1 <Fact id="fable-5-1.effort.default.api" /> |
-| OpenAI    | `reasoning.effort`     | `none`, `low`, `medium`, `high`, `xhigh`, `max` | GPT-6.1 Sol <Fact id="gpt-6-1-sol.effort.default.api" />; sin `none` en Astra ni en 6.1 Sol                                                                                                                                                                                                      |
+| OpenAI    | `reasoning.effort`     | `none`, `low`, `medium`, `high`, `xhigh`, `max` | GPT-6.1 Sol <Fact id="gpt-6-1-sol.effort.default.api" />; sin `none` en GPT-6 Astra ni en 6.1 Sol                                                                                                                                                                                                |
 | Google    | `thinking_level`       | `low`, `medium`, `high`                         | Gemini 4 Argon <Fact id="gemini-4-argon.effort.default.api" />                                                                                                                                                                                                                                   |
 
-`low` razona menos (más rápido y barato); `xhigh` no existe en Opus 4.6 ni en Sonnet 4.6; `max` en Claude Code solo vale para la sesión actual, salvo que lo fijes con `CLAUDE_CODE_EFFORT_LEVEL`. Con OpenAI, si el esfuerzo no es `none`, retira `temperature`, `top_p` y `top_logprobs`. **Sube cuando falle el razonamiento, no cuando falle el encargo** (recomendación: más esfuerzo no arregla un encargo ambiguo). Fuentes: documentación de esfuerzo de Anthropic y guías del último modelo de OpenAI y de Google.
+`low` razona menos (más rápido y barato); no todos los modelos admiten todos los niveles (por ejemplo, `xhigh` no existe en los 4.6); `max` en Claude Code solo vale para la sesión actual, salvo que lo fijes con `CLAUDE_CODE_EFFORT_LEVEL`. Con OpenAI, si el esfuerzo no es `none`, retira `temperature`, `top_p` y `top_logprobs`. **Sube cuando falle el razonamiento, no cuando falle el encargo** (recomendación: más esfuerzo no arregla un encargo ambiguo). Fuentes: documentación de esfuerzo de Anthropic y guías del último modelo de OpenAI y de Google.
 
 ## Quince comandos de Claude Code
 
