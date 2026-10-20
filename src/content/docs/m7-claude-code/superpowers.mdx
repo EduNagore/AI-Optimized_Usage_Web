@@ -1,0 +1,143 @@
+---
+title: 'Superpowers: el método en un plugin'
+description: 'Qué es el plugin Superpowers, cómo se instala en Claude Code y otros agentes, qué hace cada skill, cómo encaja con el método de esta guía y cuándo no compensa.'
+sidebar:
+  order: 5
+level: intermedio
+tracks: [tecnica]
+readingTime: 9
+lastReviewed: 2026-10-20
+sources:
+  [
+    superpowers-repositorio,
+    superpowers-notas-de-version,
+    claude-marketplace-superpowers,
+    claude-plugins-official-catalogo,
+    claude-code-plugins,
+    claude-code-skills,
+  ]
+---
+
+import KeyTakeaways from '@components/KeyTakeaways.astro';
+import Callout from '@components/Callout.astro';
+import Steps from '@components/Steps.astro';
+import Checklist from '@components/Checklist.astro';
+import Superpowers from '@components/Superpowers.astro';
+
+<KeyTakeaways>
+
+- Superpowers es un plugin de terceros que convierte un agente de código en un proceso de desarrollo: aclarar, planificar, ejecutar con pruebas, revisar y cerrar.
+- No añade herramientas nuevas: son skills (instrucciones en Markdown) y un hook de arranque que obliga al agente a usarlas.
+- Encaja con el ciclo de siete pasos de la guía, pero solo para trabajo de software de cierto tamaño.
+- Ya no tiene comandos `/` propios: pides lo que quieres con palabras o lanzas la skill como `/superpowers:<skill>`.
+- Está en el catálogo oficial, pero no lo escribe ni lo verifica Anthropic: revísalo como cualquier código que se ejecuta con tus permisos.
+
+</KeyTakeaways>
+
+## La idea
+
+En [Extender Claude Code](/AI-Optimized_Usage_Web/m7-claude-code/extender-claude-code/) viste que un plugin empaqueta skills, subagentes y hooks para instalarlos de una vez. Superpowers es el ejemplo más conocido de un plugin que no te da una función, sino **una forma de trabajar**: el agente no empieza a escribir código hasta entender qué quieres, escribe un plan que tú apruebas, lo ejecuta con pruebas primero y lo revisa antes de darlo por terminado.
+
+Es, en buena medida, la versión automatizada de lo que esta guía recomienda hacer a mano: [que la IA te entreviste](/AI-Optimized_Usage_Web/m3-prompting/que-la-ia-te-entreviste/), separar plan y ejecución, [encargar bien a subagentes](/AI-Optimized_Usage_Web/m8-agentes/encargo-a-subagentes/) y [verificar siempre](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/verificar-siempre/). La diferencia es que aquí esas normas viven en skills y un hook las activa en cada sesión, en vez de depender de que te acuerdes.
+
+<Superpowers vista="ficha" />
+
+## Instalación
+
+En Claude Code basta un comando desde el marketplace oficial, que Claude Code registra la primera vez que abres una sesión interactiva en el terminal. El autor mantiene además su propio marketplace, y el mismo repositorio se instala en otros agentes:
+
+<Superpowers vista="instalacion" />
+
+El README del proyecto documenta más herramientas (OpenCode, Factory Droid, Kimi Code, Qwen Code y otras). Al instalar en Claude Code eliges el alcance; si solo lo quieres en un repositorio, elige el de proyecto o el local en lugar del de usuario (ver la razón en [Cuándo no compensa](#cuándo-no-compensa)).
+
+<Callout tipo="cuidado" titulo="Cuidado: comandos antiguos">
+
+La ficha del catálogo de Anthropic aún nombra `/brainstorming` y `/execute-plan`, pero según las notas de versión del plugin los comandos `/brainstorm`, `/write-plan` y `/execute-plan` se retiraron en la versión 5.1.0. Vale lo que dice el repositorio del plugin: hoy no hay comandos propios; en Claude Code, cada skill de un plugin se lanza con el prefijo del plugin, por ejemplo `/superpowers:brainstorming`.
+
+</Callout>
+
+## Las skills, por fase
+
+Superpowers es un conjunto de skills. No tienes que memorizarlas: el hook de arranque carga `using-superpowers`, que manda al agente comprobar si alguna aplica antes de responder, y así «vamos a construir X» dispara `brainstorming` y «arregla este fallo» dispara `systematic-debugging`.
+
+<Superpowers vista="skills" />
+
+## El flujo completo
+
+El README del proyecto propone este orden para una funcionalidad nueva. Al lado, el paso del [ciclo de siete pasos](/AI-Optimized_Usage_Web/m2-metodo/ciclo-de-7-pasos/) de la guía con el que se corresponde:
+
+| Superpowers                                          | Qué ocurre                                                      | Paso de la guía                                                                                     |
+| ---------------------------------------------------- | --------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `brainstorming`                                      | Te entrevista y fija qué se construye y cómo de grande es       | 1 (clasificar) y 5 (formular el encargo)                                                            |
+| `using-git-worktrees`                                | Rama y carpeta aisladas                                         | 2 (superficie) y [trabajo en paralelo](/AI-Optimized_Usage_Web/m7-claude-code/trabajo-en-paralelo/) |
+| `writing-plans`                                      | Plan en pasos pequeños, con pruebas y comandos de verificación  | 5 (formular el encargo)                                                                             |
+| `subagent-driven-development` o `executing-plans`    | Ejecución: un subagente por tarea, o todo en la sesión actual   | 3 (modelo y esfuerzo) y 4 (contexto)                                                                |
+| `test-driven-development` y `requesting-code-review` | Prueba antes que código y revisión entre tareas                 | 6 (verificar)                                                                                       |
+| `finishing-a-development-branch`                     | Pruebas finales y decisión: fusionar, PR, conservar o descartar | 6 (verificar) y 7 (sistematizar)                                                                    |
+
+La correspondencia es una **recomendación de la guía** para que ubiques cada skill; el plugin no usa estos nombres.
+
+## Coste y elección de modelo
+
+Lo que sigue mezcla dato verificado y recomendación; cada punto dice cuál es.
+
+- **Gasto fijo (dato verificado).** Según la documentación de plugins de Claude Code, un plugin activado está en todas las sesiones: el nombre y la descripción de cada skill que Claude puede invocar por su cuenta entran en el contexto en cada turno, aunque no la uses. En Superpowers se suma el texto de `using-superpowers`, que el hook carga al iniciar, tras `/clear` y tras `/compact`. Mídelo con `/context` y `claude plugin details superpowers`.
+- **Subagentes o en línea (descripción de los autores).** Las notas de versión presentan `executing-plans` como la forma más barata de ejecutar un plan y dicen que funciona bien con un modelo intermedio en la sesión; `subagent-driven-development` abre un subagente nuevo por tarea y añade dos revisiones. El propio plugin recomienda uno u otro al terminar el plan, con su motivo. No es una medición de Anthropic.
+- **Qué modelo (recomendación de la guía).** Escribe el diseño y el plan con un modelo capaz y su esfuerzo por defecto: un error ahí se multiplica en cada tarea. La ejecución de un plan detallado tolera un modelo menor. Por qué: es la [regla de partida](/AI-Optimized_Usage_Web/m4-modelo-y-esfuerzo/estrategia-de-seleccion/) de la guía aplicada a dos fases con riesgos distintos.
+
+<Callout tipo="recomendacion">
+
+Mide la primera funcionalidad que hagas con Superpowers frente a cómo la habrías hecho sin él: tokens o coste de la sesión (`/usage`), minutos tuyos y fallos que llegaron a la revisión. Por qué: el plugin cambia a la vez el número de turnos, de subagentes y de pruebas; sin medir no sabes si para tu tipo de trabajo compensa.
+
+</Callout>
+
+## Cuándo no compensa
+
+- **Tareas pequeñas o que no son software.** `using-superpowers` manda comprobar las skills incluso ante una pregunta simple. Desde la versión 7.0.0, `brainstorming` dimensiona el trabajo y hace directamente lo sencillo, pero el gasto fijo sigue ahí. Si usas Claude Code para actas, informes o contratos, desactívalo en esos proyectos con `/plugin` o `claude plugin disable superpowers`, o instálalo solo en los repositorios de código.
+- **Si ya tienes tu propio proceso.** Si tu `CLAUDE.md`, tus skills o tus hooks ya imponen plan, pruebas y revisión, Superpowers duplica instrucciones y puede contradecirlas. Elige uno de los dos o deja claro en `CLAUDE.md` cuál manda.
+- **Si no vas a leer el plan.** El valor está en que apruebes el diseño y el plan antes de ejecutar. Aceptarlo todo sin leer te deja con el coste del proceso y sin su ventaja.
+
+<Callout tipo="cuidado" titulo="Cuidado: código de terceros">
+
+Superpowers lleva un hook que ejecuta un script al arrancar cada sesión, con tus permisos. Que esté en el catálogo oficial no significa que lo haya escrito o revisado Anthropic: la ficha no lleva la insignia «Verificado por Anthropic». Instálalo como cualquier dependencia: lee el repositorio, revisa las notas de versión antes de actualizar y, en un equipo, decide quién lo aprueba (ver [gobernanza para equipos](/AI-Optimized_Usage_Web/m9-calidad-y-seguridad/gobernanza-para-equipos/)).
+
+</Callout>
+
+## En la práctica
+
+<Steps>
+
+1. Instálalo en un repositorio de código con el alcance de proyecto o local, no de usuario.
+2. Ejecuta `/context` antes y después de instalar y anota cuánto añade.
+3. Empieza con una petición normal («quiero añadir la exportación a CSV del informe»): `brainstorming` debería activarse solo. Si no ocurre, pídelo con `/superpowers:brainstorming`.
+4. Responde a sus preguntas y corrige lo que te devuelva mal entendido: es la parte que más ahorra después.
+5. Lee el plan guardado antes de aprobarlo. Si un paso no tiene comando de verificación, pídelo.
+6. Elige la ejecución que te recomiende (subagentes o en línea) y anota el coste al terminar.
+7. Si algo sale raro (repite trabajo, ignora el plan, la factura sorprende), pide «averigua qué ha fallado con superpowers en esta sesión»: lo resuelve `diagnosing-superpowers`.
+
+</Steps>
+
+## Errores frecuentes
+
+- **Buscar los comandos antiguos.** `/brainstorm` y `/execute-plan` ya no existen; pide la tarea o usa `/superpowers:<skill>`.
+- **Dejarlo activo en todos los proyectos.** Pagas su gasto fijo también donde no programas.
+- **Aprobar el plan sin leerlo.** El plugin te lo enseña precisamente para que lo corrijas.
+- **Mezclarlo con otro proceso propio sin decidir cuál manda.** Dos juegos de instrucciones sobre lo mismo se siguen peor que uno.
+- **Actualizar sin leer las notas de versión.** Cada versión mayor cambia cómo se comportan las skills (la 7.0.0 rehízo `brainstorming`).
+
+<Checklist
+  id="m7-superpowers"
+  titulo="Superpowers en mi equipo"
+  items={[
+    'Lo tengo instalado solo donde hago desarrollo de software.',
+    'He medido con /context cuánto contexto añade.',
+    'Sé que las skills se piden con palabras o con /superpowers:<skill>.',
+    'Leo y apruebo el diseño y el plan antes de ejecutar.',
+    'He decidido qué manda si choca con mi CLAUDE.md.',
+    'Reviso las notas de versión antes de actualizar.',
+  ]}
+/>
+
+## Para profundizar
+
+Cómo funcionan las skills por dentro, en [Skills](/AI-Optimized_Usage_Web/m6-herramientas/skills/) (módulo 6). Cómo repartir trabajo entre subagentes sin plugin, en [Encargo a subagentes](/AI-Optimized_Usage_Web/m8-agentes/encargo-a-subagentes/) y [Patrones](/AI-Optimized_Usage_Web/m8-agentes/patrones/). El repositorio del plugin y sus notas de versión están enlazados al pie de esta página.

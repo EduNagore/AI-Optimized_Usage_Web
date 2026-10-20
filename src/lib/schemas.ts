@@ -152,6 +152,20 @@ export const modelPricingDetailSchema = z.object({
   ...volatile,
 });
 
+/** Plugin Superpowers (tercero): ficha, instalación por herramienta y skills. */
+export const superpowersSchema = z.object({
+  id: z.string().min(1),
+  kind: z.enum(['ficha', 'instalacion', 'skill']),
+  /** Posición dentro de su vista. */
+  order: z.number().int().positive(),
+  name: z.string().min(1),
+  /** Solo en las skills: fase del flujo en la que se usa. */
+  group: z.enum(['diseno', 'ejecucion', 'calidad', 'cierre', 'meta']).optional(),
+  summary: z.string().min(1).optional(),
+  command: z.array(z.string().min(1)).min(1).optional(),
+  ...volatile,
+});
+
 /** Nombre de fichero (sin .json) → esquema de cada registro. */
 export const dataSchemas = {
   sources: sourceSchema,
@@ -164,6 +178,7 @@ export const dataSchemas = {
   glossary: glossarySchema,
   changelog: changelogSchema,
   'model-pricing-details': modelPricingDetailSchema,
+  superpowers: superpowersSchema,
 } as const;
 
 export type SourceRecord = z.infer<typeof sourceSchema>;
@@ -175,3 +190,4 @@ export type FeatureRecord = z.infer<typeof featureSchema>;
 export type TaskMatrixRecord = z.infer<typeof taskMatrixSchema>;
 export type GlossaryRecord = z.infer<typeof glossarySchema>;
 export type ModelPricingDetailRecord = z.infer<typeof modelPricingDetailSchema>;
+export type SuperpowersRecord = z.infer<typeof superpowersSchema>;

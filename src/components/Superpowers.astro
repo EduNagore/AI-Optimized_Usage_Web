@@ -1,0 +1,174 @@
+---
+import { getCollection } from 'astro:content';
+import { formatDate } from '@lib/format';
+
+/**
+ * Datos del plugin Superpowers leídos de superpowers.json: la ficha, la instalación por herramienta
+ * o las skills agrupadas por fase del flujo. Cada vista enlaza sus fuentes y la fecha de verificación.
+ */
+interface Props {
+  vista: 'ficha' | 'instalacion' | 'skills';
+}
+const { vista } = Astro.props;
+
+const all = (await getCollection('superpowers')).map((e) => e.data);
+const rows = all
+  .filter((r) => r.kind === (vista === 'skills' ? 'skill' : vista))
+  .sort((a, b) => a.order - b.order);
+if (rows.length === 0) throw new Error(`<Superpowers>: no hay registros para la vista «${vista}»`);
+
+const sources = (await getCollection('sources')).map((e) => e.data);
+const used = [...new Set(rows.map((r) => r.source))].map((id) => {
+  const s = sources.find((x) => x.id === id);
+  if (!s) throw new Error(`<Superpowers>: no existe la fuente «${id}»`);
+  return s;
+});
+const verified = rows
+  .map((r) => r.verifiedAt)
+  .sort()
+  .at(-1)!;
+
+const groups = [
+  { id: 'diseno', label: 'Aclarar y planificar' },
+  { id: 'ejecucion', label: 'Ejecutar' },
+  { id: 'calidad', label: 'Probar, depurar y revisar' },
+  { id: 'cierre', label: 'Cerrar' },
+  { id: 'meta', label: 'Sobre el propio sistema' },
+] as const;
+const etiqueta = {
+  ficha: 'Ficha de Superpowers',
+  instalacion: 'Instalación de Superpowers por herramienta',
+  skills: 'Skills de Superpowers por fase',
+}[vista];
+---
+
+<div class="table-wrap not-content">
+  <div class="scroller" role="region" aria-label={etiqueta} tabindex="0">
+    <table>
+      <caption class="sr-only">{etiqueta}</caption>
+      {vista === 'ficha' && (
+        <tbody>
+          {rows.map((r) => (
+            <tr>
+              <th scope="row">{r.name}</th>
+              <td>{r.summary}</td>
+            </tr>
+          ))}
+        </tbody>
+      )}
+      {vista === 'instalacion' && (
+        <>
+          <thead>
+            <tr>
+              <th scope="col">Herramienta</th>
+              <th scope="col">Cómo instalar</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr>
+                <th scope="row">{r.name}</th>
+                <td>
+                  {r.command?.map((c) => (
+                    <code class="cmd">{c}</code>
+                  ))}
+                  {r.summary && <span>{r.summary}</span>}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </>
+      )}
+      {vista === 'skills' && (
+        <>
+          <thead>
+            <tr>
+              <th scope="col">Skill</th>
+              <th scope="col">Qué hace</th>
+            </tr>
+          </thead>
+          {groups.map((g) => (
+            <tbody>
+              <tr class="group">
+                <th scope="colgroup" colspan="2">
+                  {g.label}
+                </th>
+              </tr>
+              {rows
+                .filter((r) => r.group === g.id)
+                .map((r) => (
+                  <tr>
+                    <th scope="row">
+                      <code>superpowers:{r.name}</code>
+                    </th>
+                    <td>{r.summary}</td>
+                  </tr>
+                ))}
+            </tbody>
+          ))}
+        </>
+      )}
+    </table>
+  </div>
+  <p class="note">
+    Fuente:{' '}
+    {used.map((s, i) => (
+      <>
+        {i > 0 && '; '}
+        <a href={s.url} rel="noopener">
+          {s.publisher}, {s.title}
+        </a>
+      </>
+    ))}
+    . Verificado el {formatDate(verified)}.
+  </p>
+</div>
+
+<style>
+  .table-wrap {
+    margin-block: var(--space-5);
+  }
+  .scroller {
+    overflow-x: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md, 8px);
+  }
+  table {
+    width: 100%;
+    min-width: 34rem;
+    border-collapse: collapse;
+    font-size: var(--text-sm, 0.9rem);
+  }
+  th,
+  td {
+    padding: var(--space-2) var(--space-3);
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid var(--color-border);
+  }
+  tbody:last-child tr:last-child > * {
+    border-bottom: 0;
+  }
+  .group th {
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    font-weight: 600;
+  }
+  .cmd {
+    display: block;
+    width: fit-content;
+    margin-block: 0 var(--space-1);
+  }
+  .note {
+    margin-block: var(--space-2) 0;
+    font-size: var(--text-sm, 0.9rem);
+    color: var(--color-text-muted);
+  }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+</style>

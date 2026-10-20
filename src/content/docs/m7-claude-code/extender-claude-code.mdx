@@ -136,6 +136,8 @@ Un plugin empaqueta skills, subagentes, hooks y servidores MCP para instalarlos 
 
 **Marketplaces.** Un marketplace es un catálogo de plugins. Claude Code registra el oficial de Anthropic (`claude-plugins-official`) la primera vez que abres una sesión interactiva en terminal. Para otro, lo añades una vez con `/plugin marketplace add` seguido del origen (un repositorio de GitHub como `propietario/repositorio`, una URL de git o una ruta local) y luego instalas con `/plugin install nombre@marketplace`. Desde la terminal, `claude plugin marketplace add` acepta los mismos orígenes. Al instalar eliges el alcance: solo para ti, para todos los colaboradores del repositorio o solo para ti en ese repositorio. Para ver cuánto contexto añade un plugin ya instalado, `claude plugin details <nombre>` muestra los tokens que suma a cada sesión.
 
+Un ejemplo completo de plugin de metodología (skills, hook de arranque y flujo de trabajo), con sus costes y cuándo no compensa, en [Superpowers](/AI-Optimized_Usage_Web/m7-claude-code/superpowers/).
+
 <Callout tipo="cuidado">
 
 Instalar un plugin es instalar código y prompts de terceros que se ejecutarán con tus permisos. Instala solo de fuentes que conozcas y revisa qué hooks incluyen. Cambiar los plugins con herramientas a mitad de sesión puede, además, invalidar la caché (ver [prompt caching](/AI-Optimized_Usage_Web/m5-tokens-y-contexto/prompt-caching/)).

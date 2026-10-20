@@ -1494,5 +1494,45 @@
     "publisher": "Google",
     "official": true,
     "lastChecked": "2026-10-19"
+  },
+  {
+    "id": "superpowers-repositorio",
+    "title": "Superpowers (repositorio y README)",
+    "url": "https://github.com/obra/superpowers",
+    "publisher": "Jesse Vincent / Prime Radiant",
+    "official": true,
+    "lastChecked": "2026-10-20"
+  },
+  {
+    "id": "superpowers-notas-de-version",
+    "title": "Superpowers: notas de versión",
+    "url": "https://github.com/obra/superpowers/blob/main/RELEASE-NOTES.md",
+    "publisher": "Jesse Vincent / Prime Radiant",
+    "official": true,
+    "lastChecked": "2026-10-20"
+  },
+  {
+    "id": "claude-marketplace-superpowers",
+    "title": "Claude Marketplace: ficha de Superpowers",
+    "url": "https://claude.com/es/marketplace/plugins/superpowers",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-20"
+  },
+  {
+    "id": "claude-plugins-official-catalogo",
+    "title": "Catálogo claude-plugins-official (marketplace.json)",
+    "url": "https://github.com/anthropics/claude-plugins-official/blob/main/.claude-plugin/marketplace.json",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-20"
+  },
+  {
+    "id": "claude-code-plugins",
+    "title": "Plugins de Claude Code: visión general",
+    "url": "https://code.claude.com/docs/en/plugins",
+    "publisher": "Anthropic",
+    "official": true,
+    "lastChecked": "2026-10-20"
   }
 ]

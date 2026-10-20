@@ -1,0 +1,274 @@
+[
+  {
+    "id": "ficha-autor",
+    "kind": "ficha",
+    "order": 1,
+    "name": "Autor y licencia",
+    "summary": "Jesse Vincent y el equipo de Prime Radiant; licencia MIT. Es un plugin de terceros, no de Anthropic.",
+    "source": "superpowers-repositorio",
+    "verifiedAt": "2026-10-20"
+  },
+  {
+    "id": "ficha-version",
+    "kind": "ficha",
+    "order": 2,
+    "name": "Versión vigente",
+    "summary": "7.0.0, publicada el 2026-10-09.",
+    "source": "superpowers-notas-de-version",
+    "verifiedAt": "2026-10-20"
+  },
+  {
+    "id": "ficha-catalogo",
+    "kind": "ficha",
+    "order": 3,
+    "name": "Catálogo",
+    "summary": "Figura en el marketplace oficial de Anthropic (claude-plugins-official), sin la insignia «Verificado por Anthropic» que llevan otros plugins del catálogo.",
+    "source": "claude-marketplace-superpowers",
+    "verifiedAt": "2026-10-20"
+  },
+  {
+    "id": "ficha-arranque",
+    "kind": "ficha",
+    "order": 4,
+    "name": "Cómo se activa",
+    "summary": "Un hook SessionStart (al iniciar, tras /clear y tras /compact) carga la skill using-superpowers, que obliga al agente a comprobar si alguna skill aplica antes de responder.",
+    "source": "superpowers-repositorio",
+    "verifiedAt": "2026-10-20"
+  },
+  {
+    "id": "ficha-comandos",
+    "kind": "ficha",
+    "order": 5,
+    "name": "Comandos propios",
+    "summary": "Ninguno. /brainstorm, /write-plan y /execute-plan se retiraron en la versión 5.1.0; en Claude Code cada skill se puede lanzar como /superpowers:<skill> o pedirla con palabras.",
+    "source": "superpowers-notas-de-version",
+    "verifiedAt": "2026-10-20"
+  },
+  {
+    "id": "instalar-claude-code-oficial",
+    "kind": "instalacion",
+    "order": 1,
+    "name": "Claude Code (marketplace oficial)",
+    "command": [
+      "/plugin install superpowers@claude-plugins-official"
+    ],
+    "source": "superpowers-repositorio",
+    "verifiedAt": "2026-10-20"
+  },
+  {
+    "id": "instalar-claude-code-autor",
+    "kind": "instalacion",
+    "order": 2,
+    "name": "Claude Code (marketplace del autor)",
+    "command": [
+      "/plugin marketplace add obra/superpowers-marketplace",
+      "/plugin install superpowers@superpowers-marketplace"
+    ],
+    "source": "superpowers-repositorio",
+    "verifiedAt": "2026-10-20"
+  },
+  {
+    "id": "instalar-codex-cli",
+    "kind": "instalacion",
+    "order": 3,
+    "name": "Codex CLI",
+    "summary": "Ejecuta /plugins, busca «superpowers» y elige Install Plugin.",
+    "source": "superpowers-repositorio",
+    "verifiedAt": "2026-10-20"
+  },
+  {
+    "id": "instalar-gemini-cli",
+    "kind": "instalacion",
+    "order": 4,
+    "name": "Gemini CLI",
+    "command": [
+      "gemini extensions install https://github.com/obra/superpowers"
+    ],
+    "source": "superpowers-repositorio",
+    "verifiedAt": "2026-10-20"
+  },
+  {
+    "id": "instalar-antigravity",
+    "kind": "instalacion",
+    "order": 5,
+    "name": "Antigravity CLI",
+    "command": [
+      "agy plugin install https://github.com/obra/superpowers"
+    ],
+    "source": "superpowers-repositorio",
+    "verifiedAt": "2026-10-20"
+  },
+  {
+    "id": "instalar-cursor",
+    "kind": "instalacion",
+    "order": 6,
+    "name": "Cursor",
+    "command": [
+      "/add-plugin superpowers"
+    ],
+    "source": "superpowers-repositorio",
+    "verifiedAt": "2026-10-20"
+  },
+  {
+    "id": "instalar-copilot-cli",
+    "kind": "instalacion",
+    "order": 7,
+    "name": "GitHub Copilot CLI",
+    "command": [
+      "copilot plugin marketplace add obra/superpowers-marketplace",
+      "copilot plugin install superpowers@superpowers-marketplace"
+    ],
+    "source": "superpowers-repositorio",
+    "verifiedAt": "2026-10-20"
+  },
+  {
+    "id": "brainstorming",
+    "kind": "skill",
+    "order": 1,
+    "name": "brainstorming",
+    "group": "diseno",
+    "summary": "Te pregunta qué quieres y por qué, te devuelve lo entendido para que lo corrijas y dimensiona el trabajo: lo hace ya, lo acuerda en el chat o escribe un documento de diseño.",
+    "source": "superpowers-notas-de-version",
+    "verifiedAt": "2026-10-20"
+  },
+  {
+    "id": "writing-plans",
+    "kind": "skill",
+    "order": 2,
+    "name": "writing-plans",
+    "group": "diseno",
+    "summary": "Parte el trabajo en pasos pequeños con fichero, firma, pruebas y comando de verificación. Revisas el plan guardado antes de que se ejecute nada.",
+    "source": "superpowers-notas-de-version",
+    "verifiedAt": "2026-10-20"
+  },
+  {
+    "id": "using-git-worktrees",
+    "kind": "skill",
+    "order": 3,
+    "name": "using-git-worktrees",
+    "group": "ejecucion",
+    "summary": "Crea una rama y un worktree aislados tras aprobar el diseño.",
+    "source": "superpowers-repositorio",
+    "verifiedAt": "2026-10-20"
+  },
+  {
+    "id": "subagent-driven-development",
+    "kind": "skill",
+    "order": 4,
+    "name": "subagent-driven-development",
+    "group": "ejecucion",
+    "summary": "Un subagente nuevo por tarea, con doble revisión: primero que cumple la especificación y después la calidad del código.",
+    "source": "superpowers-repositorio",
+    "verifiedAt": "2026-10-20"
+  },
+  {
+    "id": "executing-plans",
+    "kind": "skill",
+    "order": 5,
+    "name": "executing-plans",
+    "group": "ejecucion",
+    "summary": "Ejecución en la misma sesión, con una única revisión final de toda la rama. Sus autores la presentan como la forma más barata de ejecutar un plan.",
+    "source": "superpowers-notas-de-version",
+    "verifiedAt": "2026-10-20"
+  },
+  {
+    "id": "dispatching-parallel-agents",
+    "kind": "skill",
+    "order": 6,
+    "name": "dispatching-parallel-agents",
+    "group": "ejecucion",
+    "summary": "Reparte trabajo independiente entre subagentes que trabajan a la vez.",
+    "source": "superpowers-repositorio",
+    "verifiedAt": "2026-10-20"
+  },
+  {
+    "id": "test-driven-development",
+    "kind": "skill",
+    "order": 7,
+    "name": "test-driven-development",
+    "group": "calidad",
+    "summary": "Ciclo rojo-verde-refactorizar: primero una prueba que falla, luego el código mínimo. «Verde» es la suite completa del proyecto, no solo tu fichero de pruebas.",
+    "source": "superpowers-notas-de-version",
+    "verifiedAt": "2026-10-20"
+  },
+  {
+    "id": "systematic-debugging",
+    "kind": "skill",
+    "order": 8,
+    "name": "systematic-debugging",
+    "group": "calidad",
+    "summary": "Proceso de cuatro fases para encontrar la causa raíz antes de tocar código.",
+    "source": "superpowers-repositorio",
+    "verifiedAt": "2026-10-20"
+  },
+  {
+    "id": "verification-before-completion",
+    "kind": "skill",
+    "order": 9,
+    "name": "verification-before-completion",
+    "group": "calidad",
+    "summary": "Comprueba que el arreglo funciona de verdad antes de darlo por terminado.",
+    "source": "superpowers-repositorio",
+    "verifiedAt": "2026-10-20"
+  },
+  {
+    "id": "requesting-code-review",
+    "kind": "skill",
+    "order": 10,
+    "name": "requesting-code-review",
+    "group": "calidad",
+    "summary": "Lista de comprobación previa y revisión entre tareas; un problema crítico bloquea el avance.",
+    "source": "superpowers-repositorio",
+    "verifiedAt": "2026-10-20"
+  },
+  {
+    "id": "receiving-code-review",
+    "kind": "skill",
+    "order": 11,
+    "name": "receiving-code-review",
+    "group": "calidad",
+    "summary": "Cómo responder a los comentarios de una revisión.",
+    "source": "superpowers-repositorio",
+    "verifiedAt": "2026-10-20"
+  },
+  {
+    "id": "finishing-a-development-branch",
+    "kind": "skill",
+    "order": 12,
+    "name": "finishing-a-development-branch",
+    "group": "cierre",
+    "summary": "Verifica las pruebas, ofrece fusionar, abrir PR, conservar o descartar la rama, y limpia el worktree.",
+    "source": "superpowers-repositorio",
+    "verifiedAt": "2026-10-20"
+  },
+  {
+    "id": "diagnosing-superpowers",
+    "kind": "skill",
+    "order": 13,
+    "name": "diagnosing-superpowers",
+    "group": "meta",
+    "summary": "Si una sesión sale mal (trabajo repetido, plan ignorado, skill que no se activó, factura sorprendente), lee las transcripciones y explica qué pasó con pruebas.",
+    "source": "superpowers-notas-de-version",
+    "verifiedAt": "2026-10-20"
+  },
+  {
+    "id": "writing-skills",
+    "kind": "skill",
+    "order": 14,
+    "name": "writing-skills",
+    "group": "meta",
+    "summary": "Crea skills nuevas siguiendo buenas prácticas, con un método para probarlas.",
+    "source": "superpowers-repositorio",
+    "verifiedAt": "2026-10-20"
+  },
+  {
+    "id": "using-superpowers",
+    "kind": "skill",
+    "order": 15,
+    "name": "using-superpowers",
+    "group": "meta",
+    "summary": "La introducción al sistema de skills que carga el hook de arranque.",
+    "source": "superpowers-repositorio",
+    "verifiedAt": "2026-10-20"
+  }
+]

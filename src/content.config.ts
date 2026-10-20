@@ -39,4 +39,5 @@ export const collections = {
   glossary: fromFile('glossary', dataSchemas.glossary),
   changelog: fromFile('changelog', dataSchemas.changelog),
   'model-pricing-details': fromFile('model-pricing-details', dataSchemas['model-pricing-details']),
+  superpowers: fromFile('superpowers', dataSchemas.superpowers),
 };

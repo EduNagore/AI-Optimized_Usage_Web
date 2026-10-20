@@ -359,3 +359,10 @@ lider
 implementacion
 documentacion
 dinamico
+instalacion
+diseno
+ejecucion
+Kimi
+Qwen
+desactívalo
+Mezclarlo

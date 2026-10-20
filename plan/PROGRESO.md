@@ -84,6 +84,7 @@
 | 2026-10-20 | `cspell.json`: el filtro de ids con guion estaba mal escapado; ahora usa lookarounds Unicode | No debe partir palabras españolas como «Conversación-río» |
 | 2026-10-20 | `tests/chuleta.test.ts` cruza los comandos y niveles de esfuerzo escritos a mano en la chuleta con `claude-code-commands.json` y `effort.json` | Evita un componente nuevo; si un dato cambia, falla `npm run check` |
 | 2026-10-20 | `catalogo-de-componentes` se queda (los e2e lo usan) con `noindex` y fuera de la búsqueda; `CommandList.astro` eliminado; `src/lib/clipboard.ts` unifica la copia al portapapeles (con respaldo `execCommand`) en las islas y en `PromptTemplate` | Hallazgos de `/code-review` y `/simplify` |
+| 2026-10-20 | Nueva página M7 «Superpowers: el método en un plugin» (`m7-claude-code/superpowers.mdx`, orden 5; las siguientes de M7 pasan a 6–9). Datos en `src/data/superpowers.json` (colección nueva, `superpowersSchema` con `kind` ficha/instalacion/skill y `order`) mostrados con `<Superpowers vista>`; 5 fuentes nuevas en `sources.json`. Enlaces desde `extender-claude-code` y `que-la-ia-te-entreviste` | El sitio no cubría el plugin. Verificado en el repo obra/superpowers (v7.0.0 del 2026-10-09, 15 skills, hook SessionStart), el catálogo `claude-plugins-official` y la documentación de plugins de Claude Code |
 
 ## Conflictos entre fuentes y datos pendientes
 | Dato | Fuentes | Estado |
@@ -103,6 +104,7 @@
 | Memoria de Claude: activa por defecto en Free (nota 2026-03-02); búsqueda en chats anteriores solo en planes de pago | Notas de versión vs. ayuda | Resuelto: son funciones distintas |
 | Gemini 3.8 Flash `thinking_level` por defecto: `medium` (whats-new-gemini-3.8); la guía de Gemini 3 está deprecada y se contradice | Dos páginas de Google | Resuelto a favor de la actual |
 | GPT-5.6 Sol 4/20 $ es precio promocional (al menos hasta 2026-11-21) | changelog de OpenAI | Anotado en `models.json` |
+| Superpowers: la ficha de Claude Marketplace nombra `/brainstorming` y `/execute-plan`; las notas de versión del plugin dicen que los comandos se retiraron en la v5.1.0 | claude.com/es/marketplace/plugins/superpowers vs. RELEASE-NOTES.md | Gana el repositorio del plugin; la página lo explica en un aviso |
 
 **No confirmado (no se publica como dato):** reparto por plan y fecha de GPT-6 en ChatGPT (help.openai.com da 403); esfuerzo por defecto de GPT-6 Astra; niveles de esfuerzo de GPT-5.6 Terra y Luna; lista completa de comandos de la CLI de Codex; precios en euros de la app de Gemini y de AI Pro en USD; precios de planes de Claude (claude.com/pricing, lectura automatizada); límites numéricos de Research y de proyectos; modelos que admiten razonamiento adaptativo (la URL redirige); semanas 31 y 38–42 de whats-new (el índice acaba en la 37).
 
